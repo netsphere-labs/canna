@@ -1,3 +1,50 @@
+canna (3.5b2-19) frozen unstable; urgency=high
+
+  * Re-build for "Can't make iroha dictionary because
+    I forgot to specified "frozen" at canna_3.5b2-18 package.
+    Bugfixed: (Bug#30915)
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Mon, 21 Dec 1998 14:42:05 +0900
+
+canna (3.5b2-18) unstable; urgency=low
+
+  * BugFixed: Can't make iroha dictionary.
+    This bug made at non-maintainer release.
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Mon, 21 Dec 1998 14:03:14 +0900
+
+canna (3.5b2-17) frozen unstable; urgency=low
+
+  * Maintainer release.
+  * Modified message when canna server stop. (#JP/576)
+  * Modified spell miss in debian/control.
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Thu, 17 Dec 1998 11:46:37 +0900
+
+canna (3.5b2-16.1) unstable; urgency=low
+
+  * In dic/ideo/pubdic/pod.c, moved initialization of 'FILE *in1' and
+    'FILE *in2' to main().  gcc 2.8.1 complains otherwise, at least
+    on netwinder/arm.
+
+ -- Tor Slettnes <tor@slett.net>  Mon, 23 Nov 1998 02:29:27 -0800
+	
+canna (3.5b2-16) unstable; urgency=low
+
+  * Added that the libcanna1g-dev depends on libcanna1g. (#JP/551)
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Wed,  7 Oct 1998 15:58:46 +0900
+
+canna (3.5b2-15) unstable; urgency=low
+
+  * Changed install directory of Japanese manpages to /usr/man/ja. 
+  * Remove "sudo" command in rules. (Bug#25782)
+  * Fixed typo "dh=testdir" in rules.
+  * Updated Standards-Version 2.4.1.3.
+  * Check woth lintian v0.7.4.
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Fri, 14 Aug 1998 10:09:19 +0900
+
 canna (3.5b2-14) frozen unstable; urgency=low
 
   * Bug Fix: All packages build under binary-indep. (Bug#20203)

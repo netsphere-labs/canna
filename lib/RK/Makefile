@@ -8,7 +8,8 @@
 #
 #
 #
-# $XFree86: xc/config/cf/Imake.tmpl,v 3.32.2.5 1997/07/06 07:27:59 dawes Exp $
+# $XFree86: xc/config/cf/Imake.tmpl,v 3.32.2.8 1998/02/08 11:19:24 dawes Exp $
+# Debian: changed InstIncFlags, InstManFlags, InstDatFlags from 0444 to 0644
 # ----------------------------------------------------------------------
 
 all::
@@ -16,7 +17,7 @@ all::
 .SUFFIXES: .i
 
 # $TOG: Imake.cf /main/28 1997/06/25 08:31:36 barstow $
-# $XFree86: xc/config/cf/Imake.cf,v 3.34.2.3 1997/07/27 02:41:02 dawes Exp $
+# $XFree86: xc/config/cf/Imake.cf,v 3.34.2.4 1998/05/22 16:38:18 dawes Exp $
 
 # -----------------------------------------------------------------------
 # site-specific configuration parameters that need to come before
@@ -24,23 +25,41 @@ all::
 
 # site:  $XConsortium: site.def /main/revisionist/4 1996/12/31 08:02:07 kaleb $
 # site:  $XFree86: xc/config/cf/site.def,v 3.17.2.1 1997/06/22 10:32:21 dawes Exp $
+# Debian: added define TermcapLibrary -lncurses
 
-# $XFree86: xc/config/cf/xf86site.def,v 3.101.2.11 1997/06/22 10:32:22 dawes Exp $
+# $XFree86: xc/config/cf/xf86site.def,v 3.101.2.15 1998/02/24 19:05:42 hohndel Exp $
+# Debian: define HasTk 1
+#         changed TkLibDir, TkIncDir, TkLibName
+#         define HasTcl 1
+#         changed TclLibDir, TclIncDir, TclLibName
+#         define XserverNeedsSetUID 0
+#         define JoystickSupport 1 (except for m68k)
+#         define WacomSupport 1
+#         define ElographicsSupport 1
+#         define SummaSketchSupport 1
+#         define BuildDynamicLoading 1
+#         define ForceNormalLib 1
 
 # ----------------------------------------------------------------------
 # platform-specific configuration parameters - edit linux.cf to change
 
 # platform:  $TOG: linux.cf /main/36 1997/06/16 22:21:03 kaleb $
-# platform:  $XFree86: xc/config/cf/linux.cf,v 3.57.2.10 1997/07/28 14:17:25 dawes Exp $
+# platform:  $XFree86: xc/config/cf/linux.cf,v 3.57.2.12 1998/03/01 01:57:10 dawes Exp $
+# Debian: added -D_REENTRANT to StandardDefines
+#         added define SetTtyGroup 1
+#         added define HasZlib 1
 
-# operating system:  Linux 2.0.33 i586 [ELF] (2.0.33)
-# libc:	(6.4.0)
-# binutils:	(28)
+# operating system:  Linux 2.0.36 i686 [ELF] (2.0.36)
+# libc:	(6.0.7)
+# binutils:	(29)
 
 # $XConsortium: lnxLib.rules /main/13 1996/09/28 16:11:01 rws $
 # $XFree86: xc/config/cf/lnxLib.rules,v 3.28.2.3 1997/06/22 10:32:20 dawes Exp $
+# Debian: define BaseShLibReqs -lc, argument below
+#         added -lc to SharedLibraryLoadFlags
+#         removed ExtraLoadFlags
 
-# $XFree86: xc/config/cf/xfree86.cf,v 3.129.2.14 1997/07/06 07:28:00 dawes Exp $
+# $XFree86: xc/config/cf/xfree86.cf,v 3.129.2.22 1998/02/24 19:05:43 hohndel Exp $
 
 # $XConsortium: xfree86.cf /main/34 1996/12/06 11:45:18 rws $
 
@@ -98,19 +117,20 @@ XFREE86JAPANESEDOCDIR = $(XFREE86DOCDIR)/Japanese
 
 # site:  $XConsortium: site.def /main/revisionist/4 1996/12/31 08:02:07 kaleb $
 # site:  $XFree86: xc/config/cf/site.def,v 3.17.2.1 1997/06/22 10:32:21 dawes Exp $
+# Debian: added define TermcapLibrary -lncurses
 
 # ---------------------------------------------------------------------
 # Imake rules for building libraries, programs, scripts, and data files
 # rules:  $TOG: Imake.rules /main/222 1997/07/17 20:04:40 kaleb $
-# rules:  $XFree86: xc/config/cf/Imake.rules,v 3.33.2.5 1997/07/19 04:59:07 dawes Exp $
+# rules:  $XFree86: xc/config/cf/Imake.rules,v 3.33.2.7 1998/02/06 09:02:17 dawes Exp $
 
  _NULLCMD_ = @ echo -n
 
-TKLIBNAME = tk4.2
+TKLIBNAME = tk8.0
 
 TKLIBDIR = /usr/lib
 
-TCLLIBNAME = tcl7.6
+TCLLIBNAME = tcl8.0
 
 TCLIBDIR = /usr/lib
 
@@ -153,7 +173,7 @@ TCLIBDIR = /usr/lib
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
-   CXXSTD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(CXXPROJECT_DEFINES)
+   CXXSTD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(CXXPROJECT_DEFINES)
        CXXOPTIONS =
       CXXINCLUDES = $(INCLUDES) $(TOP_INCLUDES) $(CXXEXTRA_INCLUDES)
        CXXDEFINES = $(CXXINCLUDES) $(CXXSTD_DEFINES) $(THREADS_CXXDEFINES) $(CXXEXTRA_DEFINES) $(DEFINES)
@@ -198,8 +218,8 @@ CXXEXTRA_INCLUDES =
             LATEX = latex
 
      STD_INCLUDES =
-  STD_CPP_DEFINES = -traditional -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
-      STD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
+  STD_CPP_DEFINES = -traditional -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
+      STD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
  EXTRA_LOAD_FLAGS =
   EXTRA_LDOPTIONS =
   EXTRA_LIBRARIES =
@@ -223,9 +243,9 @@ CXXEXTRA_INCLUDES =
      INSTBINFLAGS = -m 0755
      INSTUIDFLAGS = -m 4711
      INSTLIBFLAGS = -m 0644
-     INSTINCFLAGS = -m 0444
-     INSTMANFLAGS = -m 0444
-     INSTDATFLAGS = -m 0444
+     INSTINCFLAGS = -m 0644
+     INSTMANFLAGS = -m 0644
+     INSTDATFLAGS = -m 0644
     INSTKMEMFLAGS = -m 4711
 
       PROJECTROOT = /usr/X11R6
@@ -255,11 +275,11 @@ CXXEXTRA_INCLUDES =
 # Not sure this belongs here
          TKLIBDIR = /usr/lib
          TKINCDIR = /usr/include/tk
-        TKLIBNAME = tk4.2
+        TKLIBNAME = tk8.0
         TKLIBRARY = -L$(TKLIBDIR) -l$(TKLIBNAME)
         TCLLIBDIR = /usr/lib
         TCLINCDIR = /usr/include/tcl
-       TCLLIBNAME = tcl7.6
+       TCLLIBNAME = tcl8.0
        TCLLIBRARY = -L$(TCLLIBDIR) -l$(TCLLIBNAME)
 
         MACROFILE = linux.cf
@@ -281,7 +301,8 @@ CXXEXTRA_INCLUDES =
 #
 #
 #
-# $XFree86: xc/config/cf/X11.tmpl,v 1.8.2.3 1997/05/21 15:02:13 dawes Exp $
+# $XFree86: xc/config/cf/X11.tmpl,v 1.8.2.4 1998/01/23 12:35:08 dawes Exp $
+# Debian: added clean target
 
 # -----------------------------------------------------------------------
 # X Window System make variables; these need to be coordinated with rules
@@ -303,6 +324,8 @@ CXXEXTRA_INCLUDES =
            ADMDIR = /usr/adm
            LIBDIR = $(USRLIBDIR)/X11
    TOP_X_INCLUDES = -I$(XPROJECTROOT)/include
+
+           VARDIR = /var/X11
 
           FONTDIR = $(LIBDIR)/fonts
          XINITDIR = $(LIBDIR)/xinit
@@ -595,6 +618,9 @@ LINTXKBUI = $(LINTLIBDIR)/llib-lxkbui.ln
          DEPLIBS9 = $(DEPLIBS)
          DEPLIBS10 = $(DEPLIBS)
 
+clean::
+	$(RM) subdir.dir
+
 XMULIBONLY = -lXmu
 XMULIB = $(XMULIBONLY) $(XTOOLLIB) $(XLIB)
 
@@ -747,10 +773,10 @@ clean::
 install.man:: RkBgnBun.tmp RkBgnBun.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkBgnBun.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkRgnBun.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkBgnBun.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkRgnBun.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkBgnBun.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkRgnBun.$(LIBMANSUFFIX)
 	$(RM) RkBgnBun.tmp RkBgnBun.jtmp
 clean::
 	$(RM) RkBgnBun.tmp RkBgnBun.jtmp
@@ -777,10 +803,10 @@ clean::
 install.man:: RkDefine.tmp RkDefine.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkDefine.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkDefineDic.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkDefine.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkDefineDic.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkDefine.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkDefineDic.$(LIBMANSUFFIX)
 	$(RM) RkDefine.tmp RkDefine.jtmp
 clean::
 	$(RM) RkDefine.tmp RkDefine.jtmp
@@ -807,10 +833,10 @@ clean::
 install.man:: RkDelete.tmp RkDelete.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkDelete.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkDeleteDic.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkDelete.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkDeleteDic.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkDelete.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkDeleteDic.$(LIBMANSUFFIX)
 	$(RM) RkDelete.tmp RkDelete.jtmp
 clean::
 	$(RM) RkDelete.tmp RkDelete.jtmp
@@ -837,10 +863,10 @@ clean::
 install.man:: RkEndBun.tmp RkEndBun.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkEndBun.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkEndBun.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkEndBun.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkEndBun.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkEndBun.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkEndBun.$(LIBMANSUFFIX)
 	$(RM) RkEndBun.tmp RkEndBun.jtmp
 clean::
 	$(RM) RkEndBun.tmp RkEndBun.jtmp
@@ -867,10 +893,10 @@ clean::
 install.man:: RkEnlarg.tmp RkEnlarg.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkEnlarg.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkEnlarge.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkEnlarg.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkEnlarge.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkEnlarg.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkEnlarge.$(LIBMANSUFFIX)
 	$(RM) RkEnlarg.tmp RkEnlarg.jtmp
 clean::
 	$(RM) RkEnlarg.tmp RkEnlarg.jtmp
@@ -897,10 +923,10 @@ clean::
 install.man:: RkFinali.tmp RkFinali.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkFinali.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkFinalize.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkFinali.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkFinalize.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkFinali.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkFinalize.$(LIBMANSUFFIX)
 	$(RM) RkFinali.tmp RkFinali.jtmp
 clean::
 	$(RM) RkFinali.tmp RkFinali.jtmp
@@ -927,10 +953,10 @@ clean::
 install.man:: RkGetDic.tmp RkGetDic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGetDic.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGetDicList.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGetDic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGetDicList.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGetDic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGetDicList.$(LIBMANSUFFIX)
 	$(RM) RkGetDic.tmp RkGetDic.jtmp
 clean::
 	$(RM) RkGetDic.tmp RkGetDic.jtmp
@@ -957,10 +983,10 @@ clean::
 install.man:: RkGetKan.tmp RkGetKan.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGetKan.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGetKanji.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGetKan.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGetKanji.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGetKan.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGetKanji.$(LIBMANSUFFIX)
 	$(RM) RkGetKan.tmp RkGetKan.jtmp
 clean::
 	$(RM) RkGetKan.tmp RkGetKan.jtmp
@@ -987,10 +1013,10 @@ clean::
 install.man:: RkGetLex.tmp RkGetLex.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGetLex.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGetLex.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGetLex.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGetLex.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGetLex.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGetLex.$(LIBMANSUFFIX)
 	$(RM) RkGetLex.tmp RkGetLex.jtmp
 clean::
 	$(RM) RkGetLex.tmp RkGetLex.jtmp
@@ -1017,10 +1043,10 @@ clean::
 install.man:: RkGetSta.tmp RkGetSta.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGetSta.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGetStat.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGetSta.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGetStat.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGetSta.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGetStat.$(LIBMANSUFFIX)
 	$(RM) RkGetSta.tmp RkGetSta.jtmp
 clean::
 	$(RM) RkGetSta.tmp RkGetSta.jtmp
@@ -1047,10 +1073,10 @@ clean::
 install.man:: RkGetYom.tmp RkGetYom.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGetYom.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGetYomi.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGetYom.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGetYomi.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGetYom.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGetYomi.$(LIBMANSUFFIX)
 	$(RM) RkGetYom.tmp RkGetYom.jtmp
 clean::
 	$(RM) RkGetYom.tmp RkGetYom.jtmp
@@ -1077,10 +1103,10 @@ clean::
 install.man:: RkGoto.tmp RkGoto.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkGoto.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkGoto.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkGoto.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkGoto.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkGoto.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkGoto.$(LIBMANSUFFIX)
 	$(RM) RkGoto.tmp RkGoto.jtmp
 clean::
 	$(RM) RkGoto.tmp RkGoto.jtmp
@@ -1107,10 +1133,10 @@ clean::
 install.man:: RkInitia.tmp RkInitia.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkInitia.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkInitialize.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkInitia.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkInitialize.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkInitia.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkInitialize.$(LIBMANSUFFIX)
 	$(RM) RkInitia.tmp RkInitia.jtmp
 clean::
 	$(RM) RkInitia.tmp RkInitia.jtmp
@@ -1137,10 +1163,10 @@ clean::
 install.man:: RkIntro.tmp RkIntro.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkIntro.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkIntro.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkIntro.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkIntro.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkIntro.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkIntro.$(LIBMANSUFFIX)
 	$(RM) RkIntro.tmp RkIntro.jtmp
 clean::
 	$(RM) RkIntro.tmp RkIntro.jtmp
@@ -1167,10 +1193,10 @@ clean::
 install.man:: RkLeft.tmp RkLeft.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkLeft.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkLeft.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkLeft.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkLeft.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkLeft.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkLeft.$(LIBMANSUFFIX)
 	$(RM) RkLeft.tmp RkLeft.jtmp
 clean::
 	$(RM) RkLeft.tmp RkLeft.jtmp
@@ -1197,10 +1223,10 @@ clean::
 install.man:: RkMountD.tmp RkMountD.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkMountD.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkMountD.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkMountD.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkMountD.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkMountD.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkMountD.$(LIBMANSUFFIX)
 	$(RM) RkMountD.tmp RkMountD.jtmp
 clean::
 	$(RM) RkMountD.tmp RkMountD.jtmp
@@ -1227,10 +1253,10 @@ clean::
 install.man:: RkNext.tmp RkNext.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkNext.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkNext.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkNext.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkNext.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkNext.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkNext.$(LIBMANSUFFIX)
 	$(RM) RkNext.tmp RkNext.jtmp
 clean::
 	$(RM) RkNext.tmp RkNext.jtmp
@@ -1257,10 +1283,10 @@ clean::
 install.man:: RkNfer.tmp RkNfer.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkNfer.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkNfer.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkNfer.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkNfer.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkNfer.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkNfer.$(LIBMANSUFFIX)
 	$(RM) RkNfer.tmp RkNfer.jtmp
 clean::
 	$(RM) RkNfer.tmp RkNfer.jtmp
@@ -1287,10 +1313,10 @@ clean::
 install.man:: RkPrev.tmp RkPrev.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkPrev.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkPrev.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkPrev.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkPrev.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkPrev.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkPrev.$(LIBMANSUFFIX)
 	$(RM) RkPrev.tmp RkPrev.jtmp
 clean::
 	$(RM) RkPrev.tmp RkPrev.jtmp
@@ -1317,10 +1343,10 @@ clean::
 install.man:: RkRemoun.tmp RkRemoun.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkRemoun.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkRemountDic.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkRemoun.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkRemountDic.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkRemoun.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkRemountDic.$(LIBMANSUFFIX)
 	$(RM) RkRemoun.tmp RkRemoun.jtmp
 clean::
 	$(RM) RkRemoun.tmp RkRemoun.jtmp
@@ -1347,10 +1373,10 @@ clean::
 install.man:: RkResize.tmp RkResize.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkResize.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkResize.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkResize.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkResize.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkResize.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkResize.$(LIBMANSUFFIX)
 	$(RM) RkResize.tmp RkResize.jtmp
 clean::
 	$(RM) RkResize.tmp RkResize.jtmp
@@ -1377,10 +1403,10 @@ clean::
 install.man:: RkRight.tmp RkRight.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkRight.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkRight.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkRight.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkRight.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkRight.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkRight.$(LIBMANSUFFIX)
 	$(RM) RkRight.tmp RkRight.jtmp
 clean::
 	$(RM) RkRight.tmp RkRight.jtmp
@@ -1407,10 +1433,10 @@ clean::
 install.man:: RkShorte.tmp RkShorte.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkShorte.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkShorten.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkShorte.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkShorten.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkShorte.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkShorten.$(LIBMANSUFFIX)
 	$(RM) RkShorte.tmp RkShorte.jtmp
 clean::
 	$(RM) RkShorte.tmp RkShorte.jtmp
@@ -1437,10 +1463,10 @@ clean::
 install.man:: RkStoreY.tmp RkStoreY.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkStoreY.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkStoreYomi.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkStoreY.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkStoreYomi.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkStoreY.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkStoreYomi.$(LIBMANSUFFIX)
 	$(RM) RkStoreY.tmp RkStoreY.jtmp
 clean::
 	$(RM) RkStoreY.tmp RkStoreY.jtmp
@@ -1467,10 +1493,10 @@ clean::
 install.man:: RkUnmoun.tmp RkUnmoun.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkUnmoun.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkUnmountDic.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkUnmoun.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkUnmountDic.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkUnmoun.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkUnmountDic.$(LIBMANSUFFIX)
 	$(RM) RkUnmoun.tmp RkUnmoun.jtmp
 clean::
 	$(RM) RkUnmoun.tmp RkUnmoun.jtmp
@@ -1497,10 +1523,10 @@ clean::
 install.man:: RkXfer.tmp RkXfer.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) RkXfer.tmp $(DESTDIR)$(cannaManDir)/man$(LIBMANSUFFIX)/RkXfer.$(LIBMANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) RkXfer.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(LIBMANSUFFIX)/RkXfer.$(LIBMANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) RkXfer.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(LIBMANSUFFIX)/RkXfer.$(LIBMANSUFFIX)
 	$(RM) RkXfer.tmp RkXfer.jtmp
 clean::
 	$(RM) RkXfer.tmp RkXfer.jtmp

@@ -8,7 +8,8 @@
 #
 #
 #
-# $XFree86: xc/config/cf/Imake.tmpl,v 3.32.2.5 1997/07/06 07:27:59 dawes Exp $
+# $XFree86: xc/config/cf/Imake.tmpl,v 3.32.2.8 1998/02/08 11:19:24 dawes Exp $
+# Debian: changed InstIncFlags, InstManFlags, InstDatFlags from 0444 to 0644
 # ----------------------------------------------------------------------
 
 all::
@@ -16,7 +17,7 @@ all::
 .SUFFIXES: .i
 
 # $TOG: Imake.cf /main/28 1997/06/25 08:31:36 barstow $
-# $XFree86: xc/config/cf/Imake.cf,v 3.34.2.3 1997/07/27 02:41:02 dawes Exp $
+# $XFree86: xc/config/cf/Imake.cf,v 3.34.2.4 1998/05/22 16:38:18 dawes Exp $
 
 # -----------------------------------------------------------------------
 # site-specific configuration parameters that need to come before
@@ -24,23 +25,41 @@ all::
 
 # site:  $XConsortium: site.def /main/revisionist/4 1996/12/31 08:02:07 kaleb $
 # site:  $XFree86: xc/config/cf/site.def,v 3.17.2.1 1997/06/22 10:32:21 dawes Exp $
+# Debian: added define TermcapLibrary -lncurses
 
-# $XFree86: xc/config/cf/xf86site.def,v 3.101.2.11 1997/06/22 10:32:22 dawes Exp $
+# $XFree86: xc/config/cf/xf86site.def,v 3.101.2.15 1998/02/24 19:05:42 hohndel Exp $
+# Debian: define HasTk 1
+#         changed TkLibDir, TkIncDir, TkLibName
+#         define HasTcl 1
+#         changed TclLibDir, TclIncDir, TclLibName
+#         define XserverNeedsSetUID 0
+#         define JoystickSupport 1 (except for m68k)
+#         define WacomSupport 1
+#         define ElographicsSupport 1
+#         define SummaSketchSupport 1
+#         define BuildDynamicLoading 1
+#         define ForceNormalLib 1
 
 # ----------------------------------------------------------------------
 # platform-specific configuration parameters - edit linux.cf to change
 
 # platform:  $TOG: linux.cf /main/36 1997/06/16 22:21:03 kaleb $
-# platform:  $XFree86: xc/config/cf/linux.cf,v 3.57.2.10 1997/07/28 14:17:25 dawes Exp $
+# platform:  $XFree86: xc/config/cf/linux.cf,v 3.57.2.12 1998/03/01 01:57:10 dawes Exp $
+# Debian: added -D_REENTRANT to StandardDefines
+#         added define SetTtyGroup 1
+#         added define HasZlib 1
 
-# operating system:  Linux 2.0.33 i586 [ELF] (2.0.33)
-# libc:	(6.4.0)
-# binutils:	(28)
+# operating system:  Linux 2.0.36 i686 [ELF] (2.0.36)
+# libc:	(6.0.7)
+# binutils:	(29)
 
 # $XConsortium: lnxLib.rules /main/13 1996/09/28 16:11:01 rws $
 # $XFree86: xc/config/cf/lnxLib.rules,v 3.28.2.3 1997/06/22 10:32:20 dawes Exp $
+# Debian: define BaseShLibReqs -lc, argument below
+#         added -lc to SharedLibraryLoadFlags
+#         removed ExtraLoadFlags
 
-# $XFree86: xc/config/cf/xfree86.cf,v 3.129.2.14 1997/07/06 07:28:00 dawes Exp $
+# $XFree86: xc/config/cf/xfree86.cf,v 3.129.2.22 1998/02/24 19:05:43 hohndel Exp $
 
 # $XConsortium: xfree86.cf /main/34 1996/12/06 11:45:18 rws $
 
@@ -98,19 +117,20 @@ XFREE86JAPANESEDOCDIR = $(XFREE86DOCDIR)/Japanese
 
 # site:  $XConsortium: site.def /main/revisionist/4 1996/12/31 08:02:07 kaleb $
 # site:  $XFree86: xc/config/cf/site.def,v 3.17.2.1 1997/06/22 10:32:21 dawes Exp $
+# Debian: added define TermcapLibrary -lncurses
 
 # ---------------------------------------------------------------------
 # Imake rules for building libraries, programs, scripts, and data files
 # rules:  $TOG: Imake.rules /main/222 1997/07/17 20:04:40 kaleb $
-# rules:  $XFree86: xc/config/cf/Imake.rules,v 3.33.2.5 1997/07/19 04:59:07 dawes Exp $
+# rules:  $XFree86: xc/config/cf/Imake.rules,v 3.33.2.7 1998/02/06 09:02:17 dawes Exp $
 
  _NULLCMD_ = @ echo -n
 
-TKLIBNAME = tk4.2
+TKLIBNAME = tk8.0
 
 TKLIBDIR = /usr/lib
 
-TCLLIBNAME = tcl7.6
+TCLLIBNAME = tcl8.0
 
 TCLIBDIR = /usr/lib
 
@@ -153,7 +173,7 @@ TCLIBDIR = /usr/lib
 CXXDEPENDINCLUDES =
  CXXEXTRA_DEFINES =
 CXXEXTRA_INCLUDES =
-   CXXSTD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(CXXPROJECT_DEFINES)
+   CXXSTD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(CXXPROJECT_DEFINES)
        CXXOPTIONS =
       CXXINCLUDES = $(INCLUDES) $(TOP_INCLUDES) $(CXXEXTRA_INCLUDES)
        CXXDEFINES = $(CXXINCLUDES) $(CXXSTD_DEFINES) $(THREADS_CXXDEFINES) $(CXXEXTRA_DEFINES) $(DEFINES)
@@ -198,8 +218,8 @@ CXXEXTRA_INCLUDES =
             LATEX = latex
 
      STD_INCLUDES =
-  STD_CPP_DEFINES = -traditional -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
-      STD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
+  STD_CPP_DEFINES = -traditional -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
+      STD_DEFINES = -Dlinux -D__i386__ -D_POSIX_C_SOURCE=199309L -D_POSIX_SOURCE -D_XOPEN_SOURCE=500L -D_BSD_SOURCE -D_SVID_SOURCE -D_REENTRANT $(PROJECT_DEFINES)
  EXTRA_LOAD_FLAGS =
   EXTRA_LDOPTIONS =
   EXTRA_LIBRARIES =
@@ -223,9 +243,9 @@ CXXEXTRA_INCLUDES =
      INSTBINFLAGS = -m 0755
      INSTUIDFLAGS = -m 4711
      INSTLIBFLAGS = -m 0644
-     INSTINCFLAGS = -m 0444
-     INSTMANFLAGS = -m 0444
-     INSTDATFLAGS = -m 0444
+     INSTINCFLAGS = -m 0644
+     INSTMANFLAGS = -m 0644
+     INSTDATFLAGS = -m 0644
     INSTKMEMFLAGS = -m 4711
 
       PROJECTROOT = /usr/X11R6
@@ -255,11 +275,11 @@ CXXEXTRA_INCLUDES =
 # Not sure this belongs here
          TKLIBDIR = /usr/lib
          TKINCDIR = /usr/include/tk
-        TKLIBNAME = tk4.2
+        TKLIBNAME = tk8.0
         TKLIBRARY = -L$(TKLIBDIR) -l$(TKLIBNAME)
         TCLLIBDIR = /usr/lib
         TCLINCDIR = /usr/include/tcl
-       TCLLIBNAME = tcl7.6
+       TCLLIBNAME = tcl8.0
        TCLLIBRARY = -L$(TCLLIBDIR) -l$(TCLLIBNAME)
 
         MACROFILE = linux.cf
@@ -281,7 +301,8 @@ CXXEXTRA_INCLUDES =
 #
 #
 #
-# $XFree86: xc/config/cf/X11.tmpl,v 1.8.2.3 1997/05/21 15:02:13 dawes Exp $
+# $XFree86: xc/config/cf/X11.tmpl,v 1.8.2.4 1998/01/23 12:35:08 dawes Exp $
+# Debian: added clean target
 
 # -----------------------------------------------------------------------
 # X Window System make variables; these need to be coordinated with rules
@@ -303,6 +324,8 @@ CXXEXTRA_INCLUDES =
            ADMDIR = /usr/adm
            LIBDIR = $(USRLIBDIR)/X11
    TOP_X_INCLUDES = -I$(XPROJECTROOT)/include
+
+           VARDIR = /var/X11
 
           FONTDIR = $(LIBDIR)/fonts
          XINITDIR = $(LIBDIR)/xinit
@@ -595,6 +618,9 @@ LINTXKBUI = $(LINTLIBDIR)/llib-lxkbui.ln
          DEPLIBS9 = $(DEPLIBS)
          DEPLIBS10 = $(DEPLIBS)
 
+clean::
+	$(RM) subdir.dir
+
 XMULIBONLY = -lXmu
 XMULIB = $(XMULIBONLY) $(XTOOLLIB) $(XLIB)
 
@@ -716,10 +742,10 @@ clean::
 install.man:: catdic.tmp catdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) catdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/catdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) catdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/catdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) catdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/catdic.$(MANSUFFIX)
 	$(RM) catdic.tmp catdic.jtmp
 clean::
 	$(RM) catdic.tmp catdic.jtmp
@@ -746,10 +772,10 @@ clean::
 install.man:: cpdic.tmp cpdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) cpdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/cpdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) cpdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/cpdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) cpdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/cpdic.$(MANSUFFIX)
 	$(RM) cpdic.tmp cpdic.jtmp
 clean::
 	$(RM) cpdic.tmp cpdic.jtmp
@@ -776,10 +802,10 @@ clean::
 install.man:: lsdic.tmp lsdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) lsdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/lsdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) lsdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/lsdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) lsdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/lsdic.$(MANSUFFIX)
 	$(RM) lsdic.tmp lsdic.jtmp
 clean::
 	$(RM) lsdic.tmp lsdic.jtmp
@@ -806,10 +832,10 @@ clean::
 install.man:: mkdic.tmp mkdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) mkdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/mkdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) mkdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/mkdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) mkdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/mkdic.$(MANSUFFIX)
 	$(RM) mkdic.tmp mkdic.jtmp
 clean::
 	$(RM) mkdic.tmp mkdic.jtmp
@@ -836,10 +862,10 @@ clean::
 install.man:: mvdic.tmp mvdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) mvdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/mvdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) mvdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/mvdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) mvdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/mvdic.$(MANSUFFIX)
 	$(RM) mvdic.tmp mvdic.jtmp
 clean::
 	$(RM) mvdic.tmp mvdic.jtmp
@@ -866,10 +892,10 @@ clean::
 install.man:: rmdic.tmp rmdic.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) rmdic.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/rmdic.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) rmdic.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/rmdic.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) rmdic.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/rmdic.$(MANSUFFIX)
 	$(RM) rmdic.tmp rmdic.jtmp
 clean::
 	$(RM) rmdic.tmp rmdic.jtmp
@@ -896,10 +922,10 @@ clean::
 install.man:: addwords.tmp addwords.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) addwords.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/addwords.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) addwords.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/addwords.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) addwords.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/addwords.$(MANSUFFIX)
 	$(RM) addwords.tmp addwords.jtmp
 clean::
 	$(RM) addwords.tmp addwords.jtmp
@@ -926,10 +952,10 @@ clean::
 install.man:: delwords.tmp delwords.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) delwords.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/delwords.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) delwords.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/delwords.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) delwords.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/delwords.$(MANSUFFIX)
 	$(RM) delwords.tmp delwords.jtmp
 clean::
 	$(RM) delwords.tmp delwords.jtmp
@@ -956,10 +982,10 @@ clean::
 install.man:: cannakill.tmp cannakill.jtmp
 	@if [ -d $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX) ]; then set +x; \
 	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)); fi
-	@if [ -d $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX) ]; then set +x; \
-	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)); fi
+	@if [ -d $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX) ]; then set +x; \
+	else (set -x; $(MKDIRHIER) $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)); fi
 	$(INSTALL) -c $(INSTMANFLAGS) cannakill.tmp $(DESTDIR)$(cannaManDir)/man$(MANSUFFIX)/cannakill.$(MANSUFFIX)
-	$(INSTALL) -c $(INSTMANFLAGS) cannakill.jtmp $(DESTDIR)$(cannaManDir)/ja_JP.ujis/man$(MANSUFFIX)/cannakill.$(MANSUFFIX)
+	$(INSTALL) -c $(INSTMANFLAGS) cannakill.jtmp $(DESTDIR)$(cannaManDir)/ja/man$(MANSUFFIX)/cannakill.$(MANSUFFIX)
 	$(RM) cannakill.tmp cannakill.jtmp
 clean::
 	$(RM) cannakill.tmp cannakill.jtmp
@@ -1048,11 +1074,12 @@ can.o: can.c /usr/include/stdio.h /usr/include/libio.h \
  /usr/include/stdio_lim.h /usr/include/signal.h /usr/include/sigset.h \
  /usr/include/signum.h /usr/include/sigaction.h \
  /usr/include/sigcontext.h /usr/include/asm/sigcontext.h \
- ../../include/canna/RK.h /usr/include/ctype.h /usr/include/endian.h \
- /usr/include/bytesex.h /usr/include/pwd.h /usr/include/sys/types.h \
- /usr/include/time.h /usr/include/sys/select.h \
- /usr/include/selectbits.h /usr/include/grp.h /usr/include/strings.h \
- /usr/include/string.h /usr/include/locale.h
+ /usr/include/sigstack.h ../../include/canna/RK.h /usr/include/ctype.h \
+ /usr/include/endian.h /usr/include/bytesex.h /usr/include/pwd.h \
+ /usr/include/sys/types.h /usr/include/time.h \
+ /usr/include/sys/select.h /usr/include/selectbits.h \
+ /usr/include/grp.h /usr/include/strings.h /usr/include/string.h \
+ /usr/include/locale.h
 rutil.o: rutil.c /usr/include/stdio.h /usr/include/libio.h \
  /usr/include/features.h /usr/include/sys/cdefs.h \
  /usr/include/gnu/stubs.h /usr/include/_G_config.h \

@@ -29,11 +29,11 @@ case "$1" in
     fi
     ;;
   stop)
-    echo "stopping cannaserver..."
+    echo "Stopping cannaserver..."
     $CANNAKILL
     ;;
   force-reload|restart)
-    echo "restarting cannaserver..."
+    echo "Restarting cannaserver..."
     $CANNAKILL
     if [ $RUN_SERVER = 1 ]; then
         $CANNASERVER
