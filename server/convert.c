@@ -1778,6 +1778,9 @@ int size ;
 	return( needsize ) ;
 
     req->namelen = (int)L4TOL(buf + SIZE4);
+    if( (unsigned int)req->namelen > 32767 )
+        return( -1 );
+
    ir_debug( Dmsg(10,"req->namelen =%d\n", req->namelen ); )
 
     if( (needsize = SIZE8 + req->namelen - size) > 0 )
@@ -1785,6 +1788,8 @@ int size ;
 
     if( req->namelen > 0 ){
 	req->name = buf + SIZE8 ;
+	if( req->name[req->namelen - 1] != 0 )
+	    return( -1 );
     }
    ir_debug( Dmsg(10,"req->namelen =%d\n", req->namelen ); )
    ir_debug( Dmsg(10,"req->name =%s\n", req->name ); )

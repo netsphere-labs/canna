@@ -1,3 +1,14 @@
+canna (3.5b2-25.2) oldstable-security; urgency=high
+
+  * Non-maintainer upload by the Security Team
+  * Applied upstream patch to fix buffer overflows (CAN-2002-1158) and
+    invalidate requests (CAN-2002-1159)
+  * Used .2 since .1 was probably burnt and the buildd network has
+    probably recorded the version string.
+  * Added build dependencies
+
+ -- Martin Schulze <joey@infodrom.org>  Fri, 20 Dec 2002 23:27:46 +0100
+
 canna (3.5b2-25) frozen unstable; urgency=high
 
   * [SECURITY FIX] buffer overflow. If send IR_INIT command to cannaserver

@@ -217,6 +217,19 @@ Ushort *ws;
   return res;
 }
 
+const Ushort *
+ushortmemchr(ws, ch, len)
+const Ushort *ws;
+int ch;
+size_t len;
+{
+  const Ushort *p, *end;
+  for (p = ws, end = ws + len; p < end; ++p)
+      if (*p == (Ushort)ch)
+         return p;
+  return NULL;
+}
+
 int
 ushortstrcpy(wd, ws)
 Ushort *wd, *ws;

@@ -2,6 +2,7 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: ISHIKAWA Mutsumi <ishikawa@linux.or.jp>
+Build-Depends: debhelper, findutils, xlib6g-dev
 Standards-Version: 3.0.0
 
 Package: canna

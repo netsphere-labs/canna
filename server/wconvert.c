@@ -100,6 +100,7 @@ extern reqproc ExtensionWideVector[];
 #endif
 
 extern void DispDebug() ;
+extern const Ushort *ushortmemchr pro((const Ushort *, int, size_t));
 extern int canna_server_hi ;
 extern int canna_server_lo ;
 #ifdef DEBUG
@@ -1322,6 +1323,10 @@ ClientPtr *clientp ;
     char *dirname, *dirnamelong = (char *)0;
     int cxnum = Request.type18.context, stat = -1;
     int requestsize = Request.type18.size, retval;
+    size_t datasize = Request.type18.datalen - SIZEOFSHORT * 2;
+
+    if (datasize == 0 || req->data[datasize - 1] != 0)
+      goto protoerr;
 
     if (validcontext(cxnum, client, wListDictionary)) {
       if (requestsize <= sizeof(local_buffer) ||
@@ -1359,6 +1364,7 @@ ClientPtr *clientp ;
       }
     }	
 
+ protoerr:
     retval = SendType6Reply(client, wListDictionary, EXTPROTO, stat,
 			    dicnames, namesize(dicnames, stat));
     if (dicnames != (char *)local_buffer) free(dicnames);
@@ -1470,10 +1476,16 @@ ClientPtr *clientp ;
     char *dicname, *dirname, *dirnamelong = (char *)0;
     int cxnum = Request.type18.context, stat = BADCONT;
     int dirlen, requestsize = Request.type18.size, retval;
+    size_t datasize = Request.type18.datalen - SIZEOFSHORT * 2;
+
+    if (datasize == 0 || req->data[datasize - 1] != 0)
+        goto protoerr;
 
     if (validcontext(cxnum, client, wGetWordTextDictionary)) {
 	dirname = req->data ;
 	dirlen = strlen(dirname) + 1 ;
+	if (dirlen == datasize)
+	    goto protoerr;
 	dicname = &(req->data[dirlen]) ;
 	if (dirlen > 1) {
 	  if (!dirname || dirname[0] != ':' ||
@@ -1515,6 +1527,7 @@ ClientPtr *clientp ;
 	  free(dirnamelong);
 	}
     }
+ protoerr:
     retval = SendType7Reply(client, wGetWordTextDictionary, EXTPROTO,
 			    stat, stat > 0 ? stat + 1 : 0, infobuf);
     if (infobuf != (Ushort *)local_buffer) free((char *)infobuf);
@@ -2296,6 +2309,9 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq1 start!!\n") );
 
+    if (Request.type1.datalen != 0)
+        return( -1 );
+
     return( 0 ) ;
 }
 
@@ -2304,6 +2320,9 @@ ProcWideReq2(buf)
 BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq2 start!!\n") );
+
+    if (Request.type2.datalen != SIZEOFSHORT)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type2.context = S2TOS(buf);
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type2.context) );
@@ -2316,6 +2335,9 @@ ProcWideReq3(buf)
 BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq3 start!!\n") );
+
+    if (Request.type3.datalen != SIZEOFSHORT * 2)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type3.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type3.buflen = S2TOS(buf);
@@ -2334,12 +2356,21 @@ BYTE *buf ;
 
     ir_debug( Dmsg(10, "ProcWideReq4 start!!\n") );
 
+    if (Request.type4.datalen < SIZEOFSHORT * 4)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type4.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.begin = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.end = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.yomilen = S2TOS(buf);
     Request.type4.yomi = (Ushort *)(buf += SIZEOFSHORT) ;
-    len = Request.type4.datalen - SIZEOFSHORT * 4;
+    len = Request.type4.yomilen + 1;
+
+    if (Request.type4.datalen != SIZEOFSHORT * (4 + len)
+           || len == 0
+           || Request.type4.yomi[len - 1] != 0)
+       return( -1 );
+
     for (data = Request.type4.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs((unsigned short)*data); /* ちょっとやだなあ */
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type4.context) );
@@ -2359,6 +2390,9 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq5 start!!\n") );
 
+    if (Request.type5.datalen != SIZEOFSHORT * 2 + SIZEOFINT)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type5.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type5.size = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type5.mode = L4TOL(buf);
@@ -2374,6 +2408,9 @@ ProcWideReq6(buf)
 BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq6 start!!\n") );
+
+    if (Request.type6.datalen != SIZEOFSHORT * 3)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type6.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type6.number = S2TOS(buf);
@@ -2391,6 +2428,9 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq7 start!!\n") );
 
+    if (Request.type7.datalen != SIZEOFSHORT * 3)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type7.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type7.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type7.yomilen = (short)S2TOS(buf);
@@ -2406,6 +2446,9 @@ ProcWideReq8(buf)
 BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq8 start!!\n") );
+
+    if (Request.type8.datalen != SIZEOFSHORT * 4)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type8.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type8.curbun = S2TOS(buf);
@@ -2425,6 +2468,9 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq9 start!!\n") );
 
+    if (Request.type9.datalen != SIZEOFSHORT * 4)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type9.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type9.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type9.kouho = S2TOS(buf);
@@ -2442,8 +2488,13 @@ ProcWideReq10(buf)
 BYTE *buf ;
 {
     register int i ;
+    int rest ;
 
     ir_debug( Dmsg(10, "ProcWideReq10 start!!\n") );
+
+    rest = Request.type10.datalen - (SIZEOFSHORT * 2 + SIZEOFINT);
+    if (rest < 0)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type10.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type10.number = S2TOS(buf);
@@ -2451,6 +2502,9 @@ BYTE *buf ;
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type10.context) );
     ir_debug( Dmsg(10, "req->number =%d\n", Request.type10.number) );
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type10.mode) );
+
+    if (rest != Request.type10.number * SIZEOFSHORT)
+        return( -1 );
 
     buf += SIZEOFINT; Request.type10.kouho = (short *)buf; /* short? */
     for (i = 0; i < Request.type10.number; i++) {
@@ -2468,12 +2522,23 @@ BYTE *buf ;
     register Ushort *data;
     int i, len ;
 
-    ir_debug( Dmsg(10, "ProcWideReq10 start!!\n") );
+    ir_debug( Dmsg(10, "ProcWideReq11 start!!\n") );
+
+    if (Request.type11.datalen < SIZEOFSHORT * 2)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type11.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type11.curbun = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type11.yomi = (Ushort *)buf;
+ 
+    if (Request.type11.datalen % SIZEOFSHORT != 0)
+        return( -1 );
+
     len = ((int)Request.type11.datalen - SIZEOFSHORT * 2) / SIZEOFSHORT ;
+
+    if (len == 0 || Request.type11.yomi[len - 1] != 0)
+        return( -1 );
+
     for (data = Request.type11.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs( *data ); /* なんかやだ */
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type11.context) );
@@ -2491,15 +2556,33 @@ BYTE *buf ;
 {
     register Ushort *data;
     int i, len ;
+    int rest ;
 
     ir_debug( Dmsg(10, "ProcWideReq12 start!!\n") );
 
+    rest = Request.type12.datalen - SIZEOFSHORT;
+    if (rest < 0)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type12.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type12.datainfo = (Ushort *)buf;
+
+    if (!ushortmemchr((Ushort *)buf, 0, rest / SIZEOFSHORT))
+        return( -1 );
+
     len = ushortstrlen((Ushort *)buf) + 1;
+ 
+    rest -= len * SIZEOFSHORT;
+    if (rest <= 0)
+        return( -1 );
+
     for( data = Request.type12.datainfo, i = 0; i < len; i++, data++ )
 	*data = ntohs( *data ); /* なんかやだ */
     buf += len * SIZEOFSHORT;
+
+    if (buf[rest - 1] != '\0')
+        return( -1 );
+
     Request.type12.dicname = (char *)buf;
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type12.context) );
     ir_debug( Dmsg(10, "req->datainfo =%s\n",
@@ -2518,23 +2601,47 @@ BYTE *buf ;
 {
     register Ushort *data;
     int i ,len ;
+    int rest ;
 
     ir_debug( Dmsg(10, "ProcWideReq13 start!!\n") );
+
+    rest = Request.type13.datalen - SIZEOFSHORT;
+    if (rest < 0)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type13.context = S2TOS(buf);
     len = SIZEOFSHORT ;
     buf += len;
     Request.type13.dicname = (char *)buf;
+
+    if (!memchr(buf, 0, rest))
+        return( -1 );
+
     len = strlen( (char *)buf ) + 1;
+
+    rest -= len;
+    if (rest % SIZEOFSHORT
+           || rest < SIZEOFSHORT * 3)
+        return( -1 );
+
     buf += len;
     Request.type13.yomi = (Ushort *)buf;
     len = ((int)Request.type13.datalen - len - SIZEOFSHORT * 4) / SIZEOFSHORT;
+
+    if (ushortmemchr((Ushort *)buf, 0, len) != (Ushort *)buf + len - 1)
+        return( -1 );
+
     for( data = Request.type13.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs( *data );
-    buf += (ushortstrlen((Ushort *)buf) + 1) * SIZEOFSHORT;
+    buf += len * SIZEOFSHORT;
+
     Request.type13.yomilen = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type13.kouhosize = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type13.hinshisize = S2TOS(buf);
+
+    if (Request.type13.yomilen != len - 1)
+        return( -1 );
+
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type13.context) );
     ir_debug( Dmsg(10, "req->dicname =%s\n", Request.type13.dicname) );
     ir_debug( Dmsg(10, "req->yomi =%s\n",
@@ -2556,11 +2663,19 @@ BYTE *buf ;
 
     ir_debug( Dmsg(10, "ProcWideReq14 start!!\n") );
 
+    if (Request.type14.datalen <= SIZEOFINT + SIZEOFSHORT
+           || Request.type14.datalen % SIZEOFSHORT)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type14.mode = L4TOL(buf);
     buf += SIZEOFINT;   Request.type14.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type14.yomi = (Ushort *)buf;
     len = ((int)Request.type14.datalen - SIZEOFSHORT - SIZEOFINT)
       / SIZEOFSHORT;
+
+    if (Request.type14.yomi[len - 1] != 0)
+        return( -1 );
+
     for (data = Request.type14.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs( *data ); /* なんかやだ */
 
@@ -2577,11 +2692,21 @@ static
 ProcWideReq15(buf)
 BYTE *buf ;
 {
+    int rest ;
+
     ir_debug( Dmsg(10, "ProcWideReq15 start!!\n") );
+
+    rest = Request.type15.datalen - (SIZEOFINT + SIZEOFSHORT);
+    if (rest <= 0)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type15.mode = L4TOL(buf);
     buf += SIZEOFINT;   Request.type15.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type15.dicname = (char *)buf;
+
+    if (buf[rest - 1] != 0)
+        return( -1 );
+
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type15.mode) );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type15.context) );
     ir_debug( Dmsg(10, "req->dicname =%s\n",
@@ -2597,6 +2722,11 @@ BYTE *buf ;
     ir_debug( Dmsg(10, "ProcWideReq17 start!!\n") );
 
     buf += HEADER_SIZE;
+
+    if (Request.type17.datalen < SIZEOFCHAR * 2
+           || buf[Request.type17.datalen - SIZEOFCHAR * 2] != 0)
+        return( -1 );
+
     Request.type17.dicname = (char *)buf;
     Request.type17.mode = (char)*(buf + Request.type17.datalen - SIZEOFCHAR) ;
     ir_debug( Dmsg(10, "req->dicname =%s\n",
@@ -2612,6 +2742,9 @@ ProcWideReq18(buf)
 BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq18 start!!\n") );
+
+    if (Request.type18.datalen < SIZEOFSHORT * 2)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type18.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type18.data = (char *)buf;
@@ -2630,12 +2763,22 @@ static
 ProcWideReq19(buf)
 BYTE *buf ;
 {
+    int rest ;
+
     ir_debug( Dmsg(10, "ProcWideReq19 start!!\n") );
+
+    rest = Request.type20.datalen - (SIZEOFSHORT + SIZEOFINT * 2);
+    if (rest < 0)
+        return( -1 );
 
     buf += HEADER_SIZE; Request.type20.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type20.command = L4TOL(buf);
     buf += SIZEOFINT;   Request.type20.bufsize = L4TOL(buf);
     buf += SIZEOFINT;   Request.type20.buf = (char *)buf;
+
+    if (Request.type20.bufsize != rest)
+        return( -1 );
+
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type20.context) );
     ir_debug( Dmsg(10, "req->command =%d\n", Request.type20.command) );
     ir_debug( Dmsg(10, "req->bufsize =%d\n", Request.type20.bufsize) );
@@ -2647,15 +2790,32 @@ static
 ProcWideReq20(buf)
 BYTE *buf ;
 {
+    BYTE *bufend ;
+
     ir_debug( Dmsg(10, "ProcWideReq20 start!!\n") );
 
+    if (Request.type21.datalen < SIZEOFINT + SIZEOFSHORT)
+        return( -1 );
+
     buf += HEADER_SIZE; Request.type21.mode = L4TOL(buf);
+    bufend = buf + Request.type21.datalen;
     buf += SIZEOFINT;   Request.type21.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type21.dirname = (char *)buf;
+
+    if (!memchr(buf, 0, bufend - buf))
+        return( -1 );
+
     buf += strlen((char *)buf) + 1;
     Request.type21.srcdic = (char *)buf;
+
+    if (!memchr(buf, 0, bufend - buf))
+        return( -1 );
+
     buf += strlen((char *)buf) + 1;
     Request.type21.dstdic = (char *)buf;
+
+    if (*(bufend - 1) != 0)
+        return( -1 );
 
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type21.mode) );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type21.context) );
