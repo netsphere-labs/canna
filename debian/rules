@@ -9,8 +9,9 @@ build-stamp:
 	dh_testdir
 
 	## make libc6 version only.
-	xmkmf -a
+	xmkmf
 	make Makefile
+	make cannaconf.h
 	make canna
 
 	touch build-stamp
@@ -22,6 +23,7 @@ clean:
 
 	-make clean
 	-rm -f doc/intern/canna.sty doc/lisp/canna.sty doc/man/guide/tex/canna.sty doc/misc/canna.sty
+	find -name "Makefile*" | xargs rm -f
 
 	dh_clean
 
@@ -43,40 +45,41 @@ binary-arch: build
 		cannaBinDir=`pwd`/debian/tmp/usr/bin \
 		cannaSrvDir=`pwd`/debian/tmp/usr/sbin \
 		cannaLibDir=`pwd`/debian/tmp/var/lib/canna \
+		cannaEtcDir=`pwd`/debian/tmp/etc/canna \
+		cannaShareDir=`pwd`/debian/tmp/usr/share/canna \
 		cannaManDir=`pwd`/debian/tmp/usr/share/man \
 		cannaIncDir=`pwd`/debian/tmp/usr/include/canna \
 		libCannaDir=`pwd`/debian/tmp/usr/lib \
+		cannaDocDir=`pwd`/debian/tmp/usr/share/doc/libcanna1g \
+		DicDir=`pwd`/debian/tmp/var/lib/canna/dic \
 		ErrDir=`pwd`/debian/tmp/var/log/canna
 	make install.man \
 		cannaManDir=`pwd`/debian/tmp/usr/share/man \
 		MANSUFFIX=1 LIBMANSUFFIX=3
 
-	rm -f debian/tmp/usr/bin/{cpdic,lsdic,mkdic,mvdic,rmdic,syncdic,addwords,delwords,cannakill}
-	ln -s catdic debian/tmp/usr/bin/cpdic
-	ln -s catdic debian/tmp/usr/bin/lsdic
-	ln -s catdic debian/tmp/usr/bin/mkdic
-	ln -s catdic debian/tmp/usr/bin/mvdic
-	ln -s catdic debian/tmp/usr/bin/rmdic
-	ln -s catdic debian/tmp/usr/bin/addwords
-	ln -s catdic debian/tmp/usr/bin/delwords
-	ln -s cannakill debian/tmp/usr/bin/syncdic
+	(cd debian/tmp/usr/bin/ && rm -f cpdic lsdic mkdic mvdic rmdic syncdic addwords delwords cannakill)
+	rm -f debian/tmp/etc/canna/default.canna
 	cp debian/tmp/usr/bin/catdic debian/tmp/usr/bin/cannakill
 
-	mv debian/tmp/var/lib/canna/sample/* \
-	  debian/tmp/usr/share/doc/$(package)/examples
-	cp -p debian/tmp/var/lib/canna/default.canna \
-	  debian/tmp/usr/share/doc/$(package)/examples
-	rmdir debian/tmp/var/lib/canna/sample
-
 	install -m 644 debian/hosts.canna debian/tmp/etc
+	install -d -m 755 debian/tmp/etc/canna/dics.dir.d
+	install -m 644 debian/tmp/var/lib/canna/dic/canna/dics.dir debian/tmp/etc/canna/dics.dir.d/00canna.dics.dir
+	rm -f debian/tmp/var/lib/canna/dic/canna/dics.dir
 
+	install -m 755 debian/update-canna-dics_dir debian/tmp/usr/sbin
+	#install -d -m 755 debian/tmp/usr/share/man/man8
+	#install -m 644 debian/update-canna-dics_dir.8 debian/tmp/usr/share/man/man8
 	#
 	# End 
 	#
 
+	dh_installdebconf       
+	dh_installexamples
+	dh_installmenu
 	dh_movefiles
-	dh_installdocs -A README.jp README INSTALL INSTALL.jp WHATIS \
-		WHATIS.jp 
+	-rmdir -p debian/tmp/usr/share/doc/libcanna1g/sample/src
+	-rmdir -p debian/tmp/usr/include/canna debian/tmp/usr/lib
+	dh_installdocs -A README.jp README WHATIS WHATIS.jp 
 	dh_installexamples
 	dh_undocumented canlisp.1 crfreq.1 crxdic.1 crxgram.1 dpxdic.1\
 		forcpp.1 forsort.1 kpdic.1 mergeword.1 syncdic.1
@@ -86,9 +89,10 @@ binary-arch: build
 #	dh_installmanpages
 	dh_installchangelogs CHANGES.jp
 	dh_strip
+	dh_link
 	dh_compress
 	dh_fixperms
-	dh_suidregister
+#	dh_suidregister
 	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps

@@ -28,7 +28,7 @@
 #define DEBUG
 
 #if defined(SYSV) || defined(SVR4) || defined(__STDC__)
-# if defined(SYSV) || defined(SVR4)
+# if defined(SYSV) || defined(SVR4) || defined(linux) || defined(__GNU__)
 #  include    <memory.h>
 # endif
 # ifndef __EMX__

@@ -9,6 +9,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CANNASERVER=/usr/sbin/cannaserver
 CANNAKILL=/usr/bin/cannakill
+CANNA_SERVER_OPT="-u canna"
 
 # The following value is extracted by debstd to figure out how to generate
 # the postinst script. Edit the field to change the way the script is
@@ -25,7 +26,7 @@ case "$1" in
     if [ $RUN_SERVER = 1 ]
     then
 	echo "Starting cannaserver..."
-	$CANNASERVER
+	$CANNASERVER $CANNA_SERVER_OPT
     fi
     ;;
   stop)
@@ -36,7 +37,7 @@ case "$1" in
     echo "Restarting cannaserver..."
     $CANNAKILL
     if [ $RUN_SERVER = 1 ]; then
-        $CANNASERVER
+        $CANNASERVER $CANNA_SERVER_OPT
     fi
     ;;
   *)

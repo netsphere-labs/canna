@@ -1,0 +1,19 @@
+Template: canna/default_style
+Type: select
+Choices: default, 1.1, 1.2, jdaemin, just, lan5, matsu, skk, tut, unix, jve, wx2+
+Default: default
+Description: Canna input style
+ Please choose default canna input style bellow:
+ .
+  default - Canna3.5 default style
+  1.1     - old Canna style (ver. 1.1)
+  1.2     - old Canna style (ver. 1.2)
+  jdaemon - jdaemon style
+  just    - Justsystem ATOK like style
+  lan5    - LAN5 like style
+  matsu   - MATSU word prosessor like style
+  skk     - SKK like style
+  tut     - for TUT-Code
+  unix    - UNIX style
+  vje     - vje like style
+  wx2+    - WX2+ style

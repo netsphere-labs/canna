@@ -1,19 +1,20 @@
-#!/bin/sh -e
+#!/bin/sh
 
-chown bin.bin /var/lib/canna/dic/canna
-chown bin.bin /var/lib/canna/dic/canna/fuzokugo.cbd
-chown bin.bin /var/lib/canna/dic/canna/fuzokugo.cld
-chown bin.bin /var/lib/canna/dic/canna/iroha.cbd
-chown bin.bin /var/lib/canna/dic/canna/iroha.cld
-chown bin.bin /var/lib/canna/dic/canna/bushu.cld
-chown bin.bin /var/log/canna/
+case "$1" in
+    configure)
+    adduser --quiet --system --group --no-create-home  --home /var/lib/canna --gecos "Canna server" --disabled-password --disabled-login canna
+    chown -R canna.canna /var/lib/canna
+    chown -R canna.canna /var/log/canna
+    /usr/sbin/update-canna-dics_dir
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
 
-chmod 775 /var/lib/canna/dic/canna
-chmod 775 /var/log/canna/
-chmod 664 /var/lib/canna/dic/canna/fuzokugo.cbd
-chmod 664 /var/lib/canna/dic/canna/fuzokugo.cld
-chmod 664 /var/lib/canna/dic/canna/iroha.cbd
-chmod 664 /var/lib/canna/dic/canna/iroha.cld
-chmod 664 /var/lib/canna/dic/canna/bushu.cld
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 0
+    ;;
+esac
 
 #DEBHELPER#
+exit 0

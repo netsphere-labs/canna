@@ -1,0 +1,7 @@
+usr/bin/catdic usr/bin/cpdic
+usr/bin/catdic usr/bin/lsdic
+usr/bin/catdic usr/bin/mkdic
+usr/bin/catdic usr/bin/mvdic
+usr/bin/catdic usr/bin/rmdic
+usr/bin/catdic usr/bin/addwords
+usr/bin/catdic usr/bin/delwords

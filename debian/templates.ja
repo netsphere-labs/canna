@@ -1,0 +1,25 @@
+Template: canna/connection_note
+Type: note
+Description: Note of remote connection
+ Default canna server setting was changed. It is allowed to connect
+ used by UNIX domain socket. You can not connect from REMOTE clients
+ the default setting. This change is security reason.
+ .
+  - Please use `-inet' option in /etc/init.d/canna, if you want to connect
+   remote client to canna server running on this machine. Don't forget to
+   check /etc/hosts.canna ;-)
+  - If you set `CANNAHOST=localhost', client to connect canna server with
+   inet domain socket. Please use 'CANNAHOST=unix' (or nothing to set).
+Description-ja: remote コネクションに関する注意書き
+ canna サーバのディフォルトの設定が変更されました。ディフォルトでは、
+ UNIX ドメインソケットを利用した接続のみが許されます。ディフォルト設定
+ のままではリモートのクライアントからの接続はできません。この変更は
+ セキュリティの強化のためです。
+ .
+  - このマシン上で動作する cana サーバへのリモートからの接続を許したい場合は
+   `-inet' オプションを /etc/init.d/canna の canna サーバ起動部分に加えてく
+   ださい。/etc/hosts.canna のチェックもお忘れなく ;-)
+  - `CANNAHOST=localhost' がセットされているとローカルなクライアントが canna
+   サーバに inet ドメインソケットを利用して接続しようとしてしまうために、
+   接続できないことになってしまいます。'CANNAHOST=unix' (or CANNAHOST
+   をセットしない)を使ってください。

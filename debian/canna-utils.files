@@ -3,13 +3,6 @@ usr/bin/cannacheck
 usr/bin/cannastat
 usr/bin/cshost
 usr/bin/catdic
-usr/bin/cpdic
-usr/bin/lsdic
-usr/bin/mvdic
-usr/bin/rmdic
-usr/bin/mkdic
-usr/bin/addwords
-usr/bin/delwords
 usr/share/man/man1/mkromdic*
 usr/share/man/man1/cannacheck*
 usr/share/man/man1/cannastat*

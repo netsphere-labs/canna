@@ -116,8 +116,8 @@ $(RKCOBJS): $(DEPRKCOBJS)
 #endif /* ProjectX */
 #endif /* DoSharedLib */
 
-sglobal.h: GSYM.awk globnames
-	awk -f GSYM.awk < globnames > $@
+includes::
+	awk -f GSYM.awk < globnames > sglobal.h
 
 clean::
 	$(RM) y.tab.h y.tab.c lex.yy.c gram.h gram.c lex.c sglobal.h

@@ -1,13 +1,160 @@
-canna (3.5b2-25.2) oldstable-security; urgency=high
+canna (3.5b2-46.2) stable-security; urgency=high
 
   * Non-maintainer upload by the Security Team
   * Applied upstream patch to fix buffer overflows (CAN-2002-1158) and
     invalidate requests (CAN-2002-1159)
   * Used .2 since .1 was probably burnt and the buildd network has
     probably recorded the version string.
-  * Added build dependencies
 
- -- Martin Schulze <joey@infodrom.org>  Fri, 20 Dec 2002 23:27:46 +0100
+ -- Martin Schulze <joey@infodrom.org>  Fri, 20 Dec 2002 23:18:59 +0100
+
+canna (3.5b2-46) unstable; urgency=low
+
+  * fix bashism in debian/rules
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Wed,  3 Apr 2002 16:56:44 +0900
+
+canna (3.5b2-45) unstable; urgency=low
+
+  * add Suggests: canna-shion, closes: #123014
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sat, 30 Mar 2002 03:56:31 +0900
+
+canna (3.5b2-44) unstable; urgency=low
+
+  * remove /etc/canna/default.canna from canna.deb,
+    it is generated in postinst of libcanna1g.
+    closes: #134469
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Tue, 19 Feb 2002 21:49:39 +0900
+
+canna (3.5b2-43) unstable; urgency=low
+
+  * /etc/canna/default.canna marks as conffiles, closes: #132143
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon,  4 Feb 2002 21:20:48 +0900
+
+canna (3.5b2-42) unstable; urgency=low
+
+  * add Depends: adduser (>= 3.34), closes: #116239 
+  * debconf template spelling fix, closes: #116345
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 21 Oct 2001 07:45:12 +0900
+
+canna (3.5b2-41) unstable; urgency=low
+
+  * some dictionary pronounce error fix,
+    thanks Noboru Saitou <noborus@netlab.jp>
+  * update german tenplate, closes: #113116
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Tue, 25 Sep 2001 16:39:05 +0900
+
+canna (3.5b2-40) unstable; urgency=low
+
+  * add update-canna-dics_dir, closes: #109579
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Wed, 29 Aug 2001 06:58:04 +0900
+
+canna (3.5b2-39) unstable; urgency=low
+
+  * canna and libcann1g purge handling fix
+  * move /usr/share/canna/*.canna from canna package to libcanna1g package
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 19 Aug 2001 07:30:56 +0900
+
+canna (3.5b2-38) unstable; urgency=low
+
+  * add german templates, closes: #109143
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 19 Aug 2001 03:11:42 +0900
+
+canna (3.5b2-37) unstable; urgency=low
+
+  * adduser canna for cannaserver
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Fri, 17 Aug 2001 03:12:15 +0900
+
+canna (3.5b2-36) unstable; urgency=low
+
+  * apply Hurd support patch, closes: #108599
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 13 Aug 2001 23:13:21 +0900
+
+canna (3.5b2-35) unstable; urgency=low
+
+  * add debconf templates, config for selecting 
+    default canna input style
+  * add /usr/share/canna to roman-kana trans table serch path
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 12 Aug 2001 22:13:12 +0900
+
+canna (3.5b2-34) unstable; urgency=low
+
+  * skip -33 because of using internal test release (my mistake)
+  * update documents for using cannaserver with UNIX domain sokect.
+  * add debconf note `default the UNIX domain sokect only'
+  * add Depends: debconf to canna package
+  * add -u option to cannaserver for dropping root privilege
+  * cannaserver runs as user:daemon group:daemon
+  * some needles gavage files removed from source
+  * /etc/canna/default.canna set as conffiles, closes: #87850
+  * remove INSTALL and INSTALL.jp document from packages
+  * roman-kana translation tables moves to /usr/share/canna
+  * malloc() size problem in libRK fixed
+  
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Fri, 10 Aug 2001 06:19:50 +0900
+
+canna (3.5b2-32) unstable; urgency=low
+
+  * merge IA64 patch written by taru (taru@debian.org), thanks.
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 23 Apr 2001 13:27:23 +0900
+
+canna (3.5b2-31) unstable; urgency=low
+
+  * change canna server would not listen tcp port default, use UNIX domain
+    socket only.
+  * add -inet option to the server for using tcp port connection.
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Wed, 28 Mar 2001 23:15:08 +0900
+
+canna (3.5b2-30) unstable; urgency=low
+
+  * update Build-Depends, closes: #90571
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Thu, 22 Mar 2001 00:08:55 +0900
+
+canna (3.5b2-29) unstable; urgency=low
+
+  * move .canna examples from canna to libcanna1g. Because .canna file
+    is refered from canna clients not server.
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Thu, 26 Oct 2000 23:47:51 +0900
+
+canna (3.5b2-28) unstable; urgency=low
+
+  * Build-Depends typo fix, closes: #70173, #75390
+  * I forget to close Bug Report, so close.
+    closes: #66529
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 23 Oct 2000 19:51:59 +0900
+
+canna (3.5b2-27) unstable; urgency=low
+
+  * cleanup patch. remove some garbage files (Makefile, Makefile.bak) from
+    diff.gz
+  * apply Bugs#58667's patch, closes: Bugs#58667
+  * add Build-Depends: in control
+  
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 16 Oct 2000 22:18:18 +0900
+
+canna (3.5b2-26) unstable; urgency=low
+
+  * rebuild with glibc 2.1.94
+  * merge hosts.canna parse problem ad-hoc fix patch, tnx Masashi Shimbo
+    <shimbo@cis.ibaraki.ac.jp>
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Fri, 29 Sep 2000 08:25:02 +0900
 
 canna (3.5b2-25) frozen unstable; urgency=high
 

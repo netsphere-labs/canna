@@ -27,7 +27,7 @@ static char rcsid[]="$Id: dd.c,v 3.16 1996/11/27 07:20:19 kon Exp $";
 
 #include	"RKintern.h"
 
-#if defined(USG) || defined(SYSV) || defined(SVR4) || defined(WIN)
+#if defined(USG) || defined(SYSV) || defined(SVR4) || defined(WIN) || defined(linux)
 #include <string.h>
 #else
 #include <strings.h>
@@ -1743,7 +1743,7 @@ int mode;
   }
 
   if (newflags != dd->dd_flags) {
-    dicsdir = malloc(strlen(dd->dd_path + strlen("/dics.dir") + 1));
+    dicsdir = malloc(strlen(dd->dd_path) + strlen("/dics.dir") + 1);
     if (dicsdir) {
       int filemode;
 

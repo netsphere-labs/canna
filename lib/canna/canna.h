@@ -106,7 +106,7 @@ extern CANNA_wcstombs pro((char *, wchar_t *, int));
 #define STROKE_LIMIT 500 /* ストロークで接続を切る */
 
 #if defined(SYSV) || defined(SVR4) || defined(__STDC__) || defined(WIN)
-# if defined(SYSV) || defined(SVR4)
+# if defined(SYSV) || defined(SVR4) || defined(linux) || defined(__GNU__)
 #  include <memory.h>
 # endif
 # ifndef __EMX__

@@ -205,9 +205,9 @@ jrKanjiStatus *kanji_status_return;
     }
   }
 
-  inbuf[0] = (wchar_t)buffer_return[0];
+  inbuf[0] = (wchar_t)(buffer_return[0] & 0xff);
   for (i = 1 ; i < nbytes ; i++) {
-    inbuf[i] = (wchar_t)buffer_return[i];
+    inbuf[i] = (wchar_t)(buffer_return[i] & 0xff);
   }
   ch = buffer_return[0] & 0xff;
   ret = XwcLookupKanji2(dpy, win, inbuf, inbufsize, nbytes, functionalChar,

@@ -11,7 +11,7 @@ MakeSubdirs($(SUBDIRS))
 DependSubdirs($(SUBDIRS))
 
 clean::
-	$(RM) -r include cannaconf.h
+	$(RM) -r include
 
 includes::
 	$(RM) -r include

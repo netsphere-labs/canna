@@ -1,0 +1,16 @@
+Canna for DEBIAN
+----------------------
+
+This packages is Canna for Debian GNU/Linux.
+
+ Default setting of Canna Server can connect UNIX Domain Socket only
+for security reason.
+
+ If you want to connect the server from remote, please restart the server with -inet option.
+
+ If you set CANNAHOST=localhost, canna client to connect server with inet domain socket.
+Please use CANNAHOST=unix (or nothing to set the CANNAHOST).
+
+-----
+ISHIKAWA Mutsumi
+ <ishikawa@linux.or.jp>, <ishikawa@debian.org>, <ishikawa@redhat.com>

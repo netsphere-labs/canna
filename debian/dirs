@@ -1,5 +1,4 @@
-usr/share/doc/canna/examples
 usr/bin
 usr/lib
 usr/share/man
-etc/
+etc/canna

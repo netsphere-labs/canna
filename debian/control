@@ -2,14 +2,15 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: ISHIKAWA Mutsumi <ishikawa@linux.or.jp>
-Build-Depends: debhelper, findutils, xlib6g-dev
-Standards-Version: 3.0.0
+Build-Depends: debhelper (>= 2.1.0), findutils, xlibs-dev, xutils
+Standards-Version: 3.5.2
 
 Package: canna
 Architecture: any
-Depends: ${shlibs:Depends}
-Conflicts: canna-server
+Depends: ${shlibs:Depends}, debconf, adduser (>= 3.34)
+Conflicts: canna-server, libcanna1g (<= 3.5b2-33)
 Replaces: canna-server
+Suggests: canna-shion
 Description: A japanese input system (server and dictionary).
  Canna is a Japanese input system available in Free Software.
  Canna provides a unified user interface for inputing Japanese.
@@ -27,6 +28,7 @@ Description: A japanese input system (server and dictionary).
 Package: canna-utils
 Architecture: any
 Depends: ${shlibs:Depends}
+Conflicts: canna (<= 3.5b2-33), libcanna1g (<= 3.5b2-33)
 Description: A japanese input system (utility).
  Canna is a Japanese input system available in Free Software.
  This package includes canna client programs.
@@ -34,18 +36,17 @@ Description: A japanese input system (utility).
 Package: libcanna1g
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}
-Conflicts: canna (<< 3.5b2-23)
+Depends: ${shlibs:Depends}, debconf
+Conflicts: canna (<= 3.5b2-33)
 Description: Canna Runtime Library (Libc6).
  Canna is a Japanese input system available in Free Software.
  This package includes canna shared libraries.
 
 Package: libcanna1g-dev
 Section: devel
-Priority: extra
 Architecture: any
 Depends: libcanna1g
-Conflicts: canna-dev, libcanna1-dev, canna (<< 3.5b2-23)
+Conflicts: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
 Replaces: canna-dev
 Description: Canna Static Library and Headers (Libc6).
  Canna is a Japanese input system available in Free Software.

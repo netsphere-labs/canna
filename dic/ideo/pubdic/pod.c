@@ -30,6 +30,7 @@ static char rcsid[] = "$Id: pod.c,v 1.41 1994/05/31 11:42:12 kon Exp $";
 
 #if __STDC__
 #include <stddef.h>
+#include <stdlib.h>
 #else
 extern char *malloc();
 #endif

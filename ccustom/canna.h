@@ -41,7 +41,7 @@
 /*#include "jrkanji.h"*/
 
 #if defined(SYSV) || defined(SVR4) || defined(__STDC__)
-# if defined(SYSV) || defined(SVR4)
+# if defined(SYSV) || defined(SVR4) || defined(linux) || defined(__GNU__)
 #  include <memory.h>
 # endif
 # define bzero(buf, size) memset((char *)(buf), 0x00, (size))
