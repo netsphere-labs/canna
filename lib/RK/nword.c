@@ -208,7 +208,11 @@ concWord(st, p, q, loc, bb) 		/* create the concatinated word p+q */
     conc = *q;
     conc.nw_klen  += p->nw_klen;
     conc.nw_ylen  += p->nw_ylen;
+#ifdef FUJIEDA_HACK
+    conc.nw_flags = p->nw_flags&(NW_PRE|NW_SUC|NW_SWD|NW_DUMMY);
+#else
     conc.nw_flags = p->nw_flags&(NW_PRE|NW_SUC|NW_SWD);
+#endif
     conc.nw_prio = p->nw_prio;
     conc.nw_next = (struct nword *)0;
     conc.nw_left = p;
@@ -237,6 +241,9 @@ concWord(st, p, q, loc, bb) 		/* create the concatinated word p+q */
 	break;
     case	ND_MWD:
 	conc.nw_flags |= NW_MWD;
+#ifdef FUJIEDA_HACK
+	conc.nw_flags |= (q->nw_flags & NW_DUMMY);
+#endif
 	conc.nw_prio = q->nw_prio;
 	break;
     case	ND_SWD:
@@ -699,10 +706,12 @@ makeWord(cx, yy, ys, ye, class, word, maxword, doflush, douniq)
 	  break;
 	};
 	switch (*k) {
+#ifndef FUJIEDA_HACK
 	case 0xa4a1: case 0xa4a3: case 0xa4a5:
 	case 0xa4a7: case 0xa4a9:
 	case 0xa4e3: case 0xa4e5: case 0xa4e7:
 	case 0xa4c3: case 0xa4f3:
+#endif
 	case 0xa1ab: case 0xa1ac: case 0xa1b3:
 	case 0xa1b4: case 0xa1b5: case 0xa1b6:
 	case 0xa1bc:
@@ -743,6 +752,9 @@ makeWord(cx, yy, ys, ye, class, word, maxword, doflush, douniq)
 		    clen, cx->gram->P_BB);
 	    if (punct)
 	      w[-1].nw_class = punct;
+#ifdef FUJIEDA_HACK
+	    w[-1].nw_flags |= NW_DUMMY;
+#endif
 	  };
       }
     }
@@ -1352,6 +1364,23 @@ parseBun(cx, yy, ys, ye, doflush, douniq, maxclen)
   }
 }
 
+#ifdef BUNMATU
+static
+struct nword	*
+modifyPrio(cx, words)
+    struct RkContext	*cx;
+    struct nword	*words;
+{
+  struct RkKxGram	*gram = cx->gram->gramdic;
+  struct nword		*w;
+
+  for (w = words; w; w = w->nw_next)
+    if (w->nw_prio > 0 && !IsBunmatu(gram, w->nw_rowcol))
+	w->nw_prio += 0x2000 << 4;
+  return words;
+}
+#endif
+
 static 
 void
 storeBun(cx, yy, ys, ye, bun)
@@ -1363,7 +1392,11 @@ storeBun(cx, yy, ys, ye, bun)
   struct nword	*w;
   int		maxclen;
   
+#ifdef BUNMATU
+  full = sortWord(modifyPrio(cx, parseBun(cx, yy, ys, ye, 1, 0, &maxclen)));
+#else
   full = sortWord(parseBun(cx, yy, ys, ye, 1, 0, &maxclen));
+#endif
   bun->nb_cand = full;
   bun->nb_yoff = yy;
 /* kouho wo unique ni suru */
@@ -1387,6 +1420,38 @@ struct splitParm {
 #define FUJIEDA_HACK
 /* 藤枝＠ＪＡＩＳＴのハックを有効にする */
 
+#ifdef FUJIEDA_HACK
+static
+void
+evalSplit(cx, suc, ul)
+     struct RkContext	*cx;
+     struct nword	*suc;
+     struct splitParm	*ul;
+{
+  struct nword	*p;
+  unsigned	l2;
+  unsigned long	u2;
+  
+  l2 = 0;
+  u2 = 0L;
+  for (p = suc; p; p = p->nw_next)  
+  {
+    if (!CanSplitWord(p) || /* 文節にならない */
+	OnlyBunmatu(p) || /* リテラルの直前でしか文節になれない */
+	(p->nw_rowcol == cx->gram->P_KJ) || /* 単漢字 */
+	(p->nw_flags & NW_DUMMY) || /* 捏造された名詞 */
+	(p->nw_flags & NW_SUC))
+      continue;
+    if (l2 <= p->nw_ylen) {
+      l2 = p->nw_ylen;
+      if (u2 < p->nw_prio)
+        u2 = p->nw_prio;
+    }
+  }
+  ul->l2 = l2;
+  ul->u2 = u2;
+}
+#else /* FUJIEDA_HACK */
 static
 void
 evalSplit(suc, ul)
@@ -1420,6 +1485,7 @@ evalSplit(suc, ul)
   ul->l2 = l2;
   ul->u2 = u2;
 }
+#endif /* FUJIEDA_HACK */
 
 #define PARMSIZE 256
 
@@ -1435,7 +1501,7 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 {
 #ifdef FUJIEDA_HACK
   int			L, L1 = 0, L2;
-  unsigned long		U1, U2;
+  unsigned long		U;
 #else
   unsigned		L, L1 = 0, L2;
   unsigned		U2;
@@ -1468,7 +1534,7 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
   if (L1 == 0) {
     L = (L1 = 1)+ (L2 = 0);
 #ifdef FUJIEDA_HACK
-    U2 = U1 = 0L;
+    U = 0L;
 #else
     U2 = (unsigned)0;
 #endif
@@ -1478,6 +1544,9 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
       ul2[i].l2 = ul2[i].u2 = 0L;
     for (w = top; w; w = w->nw_next) {
       int			l, l1;
+#ifdef FUJIEDA_HACK
+      unsigned long		u;
+#endif
       struct splitParm		ul;
       /* 文節にならない */
       if (!CanSplitWord(w)) {
@@ -1503,30 +1572,42 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 	continue;
       }
 #endif
+#ifdef FUJIEDA_HACK
+      /* 単漢字は文の途中に登場しない */
+      if (w->nw_rowcol == cx->gram->P_KJ) {
+        DontSplitWord(w);
+        continue;
+      }
+#endif
       /* 右隣の文節を解析 */
       if (l1 <= maxary) {
 	if (!ul2[l1].l2) 
-	  evalSplit(xq[l1].tree, &ul2[l1]);
+#ifdef FUJIEDA_HACK
+        evalSplit(cx, xq[l1].tree, &ul2[l1]);
+#else
+        evalSplit(xq[l1].tree, &ul2[l1]);
+#endif
 	ul = ul2[l1];
       }
       else {
-	evalSplit(xq[l1].tree, &ul);
+#ifdef FUJIEDA_HACK
+      evalSplit(cx, xq[l1].tree, &ul);
+#else
+      evalSplit(xq[l1].tree, &ul);
+#endif
       }
       /* hikaku */
       l = l1 + ul.l2;
 #ifdef FUJIEDA_HACK
+      u = w->nw_prio + ul.u2;
       if ((L < l) || /* 二文節最長 */
-	  ((L == l) &&
-	   (U1 < w->nw_prio || /* 一文節目の優先度 */
-	    (U1 == w->nw_prio &&
-	     (U2 < ul.u2 || /* 二文節目の優先度 */
-	      (U2 == ul.u2 &&
-	       (L2 < ul.l2))))))) { /* 二文節目の長さ */
-	  L = l;
-	  U1 = w->nw_prio;
-	  L1 = l1;
-	  L2 = ul.l2;
-	  U2 = ul.u2;
+        ((L == l) &&
+         (U < u || /* 優先度の合計 */
+          (U == u && (L2 < ul.l2))))) { /* 二文節目の長さ */
+        L = l;
+        U = u;
+        L1 = l1;
+        L2 = ul.l2;
       }
 #else
       if ((((int)L < l)) ||

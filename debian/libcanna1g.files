@@ -6,3 +6,17 @@ usr/lib/libRKC16.so.1.0
 usr/lib/libRKC16.so.1
 usr/lib/libRKC.so.1.0
 usr/lib/libRKC.so.1
+var/lib/canna/dic/default.cbp
+var/lib/canna/dic/english.cbp
+var/lib/canna/dic/jdaemon.cbp
+var/lib/canna/dic/just.cbp
+var/lib/canna/dic/kaisoku.cbp
+var/lib/canna/dic/kana.cbp
+var/lib/canna/dic/lan5.cbp
+var/lib/canna/dic/matsu.cbp
+var/lib/canna/dic/newjis.cbp
+var/lib/canna/dic/romaji.cbp
+var/lib/canna/dic/sokuon.cbp
+var/lib/canna/dic/tut.cbp
+var/lib/canna/dic/vje.cbp
+var/lib/canna/dic/wx2+.cbp

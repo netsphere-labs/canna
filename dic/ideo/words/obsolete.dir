@@ -32,7 +32,7 @@ bushu.fq(bushu.mwd)	-bushu---
 hojomwd.t(.mwd)		-hojomwd---
 number.t(.swd)		-number---
 katakana.t(.mwd)	-katakana---
-keishiki.t(.mwd)	-keishiki---
+keishiki.t(.swd)	-keishiki---
 
 chimei.t(.mwd)		-chimei---
 kanasmpl.t(.mwd)	-kanasample---

@@ -175,6 +175,9 @@ _RkInitialize(ddhome, numCache)
 		SG.P_T00 = RkGetGramNum(SG.gramdic, "T00");
 		SG.P_T30 = RkGetGramNum(SG.gramdic, "T30");
 		SG.P_T35 = RkGetGramNum(SG.gramdic, "T35");
+#ifdef FUJIEDA_HACK
+		SG.P_KJ  = RkGetGramNum(SG.gramdic, "KJ");
+#endif
 		CX = (struct RkContext *)
 		  Calloc(INIT_CONTEXT, sizeof(struct RkContext));
 		if (CX) {

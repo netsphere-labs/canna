@@ -1,13 +1,5 @@
 #!/bin/sh -e
 
-if ! grep -q '#-- canna begin' /etc/services; then
-    cat >>/etc/services <<EOF
-#-- canna begin
-canna		5680/tcp	# cannaserver
-#-- canna end
-EOF
-fi
-
 chown bin.bin /var/lib/canna/dic/canna
 chown bin.bin /var/lib/canna/dic/canna/fuzokugo.cbd
 chown bin.bin /var/lib/canna/dic/canna/fuzokugo.cld

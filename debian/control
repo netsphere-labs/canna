@@ -1,7 +1,7 @@
 Source: canna
 Section: utils
 Priority: optional
-Maintainer: Yoshiaki Yanagihara <yochi@debian.or.jp>
+Maintainer: ISHIKAWA Mutsumi <ishikawa@linux.or.jp>
 Standards-Version: 2.4.1.3
 
 Package: canna
@@ -34,6 +34,7 @@ Package: libcanna1g
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
+Conflicts: canna (<< 3.5b2-23)
 Description: Canna Runtime Library (Libc6).
  Canna is a Japanese input system available in Free Software.
  This package includes canna shared libraries.
@@ -43,7 +44,7 @@ Section: devel
 Priority: extra
 Architecture: any
 Depends: libcanna1g
-Conflicts: canna-dev, libcanna1-dev
+Conflicts: canna-dev, libcanna1-dev, canna (<< 3.5b2-23)
 Replaces: canna-dev
 Description: Canna Static Library and Headers (Libc6).
  Canna is a Japanese input system available in Free Software.

@@ -33,6 +33,7 @@ hojomwd.ctd(.mwd)		-hojomwd---
 number.ctd(.swd)		-number---
 katakana.ctd(.mwd)		-katakana---
 keishiki.ctd(.swd)		-keishiki---
+suffix.ctd(.swd)		-suffix---
 
 chimei.ctd(.mwd)		-chimei---
 kanasmpl.ctd(.mwd)		-kanasample---

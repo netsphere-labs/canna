@@ -1,7 +1,12 @@
 This package was debianized by Yoshiaki Yanagihara yochi@debian.or.jp on
 Wed, 25 Feb 1998 01:35:35 +0900.
 
+Maintainer Change from YoshiakiYanagihara <yochi@debian.or.jp> to
+ISHIKAWA Mutsumi <ishikawa@linux.or.jp> on Fri May 28 23:13:01 JST 1999
+
 It was downloaded from ftp://ftp.nec.co.jp/pub/Canna/Canna35/Canna35b2.tar.gz
+
+Unofficial Patches downloaded from http://www.jaist.ac.jp/~fujieda/canna/
 
 ----------------------------------------------------------------------
 Copyright 1994 NEC Corporation, Tokyo, Japan.

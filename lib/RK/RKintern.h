@@ -34,6 +34,9 @@
    なくなり変換効率が向上します。このコードをかいて下さいました藤枝さ
    んに感謝します。 */
 
+#define FUJIEDA_HACK
+/* 藤枝＠ＪＡＩＳＴのハックを有効にする */
+
 #define EXTENSION_NEW
 
 #include "cannaconf.h"
@@ -608,6 +611,9 @@ struct RkGram {
   int			refcount; /* reference counter */
   struct RkKxGram	*gramdic; /* grammar dictionary */
   int	 		P_BB, P_NN, P_T00, P_T30, P_T35; /* hinshi codes */
+#ifdef FUJIEDA_HACK
+  int			P_KJ; /* tankanji */
+#endif
 };
 
 extern struct RkGram SG;
@@ -682,6 +688,9 @@ struct nword {
 #define NW_SWD		0x40
 #define NW_PRE		0x20
 #define NW_SUC		0x10
+#ifdef FUJIEDA_HACK
+#define NW_DUMMY	0x08
+#endif
 #ifdef BUNMATU
 #define NW_BUNMATU	0x04
 #endif

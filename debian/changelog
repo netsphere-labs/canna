@@ -1,3 +1,50 @@
+canna (3.5b2-24slink1) stable; urgency=high
+
+  * for stable release security fix based on canna_3.5b2-25
+  * readopt to fsstnd for slink
+  * [SECURITY FIX] buffer overflow. If send IR_INIT command to cannaserver
+    with very logn username and/or groupname, remote user can get root
+    facility. 
+  * add /etc/hosts.canna file as conffile for security reason. Default
+    setting is `clients can connect cannaserver only from localhost.'
+  
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sat,  1 Jul 2000 21:10:00 +0900
+
+canna (3.5b2-23) unstable; urgency=low
+
+  * move /usr/lib/lib*.so from canna.deb to libcanna1g-dev.deb
+  * add Confilics: canna (<= 3.5b2-22) for libcanna1g and libcanna1g-dev.
+    (Because some files from canna to libcanna1g and libcanna1g-dev)
+  
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 10 Oct 1999 03:11:15 +0900
+
+canna (3.5b2-22) unstable; urgency=low
+
+  * /var/lib/canna/dic/*.cbp moved from canna to libcanna1g package,
+    closes: Bug#32096.
+  * adopt FHS.
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Thu,  7 Oct 1999 22:47:57 +0900
+
+canna (3.5b2-21) unstable; urgency=high
+
+  * Oops 3.5b2-20 has not been builded compleatly, so fixed (Bug#38504)
+  * remove -k option flag for make command from $(TOP)/Imakefile
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sat, 29 May 1999 10:41:52 +0900
+
+canna (3.5b2-20) unstable; urgency=low
+
+  * New Maintainer.
+  * Apply Unofficial patche 1 and 2
+   (downloaded from http://www.jaist.ac.jp/~fujieda/canna/)
+  * /etc/service already has canna service, so does not add it in postinst
+   (Bug#37835)
+  * purge /var/log/canna and /var/lib/canna/dic/{user,group}
+   (Bug#36353)
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sat, 29 May 1999 00:02:37 +0900
+
 canna (3.5b2-19) frozen unstable; urgency=high
 
   * Re-build for "Can't make iroha dictionary because

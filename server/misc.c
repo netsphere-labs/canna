@@ -649,12 +649,22 @@ int cxnum ;
 
     if (client->username && client->username[0]) {
       if (client->groupname && client->groupname[0]) {
+	if (strlen(DDUSER) + strlen(client->username) +
+	    strlen(DDGROUP) + strlen(client->groupname) +
+	    strlen(DDPATH) + 4 >= 256) {
+	  return(-1);
+	}
+
 	sprintf(dichome, "%s/%s:%s/%s:%s",
 		DDUSER, client->username,
 		DDGROUP, client->groupname,
 		DDPATH);
       }
       else {
+        if (strlen(DDUSER) + strlen(client->username) +
+	    strlen(DDPATH) + 2 >= 256) {
+	  return(-1);
+	}
 	sprintf(dichome, "%s/%s:%s",
 		DDUSER, client->username,
 		DDPATH);

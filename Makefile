@@ -49,7 +49,7 @@ all::
 #         added define SetTtyGroup 1
 #         added define HasZlib 1
 
-# operating system:  Linux 2.0.36 i686 [ELF] (2.0.36)
+# operating system:  Linux 2.2.13 i686 [ELF] (2.2.13)
 # libc:	(6.0.7)
 # binutils:	(29)
 
@@ -693,7 +693,7 @@ DicDir   = $(cannaLibDir)/dic
 
 MANUALSED = $(CANNAROOT)/misc/manual.sed
 
-      WORLDOPTS = -k
+      WORLDOPTS =
         SUBDIRS = lib canna server cmd dic misc doc
         INCLUDE = ./include/canna
 

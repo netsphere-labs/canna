@@ -50,7 +50,7 @@ binary-arch: build
 	make install.man \
 		cannaManDir=`pwd`/debian/tmp/usr/man \
 		MANSUFFIX=1 LIBMANSUFFIX=3
-	
+
 	rm -f debian/tmp/usr/bin/{cpdic,lsdic,mkdic,mvdic,rmdic,syncdic,addwords,delwords,cannakill}
 	ln -s catdic debian/tmp/usr/bin/cpdic
 	ln -s catdic debian/tmp/usr/bin/lsdic
@@ -61,17 +61,19 @@ binary-arch: build
 	ln -s catdic debian/tmp/usr/bin/delwords
 	ln -s cannakill debian/tmp/usr/bin/syncdic
 	cp debian/tmp/usr/bin/catdic debian/tmp/usr/bin/cannakill
-	
+
 	mv debian/tmp/var/lib/canna/sample/* \
 	  debian/tmp/usr/doc/$(package)/examples
 	cp -p debian/tmp/var/lib/canna/default.canna \
 	  debian/tmp/usr/doc/$(package)/examples
 	rmdir debian/tmp/var/lib/canna/sample
 
+	install -m 644 debian/hosts.canna debian/tmp/etc
+
 	#
 	# End 
 	#
-	
+
 	dh_movefiles
 	dh_installdocs -A README.jp README INSTALL INSTALL.jp WHATIS \
 		WHATIS.jp 

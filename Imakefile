@@ -3,7 +3,7 @@
 
 #define IHaveSubdirs
 #define PassCDebugFlags
-      WORLDOPTS = -k
+      WORLDOPTS =
         SUBDIRS = lib canna server cmd dic misc doc
         INCLUDE = ./include/canna
 AllTarget(cannaconf.h)

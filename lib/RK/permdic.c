@@ -257,6 +257,9 @@ _Rkpopen(dm, dfnm, mode, gram)
 	dm->dm_gram->P_T00 = RkGetGramNum(gram, "T00");
 	dm->dm_gram->P_T30 = RkGetGramNum(gram, "T30");
 	dm->dm_gram->P_T35 = RkGetGramNum(gram, "T35");
+#ifdef FUJIEDA_HACK
+	dm->dm_gram->P_KJ  = RkGetGramNum(gram, "KJ");
+#endif
 	dm->dm_gram->refcount = 1;
 	goto next;
       }
