@@ -14,7 +14,7 @@ dicar \- Archive Binary Dictionary
 ]
 .br
 .B dicar
-.B \-d
+.B \-r
 .I bindic1
 .I bindic2
 .br
@@ -113,4 +113,4 @@ dpbindic(1), mkbindic(1)
 .\" OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
 .\" PERFORMANCE OF THIS SOFTWARE. 
 .\"
-.\" $Id: dicar.man,v 1.4 1994/01/27 09:51:41 kon Exp $
+.\" $Id: dicar.man,v 1.2 2003/01/13 05:29:15 aida_s Exp $

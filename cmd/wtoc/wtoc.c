@@ -21,13 +21,15 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 112.1 $Id: wtoc.c,v 1.22 1996/11/27 07:17:55 kon Exp $";
+static char rcsid[]="@(#) 112.1 $Id: wtoc.c,v 1.2.2.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
 /* wtoi.c  テキスト形式の辞書をＷｎｎから「いろは」のものに変換する。
  *	wtoi [-f hinshifile] [wnndic] [irohadic]
  */
 #include	<stdio.h>
 #include        <ctype.h>
+#include	<unistd.h>
+#include "ccompat.h"
 
 #if defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -80,9 +82,9 @@ static struct hin table[] = {
 char *salloc(s)
      char *s;
 {
-  char *new,*malloc();
+  char *new;
   
-  if (new = (char *)malloc(strlen( s ) + 1))
+  if ((new = (char *)malloc(strlen( s ) + 1)) != NULL)
     strcpy(new, s);
   else{
     fprintf(stderr, gettxt("cannacmd:48", "No more memory\n"));
@@ -169,7 +171,7 @@ main(argc,argv)
 {
   struct hin taiou[MAXHINSHI];
   uchar	S[MAXTANGO],y[MAXTANGO], h[MAXTANGO], k[MAXTANGO],nd[10];
-  int	d,option,fshurui;
+  int	d,option,fshurui = (int)0xdeadbeef; /* for gcc */
   FILE	*fph,*fpi,*fpo;
   
 #if defined(__STDC__) || defined(SVR4)
@@ -183,7 +185,7 @@ main(argc,argv)
 	exit(2);
       }
       fshurui = read_hinshi( fph, taiou );
-      close( fph );
+      fclose( fph );
       option = 1;
     }
     fpi = stdin;
@@ -193,7 +195,7 @@ main(argc,argv)
 #endif
   }
   else { /* 引数が不正 */
-    fprintf(stderr,gettxt("cannacmd:50", "Usage: wtoc [-f part-of-speach table] [wnndic] [cannadic]\n"),argv[0]);
+    fprintf(stderr,gettxt("cannacmd:50", "Usage: wtoc [-f part-of-speach table] [wnndic] [cannadic]\n"));
     exit(2);
   }
   if( argc >= (2 + option*2) ) { /* Ｗｎｎ辞書をオープン */

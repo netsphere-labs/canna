@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 3.7 1996/11/07 01:24:04 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 1.7.2.2 2003/12/27 17:15:22 aida_s Exp $";
 #endif
 
 #include "RKintern.h"
@@ -33,12 +33,8 @@ static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 3.7 1996/11/07 01:24:04 kon Exp 
 #include	<unistd.h>
 #endif
 
-#ifdef __STDC__
-#define pro(x) x
-#else
-#define pro(x) ()
-#endif
-
+#include "ccompat.h"
+#include "RKindep/file.h"
 
 #ifndef HYOUJUN_GRAM
 #ifdef USE_OBSOLETE_STYLE_FILENAME
@@ -51,20 +47,6 @@ static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 3.7 1996/11/07 01:24:04 kon Exp 
 int	inv = 0;
 static	char	*program;
 static	unsigned char ebuf[8048];
-
-char *
-basename(name)
-char	*name;
-{
-    char	*s = name + strlen(name);
-    
-    if (*s == '/')
-	*s = (char)0;
-    while (s-- >= name)
-	if (*s == '/')
-	    return ++s;
-    return name;
-}
 
 unsigned char *
 show_a_cand(gram, wrec, or)
@@ -95,7 +77,7 @@ show_a_cand(gram, wrec, or)
   }
   *dst = (Wchar)0;
   if (gram) {
-    if (ptr = (char *)RkGetGramName(gram, row)) {
+    if ((ptr = (char *)RkGetGramName(gram, row)) != NULL) {
       (void)strcpy(rowname, ptr);
       if (*or != row) {
 	printf(" #%s", rowname);
@@ -247,7 +229,7 @@ loadPage(dic, id)
   }
 
   if (id >= dic->ttlpg) {
-    fprintf(stderr, "ERROR: %dth page is greater than max page %d\n",
+    fprintf(stderr, "ERROR: %dth page is greater than max page %lu\n",
 	    id, dic->ttlpg);
     return(-1);
   }
@@ -355,7 +337,7 @@ compit(a, b)
      unsigned char *a;
      unsigned char *b;
 {
-  if (*a > *b || (*a == *b) && *(a+1) >= *(b+1)) {
+  if (*a > *b || ((*a == *b) && *(a+1) >= *(b+1))) {
     return(1);
   }
   return(-1);
@@ -431,6 +413,9 @@ getdic(dic, filenm, dmnm)
     return(-1);
   if ((fd = open(filenm, O_RDONLY)) < 0)
     return(-1);
+#ifdef __CYGWIN32__
+  setmode(fd, O_BINARY);
+#endif
   for (off = 0, lk = 1, doff = 0, err = 0;
        !err && lk && _RkReadHeader(fd, &hd, off) >= 0;
        lk = dmnm ? strcmp(dmnm, (char *)hd.data[HD_DMNM].ptr) : 1) {
@@ -441,7 +426,7 @@ getdic(dic, filenm, dmnm)
       tloc = hd.data[HD_TIME].var;
       strcpy(date, ctime(&tloc));
       date[24] = 0;
-      (void)fprintf(stderr, "%s [ %s ] = %d + %d\n",
+      (void)fprintf(stderr, "%s [ %s ] = %ld + %ld\n",
 		    (char *)hd.data[HD_DMNM].ptr,
 		    date,
 		    hd.data[HD_CAN].var,
@@ -449,7 +434,8 @@ getdic(dic, filenm, dmnm)
     }
     doff = off;
     off += hd.data[HD_SIZ].var;
-    if (!strncmp(".swd", (char *)(hd.data[HD_DMNM].ptr + strlen((char *)hd.data[HD_DMNM].ptr) - 4), 4)) {
+    if (HD_VERSION(&hd) < 300702L &&
+	!strncmp(".swd", (char *)(hd.data[HD_DMNM].ptr + strlen((char *)hd.data[HD_DMNM].ptr) - 4), 4)) {
       if (lseek(fd, off, 0) < 0 || read(fd, (char *)ll, 4) != 4)
 	err = 1;
       off += bst4_to_l(ll) + 4;
@@ -487,7 +473,7 @@ main (argc, argv)
   char			bn[256];
   int			fd;
 
-  program = basename(argv[0]);
+  program = RkiBasename(argv[0]);
   for (i = 1; i < argc && argv[i][0] == '-'; i++) {
     if (!strcmp(argv[i], "-i") ) {
       inv = 1;
@@ -519,7 +505,10 @@ main (argc, argv)
       (void)fprintf(stderr, "%s: cannot open grammar file %s.\n", program, cnj);
       exit(1);
     }
-    gram = RkReadGram(fd);
+#ifdef __CYGWIN32__
+    setmode(fd, O_BINARY);
+#endif
+    gram = RkReadGram(fd, (size_t)-1);
     close(fd);
   }
   (void)strcpy(bn, argv[i]);

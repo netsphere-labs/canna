@@ -11,6 +11,10 @@ CANNASERVER=/usr/sbin/cannaserver
 CANNAKILL=/usr/bin/cannakill
 CANNA_SERVER_OPT="-u canna"
 
+if [ -e /etc/default/canna ] ; then
+    . /etc/default/canna
+fi
+
 # The following value is extracted by debstd to figure out how to generate
 # the postinst script. Edit the field to change the way the script is
 # registered through update-rc.d (see the manpage for update-rc.d!)
@@ -18,16 +22,19 @@ FLAGS="defaults 98"
 
 test -f $CANNASERVER || exit 0
 test -f $CANNAKILL || exit 0
+[ "${CANNA_SERVER_RUN}" = "no" ] && exit 0
+if [ "${CANNA_ENABLE_INET}" = "yes" ] ; then
+    CANNA_INET_OPT="-inet"
+else
+    CANNA_INET_OPT=""
+fi
 
 RUN_SERVER=1
 
 case "$1" in
   start)
-    if [ $RUN_SERVER = 1 ]
-    then
-	echo "Starting cannaserver..."
-	$CANNASERVER $CANNA_SERVER_OPT
-    fi
+    echo "Starting cannaserver..."
+    $CANNASERVER $CANNA_INET_OPT $CANNA_SERVER_OPT
     ;;
   stop)
     echo "Stopping cannaserver..."
@@ -36,9 +43,7 @@ case "$1" in
   force-reload|restart)
     echo "Restarting cannaserver..."
     $CANNAKILL
-    if [ $RUN_SERVER = 1 ]; then
-        $CANNASERVER $CANNA_SERVER_OPT
-    fi
+    $CANNASERVER $CANNA_INET_OPT $CANNA_SERVER_OPT
     ;;
   *)
     echo "Usage: /etc/init.d/$0 {start|stop|restart}"

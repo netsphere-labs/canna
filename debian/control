@@ -1,9 +1,10 @@
 Source: canna
 Section: utils
 Priority: optional
-Maintainer: ISHIKAWA Mutsumi <ishikawa@linux.or.jp>
-Build-Depends: debhelper (>= 2.1.0), findutils, xlibs-dev, xutils
-Standards-Version: 3.5.2
+Maintainer: Junichi Uekawa <dancer@debian.org>
+Build-Depends: debhelper (>= 4.1.59), xlibs-dev, xutils, dpatch, po-debconf, autoconf2.13, ptex-bin
+Build-Conflicts: libc6 (= 2.3.1-1), libc6.1 (= 2.3.1-1), libc0.3 (= 2.3.1-1), libc1 (= 2.3.1-1)
+Standards-Version: 3.6.1
 
 Package: canna
 Architecture: any
@@ -11,11 +12,11 @@ Depends: ${shlibs:Depends}, debconf, adduser (>= 3.34)
 Conflicts: canna-server, libcanna1g (<= 3.5b2-33)
 Replaces: canna-server
 Suggests: canna-shion
-Description: A japanese input system (server and dictionary).
+Description: A Japanese input system (server and dictionary).
  Canna is a Japanese input system available in Free Software.
- Canna provides a unified user interface for inputing Japanese.
+ Canna provides a unified user interface for inputting Japanese.
  .
- Canna supports Nemacs(Mule), kinput2 and canuum.  All of these
+ Canna supports Nemacs, Mule, kinput2 and canuum.  All of these
  tools can be used by a single customization file, romaji-to-kana
  conversion rules and conversion dictionaries, and input Japanese in
  the same way.
@@ -23,7 +24,7 @@ Description: A japanese input system (server and dictionary).
  Canna converts kana to kanji based on a client-server model and
  supports automatic kana-to-kanji conversion.
  .
- This package includes cannaserver program and dictionary files.
+ This package includes the cannaserver program and dictionary files.
 
 Package: canna-utils
 Architecture: any
@@ -38,16 +39,16 @@ Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, debconf
 Conflicts: canna (<= 3.5b2-33)
-Description: Canna Runtime Library (Libc6).
+Description: Canna Runtime Library
  Canna is a Japanese input system available in Free Software.
  This package includes canna shared libraries.
 
 Package: libcanna1g-dev
-Section: devel
+Section: libdevel
 Architecture: any
 Depends: libcanna1g
 Conflicts: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
 Replaces: canna-dev
-Description: Canna Static Library and Headers (Libc6).
+Description: Canna Static Library and Headers
  Canna is a Japanese input system available in Free Software.
  This package includes header and static libraries.

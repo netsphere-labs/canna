@@ -2,11 +2,14 @@
 
 case "$1" in
     purge)
-    rm -f /etc/canna/default.canna
-    ;;
+	rm -f /etc/canna/default.canna
+	;;
     
-    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-    ;;
+    remove)
+	ldconfig
+	;;
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+	;;
     
     *)
     

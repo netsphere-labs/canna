@@ -1,40 +1,29 @@
-/* $Id: Imakefile,v 2.3 1996/11/27 07:25:24 kon Exp $ */
+/* $Id: Imakefile,v 1.8.2.1 2004/04/26 21:48:37 aida_s Exp $ */
 #include "../Canna.conf"
 
          CANNAROOT = ..
-     INSTUGIDFLAGS = -m 6555 $(cannaOwnerGroup)
+     INSTUGIDFLAGS = /* -m 6555 $(cannaOwnerGroup) */
 #ifdef __EMX__
          INSTFLAGS = $(INSTUGIDFLAGS)
-   LOCAL_LIBRARIES = $(CANNAROOT)/lib/RK/RK.a
 #else
          INSTFLAGS = -s $(INSTUGIDFLAGS)
-   LOCAL_LIBRARIES = $(CANNAROOT)/lib/RK/libRK.a
 #endif
-           DEFINES = $(CANNASERVER_DEFINES)
+           DEFINES = $(CANNASERVER_DEFINES) $(SIGNAL_DEFINES) ConnectionFlags
           INCLUDES = -I$(CANNAROOT)/include
 
             IRSRCS = $(SRCS) $(HEADER)
-            HEADER = IR.h IRproto.h IRwproto.h
-              SRCS = WaitFor.c connection.c convert.c wconvert.c main.c \
+            HEADER = IR.h IRproto.h IRwproto.h server.h comm.h
+              SRCS = comm.c session.c convert.c wconvert.c main.c \
 			misc.c util.c
-              OBJS = WaitFor.o connection.o convert.o wconvert.o main.o \
+              OBJS = comm.o session.o convert.o wconvert.o main.o \
 			misc.o util.o
 
             TARGET = cannaserver
-           DEPLIBS = $(LOCAL_LIBRARIES)
 
-#ifdef __EMX__
-AllTarget($(TARGET).exe)
-#else
-AllTarget($(TARGET))
-#endif
-NormalProgramTarget($(TARGET),$(OBJS),$(DEPLIBS),$(DEPLIBS),)
+AllTarget(ProgramTargetName($(TARGET)))
+NormalProgramTarget($(TARGET),$(OBJS),$(DEPRKLIB) $(DEPRKINDEPLIB),$(RKLIB) $(RKINDEPLIB),)
 
-#ifdef __EMX__
-InstallMultipleFlags($(TARGET).exe,$(cannaSrvDir),$(INSTFLAGS))
-#else
-InstallMultipleFlags($(TARGET),$(cannaSrvDir),$(INSTFLAGS))
-#endif
+InstallMultipleFlags(ProgramTargetName($(TARGET)),$(cannaSrvDir),$(INSTFLAGS))
 InstallManPageLong(server,$(cannaManDir),$(TARGET))
 DependTarget()
 LintTarget()

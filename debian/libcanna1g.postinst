@@ -10,6 +10,7 @@ case "$1" in
 	db_get canna/default_style
 	cp /usr/share/canna/${RET}.canna /etc/canna/default.canna
     fi
+    ldconfig
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -21,6 +22,6 @@ case "$1" in
     ;;
 esac
 
-ldconfig
+
 
 #DEBHELPER#

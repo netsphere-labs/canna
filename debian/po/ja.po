@@ -1,0 +1,157 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-27 08:56+0900\n"
+"PO-Revision-Date: 2003-09-03 06:25+0900\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Description
+#: ../templates:4
+msgid "Do you want to run the Canna server ?"
+msgstr "かんなサーバを起動しますか?"
+
+#. Description
+#: ../templates:4
+msgid ""
+"This package contains the Canna server and server related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+"このパッケージはかんなサーバとサーバに関係したユーティリティを 含んでいます。"
+"もし、サーバ関連のユーティリティにのみ興味があるのであれば、かんなサーバが起"
+"動するのを無効にすることができます。"
+
+#. Description
+#: ../templates:13
+msgid "Do you want to connect to the Canna server from remote host?"
+msgstr "遠隔のホストからかんなサーバに接続しますか?"
+
+#. Description
+#: ../templates:13
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when `-"
+"inet' option is not specified.  It means that when Canna server is started "
+"without `-inet' option, only clients which run on the same host can connect "
+"to the server. Some clients such as `egg' and `yc-el' do not support  UNIX "
+"domain socket and  require `-inet' option even if they run on  the same host."
+msgstr ""
+"このバージョンのかんなサーバは inet オプションがない場合、UNIX ドメインソケッ"
+"ト経由でしか接続できません(セキュリティの強化の ためです)。これは inet オプ"
+"ションなしで起動したかんなサーバ には同じホストで動いているクライアントからし"
+"か接続できない ことを意味します。また `egg' や`yc-el'のように UNIX ドメインソ"
+"ケットを サポートしていないいくつかのクライアントでは、そのクライアント が同"
+"じホストで動作していたとしても、inet オプションを利用する 必要があります。"
+
+#. Description
+#: ../templates:13
+msgid ""
+"If you want to connect this Canna server from remote hosts or if you want to "
+"use INET-domain-only softwares, you should run the server with `-inet' "
+"option."
+msgstr ""
+"もし、このかんなサーバにリモートホストからも接続したい場合、 もしくは、UNIX "
+"ドメインソケットを利用できないクライアント を使う場合、inet オプションをつけ"
+"てサーバを起動しなければ なりません。"
+
+#. Description
+#: ../templates:30
+msgid "Manage /etc/hosts.canna with debconf ?"
+msgstr "/etc/hosts.canna を debconf で管理しますか?"
+
+#. Description
+#: ../templates:30
+msgid "/etc/hosts.canna controls which host can connect to this server."
+msgstr ""
+"/etc/host.canna はどのホストがこのかんなサーバに接続できるかを 制御します。"
+
+#. Description
+#: ../templates:30
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+"/etc/hosts.cannaはデフォルトではdebconfで管理されます。手動で管理したい場合"
+"は、ここで拒否してください。"
+
+#. Description
+#: ../templates:40
+msgid "Please enter the name of hosts allowed to connect this server"
+msgstr "このかんなサーバに接続できるホスト名を入力してください"
+
+#. Description
+#: ../templates:40
+msgid ""
+"Please enter the names of hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"このかんなサーバに接続できるホストネームをスペースで区切って入力してくださ"
+"い。"
+
+#. Description
+#: ../templates:40
+msgid ""
+"`unix'  is a special notation for allowing the accses via UNIX domain "
+"sockets."
+msgstr "`unix' は UNIX ドメインソケットでのアクセスを意味する特別な記述です。"
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid "Canna input style"
+msgstr "Canna 入力スタイル"
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+"Please choose default canna input style below, which will be installed if "
+"there is no previous configuration:"
+msgstr "デフォルトの入力スタイルを選択してください。すでに設定ファイルがインストールされていなければその設定をデフォルトとして利用します："
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word prosessor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"
+msgstr ""
+" verbose - コメント付の Canna3.5 デフォルトスタイル\n"
+" 1.1     - 旧 Canna スタイル (ver. 1.1)\n"
+" 1.2     - 旧 Canna スタイル (ver. 1.2)\n"
+" jdaemon - jdaemon スタイル\n"
+" just    - Justsystem ATOK 風スタイル\n"
+" lan5    - LAN5 風スタイル\n"
+" matsu   - 松ワードプロセッサ風 style\n"
+" skk     - SKK 風スタイル\n"
+" tut     - TUT-code 向け\n"
+" unix    - UNIX スタイル\n"
+" vje     - vje 風スタイル\n"
+" wx2+    - WX2+ 風スタイル"
+
+#~ msgid "Please choose default canna input style below:"
+#~ msgstr "デフォルトの入力スタイルを選択してください。"

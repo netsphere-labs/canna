@@ -1,11 +1,12 @@
 Template: canna/default_style
 Type: select
-Choices: default, 1.1, 1.2, jdaemin, just, lan5, matsu, skk, tut, unix, jve, wx2+
-Default: default
-Description: Canna input style
- Please choose default canna input style bellow:
+Choices: verbose, 1.1, 1.2, jdaemin, just, lan5, matsu, skk, tut, unix, vje, wx2+
+Default: verbose
+_Description: Canna input style
+ Please choose default canna input style below, which will be installed if
+ there is no previous configuration:
  .
-  default - Canna3.5 default style
+  verbose - Canna3.5 default style with verbose comments
   1.1     - old Canna style (ver. 1.1)
   1.2     - old Canna style (ver. 1.2)
   jdaemon - jdaemon style

@@ -3,6 +3,7 @@ usr/bin/cannacheck
 usr/bin/cannastat
 usr/bin/cshost
 usr/bin/catdic
+usr/bin/chkconc
 usr/share/man/man1/mkromdic*
 usr/share/man/man1/cannacheck*
 usr/share/man/man1/cannastat*

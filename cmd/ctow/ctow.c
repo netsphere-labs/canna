@@ -21,13 +21,15 @@
  */
 
 #ifndef lint
-static char rcs[]="@(#) 112.1 $Id: ctow.c,v 1.20 1996/11/09 02:07:47 kon Exp $";
+static char rcs[]="@(#) 112.1 $Id: ctow.c,v 1.3.2.3 2003/12/27 17:15:22 aida_s Exp $";
 #endif
-/* itow.c  テキスト形式の辞書を「いろは」からＷｎｎのものに変換する。
- *	itow [-f hinshifile] [irohadic] [wnndic]
+/* ctow.c  テキスト形式の辞書を「かんな」からＷｎｎのものに変換する。
+ *	ctow [-f parts-of-speech table ] [cannadic] [wnndic]
  */
 #include	<stdio.h>
 #include        <ctype.h>
+#include	"ccompat.h"
+#include	<unistd.h>
 
 #if  defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -37,13 +39,6 @@ static char rcs[]="@(#) 112.1 $Id: ctow.c,v 1.20 1996/11/09 02:07:47 kon Exp $";
 extern char *gettxt();
 #else
 #define	gettxt(x,y)  (y)
-#endif
-
-#ifdef __STDC__
-#include        <stdlib.h>
-#else
-extern char *malloc(), *realloc(), *calloc();
-extern void free();
 #endif
 
 #define		MAXTANGO	256
@@ -219,7 +214,7 @@ char *argv[];
 	exit(2);
       }
       fsize = read_hinshi(fph, taiou);
-      close( fph );
+      fclose( fph );
       option = 1;
     }
     fpi = stdin;
@@ -227,8 +222,7 @@ char *argv[];
   }
   else { /* 引数が不正 */
     fprintf(stderr,gettxt("cannacmd:10", 
-	  "Usage: ctow [-f parts-of-speach table] [cannadic] [wnndic]\n"),
-	    argv[0]);
+	  "Usage: ctow [-f parts-of-speech table] [cannadic] [wnndic]\n"));
     exit(2);
   }
   if( argc >= (2 + option*2) ) { /* いろは辞書をオープン */

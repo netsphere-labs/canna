@@ -1,27 +1,32 @@
 .TH MKBINDIC 1
 .SH NAME
-mkbindic - Convert a text-form dictionary into the binary-form dictionary
-.SHSYNOPSYS
-.B mkbindic
-[
-.I ontions ...
-]
-.I "file"
+mkbindic - Convert a text-form dictionary into a binary-form dictionary
+
+.SH SYNOPSYS
+.B "mkbindic [\-m | \-s] [\-name \fIdicname\fP] [\-c \fIversion\fP] \fItextfile\fP"
+
 .SH DESCRIPTION
-.BI Mkbindic
-creates a binary-form dictionary from a text file dictionary that contains definitions of
-readings and word transformation.  Any option specifiable in 
-.I cpp(1)
-may be specified in
-.I options.
+.BI mkbindic
+creates a binary-form dictionary (with extension .cbd or \fIdicname\fP)
+from a text-form dictionary \fItextfile\fP. With \-c mkbindic creates old
+format dictionary. Current supported \fIversion\fPs are 3.0 and 3.7.
+
 .SH EXAMPLE
 .nf
 .B
-% mkbindic -DKIGOU yamada.t
-yamada.t is sorted and rewritten into an arranged file.
-Binary-form dictionary yamada.d is created.
+% mkbindic user.ctd
+
+A binary-form dictionary user.cbd and a frequency dictionary
+user.cld are created from a text-form dictionary user.ctd.
+
+.SH ENVIRONMENT
+.TP
+TMPDIR
+mkbindic uses the value of this variable for the working directory
+when it makes temporary files. The value defaults to /tmp if not specified.
+
 .SH SEE ALSO
-cpp(1), dicar(1)
+dicar(1), dpbindic(1)
 
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
@@ -44,4 +49,4 @@ cpp(1), dicar(1)
 .\" OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
 .\" PERFORMANCE OF THIS SOFTWARE. 
 .\"
-.\" $Id: mkbindic.man,v 1.3 1994/01/27 09:52:09 kon Exp $
+.\" $Id: mkbindic.man,v 1.3 2003/08/24 09:40:27 aida_s Exp $

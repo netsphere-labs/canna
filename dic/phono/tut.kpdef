@@ -21,7 +21,7 @@
 #  OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
 #  PERFORMANCE OF THIS SOFTWARE. 
 #
-# $Id: tut.kpdef,v 1.2 1994/09/22 04:53:38 kuma Exp $
+# $Id: tut.kpdef,v 1.2 2003/09/17 01:37:01 aida_s Exp $
 # */
 
 rk ¤¢
@@ -2274,7 +2274,7 @@ tgm	°Ö
 tgn	ÁÆ
 tgo	¾Í
 tgp	´·
-tgu	ÂÖ
+tgu	·§
 tgy	°Ù
 tt,	¶à
 tt.	¶§

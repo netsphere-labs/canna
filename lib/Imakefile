@@ -1,11 +1,11 @@
-/* $Id: Imakefile,v 2.5 1994/01/28 05:27:50 kon Exp $ */
+/* $Id: Imakefile,v 1.2 2003/01/26 04:36:34 aida_s Exp $ */
 #include "../Canna.conf"
 #define IHaveSubdirs
 #define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
 
 CANNAROOT = ..
 
-SUBDIRS =RK RKC RKC16 $(RKWNN) canna canna16
+SUBDIRS = RKindep RK RKC RKC16 $(RKWNN) canna canna16
 
 #ifdef engineSwitch
   RKWNN = RKWnn RKWnn16 RKSj3 RKSj316

@@ -1,13 +1,12 @@
 usr/share/doc/libcanna1g
-usr/lib/libcanna16.so.1.0
+usr/lib/libcanna16.so.1.2
 usr/lib/libcanna16.so.1
-usr/lib/libcanna.so.1.0
+usr/lib/libcanna.so.1.2
 usr/lib/libcanna.so.1
-usr/lib/libRKC16.so.1.0
+usr/lib/libRKC16.so.1.2
 usr/lib/libRKC16.so.1
-usr/lib/libRKC.so.1.0
+usr/lib/libRKC.so.1.2
 usr/lib/libRKC.so.1
-usr/share/canna/default.cbp
 usr/share/canna/english.cbp
 usr/share/canna/jdaemon.cbp
 usr/share/canna/just.cbp
@@ -21,7 +20,6 @@ usr/share/canna/sokuon.cbp
 usr/share/canna/tut.cbp
 usr/share/canna/vje.cbp
 usr/share/canna/wx2+.cbp
-usr/share/canna/default.canna
 usr/share/canna/1.1.canna
 usr/share/canna/1.2.canna
 usr/share/canna/fixer.canna
@@ -36,3 +34,5 @@ usr/share/canna/tut.canna
 usr/share/canna/unix.canna
 usr/share/canna/vje.canna
 usr/share/canna/wx2+.canna
+usr/share/canna/default.cbp
+usr/share/canna/verbose.canna

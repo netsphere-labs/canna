@@ -1,0 +1,126 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-27 08:56+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Description
+#: ../templates:4
+msgid "Do you want to run the Canna server ?"
+msgstr ""
+
+#. Description
+#: ../templates:4
+msgid ""
+"This package contains the Canna server and server related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+
+#. Description
+#: ../templates:13
+msgid "Do you want to connect to the Canna server from remote host?"
+msgstr ""
+
+#. Description
+#: ../templates:13
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when `-"
+"inet' option is not specified.  It means that when Canna server is started "
+"without `-inet' option, only clients which run on the same host can connect "
+"to the server. Some clients such as `egg' and `yc-el' do not support  UNIX "
+"domain socket and  require `-inet' option even if they run on  the same host."
+msgstr ""
+
+#. Description
+#: ../templates:13
+msgid ""
+"If you want to connect this Canna server from remote hosts or if you want to "
+"use INET-domain-only softwares, you should run the server with `-inet' "
+"option."
+msgstr ""
+
+#. Description
+#: ../templates:30
+msgid "Manage /etc/hosts.canna with debconf ?"
+msgstr ""
+
+#. Description
+#: ../templates:30
+msgid "/etc/hosts.canna controls which host can connect to this server."
+msgstr ""
+
+#. Description
+#: ../templates:30
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+
+#. Description
+#: ../templates:40
+msgid "Please enter the name of hosts allowed to connect this server"
+msgstr ""
+
+#. Description
+#: ../templates:40
+msgid ""
+"Please enter the names of hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+
+#. Description
+#: ../templates:40
+msgid ""
+"`unix'  is a special notation for allowing the accses via UNIX domain "
+"sockets."
+msgstr ""
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid "Canna input style"
+msgstr ""
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+"Please choose default canna input style below, which will be installed if "
+"there is no previous configuration:"
+msgstr ""
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word prosessor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"
+msgstr ""

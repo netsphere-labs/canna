@@ -20,8 +20,8 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: hojomwd.t,v 1.13 1996/12/02 08:41:24 kon Exp $ */
-# $Id: hojomwd.t,v 1.13 1996/12/02 08:41:24 kon Exp $
+/* $Id: hojomwd.t,v 1.2 2002/10/20 04:10:29 aida_s Exp $ */
+# $Id: hojomwd.t,v 1.2 2002/10/20 04:10:29 aida_s Exp $
 きりがな #KY きりがな
 くりゃ #kxya 来りゃ
 くりゃあ #kxya 来りゃあ

@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char alphamap_id[] = "@(#) 102.1 $Id: alphamap.h,v 9.3 1996/11/06 01:47:49 kon Exp $";
+static char alphamap_id[] = "@(#) 102.1 $Id: alphamap.h,v 1.3 2003/09/17 08:50:53 aida_s Exp $";
 #endif /* lint */
 
 extern int JapaneseMode();
@@ -36,15 +36,6 @@ static struct funccfunc alpha_funcs[] = {
   {CANNA_FN_FunctionalInsert	,AlphaSelfInsert	},
   {DEFAULTBEHAVIOR		,AlphaSelfInsert	},
 
-#ifdef WIN
-  {CANNA_FN_DefineDicMode	,dicTouroku		},
-  {CANNA_FN_DeleteDicMode	,dicSakujo		},
-
-  {CANNA_FN_HenkanRegion	,HenkanRegion		},
-  {CANNA_FN_PhonoEdit		,PhonoEdit		},
-  {CANNA_FN_DicEdit		,DicEdit		},
-  {CANNA_FN_Configure		,Configure		},
-#endif
   {0				,0			},
 };
 
@@ -108,7 +99,7 @@ BYTE alpha_kmap[256] =
 /* 7 */         CANNA_FN_SelfInsert,
 /* 8 */         CANNA_FN_SelfInsert,
 /* 9 */         CANNA_FN_SelfInsert,
-/*   : */       CANNA_FN_SelfInsert,
+/* : */         CANNA_FN_SelfInsert,
 /* ; */         CANNA_FN_SelfInsert,
 /* < */         CANNA_FN_SelfInsert,
 /* = */         CANNA_FN_SelfInsert,

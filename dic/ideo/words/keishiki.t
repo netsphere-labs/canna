@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: keishiki.t,v 1.1.2.2 1996/11/13 00:58:30 kon Exp $ */
+/* $Id: keishiki.t,v 1.2 2002/10/20 04:10:29 aida_s Exp $ */
 
 うち #KN @
 こと #KN @

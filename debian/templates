@@ -1,12 +1,46 @@
-Template: canna/connection_note
-Type: note
-Description: Note of remote connection
- Default canna server setting was changed. It is allowed to connect
- used by UNIX domain socket. You can not connect from REMOTE clients
- the default setting. This change is security reason.
+Template: canna/run_cannaserver
+Type: boolean
+Default: true
+_Description: Do you want to run the Canna server ?
+ This package contains the Canna server and server related
+ utilities. If you are only interested in these utilities,
+ you can disable the Canna server here.
+
+
+Template: canna/run_with_inet
+Type: boolean
+Default: false
+_Description: Do you want to connect to the Canna server from remote host?
+ The Canna server only allows connections via UNIX domain
+ sockets when `-inet' option is not specified.  It
+ means that when Canna server is started without `-inet' option,
+ only clients which run on the same host can connect to the server.
+ Some clients such as `egg' and `yc-el' do not support 
+ UNIX domain socket and  require `-inet' option even if they run on 
+ the same host.
  .
-  - Please use `-inet' option in /etc/init.d/canna, if you want to connect
-   remote client to canna server running on this machine. Don't forget to
-   check /etc/hosts.canna ;-)
-  - If you set `CANNAHOST=localhost', client to connect canna server with
-   inet domain socket. Please use 'CANNAHOST=unix' (or nothing to set).
+ If you want to connect this Canna server from remote hosts or
+ if you want to use INET-domain-only softwares, you should run
+ the server with `-inet' option.
+
+
+Template: canna/manage_allow_hosts_with_debconf
+Type: boolean
+Default: true
+_Description: Manage /etc/hosts.canna with debconf ?
+ /etc/hosts.canna controls which host can connect to this server.
+ .
+ By default /etc/hosts.canna will be managed with debconf.
+ Refuse here if you want to manage /etc/hosts.canna yourself.
+
+
+Template: canna/allow_hosts
+Type: string
+Default: unix localhost
+_Description: Please enter the name of hosts allowed to connect this server
+ Please enter the names of hosts allowed to connect to this Canna server,
+ separated by spaces.
+ .
+ `unix'  is a special notation for allowing the accses
+ via UNIX domain sockets.
+

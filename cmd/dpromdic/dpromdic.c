@@ -21,15 +21,18 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 112.1 $Id: dpromdic.c,v 1.24 1996/11/27 08:20:32 kon Exp $";
+static char rcsid[]="@(#) 112.1 $Id: dpromdic.c,v 1.3.2.2 2003/12/27 17:15:22 aida_s Exp $";
 #endif
 
 /* # include       "RKintern.h"       */
 
 # include	<stdio.h>
+#include	<unistd.h>
 #if defined(__STDC__) || defined(SVR4)
 # include       <locale.h>
 #endif
+#include "ccompat.h"
+#define CANNA_NEW_WCHAR_AWARE
 
 #ifdef SVR4
 extern char *gettxt();
@@ -74,7 +77,7 @@ char	**argv;
     /* NOTREACHED */
   }
 
-  if(rdic = RkwOpenRoma(filename)) {
+  if((rdic = RkwOpenRoma(filename)) != NULL) {
 
     if( rdic -> nr_bchars != NULL && rdic -> nr_bchars[0] ) {
       printf("!%s\n",rdic -> nr_bchars) ;
@@ -123,9 +126,13 @@ printch(s)
       char s ;
 {
 	switch(s) {
+	  case '\''   :
+	  case '\"'   : printf("\\x%02x", s);
+			break;
 	  case ' '    :
 	  case '#'    :
 	  case '\\'   : printf("\\");
+			/* FALLTHROUGH */
 	  default     : printf("%c", s);
                         break;
 	}

@@ -1,0 +1,161 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+# Erik Schanze <mail@erikschanze.de>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: canna_3.7-6_templates\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-27 08:56+0900\n"
+"PO-Revision-Date: 2004-05-24 23:20+0200\n"
+"Last-Translator: Erik Schanze <mail@erikschanze.de>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#. Description
+#: ../templates:4
+msgid "Do you want to run the Canna server ?"
+msgstr "Wollen Sie den Canna-Server starten? "
+
+#. Description
+#: ../templates:4
+msgid ""
+"This package contains the Canna server and server related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+"Dieses Paket enthält den Canna-Server und Server-Werkzeuge. Wenn Sie nur "
+"an diesen Werkzeugen interessiert sind, können Sie den Canna-Server "
+"ausschalten."
+
+#. Description
+#: ../templates:13
+msgid "Do you want to connect to the Canna server from remote host?"
+msgstr "Wollen Sie sich von entfernten Rechnern mit dem Canna-Server verbinden?"
+
+#. Description
+#: ../templates:13
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when `-"
+"inet' option is not specified.  It means that when Canna server is started "
+"without `-inet' option, only clients which run on the same host can connect "
+"to the server. Some clients such as `egg' and `yc-el' do not support  UNIX "
+"domain socket and  require `-inet' option even if they run on  the same host."
+msgstr ""
+"Der Canna-Server lässt nur Verbindungen über UNIX-Domain-Sockets zu, wenn "
+"die Option `-inet' nicht angegeben wurde. Das bedeutet, wenn der Canna-Server "
+"ohne die Option `-inet' gestartet wird, können sich nur Clients mit dem "
+"Server verbinden, die auf dem selben Rechner laufen. Einige Clients wie `egg' "
+"und `yc-el' unterstützen keine UNIX-Domain-Sockets und erfordern die Option "
+"`-inet', auch wenn sie auf dem selben Rechner laufen."
+
+#. Description
+#: ../templates:13
+msgid ""
+"If you want to connect this Canna server from remote hosts or if you want to "
+"use INET-domain-only softwares, you should run the server with `-inet' "
+"option."
+msgstr ""
+"Wenn Sie sich von entfernen Rechnern auf diesen Canna-Server verbinden wollen "
+"oder Software nutzen, die nur INET-Domains unterstützt, sollten Sie den Server "
+"mit der Option `-inet' betreiben."
+
+#. Description
+#: ../templates:30
+msgid "Manage /etc/hosts.canna with debconf ?"
+msgstr "Die Datei /etc/hosts.canna mit debconf verwalten?"
+
+#. Description
+#: ../templates:30
+msgid "/etc/hosts.canna controls which host can connect to this server."
+msgstr ""
+"Die Datei /etc/hosts.canna legt fest, welcher Rechner sich mit diesem "
+"Server verbinden darf."
+
+#. Description
+#: ../templates:30
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+"Normalerweise wird die Datei /etc/hosts.canna von debconf verwaltet. "
+"Lehnen Sie das ab, wenn Sie die Datei /etc/hosts.canna selbst pflegen wollen."
+
+#. Description
+#: ../templates:40
+msgid "Please enter the name of hosts allowed to connect this server"
+msgstr "Bitte Rechnernamen eingeben, die sich mit diesem Server verbinden dürfen"
+
+#. Description
+#: ../templates:40
+msgid ""
+"Please enter the names of hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Bitte geben Sie durch Leerzeichen getrennt die Namen der Rechner ein, die "
+"sich mit diesem Canna-Server verbinden dürfen."
+
+#. Description
+#: ../templates:40
+msgid ""
+"`unix'  is a special notation for allowing the accses via UNIX domain "
+"sockets."
+msgstr ""
+"`unix'  ist eine besondere Schreibweise, um den Zugriff über "
+"UNIX-Domain-Sockets zu gestatten."
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid "Canna input style"
+msgstr "Eingabestil von Canna"
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+"Please choose default canna input style below, which will be installed if "
+"there is no previous configuration:"
+msgstr ""
+"Bitte wählen Sie unten den Standard-Eingabestil aus, der verwendet wird, wenn "
+"keine vorherige Einstellung vorhanden ist:"
+
+#. Description
+#: ../libcanna1g.templates:5
+msgid ""
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word prosessor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"
+msgstr ""
+" verbose - Canna3.5 Standard Stil mit ausführlichen Kommentaren\n"
+" 1.1     - alter Canna-Stil (ver. 1.1)\n"
+" 1.2     - alter Canna-Stil (ver. 1.2)\n"
+" jdaemon - jdaemon Stil\n"
+" just    - Justsystem ATOK-Stil\n"
+" lan5    - LAN5-Stil\n"
+" matsu   - MATSU word prosessor Stil\n"
+" skk     - SKK-Stil\n"
+" tut     - für TUT-Code\n"
+" unix    - UNIX-Stil\n"
+" vje     - vje-Stil\n"
+" wx2+    - WX2+-Stil"
+

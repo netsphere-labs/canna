@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: symbolname.h,v 6.7 1996/11/06 01:46:47 kon Exp $
+/* $Id: symbolname.h,v 1.4 2003/08/05 12:03:01 aida_s Exp $
  */
 
 #define S_HenkanNyuuryokuMode	"henkan-nyuuryoku-mode"
@@ -75,7 +75,6 @@
 #define S_SetInitFunc		"initialize-function"
 #define S_FN_UseDictionary	"use-dictionary"
 #define S_defEscSequence	"define-esc-sequence"
-#define S_defXKeysym		"define-x-keysym"
 
 #define S_FN_Undefined		"undefined"
 #define S_FN_SelfInsert		"self-insert"
@@ -210,6 +209,7 @@
 #define S_VA_QuicklyEscape	"quickly-escape-from-kigo-input"
 #define S_VA_InhibitHanKana	"inhibit-hankaku-kana"
 #define S_VA_CodeInput          "code-input"
+#define S_VA_DelayConnect       "delay-connect"
 
 #define S_IF_HenkanNyuryoku     "(japanese-mode)"
 #define S_IF_ZenHiraKakutei     "(japanese-mode base-kakutei)"
