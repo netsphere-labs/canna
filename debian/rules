@@ -43,12 +43,12 @@ binary-arch: build
 		cannaBinDir=`pwd`/debian/tmp/usr/bin \
 		cannaSrvDir=`pwd`/debian/tmp/usr/sbin \
 		cannaLibDir=`pwd`/debian/tmp/var/lib/canna \
-		cannaManDir=`pwd`/debian/tmp/usr/man \
+		cannaManDir=`pwd`/debian/tmp/usr/share/man \
 		cannaIncDir=`pwd`/debian/tmp/usr/include/canna \
 		libCannaDir=`pwd`/debian/tmp/usr/lib \
 		ErrDir=`pwd`/debian/tmp/var/log/canna
 	make install.man \
-		cannaManDir=`pwd`/debian/tmp/usr/man \
+		cannaManDir=`pwd`/debian/tmp/usr/share/man \
 		MANSUFFIX=1 LIBMANSUFFIX=3
 
 	rm -f debian/tmp/usr/bin/{cpdic,lsdic,mkdic,mvdic,rmdic,syncdic,addwords,delwords,cannakill}
@@ -63,9 +63,9 @@ binary-arch: build
 	cp debian/tmp/usr/bin/catdic debian/tmp/usr/bin/cannakill
 
 	mv debian/tmp/var/lib/canna/sample/* \
-	  debian/tmp/usr/doc/$(package)/examples
+	  debian/tmp/usr/share/doc/$(package)/examples
 	cp -p debian/tmp/var/lib/canna/default.canna \
-	  debian/tmp/usr/doc/$(package)/examples
+	  debian/tmp/usr/share/doc/$(package)/examples
 	rmdir debian/tmp/var/lib/canna/sample
 
 	install -m 644 debian/hosts.canna debian/tmp/etc

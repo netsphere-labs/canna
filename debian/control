@@ -2,7 +2,7 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: ISHIKAWA Mutsumi <ishikawa@linux.or.jp>
-Standards-Version: 2.4.1.3
+Standards-Version: 3.0.0
 
 Package: canna
 Architecture: any

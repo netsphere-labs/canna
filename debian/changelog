@@ -1,14 +1,13 @@
-canna (3.5b2-24slink1) stable; urgency=high
+canna (3.5b2-25) frozen unstable; urgency=high
 
-  * for stable release security fix based on canna_3.5b2-25
-  * readopt to fsstnd for slink
   * [SECURITY FIX] buffer overflow. If send IR_INIT command to cannaserver
     with very logn username and/or groupname, remote user can get root
     facility. 
   * add /etc/hosts.canna file as conffile for security reason. Default
     setting is `clients can connect cannaserver only from localhost.'
-  
- -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sat,  1 Jul 2000 21:10:00 +0900
+    closes: Bug#63402
+
+ -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Fri, 30 Jun 2000 21:25:15 +0900
 
 canna (3.5b2-23) unstable; urgency=low
 
