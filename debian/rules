@@ -1,0 +1,103 @@
+#!/usr/bin/make -f
+#
+
+package=canna
+PWD=$(shell pwd)
+
+build:	build-stamp
+build-stamp:
+	dh=testdir
+
+	## make libc6 version
+	PATH=/usr/bin:/bin:/usr/sbin:/usr/X11R6/bin
+	sudo make clean
+	xmkmf
+	make Makefile
+	make canna
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf build-stamp
+
+	-make clean
+	-rm -f doc/intern/canna.sty doc/lisp/canna.sty doc/man/guide/tex/canna.sty doc/misc/canna.sty
+
+	dh_clean
+
+# Build architecture-independent files here.
+binary-indep: build
+#Nothing
+
+# Build architecture-dependent files here.
+binary-arch: build
+	dh_testdir -a
+	dh_testroot -a
+	dh_clean -a -k
+	dh_installdirs -a
+
+	#
+	# Canna Install
+	#
+	make install \
+		cannaBinDir=`pwd`/debian/tmp/usr/bin \
+		cannaSrvDir=`pwd`/debian/tmp/usr/sbin \
+		cannaLibDir=`pwd`/debian/tmp/var/lib/canna \
+		cannaManDir=`pwd`/debian/tmp/usr/man \
+		cannaIncDir=`pwd`/debian/tmp/usr/include/canna \
+		libCannaDir=`pwd`/debian/tmp/usr/lib \
+		ErrDir=`pwd`/debian/tmp/var/log/canna
+	make install.man \
+		cannaManDir=`pwd`/debian/tmp/usr/man \
+		MANSUFFIX=1 LIBMANSUFFIX=3
+	
+	rm -f debian/tmp/usr/bin/{cpdic,lsdic,mkdic,mvdic,rmdic,syncdic,addwords,delwords,cannakill}
+	ln -s catdic debian/tmp/usr/bin/cpdic
+	ln -s catdic debian/tmp/usr/bin/lsdic
+	ln -s catdic debian/tmp/usr/bin/mkdic
+	ln -s catdic debian/tmp/usr/bin/mvdic
+	ln -s catdic debian/tmp/usr/bin/rmdic
+	ln -s catdic debian/tmp/usr/bin/addwords
+	ln -s catdic debian/tmp/usr/bin/delwords
+	ln -s cannakill debian/tmp/usr/bin/syncdic
+	cp debian/tmp/usr/bin/catdic debian/tmp/usr/bin/cannakill
+	
+	mv debian/tmp/var/lib/canna/sample/* \
+	  debian/tmp/usr/doc/$(package)/examples
+	cp -p debian/tmp/var/lib/canna/default.canna \
+	  debian/tmp/usr/doc/$(package)/examples
+	rmdir debian/tmp/var/lib/canna/sample
+
+	#
+	# End 
+	#
+	
+	dh_movefiles -a
+	dh_installdocs -a INSTALL INSTALL.jp README README.jp WHATIS WHATIS.jp
+	dh_installexamples -a
+	dh_undocumented canlisp.1 crfreq.1 crxdic.1 crxgram.1 dpxdic.1\
+		forcpp.1 forsort.1 kpdic.1 mergeword.1 syncdic.1
+	dh_installinit -a
+#	dh_installmenu	
+#	dh_installcron
+#	dh_installmanpages
+	dh_installchangelogs -a CHANGES.jp
+	dh_strip -a 
+	dh_compress -a
+	dh_fixperms -a
+	dh_suidregister
+	dh_installdeb -a
+	dh_shlibdeps -a 
+	dh_gencontrol -a 
+	dh_makeshlibs -a
+#	dh_du -a
+	dh_md5sums -a 
+	dh_builddeb -a
+
+source diff:
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary:	binary-indep binary-arch
+.PHONY: binary binary-arch binary-indep clean build

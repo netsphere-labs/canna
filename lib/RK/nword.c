@@ -984,8 +984,10 @@ parseWord(cx, yy, ys, ye, class, xqh, maxclen, doflush, douniq)
 #ifdef BUNMATU
 	      /* 文章末にしかならない */
 	      if (IsBunmatu(gram, pq->nw_rowcol)) {
-		/* 句読点その他の場合には文章末検査は不要 */
-		if (q->nw_class >= ND_OPN)
+		/* 句読点などの場合と、読みを尽くしている場合には
+		   文章末検査は不要 */
+		if (q->nw_class >= ND_OPN ||
+		    (doflush && yy + pq->nw_ylen == cx->store->nyomi))
 		  pq->nw_flags &= ~NW_BUNMATU;
 		else
 		  pq->nw_flags |= NW_BUNMATU;
@@ -1382,6 +1384,9 @@ struct splitParm {
   int		l2;
 };
 
+#define FUJIEDA_HACK
+/* 藤枝＠ＪＡＩＳＴのハックを有効にする */
+
 static
 void
 evalSplit(suc, ul)
@@ -1396,11 +1401,20 @@ evalSplit(suc, ul)
   u2 = 0L;
   for (p = suc; p; p = p->nw_next)  
   {
+#ifdef BUNMATU
+    if (!CanSplitWord(p) || OnlyBunmatu(p) || (p->nw_flags & NW_SUC))
+#else
     if (!CanSplitWord(p) || (p->nw_flags & NW_SUC))
+#endif
       continue;
     if ((unsigned long)l2 < (unsigned long)p->nw_ylen) 
       l2 = p->nw_ylen;
+#ifdef FUJIEDA_HACK
+    /* 読みが一文字の単語の優先度は考慮しない */
+    if (u2 < p->nw_prio && p->nw_ylen > 1)
+#else
     if (u2 < p->nw_prio)
+#endif
       u2 = p->nw_prio;
   };
   ul->l2 = l2;
@@ -1419,8 +1433,13 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
      int		maxclen;
      int		flush;
 {
+#ifdef FUJIEDA_HACK
+  int			L, L1 = 0, L2;
+  unsigned long		U1, U2;
+#else
   unsigned		L, L1 = 0, L2;
   unsigned		U2;
+#endif
   struct nword	*w;
   int			i;
   int			maxary = PARMSIZE - 1;
@@ -1448,27 +1467,31 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
   }
   if (L1 == 0) {
     L = (L1 = 1)+ (L2 = 0);
+#ifdef FUJIEDA_HACK
+    U2 = U1 = 0L;
+#else
     U2 = (unsigned)0;
+#endif
     if (maxary > maxclen)
       maxary = maxclen;
     for (i = 0; i <= maxary; i++)
       ul2[i].l2 = ul2[i].u2 = 0L;
     for (w = top; w; w = w->nw_next) {
-      int				l, l1;
+      int			l, l1;
       struct splitParm		ul;
-      /* ichido ni 2tu tukomono ha yameru */
+      /* 文節にならない */
       if (!CanSplitWord(w)) {
 	continue;
       }
       if ((w->nw_flags & NW_PRE) && (w->nw_flags & NW_SUC)) {
 	continue;
       }
-      /* mijikasugiru/bunsetumatu ni narenai  monoha hazusu */
+      /* 読みを消費していない */
       l1 = w->nw_ylen;
       if (l1 <= 0) {
 	continue;
       }
-      /* shuujoushi ha bun no tochuu deha tukanai */
+      /* 一文節にするのが最長 */
       if (flush && (unsigned)yy + w->nw_ylen == cx->store->nyomi) {
 	L1 = l1;
 	break;
@@ -1480,7 +1503,7 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 	continue;
       }
 #endif
-      /* migi donari no bunsetsu wo kaiseki */
+      /* 右隣の文節を解析 */
       if (l1 <= maxary) {
 	if (!ul2[l1].l2) 
 	  evalSplit(xq[l1].tree, &ul2[l1]);
@@ -1491,6 +1514,21 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
       }
       /* hikaku */
       l = l1 + ul.l2;
+#ifdef FUJIEDA_HACK
+      if ((L < l) || /* 二文節最長 */
+	  ((L == l) &&
+	   (U1 < w->nw_prio || /* 一文節目の優先度 */
+	    (U1 == w->nw_prio &&
+	     (U2 < ul.u2 || /* 二文節目の優先度 */
+	      (U2 == ul.u2 &&
+	       (L2 < ul.l2))))))) { /* 二文節目の長さ */
+	  L = l;
+	  U1 = w->nw_prio;
+	  L1 = l1;
+	  L2 = ul.l2;
+	  U2 = ul.u2;
+      }
+#else
       if ((((int)L < l)) ||
 	  (((int)L == l) &&  (U2 < ul.u2)) ||
 	  (((int)L == l) &&  (U2 == ul.u2) && ((int)L2 < ul.l2))
@@ -1500,6 +1538,7 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 	L2 = ul.l2;
 	U2 = ul.u2;
       }
+#endif
     }
   }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -2000,8 +2039,10 @@ doLearn(cx, thisW)
 	candidates[i] = wp;
 	wp += 2 * ((*wp >> 1) & 0x7f) + 2;
       };
+/*
       if (thisCache->nc_count)
 	continue;
+*/
       if (qm && qm->dm_qbits) {
 	int		bits;
 	

@@ -1,0 +1,48 @@
+#! /bin/sh
+#
+# This file was automatically customized by debmake on Thu, 14 Nov 1996 01:44:07 +0900
+#
+# Written by Miquel van Smoorenburg <miquels@drinkel.ow.org>.
+# Modified for Debian GNU/Linux by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+# Modified for Debian by Christoph Lameter <clameter@debian.org>
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+CANNASERVER=/usr/sbin/cannaserver
+CANNAKILL=/usr/bin/cannakill
+
+# The following value is extracted by debstd to figure out how to generate
+# the postinst script. Edit the field to change the way the script is
+# registered through update-rc.d (see the manpage for update-rc.d!)
+FLAGS="defaults 98"
+
+test -f $CANNASERVER || exit 0
+test -f $CANNAKILL || exit 0
+
+RUN_SERVER=1
+
+case "$1" in
+  start)
+    if [ $RUN_SERVER = 1 ]
+    then
+	echo "Starting cannaserver..."
+	$CANNASERVER
+    fi
+    ;;
+  stop)
+    echo "stopping cannaserver..."
+    $CANNAKILL
+    ;;
+  force-reload|restart)
+    echo "restarting cannaserver..."
+    $CANNAKILL
+    if [ $RUN_SERVER = 1 ]; then
+        $CANNASERVER
+    fi
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$0 {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0

@@ -1,0 +1,166 @@
+canna (3.5b2-14) frozen unstable; urgency=low
+
+  * Bug Fix: All packages build under binary-indep. (Bug#20203)
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Tue, 31 Mar 1998 10:16:59 +0900
+
+canna (3.5b2-13) frozen unstable; urgency=low
+
+  * Bug Fix: can't unpack source package. (Bug#20156) 
+  * Bug Fix: libcanna1g-dev changed priority optional to extra. (Bug#19920)
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Wed, 25 Mar 1998 10:16:08 +0900
+
+canna (3.5b2-12) unstable; urgency=low
+
+  * First Debian Project Release.
+  * Added English manpages.
+  * Added postinst of libcanna1g package.
+  * Modified libcanna1g.files file (fixed lintian error).
+  * Check with lintian.
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Wed,  4 Mar 1998 10:43:48 +0900
+
+canna (3.5b2-11) hamm-jp; urgency=low
+
+  * Fixed file modes. 
+  * Fixed symbolic files.
+  * Made conffiles for /etc/init.d/canna.
+  * Fixed init (added restart and force-reload).
+  * Removed control file "du".
+  * Added undocumented manpages:
+     canlisp.1 crfreq.1 crxdic.1 crxgram.1 dpxdic.1
+     forcpp.1 forsort.1 kpdic.1 mergeword.1 syncdic.1
+  * Check package file with lintian.
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Thu, 26 Feb 1998 20:40:42 +0900
+
+canna (3.5b2-10) hamm-jp; urgency=HIGH
+
+  * Rename canna-server package to canna.
+  * Delete oldlibs (libcanna1, libcanna1-dev).
+  * Fixed mode /var/lib/canna/dic and /var/log/canna. (#JP/169, #JP/181)
+  * Built with debhelper.
+  * Change to Standards-Version 2.4.0.0
+
+ -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Wed, 25 Feb 1998 01:58:54 +0900
+
+canna (3.5b2-9) hamm-jp; urgency=low
+
+  * Fixed Bug: libcanna1g-dev package is depended to libc5 and libcanna1.
+  * Modified Conflicts list of libcanna1-dev and libcanna1g package
+    in control file.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Mon, 10 Nov 1997 10:23:15 +0900
+
+canna (3.5b2-8) unstable; urgency=low
+
+  * Fixed Bug: fuzokugo.cbd file is none.
+  * Compiled with libc6.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Fri,  7 Nov 1997 17:51:19 +0900
+
+canna (3.5b2-7) unstable; urgency=low
+
+  * Libc6 compiled.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Mon, 27 Oct 1997 02:47:02 +0900
+
+canna (3.5b2-6) unstable; urgency=HIGH
+
+  * Fixed Bug: Bad file owner. (FATAL BUG)
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Tue, 16 Sep 1997 12:48:11 +0900
+
+canna (3.5b2-5) bo-jp hamm-jp; urgency=medium
+
+  * Change section of libcanna1-dev package from libs to devel.
+  * Bug FIxed: Use default.cbp file as default Romaji-Kana Dictionaly.
+  * Build libc5 still.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Mon,  8 Sep 1997 14:20:19 +0900
+
+canna (3.5b2-4) bo-jp hamm-jp; urgency=HIGH
+
+  * Fixed Bug: Don't execute cannaserver. (FATAL BUG)
+  * Change that cannaserver run when canna-server package.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Mon,  4 Aug 1997 12:20:09 +0900
+
+canna (3.5b2-3) bo-jp hamm-jp; urgency=low
+
+  * New package: canna-utils is canna utility programs
+  * New package: libcanna1 is shared libraries.
+  * Rename from canna to canna-server.
+  * Rename from canna-dev to libcanna1-dev.
+  * Change section misc to utils and libs.
+  * Change ja_JP.EUC to ja_JP.ujis of manpage directory.
+  * Change init.d filename from canna to canna-server.
+  * Upgrading from canna_3.5b2-2:
+    	You must purge canna_3.5b2-2 package 
+  	before install these packages.
+  		dpkg --purge --force-depends canna
+  * cannaserver don't run after install canna-server package.
+    If you want to run cannaserver on system boot,
+    modify RUN_SERVER=1 in /etc/init.d/canna-server file.
+  * Update to Standards-Versoin 2.2.0.0.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Fri, 25 Jul 1997 12:56:02 +0900
+
+canna (3.5b2-2) unstable; urgency=low
+
+  * Fixed Bug: cannaserver don't start. (Initialize failed)
+  * Applied patch from fujieda@jaist.ac.jp.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Fri, 13 Dec 1996 14:40:46 +0900
+
+canna (3.5b2-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Fri, 6 Dec 1996 02:14:59 +0900
+
+canna (3.5b1-2) unstable; urgency=high
+
+  * Fixed Bug: exit select(2) on linux. (H.Hane)
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Tue, 19 Nov 1996 01:00:33 +0900
+
+canna (3.5b1-1) unstable; urgency=high
+
+  * New upstream version.
+  * This package is Beta Release version.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Thu, 14 Nov 1996 01:44:07 +0900
+
+canna (3.2p2+uf1+gp3-3) unstable; urgency=high
+
+  * Used deb-make.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Sat, 2 Nov 1996 02:03:53 +0900
+
+canna (32p2+uf1+gp3-2) unstable; urgency=low
+
+  * Fixed bug: man page paths are wrong.
+  * Remove preinst script.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Sat, 2 Nov 1996 00:57:21 +0900
+
+canna (32p2+uf1+gp3-1) unstable; urgency=low
+
+  * New source package.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Fri, 13 Sep 1996 19:56:07 +0900
+
+canna (32p2+uf1+gp3-0) unstable; urgency=low
+
+  * Initial Beta Release.
+  * added Debian GNU/Linux package maintenance system files.
+  * Apply unofficail patch 1 and grammer patch 1,2,3,
+    but grammer-patch patch.228 doesn't apply to sources.
+
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Tue, 28 Aug 1996 01:30:00 +0900
+
+Local variables:
+mode: debian-changelog
+End:

@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+if [ "$1" = "purge" ]; then
+	if grep -q "#-- canna begin" /etc/services; then
+		cp /etc/services /etc/services.new
+		sed -e '/#-- canna begin/,/#-- canna end/d' </etc/services.new >/etc/services
+		rm /etc/services.new
+	fi
+fi
+
+#DEBHELPER#

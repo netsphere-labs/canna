@@ -69,7 +69,6 @@ struct RkKxGram {
 static char	fileName[256];
 static int	lineNum;
 
-#if !defined(__GLIBC__)
 static char *
 basename(name)
   char *name;
@@ -84,7 +83,6 @@ basename(name)
 	    break;
     return ++s;
 }
-#endif /* __GLIBC__ */
 static void
 usage(prog)
   char	*prog;

@@ -37,11 +37,15 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 7.32 1996/11/25 10:06:50 kon 
 #endif
 #endif
 
+/* Comment out original code.
 #ifdef WIN
 #define DEFAULT_ROMKANA_TABLE "/dic/default.cbp"
 #else
 #define DEFAULT_ROMKANA_TABLE "/dic/default.kp"
 #endif
+*/
+/* Canna 3.5b2 have only cbp files. */
+#define DEFAULT_ROMKANA_TABLE "/dic/default.cbp"
 
 #ifdef luna88k
 extern int errno;

@@ -1,0 +1,5 @@
+usr/include
+usr/lib/*.a
+usr/man/man3
+usr/man/ja_JP.ujis/man3
+

@@ -131,8 +131,7 @@
 cannaBinDir = /usr/bin
 cannaSrvDir = /usr/sbin
 cannaLibDir = /var/lib/canna
-/* cannaManDir = /usr/man/ja_JP.ujis */
-cannaManDir = /usr/man
+cannaManDir = /usr/man/ja_JP.ujis
 cannaIncDir = /usr/include/canna
 libCannaDir = /usr/lib
 
@@ -168,7 +167,7 @@ CHGRP = chgrp
 CHMOD = chmod
 
 /* 日本語マニュアルを使わないのであればコメントアウト */
-/* #define JAPANESEMAN */
+#define JAPANESEMAN
 
 /* locale ディレクトリを持っている場合は以下を記述する */
 /* #define LOCALE_DIR /usr/lib/locale */
@@ -284,13 +283,11 @@ DicDir   = $(cannaLibDir)/dic
      SCRIPTS_DEFINES = 
 
 /* The following is based on the macro definition in mit/config/Imake.rules */
-/*
 #ifdef JAPANESEMAN
  MANSRCSUFF = jmn
 #else
  MANSRCSUFF = man
 #endif
-*/
 
 /* USE_OBSOLETE_STYLE_FILENAME を定義するための定義 */
 #ifdef USE_OBSOLETE_STYLE_FILENAME
@@ -329,16 +326,13 @@ clean::									@@\
 #undef InstallManPageLong
 #endif
 #define	InstallManPageLong(file,destdir,dest)				@@\
-ConvertPathName(file.tmp,file.man)					@@\
-ConvertPathName(file.jtmp,file.jmn)					@@\
-install.man:: file.tmp file.jtmp					@@\
+ConvertPathName(file.tmp,file.$(MANSRCSUFF))				@@\
+install.man:: file.tmp							@@\
 	MakeDir($(DESTDIR)destdir/man$(MANSUFFIX))			@@\
-	MakeDir($(DESTDIR)destdir/ja_JP.ujis/man$(MANSUFFIX))		@@\
 	$(INSTALL) -c $(INSTMANFLAGS) file.tmp $(DESTDIR)destdir/man$(MANSUFFIX)/dest.$(MANSUFFIX)	@@\
-	$(INSTALL) -c $(INSTMANFLAGS) file.jtmp $(DESTDIR)destdir/ja_JP.ujis/man$(MANSUFFIX)/dest.$(MANSUFFIX)	@@\
-	$(RM) file.tmp file.jtmp					@@\
+	$(RM) file.tmp							@@\
 clean::									@@\
-	$(RM) file.tmp file.jtmp
+	$(RM) file.tmp
 
 #ifdef InstallManPage
 #undef InstallManPage
@@ -350,16 +344,13 @@ InstallManPageLong(file,destdir,file)
 #undef InstallLibManPageLong
 #endif
 #define	InstallLibManPageLong(file,destdir,dest)			@@\
-ConvertPathName(file.tmp,file.man)				@@\
-ConvertPathName(file.jtmp,file.jmn)				@@\
-install.man:: file.tmp file.jtmp				@@\
+ConvertPathName(file.tmp,file.$(MANSRCSUFF))				@@\
+install.man:: file.tmp							@@\
 	MakeDir($(DESTDIR)destdir/man$(LIBMANSUFFIX))			@@\
-	MakeDir($(DESTDIR)destdir/ja_JP.ujis/man$(LIBMANSUFFIX))	@@\
 	$(INSTALL) -c $(INSTMANFLAGS) file.tmp $(DESTDIR)destdir/man$(LIBMANSUFFIX)/dest.$(LIBMANSUFFIX)	@@\
-	$(INSTALL) -c $(INSTMANFLAGS) file.jtmp $(DESTDIR)destdir/ja_JP.ujis/man$(LIBMANSUFFIX)/dest.$(LIBMANSUFFIX)	@@\
-	$(RM) file.tmp file.jtmp					@@\
+	$(RM) file.tmp							@@\
 clean::									@@\
-	$(RM) file.tmp file.jtmp
+	$(RM) file.tmp
 
 #ifdef InstallLibManPage
 #undef InstallLibManPage

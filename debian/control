@@ -1,0 +1,49 @@
+Source: canna
+Section: utils
+Priority: optional
+Maintainer: Yoshiaki Yanagihara <yochi@debian.or.jp>
+Standards-Version: 2.4.0.0
+
+Package: canna
+Architecture: any
+Depends: ${shlibs:Depends}
+Conflicts: canna-server
+Replaces: canna-server
+Description: A japanese input system (server and dictionary).
+ Canna is a Japanese input system available in Free Software.
+ Canna provides a unified user interface for inputing Japanese.
+ .
+ Canna supports Nemacs(Mule), kinput2 and canuum.  All of these
+ tools can be used by a single customization file, romaji-to-kana
+ conversion rules and conversion dictionaries, and input Japanese in
+ the same way.
+ .
+ Canna converts kana to kanji based on a client-server model and
+ supports automatic kana-to-kanji conversion.
+ .
+ This packege includes cannaserver program and dictionary files.
+
+Package: canna-utils
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: A japanese input system (utility).
+ Canna is a Japanese input system available in Free Software.
+ This packege includes canna client programs.
+
+Package: libcanna1g
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Canna Runtime Library (Libc6).
+ Canna is a Japanese input system available in Free Software.
+ This package includes canna shared libraries.
+
+Package: libcanna1g-dev
+Section: devel
+Priority: extra
+Architecture: any
+Conflicts: canna-dev, libcanna1-dev
+Replaces: canna-dev
+Description: Canna Static Library and Headers (Libc6).
+ Canna is a Japanese input system available in Free Software.
+ This package includes header and static libraries.
