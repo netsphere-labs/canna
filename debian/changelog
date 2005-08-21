@@ -1,3 +1,14 @@
+canna (3.7p3-2) unstable; urgency=low
+
+  * add cs.po translation (closes: #308518)
+  * add vi.po translation (closes: #313201)
+  * Standards-Version: 3.6.2
+  * Remove the Build-conflicts against libc6 2.3.1, since 3.5b2-51;
+    should no longer be necessary.
+  * postinst: do not use [ .. -a ... ], use [ ] && [ ] instead.
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 21 Aug 2005 13:31:49 +0900
+
 canna (3.7p3-1) unstable; urgency=low
 
   * New upstream release

@@ -3,8 +3,7 @@ Section: utils
 Priority: optional
 Maintainer: Junichi Uekawa <dancer@debian.org>
 Build-Depends: debhelper (>= 4.1.59), xlibs-dev, xutils, dpatch, po-debconf, autoconf2.13, ptex-bin
-Build-Conflicts: libc6 (= 2.3.1-1), libc6.1 (= 2.3.1-1), libc0.3 (= 2.3.1-1), libc1 (= 2.3.1-1)
-Standards-Version: 3.6.1
+Standards-Version: 3.6.2
 
 Package: canna
 Architecture: any

@@ -76,7 +76,7 @@ EOF
     fi
 
     # Install files from template dir to /var
-    if [ -f /var/lib/canna/dic/canna/iroha.cbd -a -f /var/lib/canna/dic/canna/iroha.cld -a -f /var/lib/canna/dic/canna/bushu.cld ]; then
+    if [ -f /var/lib/canna/dic/canna/iroha.cbd ] && [ -f /var/lib/canna/dic/canna/iroha.cld ] && [ -f /var/lib/canna/dic/canna/bushu.cld ]; then
 	: # the files already exist, ignore
 	echo "iroha dics are already installed... ignoring" >&2
     else
@@ -87,7 +87,7 @@ EOF
 	echo "Installed new iroha dic" >&2
     fi
 
-    if [ -f /var/lib/canna/dic/canna/fuzokugo.cbd -a -f /var/lib/canna/dic/canna/fuzokugo.cld ]; then
+    if [ -f /var/lib/canna/dic/canna/fuzokugo.cbd ] && [ -f /var/lib/canna/dic/canna/fuzokugo.cld ]; then
 	: # the files already exist, ignore
 	echo "fuzokugo dics are already installed... ignoring" >&2
     else
