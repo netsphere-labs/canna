@@ -1,3 +1,13 @@
+canna (3.7p3-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Medium-urgency upload for RC bugfix.
+  * Build-Depend on libx11-dev instead of on the obsolete xlibs-dev; thanks
+    to Justin Pryzby <justinpryzby@users.sf.net> for the patch.
+    Closes: #346613.
+
+ -- Steve Langasek <vorlon@debian.org>  Mon, 16 Jan 2006 01:20:47 -0800
+
 canna (3.7p3-2) unstable; urgency=low
 
   * add cs.po translation (closes: #308518)
