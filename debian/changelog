@@ -1,3 +1,9 @@
+canna (3.7p3-3) unstable; urgency=low
+
+  * New maintainer
+
+ -- Atsushi Mitsuka <mitsuka@misao.gr.jp>  Fri, 24 Mar 2006 09:29:41 +0900
+
 canna (3.7p3-2.1) unstable; urgency=medium
 
   * Non-maintainer upload.
