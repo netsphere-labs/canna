@@ -1,106 +1,142 @@
 # Vietnamese translation for canna.
-# Copyright © 2005 Free Software Foundation, Inc.
-# Clytie Siddall <clytie@riverland.net.au>, 2005.
+# Copyright © 2006 Free Software Foundation, Inc.
+# Clytie Siddall <clytie@riverland.net.au>, 2005-2006.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: canna 3.7p3-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-09-27 08:56+0900\n"
-"PO-Revision-Date: 2005-06-12 22:22+0930\n"
+"POT-Creation-Date: 2006-10-29 11:01+0100\n"
+"PO-Revision-Date: 2006-10-29 17:16+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
-"Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.6fc1\n"
 
-#.Description
-#:../templates:4
+#. Type: boolean
+#. Description
+#: ../templates:1001
 msgid "Do you want to run the Canna server ?"
 msgstr "Bạn có muốn chạy trình phục vụ Canna không?"
 
-#.Description
-#:../templates:4
+#. Type: boolean
+#. Description
+#: ../templates:1001
 msgid ""
-"This package contains the Canna server and server related utilities. If you "
+"This package contains the Canna server and server-related utilities. If you "
 "are only interested in these utilities, you can disable the Canna server "
 "here."
-msgstr "Gói tin này chứa trình phục vụ Canna, và một số tiện ích liên quan đến trình phục vụ ấy. Nếu bạn chỉ muốn sử dụng những tiện ích ấy thì bạn có thể vô hiệu hóa trình phục vụ Canna tại đây."
+msgstr ""
+"Gói này chứa trình phục vụ Canna, và một số tiện ích liên quan đến trình "
+"phục vụ đó. Nếu bạn chỉ muốn sử dụng những tiện ích này, ở đây bạn có khả "
+"năng vô hiệu hóa trình phục vụ Canna."
 
-#.Description
-#:../templates:13
-msgid "Do you want to connect to the Canna server from remote host?"
-msgstr "Bạn có muốn kết nối đến trình phục vụ Canna từ một máy ở xa không?"
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Do you want to connect to the Canna server from a remote host?"
+msgstr "Bạn có muốn kết nối đến trình phục vụ Canna từ máy ở xa không?"
 
-#.Description
-#:../templates:13
+#. Type: boolean
+#. Description
+#: ../templates:2001
 msgid ""
-"The Canna server only allows connections via UNIX domain sockets when `-"
-"inet' option is not specified.  It means that when Canna server is started "
-"without `-inet' option, only clients which run on the same host can connect "
-"to the server. Some clients such as `egg' and `yc-el' do not support  UNIX "
-"domain socket and  require `-inet' option even if they run on  the same host."
-msgstr "Trình phục vụ Canna cho phép kết nối thông qua ổ cắm miền Unix chỉ khi không ghi rõ tùy chọn «-inet». Có nghĩa là khi trình phục vụ Canna khởi chạy không có tùy chọn «-inet», chỉ trình khách có chạy trên cùng máy có thể kết nối đến trình phục vụ ấy. Một số trình khách như «egg» và «yc-el» không hỗ trợ ổ cắm miền Unix, thì cần đến tùy chọn «-inet» tham chí nếu có chạy trên cùng máy."
+"The Canna server only allows connections via UNIX domain sockets when the `-"
+"inet' option is not specified.  This means that when the Canna server is "
+"started without the `-inet' option, only clients which run on the same host "
+"can connect to the server. Some clients such as, `egg' and `yc-el', do not "
+"support UNIX domain socket and require the `-inet' option, even if they run "
+"on the same host."
+msgstr ""
+"Trình phục vụ Canna chỉ cho phép kết nối thông qua ổ cắm miền UNIX khi tùy "
+"chọn « -inet » không được xác định. Có nghĩa là khi trình phục vụ Canna được "
+"khởi chạy, không có tùy chọn « -inet », chỉ những ứng dụng khách chạy trên "
+"cùng máy có khả năng kết nối đến trình phục vụ. Một số ứng dụng khách riêng "
+"như « egg » và « yc-el » không hỗ trợ ổ cắm miền UNIX thì cần thiết tùy chọn "
+"« -inet » thậm chí nếu chúng chạy trên cùng một máy với trình phục vụ."
 
-#.Description
-#:../templates:13
+#. Type: boolean
+#. Description
+#: ../templates:2001
 msgid ""
-"If you want to connect this Canna server from remote hosts or if you want to "
-"use INET-domain-only softwares, you should run the server with `-inet' "
-"option."
-msgstr "Nếu bạn muốn kết nối đến trình phục vụ Canna này từ máy ở xa, hoặc nếu bạn muốn sử dụng phần mềm chỉ hoạt động trên miền INET, thì bạn hãy chạy trình phục vụ với tùy chọn «-inet»."
+"If you want to connect to this Canna server from remote hosts, or if you "
+"want to use INET-domain-only software, you should run the server with the `-"
+"inet' option."
+msgstr ""
+"Nếu bạn muốn kết nối đến trình phục vụ Canna này từ máy ở xa, hoặc nếu bạn "
+"muốn sử dụng phần mềm chỉ hoạt động trên miền INET, bạn nên chạy trình phục "
+"vụ với tùy chọn « -inet »."
 
-#.Description
-#:../templates:30
+#. Type: boolean
+#. Description
+#: ../templates:3001
 msgid "Manage /etc/hosts.canna with debconf ?"
-msgstr "Bạn có muốn cho phép debconf quản lý tập tin «/etc/hosts.canna» không?"
+msgstr "Quản lý « /etc/hosts.canna » bằng debconf không?"
 
-#.Description
-#:../templates:30
-msgid "/etc/hosts.canna controls which host can connect to this server."
-msgstr "Tập tin «/etc/hosts.canna» điều khiển máy nào có thể kết nối đến trình phụ vụ này."
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "/etc/hosts.canna controls which hosts can connect to this server."
+msgstr ""
+"Tập tin « /etc/hosts.canna » điều khiển máy nào có khả năng kết nối đến "
+"trình phụ vụ này."
 
-#.Description
-#:../templates:30
+#. Type: boolean
+#. Description
+#: ../templates:3001
 msgid ""
 "By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
 "want to manage /etc/hosts.canna yourself."
-msgstr "Mặc định là debconf sẽ quản lý tập tin «/etc/hosts.canna». Bạn hãy từ chối tại đây, nếu bạn muốn tự quản lý tập tin này."
+msgstr ""
+"Mặc định là tập tin liệt kê các máy được phép « /etc/hosts.canna » sẽ được "
+"quản lý bằng debconf. Hãy từ chối ở đây nếu bạn muốn tự quản lý tập tin nay."
 
-#.Description
-#:../templates:40
-msgid "Please enter the name of hosts allowed to connect this server"
-msgstr "Hãy nhập danh sách các máy được cho phép kết nối đến trình phục vụ này."
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid "Please enter the name of each host allowed to connect to this server"
+msgstr "Hãy nhập tên của mỗi máy được phép kết nối đến máy phục vụ này."
 
-#.Description
-#:../templates:40
+#. Type: string
+#. Description
+#: ../templates:4001
 msgid ""
-"Please enter the names of hosts allowed to connect to this Canna server, "
+"Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
-msgstr "Hãy nhập danh sách (định giới bằng dấu cách) các máy được cho phép kết nối đến trình phục vụ Canna này."
+msgstr ""
+"Hãy nhập danh sách (định giới bằng dấu cách) các máy được phép kết nối đến "
+"trình phục vụ Canna này."
 
-#.Description
-#:../templates:40
+#. Type: string
+#. Description
+#: ../templates:4001
 msgid ""
-"`unix'  is a special notation for allowing the accses via UNIX domain "
-"sockets."
-msgstr "«unix» là một tùy chọn đặc biệt cho phép truy cập thông qua ổ cắm miền Unix."
+"`unix'  is a special notation for allowing access via UNIX domain sockets."
+msgstr ""
+"« unix » là một chuỗi đặc biệt cho phép truy cập thông qua ổ cắm miền UNIX."
 
-#.Description
-#:../libcanna1g.templates:5
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
 msgid "Canna input style"
 msgstr "Kiểu gõ Canna"
 
-#.Description
-#:../libcanna1g.templates:5
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
 msgid ""
-"Please choose default canna input style below, which will be installed if "
-"there is no previous configuration:"
-msgstr "Hãy chọn kiểu gõ Canna mặc định bên dưới: sẽ cài đặt nó nếu không có cấu hình trước."
+"Please choose the default canna input style below, which will be installed "
+"if there is no previous configuration:"
+msgstr ""
+"Hãy chọn kiểu dáng gõ Canna mặc định bên dưới: nó sẽ được cài đặt nếu chưa "
+"có cấu hình:"
 
-#.Description
-#:../libcanna1g.templates:5
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
 msgid ""
 " verbose - Canna3.5 default style with verbose comments\n"
 " 1.1     - old Canna style (ver. 1.1)\n"
@@ -108,22 +144,22 @@ msgid ""
 " jdaemon - jdaemon style\n"
 " just    - Justsystem ATOK like style\n"
 " lan5    - LAN5 like style\n"
-" matsu   - MATSU word prosessor like style\n"
+" matsu   - MATSU word processor like style\n"
 " skk     - SKK like style\n"
 " tut     - for TUT-Code\n"
 " unix    - UNIX style\n"
 " vje     - vje like style\n"
 " wx2+    - WX2+ style"
 msgstr ""
-" • verbose	kiểu gõ Canna mặc định, xuất chi tiết\n"
-" • 1.1     		kiểu Canna cũ (phiên bản 1.1)\n"
-" • 1.2     		kiểu Canna cũ (phiên bản 1.2)\n"
-" • jdaemon	kiểu jdaemon\n"
-" • just    		kiểu như Justsystem ATOK\n"
-" • lan5    		kiểu như LAN5\n"
-" • matsu   	kiểu như trình xử lý từ MATSU\n"
-" • skk     		kiểu như SKK\n"
-" • tut    		cho mã TUT\n"
-" • unix    		kiểu UNIX\n"
-" • vje     		kiểu như vje\n"
-" • wx2+    	kiểu WX2+"
+" • verbose\tkiểu gõ Canna3.5 mặc định, xuất chi tiết\n"
+" • 1.1     \t\tkiểu Canna cũ (phiên bản 1.1)\n"
+" • 1.2     \t\tkiểu Canna cũ (phiên bản 1.2)\n"
+" • jdaemon\tkiểu jdaemon\n"
+" • just    \t\tkiểu như Justsystem ATOK\n"
+" • lan5    \t\tkiểu như LAN5\n"
+" • matsu   \tkiểu như trình xử lý từ MATSU\n"
+" • skk     \t\tkiểu như SKK\n"
+" • tut    \t\tcho mã TUT\n"
+" • unix    \t\tkiểu UNIX\n"
+" • vje     \t\tkiểu như vje\n"
+" • wx2+    \tkiểu WX2+"

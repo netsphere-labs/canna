@@ -1,0 +1,174 @@
+# translation of canna_debconf_ru.po to Russian
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+#
+# Yuri Kozlov <kozlov.y@gmail.com>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: 3.7p3-3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-10-29 11:01+0100\n"
+"PO-Revision-Date: 2006-10-29 18:48+0300\n"
+"Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.2\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:1001
+msgid "Do you want to run the Canna server ?"
+msgstr "Запускать Canna сервер ?"
+
+#. Type: boolean
+#. Description
+#: ../templates:1001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+"Данный пакет содержит Canna сервер и серверные утилиты. Если вам требуются "
+"только утилиты, то вы можете не запускать Canna сервер."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Do you want to connect to the Canna server from a remote host?"
+msgstr "Разрешить подключения к Canna серверу с удалённых хостов?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when the `-"
+"inet' option is not specified.  This means that when the Canna server is "
+"started without the `-inet' option, only clients which run on the same host "
+"can connect to the server. Some clients such as, `egg' and `yc-el', do not "
+"support UNIX domain socket and require the `-inet' option, even if they run "
+"on the same host."
+msgstr ""
+"Если не указан параметр `-inet', к Canna серверу разрешены подключения "
+"только через доменные сокеты UNIX. Это означает, что когда Canna сервер "
+"запускается без параметра `-inet', то только клиенты на том же компьютере "
+"могут подключаться к серверу. Некоторые клиенты, например `egg' и `yc-el', "
+"не поддерживают доменные сокеты UNIX, и для них нужен параметр `-inet', даже "
+"если они запускаются на той же машине что и сервер."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"If you want to connect to this Canna server from remote hosts, or if you "
+"want to use INET-domain-only software, you should run the server with the `-"
+"inet' option."
+msgstr ""
+"Если вы хотите подключаться к Canna серверу с удалённых хостов, или если вы "
+"хотите использовать ПО, работающее только через INET-домены, то вам нужно "
+"запускать сервер с параметром `-inet'."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Manage /etc/hosts.canna with debconf ?"
+msgstr "Управлять файлом /etc/hosts.canna через debconf ?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "/etc/hosts.canna controls which hosts can connect to this server."
+msgstr ""
+"Файл /etc/hosts.canna контролирует какие хосты могут подключаться к серверу."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+"По умолчанию файл /etc/hosts.canna управляется через debconf. Ответьте "
+"отрицательно, если хотите редактировать файл /etc/hosts.canna самостоятельно."
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid "Please enter the name of each host allowed to connect to this server"
+msgstr "Введите имя каждого хоста, с которого разрешено подключаться к серверу"
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Введите имена хостов через пробел, с которых разрешено подключаться к "
+"серверу Canna."
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid ""
+"`unix'  is a special notation for allowing access via UNIX domain sockets."
+msgstr ""
+"`unix' -- это специальное обозначение, которое указывается, если нужно "
+"разрешить доступ через доменные сокеты UNIX."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid "Canna input style"
+msgstr "Стиль ввода Canna"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid ""
+"Please choose the default canna input style below, which will be installed "
+"if there is no previous configuration:"
+msgstr ""
+"Выберите стиль ввода canna по умолчанию, который будет установлен, если не "
+"был настроен ранее:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid ""
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word processor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"
+msgstr ""
+" verbose - Canna3.5 стиль по умолчанию с подробными комментариями\n"
+" 1.1     - старый стиль Canna (вер. 1.1)\n"
+" 1.2     - старый стиль Canna (вер. 1.2)\n"
+" jdaemon - стиль jdaemon\n"
+" just    - Justsystem ATOK-подобный стиль\n"
+" lan5    - LAN5-подобный стиль\n"
+" matsu   - стиль, подобный текстовому процессору MATSU\n"
+" skk     - SKK-подобный стиль\n"
+" tut     - для TUT-Code\n"
+" unix    - UNIX стиль\n"
+" vje     - vje-подобный стиль\n"
+" wx2+    - WX2+ стиль"

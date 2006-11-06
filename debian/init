@@ -6,6 +6,16 @@
 # Modified for Debian GNU/Linux by Ian Murdock <imurdock@gnu.ai.mit.edu>.
 # Modified for Debian by Christoph Lameter <clameter@debian.org>
 
+### BEGIN INIT INFO
+# Provides:          canna
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: canna Japanese Input System
+# Description:       Canna provides a unified user interface for inputting Japanese.
+### END INIT INFO
+
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 CANNASERVER=/usr/sbin/cannaserver
 CANNAKILL=/usr/bin/cannakill

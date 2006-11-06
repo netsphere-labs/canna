@@ -3,7 +3,7 @@ Type: select
 Choices: verbose, 1.1, 1.2, jdaemin, just, lan5, matsu, skk, tut, unix, vje, wx2+
 Default: verbose
 _Description: Canna input style
- Please choose default canna input style below, which will be installed if
+ Please choose the default canna input style below, which will be installed if
  there is no previous configuration:
  .
   verbose - Canna3.5 default style with verbose comments
@@ -12,7 +12,7 @@ _Description: Canna input style
   jdaemon - jdaemon style
   just    - Justsystem ATOK like style
   lan5    - LAN5 like style
-  matsu   - MATSU word prosessor like style
+  matsu   - MATSU word processor like style
   skk     - SKK like style
   tut     - for TUT-Code
   unix    - UNIX style

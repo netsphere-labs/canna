@@ -1,33 +1,25 @@
+# Portuguese translation for canna debconf messages
+# Copyright (C) 2006 THE canna'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the canna package.
+# Ricardo Silva <ardoric@gmail.com>, 2006
 #
-#    Translators, if you are not familiar with the PO format, gettext
-#    documentation is worth reading, especially sections dedicated to
-#    this format, e.g. by running:
-#         info -n '(gettext)PO Files'
-#         info -n '(gettext)Header Entry'
-#
-#    Some information specific to po-debconf are available at
-#            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
-#    Developers do not need to manually edit POT or PO files.
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: canna 3.7p3-3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-29 11:01+0100\n"
-"PO-Revision-Date: 2003-09-03 06:25+0900\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2006-07-29 10:48+0100\n"
+"Last-Translator: Ricardo Silva <ardoric@gmail.com>\n"
+"Language-Team: Native Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Do you want to run the Canna server ?"
-msgstr "かんなサーバを起動しますか?"
+msgstr "Deseja correr o servidor Canna?"
 
 #. Type: boolean
 #. Description
@@ -37,16 +29,15 @@ msgid ""
 "are only interested in these utilities, you can disable the Canna server "
 "here."
 msgstr ""
-"このパッケージはかんなサーバとサーバに関係したユーティリティを 含んでいます。"
-"もし、サーバ関連のユーティリティにのみ興味があるのであれば、かんなサーバが起"
-"動するのを無効にすることができます。"
+"Este pacote contem o servidor Canna e utilit叩rios relacionados. Se s坦 est叩 "
+"interessado nos utilit叩rios pode desactivar o servidor Canna aqui."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 #, fuzzy
 msgid "Do you want to connect to the Canna server from a remote host?"
-msgstr "遠隔のホストからかんなサーバに接続しますか?"
+msgstr "Deseja conectar-se ao servidor Canna a partir de um anfitri達o remoto?"
 
 #. Type: boolean
 #. Description
@@ -60,12 +51,12 @@ msgid ""
 "support UNIX domain socket and require the `-inet' option, even if they run "
 "on the same host."
 msgstr ""
-"このバージョンのかんなサーバは inet オプションがない場合、UNIX ドメインソケッ"
-"ト経由でしか接続できません(セキュリティの強化の ためです)。これは inet オプ"
-"ションなしで起動したかんなサーバ には同じホストで動いているクライアントからし"
-"か接続できない ことを意味します。また `egg' や`yc-el'のように UNIX ドメインソ"
-"ケットを サポートしていないいくつかのクライアントでは、そのクライアント が同"
-"じホストで動作していたとしても、inet オプションを利用する 必要があります。"
+"O servidor Canna apenas permite liga巽探es a partir de sockets UNIX quando a "
+"op巽達o `-inet' n達o 辿 especificada. Isto significa que quando o servidor Canna "
+"辿 iniciado sem a op巽達o `-inet', s坦 clientes a correr no mesmo anfitri達o se "
+"podem ligar ao servidor. Alguns clientes, tais como o `egg' e o `yc-el' n達o "
+"suportam sockets UNIX e necessitam a op巽達o `-inet' mesmo estando a correr no "
+"mesmo anfitri達o."
 
 #. Type: boolean
 #. Description
@@ -76,15 +67,15 @@ msgid ""
 "want to use INET-domain-only software, you should run the server with the `-"
 "inet' option."
 msgstr ""
-"もし、このかんなサーバにリモートホストからも接続したい場合、 もしくは、UNIX "
-"ドメインソケットを利用できないクライアント を使う場合、inet オプションをつけ"
-"てサーバを起動しなければ なりません。"
+"Se deseja poder ligar-se a este servidor Canna a partir de anfitri探es "
+"remotos ou se quer usar sofware que s坦 conhece o dominio INET, deve correr o "
+"servidor com a op巽達o `-inet'."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Manage /etc/hosts.canna with debconf ?"
-msgstr "/etc/hosts.canna を debconf で管理しますか?"
+msgstr "Gerir o /etc/hosts.canna com o debconf?"
 
 #. Type: boolean
 #. Description
@@ -92,7 +83,7 @@ msgstr "/etc/hosts.canna を debconf で管理しますか?"
 #, fuzzy
 msgid "/etc/hosts.canna controls which hosts can connect to this server."
 msgstr ""
-"/etc/host.canna はどのホストがこのかんなサーバに接続できるかを 制御します。"
+"o /etc/hosts.canna controla que anfitri探es se podem ligar a este servidor."
 
 #. Type: boolean
 #. Description
@@ -101,15 +92,17 @@ msgid ""
 "By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
 "want to manage /etc/hosts.canna yourself."
 msgstr ""
-"/etc/hosts.cannaはデフォルトではdebconfで管理されます。手動で管理したい場合"
-"は、ここで拒否してください。"
+"Por omiss達o o /etc/hosts.canna vai ser gerido com o debconf. Recuse se "
+"quiser gerir o /etc/hosts.canna por si."
 
 #. Type: string
 #. Description
 #: ../templates:4001
 #, fuzzy
 msgid "Please enter the name of each host allowed to connect to this server"
-msgstr "このかんなサーバに接続できるホスト名を入力してください"
+msgstr ""
+"Por favor introduza o nome dos anfitri探es permitidos a ligar-se a este "
+"servidor"
 
 #. Type: string
 #. Description
@@ -119,8 +112,8 @@ msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
 msgstr ""
-"このかんなサーバに接続できるホストネームをスペースで区切って入力してくださ"
-"い。"
+"Por favor introduza os nomes dos anfitri探es permitidos a ligar-se a este "
+"servidor Canna separados por espa巽os."
 
 #. Type: string
 #. Description
@@ -128,13 +121,13 @@ msgstr ""
 #, fuzzy
 msgid ""
 "`unix'  is a special notation for allowing access via UNIX domain sockets."
-msgstr "`unix' は UNIX ドメインソケットでのアクセスを意味する特別な記述です。"
+msgstr "`unix' 辿 uma nota巽達o especial para permitir o acesso via sockets UNIX."
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:1001
 msgid "Canna input style"
-msgstr "Canna 入力スタイル"
+msgstr "Estilo de input do Canna"
 
 #. Type: select
 #. Description
@@ -144,8 +137,8 @@ msgid ""
 "Please choose the default canna input style below, which will be installed "
 "if there is no previous configuration:"
 msgstr ""
-"デフォルトの入力スタイルを選択してください。すでに設定ファイルがインストール"
-"されていなければその設定をデフォルトとして利用します："
+"Por favor escolha o estilo de input do canna das op巽探es em baixo. Ser叩 "
+"instalado se n達o houver configura巽達o pr辿via:"
 
 #. Type: select
 #. Description
@@ -165,18 +158,15 @@ msgid ""
 " vje     - vje like style\n"
 " wx2+    - WX2+ style"
 msgstr ""
-" verbose - コメント付の Canna3.5 デフォルトスタイル\n"
-" 1.1     - 旧 Canna スタイル (ver. 1.1)\n"
-" 1.2     - 旧 Canna スタイル (ver. 1.2)\n"
-" jdaemon - jdaemon スタイル\n"
-" just    - Justsystem ATOK 風スタイル\n"
-" lan5    - LAN5 風スタイル\n"
-" matsu   - 松ワードプロセッサ風 style\n"
-" skk     - SKK 風スタイル\n"
-" tut     - TUT-code 向け\n"
-" unix    - UNIX スタイル\n"
-" vje     - vje 風スタイル\n"
-" wx2+    - WX2+ 風スタイル"
-
-#~ msgid "Please choose default canna input style below:"
-#~ msgstr "デフォルトの入力スタイルを選択してください。"
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word prosessor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"

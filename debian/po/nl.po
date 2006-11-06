@@ -14,7 +14,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: canna 3.7-4\n"
-"POT-Creation-Date: 2003-09-27 08:56+0900\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-10-29 11:01+0100\n"
 "PO-Revision-Date: 2004-03-29 09:38+0100\n"
 "Last-Translator: Luk Claes <luk.claes@ugent.be>\n"
 "Language-Team: Debian l10n Dutch <debian-l10n-dutch@lists.debian.org>\n"
@@ -22,73 +23,136 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Type: boolean
 #. Description
-#: ../templates:4
+#: ../templates:1001
 msgid "Do you want to run the Canna server ?"
 msgstr "Wilt u de Canna-server uitvoeren?"
 
+#. Type: boolean
 #. Description
-#: ../templates:4
-msgid "This package contains the Canna server and server related utilities. If you are only interested in these utilities, you can disable the Canna server here."
-msgstr "Dit pakket bevat de Canna-server en servergerelateerde utilities. Als u enkel geïnteresseerd bent in deze utilities, dan kunt u hier zorgen dat de Canna-server niet wordt uitgevoerd."
+#: ../templates:1001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+"Dit pakket bevat de Canna-server en servergerelateerde utilities. Als u "
+"enkel geïnteresseerd bent in deze utilities, dan kunt u hier zorgen dat de "
+"Canna-server niet wordt uitgevoerd."
 
+#. Type: boolean
 #. Description
-#: ../templates:13
-msgid "Do you want to connect to the Canna server from remote host?"
+#: ../templates:2001
+#, fuzzy
+msgid "Do you want to connect to the Canna server from a remote host?"
 msgstr "Wilt u de Canna-server connecteren van een andere computer?"
 
+#. Type: boolean
 #. Description
-#: ../templates:13
-msgid "The Canna server only allows connections via UNIX domain sockets when `-inet' option is not specified.  It means that when Canna server is started without `-inet' option, only clients which run on the same host can connect to the server. Some clients such as `egg' and `yc-el' do not support  UNIX domain socket and  require `-inet' option even if they run on  the same host."
-msgstr "De Canna-server aanvaardt enkel connecties via de UNIX-domeinsocket wanneer de `-inet'-optie niet wordt  aangegeven. Dit betekent dat wanneer de Canna-server opgestart wordt zonder de `-inet'-optie, uitsluitend clients die op dezelfde host draaien, een verbinding kunnen maken met de server. Enkele clients zoals `egg' en `yc-el' ondersteunen geen UNIX-domeinsockets en vereisen de `-inet'-optie ook al draaien ze  op dezelfde host."
+#: ../templates:2001
+#, fuzzy
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when the `-"
+"inet' option is not specified.  This means that when the Canna server is "
+"started without the `-inet' option, only clients which run on the same host "
+"can connect to the server. Some clients such as, `egg' and `yc-el', do not "
+"support UNIX domain socket and require the `-inet' option, even if they run "
+"on the same host."
+msgstr ""
+"De Canna-server aanvaardt enkel connecties via de UNIX-domeinsocket wanneer "
+"de `-inet'-optie niet wordt  aangegeven. Dit betekent dat wanneer de Canna-"
+"server opgestart wordt zonder de `-inet'-optie, uitsluitend clients die op "
+"dezelfde host draaien, een verbinding kunnen maken met de server. Enkele "
+"clients zoals `egg' en `yc-el' ondersteunen geen UNIX-domeinsockets en "
+"vereisen de `-inet'-optie ook al draaien ze  op dezelfde host."
 
+#. Type: boolean
 #. Description
-#: ../templates:13
-msgid "If you want to connect this Canna server from remote hosts or if you want to use INET-domain-only softwares, you should run the server with `-inet' option."
-msgstr "Als u een verbinding wilt maken met de Canna-server vanaf andere computers of als u INET-domein-specifieke software wilt gebruiken, dan moet u de server uitvoeren met de `-inet'-optie."
+#: ../templates:2001
+#, fuzzy
+msgid ""
+"If you want to connect to this Canna server from remote hosts, or if you "
+"want to use INET-domain-only software, you should run the server with the `-"
+"inet' option."
+msgstr ""
+"Als u een verbinding wilt maken met de Canna-server vanaf andere computers "
+"of als u INET-domein-specifieke software wilt gebruiken, dan moet u de "
+"server uitvoeren met de `-inet'-optie."
 
+#. Type: boolean
 #. Description
-#: ../templates:30
+#: ../templates:3001
 msgid "Manage /etc/hosts.canna with debconf ?"
 msgstr "Wilt u /etc/hosts.canna met debconf beheren?"
 
+#. Type: boolean
 #. Description
-#: ../templates:30
-msgid "/etc/hosts.canna controls which host can connect to this server."
-msgstr "/etc/hosts.canna bepaalt welke host met de server een verbinding kan maken."
+#: ../templates:3001
+#, fuzzy
+msgid "/etc/hosts.canna controls which hosts can connect to this server."
+msgstr ""
+"/etc/hosts.canna bepaalt welke host met de server een verbinding kan maken."
 
+#. Type: boolean
 #. Description
-#: ../templates:30
-msgid "By default /etc/hosts.canna will be managed with debconf. Refuse here if you want to manage /etc/hosts.canna yourself."
-msgstr "Standaard zal /etc/hosts.canna met debconf beheerd worden. Weiger hier als u zelf /etc/hosts.canna wilt beheren."
+#: ../templates:3001
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+"Standaard zal /etc/hosts.canna met debconf beheerd worden. Weiger hier als u "
+"zelf /etc/hosts.canna wilt beheren."
 
+#. Type: string
 #. Description
-#: ../templates:40
-msgid "Please enter the name of hosts allowed to connect this server"
+#: ../templates:4001
+#, fuzzy
+msgid "Please enter the name of each host allowed to connect to this server"
 msgstr "Geef de naam van de hosts die toegang krijgen tot de server"
 
+#. Type: string
 #. Description
-#: ../templates:40
-msgid "Please enter the names of hosts allowed to connect to this Canna server, separated by spaces."
-msgstr "Geef de namen van de hosts die toestemming krijgen om met deze Canna-server een verbinding te maken, gescheiden met spaties."
+#: ../templates:4001
+#, fuzzy
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Geef de namen van de hosts die toestemming krijgen om met deze Canna-server "
+"een verbinding te maken, gescheiden met spaties."
 
+#. Type: string
 #. Description
-#: ../templates:40
-msgid "`unix'  is a special notation for allowing the accses via UNIX domain sockets."
-msgstr "`unix' is een speciale notatie om de toegang via UNIX-domeinsockets toe te laten."
+#: ../templates:4001
+#, fuzzy
+msgid ""
+"`unix'  is a special notation for allowing access via UNIX domain sockets."
+msgstr ""
+"`unix' is een speciale notatie om de toegang via UNIX-domeinsockets toe te "
+"laten."
 
+#. Type: select
 #. Description
-#: ../libcanna1g.templates:5
+#: ../libcanna1g.templates:1001
 msgid "Canna input style"
 msgstr "Canna-invoerstijl"
 
+#. Type: select
 #. Description
-#: ../libcanna1g.templates:5
-msgid "Please choose default canna input style below, which will be installed if there is no previous configuration:"
-msgstr "Kies de standaard canna-invoerstijl, welke zal worden geïnstalleerd als er geen vorige configuratie is:"
+#: ../libcanna1g.templates:1001
+#, fuzzy
+msgid ""
+"Please choose the default canna input style below, which will be installed "
+"if there is no previous configuration:"
+msgstr ""
+"Kies de standaard canna-invoerstijl, welke zal worden geïnstalleerd als er "
+"geen vorige configuratie is:"
 
+#. Type: select
 #. Description
-#: ../libcanna1g.templates:5
+#: ../libcanna1g.templates:1001
+#, fuzzy
 msgid ""
 " verbose - Canna3.5 default style with verbose comments\n"
 " 1.1     - old Canna style (ver. 1.1)\n"
@@ -96,7 +160,7 @@ msgid ""
 " jdaemon - jdaemon style\n"
 " just    - Justsystem ATOK like style\n"
 " lan5    - LAN5 like style\n"
-" matsu   - MATSU word prosessor like style\n"
+" matsu   - MATSU word processor like style\n"
 " skk     - SKK like style\n"
 " tut     - for TUT-Code\n"
 " unix    - UNIX style\n"
@@ -115,4 +179,3 @@ msgstr ""
 "unix - UNIX-stijl\n"
 "vje - zoals de vje-stijl\n"
 "wx2+ - WX2+-stijl"
-

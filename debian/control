@@ -7,11 +7,11 @@ Standards-Version: 3.6.2
 
 Package: canna
 Architecture: any
-Depends: ${shlibs:Depends}, debconf, adduser (>= 3.34)
+Depends: ${shlibs:Depends}, debconf | debconf-2.0, adduser (>= 3.34)
 Conflicts: canna-server, libcanna1g (<= 3.5b2-33)
 Replaces: canna-server
 Suggests: canna-shion
-Description: A Japanese input system (server and dictionary).
+Description: Japanese input system (server and dictionary)
  Canna is a Japanese input system available in Free Software.
  Canna provides a unified user interface for inputting Japanese.
  .
@@ -29,7 +29,7 @@ Package: canna-utils
 Architecture: any
 Depends: ${shlibs:Depends}
 Conflicts: canna (<= 3.5b2-33), libcanna1g (<= 3.5b2-33)
-Description: A japanese input system (utility).
+Description: Japanese input system (utility)
  Canna is a Japanese input system available in Free Software.
  This package includes canna client programs.
 

@@ -1,3 +1,29 @@
+canna (3.7p3-3.1) unstable; urgency=low
+
+  * Non-maintainer upload to fix pending l10n issues
+  * Fix the dependency on debconf to allow cdebconf transition.
+    Closes: #331770
+  * Correct English in debconf templates. Closes: #313202, #395979
+  * Remove /etc/canna/dics.dir.d/00canna.dics.dir from debian/conffiles
+    This was, technically speaking, a FTBFS
+  * Lintian fixes, while we're at it:
+    - set the debhelper compatibility to 4 with debian/compat
+    - use more up-to-date config.{guess|sub} files
+      (the way it's done is not the cleanest but the simplest, which is
+       the most approrpiate for a NMU)
+    - remove /etc/init.d/canna from conffiles and remove that now empty file
+      (the file is automatically added to conffiles by debhelper)
+    - provide an LSB header to the init script
+  * Debconf templates translations:
+    - Added Swedish. Closes: #339328
+    - Added Portuguese. Closes: #380325
+    - Added Spanish. Closes: #334388
+    - Added Czech. Sent during the NMU campaign.
+    - Added Russian. Sent during the NMU campaign.
+    - Updated German. Closes: #396457
+
+ -- Christian Perrier <bubulle@debian.org>  Mon,  6 Nov 2006 07:27:45 +0100
+
 canna (3.7p3-3) unstable; urgency=low
 
   * New maintainer
@@ -382,7 +408,7 @@ canna (3.5b2-27) unstable; urgency=low
 
   * cleanup patch. remove some garbage files (Makefile, Makefile.bak) from
     diff.gz
-  * apply Bugs#58667's patch, closes: Bugs#58667
+  * apply Bugs#58667's patch, closes: #58667
   * add Build-Depends: in control
   
  -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 16 Oct 2000 22:18:18 +0900
