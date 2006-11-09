@@ -1,3 +1,12 @@
+canna (3.7p3-3.2) unstable; urgency=medium
+
+  * Non-maintainer upload to fix RC issue introduced in the former NMU
+  * Remove the debian/compat file which messes up the (outdated) build
+    system of the package
+    Closes: #397696
+
+ -- Christian Perrier <bubulle@debian.org>  Thu,  9 Nov 2006 07:13:02 +0100
+
 canna (3.7p3-3.1) unstable; urgency=low
 
   * Non-maintainer upload to fix pending l10n issues
