@@ -39,45 +39,45 @@ binary-arch: build
 	dh_installdirs -a
 
 	make install \
-		cannaBinDir=`pwd`/debian/tmp/usr/bin \
-		cannaSrvDir=`pwd`/debian/tmp/usr/sbin \
-		cannaLibDir=`pwd`/debian/tmp/var/lib/canna \
-		cannaEtcDir=`pwd`/debian/tmp/etc/canna \
-		cannaShareDir=`pwd`/debian/tmp/usr/share/canna \
-		cannaManDir=`pwd`/debian/tmp/usr/share/man \
-		cannaIncDir=`pwd`/debian/tmp/usr/include/canna \
-		libCannaDir=`pwd`/debian/tmp/usr/lib \
-		cannaDocDir=`pwd`/debian/tmp/usr/share/doc/libcanna1g \
-		DicDir=`pwd`/debian/tmp/var/lib/canna/dic \
-		ErrDir=`pwd`/debian/tmp/var/log/canna
+		cannaBinDir=`pwd`/debian/canna/usr/bin \
+		cannaSrvDir=`pwd`/debian/canna/usr/sbin \
+		cannaLibDir=`pwd`/debian/canna/var/lib/canna \
+		cannaEtcDir=`pwd`/debian/canna/etc/canna \
+		cannaShareDir=`pwd`/debian/canna/usr/share/canna \
+		cannaManDir=`pwd`/debian/canna/usr/share/man \
+		cannaIncDir=`pwd`/debian/canna/usr/include/canna \
+		libCannaDir=`pwd`/debian/canna/usr/lib \
+		cannaDocDir=`pwd`/debian/canna/usr/share/doc/libcanna1g \
+		DicDir=`pwd`/debian/canna/var/lib/canna/dic \
+		ErrDir=`pwd`/debian/canna/var/log/canna
 	make install.man \
-		cannaManDir=`pwd`/debian/tmp/usr/share/man \
+		cannaManDir=`pwd`/debian/canna/usr/share/man \
 		MANSUFFIX=1 LIBMANSUFFIX=3
 
 	# debug
-	find debian/tmp/
+	find debian/canna/
 
-	(cd debian/tmp/usr/bin/ && rm -f cpdic lsdic mkdic mvdic rmdic syncdic addwords delwords cannakill)
-	cp debian/tmp/usr/bin/catdic debian/tmp/usr/bin/cannakill
-	install -d -m 755 debian/tmp/etc/canna/dics.dir.d
-	install -m 644 debian/tmp/var/lib/canna/dic/canna/dics.dir debian/tmp/etc/canna/dics.dir.d/00canna.dics.dir
-	rm -f debian/tmp/var/lib/canna/dic/canna/dics.dir
+	(cd debian/canna/usr/bin/ && rm -f cpdic lsdic mkdic mvdic rmdic syncdic addwords delwords cannakill)
+	cp debian/canna/usr/bin/catdic debian/canna/usr/bin/cannakill
+	install -d -m 755 debian/canna/etc/canna/dics.dir.d
+	install -m 644 debian/canna/var/lib/canna/dic/canna/dics.dir debian/canna/etc/canna/dics.dir.d/00canna.dics.dir
+	rm -f debian/canna/var/lib/canna/dic/canna/dics.dir
 	# 3.7 tries to install symlink to cannakill here, ignore it.
-	rm -f debian/tmp/usr/sbin/cannakill
+	rm -f debian/canna/usr/sbin/cannakill
 
-	install -m 755 debian/update-canna-dics_dir debian/tmp/usr/sbin
+	install -m 755 debian/update-canna-dics_dir debian/canna/usr/sbin
 
 	# move /var/lib/canna/dic/*.cld and related file to template dir
-	install -d -m 755 debian/tmp/usr/lib/canna/debian-template/
-	mv debian/tmp/var/lib/canna/dic/canna/*.cld debian/tmp/var/lib/canna/dic/canna/iroha.cbd debian/tmp/var/lib/canna/dic/canna/fuzokugo.cbd debian/tmp/usr/lib/canna/debian-template/
-	chown -R root:root debian/tmp/usr/lib/canna/debian-template/
+	install -d -m 755 debian/canna/usr/lib/canna/debian-template/
+	mv debian/canna/var/lib/canna/dic/canna/*.cld debian/canna/var/lib/canna/dic/canna/iroha.cbd debian/canna/var/lib/canna/dic/canna/fuzokugo.cbd debian/canna/usr/lib/canna/debian-template/
+	chown -R root:root debian/canna/usr/lib/canna/debian-template/
 
 	dh_installdebconf
 	dh_installexamples
 	dh_installmenu
-	dh_movefiles
-	-rmdir -p debian/tmp/usr/share/doc/libcanna1g/sample/src
-	-rmdir -p debian/tmp/usr/include/canna debian/tmp/usr/lib
+	dh_movefiles --sourcedir=debian/canna
+	-rmdir -p debian/canna/usr/share/doc/libcanna1g/sample/src
+	-rmdir -p debian/canna/usr/include/canna debian/canna/usr/lib
 	dh_installdocs
 	dh_installexamples
 	#dh_undocumented crfreq.1 crxdic.1 crxgram.1 dpxdic.1\

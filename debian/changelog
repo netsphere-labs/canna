@@ -1,11 +1,9 @@
-canna (3.7p3-3.2) unstable; urgency=medium
+canna (3.7p3-4) unstable; urgency=medium
 
-  * Non-maintainer upload to fix RC issue introduced in the former NMU
-  * Remove the debian/compat file which messes up the (outdated) build
-    system of the package
-    Closes: #397696
+  [ Atsushi Mitsuka ]
+  * Fix unusable. Closes: #397696
 
- -- Christian Perrier <bubulle@debian.org>  Thu,  9 Nov 2006 07:13:02 +0100
+ -- Atsushi Mitsuka <mitsuka@misao.gr.jp>  Sun, 12 Nov 2006 23:00:41 +0900
 
 canna (3.7p3-3.1) unstable; urgency=low
 
@@ -32,6 +30,7 @@ canna (3.7p3-3.1) unstable; urgency=low
     - Updated German. Closes: #396457
 
  -- Christian Perrier <bubulle@debian.org>  Mon,  6 Nov 2006 07:27:45 +0100
+
 
 canna (3.7p3-3) unstable; urgency=low
 
