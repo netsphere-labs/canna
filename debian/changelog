@@ -1,3 +1,10 @@
+canna (3.7p3-5) unstable; urgency=low
+
+  * add gl.po translation (Closes: #412644)
+  * delete some files left in the case of purge (Closes: #350465)
+
+ -- Atsushi Mitsuka <mitsuka@misao.gr.jp>  Wed, 28 Feb 2007 15:02:43 +0900
+
 canna (3.7p3-4) unstable; urgency=medium
 
   [ Atsushi Mitsuka ]

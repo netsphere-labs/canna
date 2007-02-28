@@ -1,0 +1,164 @@
+# Galician translation of canna's debconf templates
+# This file is distributed under the same license as the canna package.
+# Jacobo Tarrio <jtarrio@debian.org>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: canna\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-10-29 11:01+0100\n"
+"PO-Revision-Date: 2007-02-27 09:24+0100\n"
+"Last-Translator: Jacobo Tarrio <jtarrio@debian.org>\n"
+"Language-Team: Galician <proxecto@trasno.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:1001
+msgid "Do you want to run the Canna server ?"
+msgstr "¿Quere executar o servidor Canna?"
+
+#. Type: boolean
+#. Description
+#: ../templates:1001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server "
+"here."
+msgstr ""
+"Este paquete contén o servidor Canna e utilidades relacionadas co servidor. "
+"Se só está interesado nesas utilidades, pode desactivar aquí o servidor "
+"Canna."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Do you want to connect to the Canna server from a remote host?"
+msgstr "¿Quere conectarse ao servidor Canna desde outra máquina?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"The Canna server only allows connections via UNIX domain sockets when the `-"
+"inet' option is not specified.  This means that when the Canna server is "
+"started without the `-inet' option, only clients which run on the same host "
+"can connect to the server. Some clients such as, `egg' and `yc-el', do not "
+"support UNIX domain socket and require the `-inet' option, even if they run "
+"on the same host."
+msgstr ""
+"Cando a opción \"-inet\" non se especifica, o servidor Canna só permite "
+"conexións mediante sockets de dominio UNIX. Isto significa que, nese caso, "
+"só os clientes que se executen na mesma máquina se han poder conectar ao "
+"servidor. Algúns clientes coma \"egg\" e \"yc-el\" non soportan sockets de "
+"dominio UNIX e precisan da opción \"-inet\", aínda que estean a funcionar na "
+"mesma máquina."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"If you want to connect to this Canna server from remote hosts, or if you "
+"want to use INET-domain-only software, you should run the server with the `-"
+"inet' option."
+msgstr ""
+"Se quere conectarse a este servidor Canna desde máquinas remotas, ou se "
+"quere empregar software que só se pode conectar mediante o dominio INET, "
+"debería executar o servidor coa opción \"-inet\"."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Manage /etc/hosts.canna with debconf ?"
+msgstr "¿Xestionar /etc/hosts.canna con debconf?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "/etc/hosts.canna controls which hosts can connect to this server."
+msgstr ""
+"O ficheiro /etc/hosts.canna controla as máquinas que se poden conectar a "
+"este servidor."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
+"want to manage /etc/hosts.canna yourself."
+msgstr ""
+"Por defecto, o ficheiro /etc/hosts.canna hase xestionar con debconf. Rexeite "
+"esta opción se quere xestionalo vostede."
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid "Please enter the name of each host allowed to connect to this server"
+msgstr ""
+"Introduza o nome de cada máquina á que se permite conectar a este servidor"
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Introduza os nomes das máquinas ás que se permite conectar a este servidor "
+"Canna, separados por espazos."
+
+#. Type: string
+#. Description
+#: ../templates:4001
+msgid ""
+"`unix'  is a special notation for allowing access via UNIX domain sockets."
+msgstr ""
+"\"unix\" é unha notación especial para permitir o acceso mediante sockets de "
+"dominio UNIX."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid "Canna input style"
+msgstr "Estilo de entrada de Canna"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid ""
+"Please choose the default canna input style below, which will be installed "
+"if there is no previous configuration:"
+msgstr ""
+"Escolla embaixo o estilo de entrada por defecto de Canna, que se ha instalar "
+"se non existe unha configuración anterior:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:1001
+msgid ""
+" verbose - Canna3.5 default style with verbose comments\n"
+" 1.1     - old Canna style (ver. 1.1)\n"
+" 1.2     - old Canna style (ver. 1.2)\n"
+" jdaemon - jdaemon style\n"
+" just    - Justsystem ATOK like style\n"
+" lan5    - LAN5 like style\n"
+" matsu   - MATSU word processor like style\n"
+" skk     - SKK like style\n"
+" tut     - for TUT-Code\n"
+" unix    - UNIX style\n"
+" vje     - vje like style\n"
+" wx2+    - WX2+ style"
+msgstr ""
+" verbose - estilo por defecto de Canna3.5 con comentarios ampliados\n"
+" 1.1     - estilo antigo de Canna (ver. 1.1)\n"
+" 1.2     - estilo antigo de Canna (ver. 1.2)\n"
+" jdaemon - estilo de jdaemon\n"
+" just    - estilo semellante ao de Justsystem ATOK\n"
+" lan5    - estilo semellante ao de LAN5\n"
+" matsu   - estilo semellante ao do procesador de textos MATSU\n"
+" skk     - estilo semellante ao de SKK\n"
+" tut     - para TUT-Code\n"
+" vje     - estilo semellante ao de vje\n"
+" wx2+    - estilo de WX2+"

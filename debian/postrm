@@ -6,6 +6,11 @@ case "$1" in
     deluser --remove-home canna
     rm -f /etc/default/canna
     rm -f /etc/hosts.canna
+    rm -rf /var/lib/canna/dic/group
+    rm -rf /var/lib/canna/dic/user
+    rm -f /var/lib/canna/dic/canna/*.cld
+    rm -f /var/lib/canna/dic/canna/*.cbd
+    rm -f /var/lib/canna/dic/canna/dics.dir
     ;;
     
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
