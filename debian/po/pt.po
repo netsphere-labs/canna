@@ -5,12 +5,12 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: canna 3.7p3-3\n"
+"Project-Id-Version: canna 3.7p3-5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-29 11:01+0100\n"
-"PO-Revision-Date: 2006-07-29 10:48+0100\n"
+"PO-Revision-Date: 2007-03-06 22:33+0000\n"
 "Last-Translator: Ricardo Silva <ardoric@gmail.com>\n"
-"Language-Team: Native Portuguese <traduz@debianpt.org>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,14 +35,12 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
 msgid "Do you want to connect to the Canna server from a remote host?"
 msgstr "Deseja conectar-se ao servidor Canna a partir de um anfitrião remoto?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
 msgid ""
 "The Canna server only allows connections via UNIX domain sockets when the `-"
 "inet' option is not specified.  This means that when the Canna server is "
@@ -61,14 +59,13 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
 msgid ""
 "If you want to connect to this Canna server from remote hosts, or if you "
 "want to use INET-domain-only software, you should run the server with the `-"
 "inet' option."
 msgstr ""
 "Se deseja poder ligar-se a este servidor Canna a partir de anfitriões "
-"remotos ou se quer usar sofware que só conhece o dominio INET, deve correr o "
+"remotos ou se quer usar sofware que só conhece o domínio INET, deve correr o "
 "servidor com a opção `-inet'."
 
 #. Type: boolean
@@ -80,10 +77,8 @@ msgstr "Gerir o /etc/hosts.canna com o debconf?"
 #. Type: boolean
 #. Description
 #: ../templates:3001
-#, fuzzy
 msgid "/etc/hosts.canna controls which hosts can connect to this server."
-msgstr ""
-"o /etc/hosts.canna controla que anfitriões se podem ligar a este servidor."
+msgstr "o /etc/hosts.canna controla que anfitriões se podem ligar a este servidor."
 
 #. Type: boolean
 #. Description
@@ -98,16 +93,13 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../templates:4001
-#, fuzzy
 msgid "Please enter the name of each host allowed to connect to this server"
-msgstr ""
-"Por favor introduza o nome dos anfitriões permitidos a ligar-se a este "
+msgstr "Por favor introduza o nome dos anfitriões permitidos a ligar-se a este "
 "servidor"
 
 #. Type: string
 #. Description
 #: ../templates:4001
-#, fuzzy
 msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
@@ -118,7 +110,6 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../templates:4001
-#, fuzzy
 msgid ""
 "`unix'  is a special notation for allowing access via UNIX domain sockets."
 msgstr "`unix' é uma notação especial para permitir o acesso via sockets UNIX."
@@ -132,18 +123,16 @@ msgstr "Estilo de input do Canna"
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:1001
-#, fuzzy
 msgid ""
 "Please choose the default canna input style below, which will be installed "
 "if there is no previous configuration:"
 msgstr ""
-"Por favor escolha o estilo de input do canna das opções em baixo. Será "
-"instalado se não houver configuração prévia:"
+"Por favor escolha o estilo de input do canna das opções em baixo que irá "
+"ser instalado se não houver configuração prévia:"
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:1001
-#, fuzzy
 msgid ""
 " verbose - Canna3.5 default style with verbose comments\n"
 " 1.1     - old Canna style (ver. 1.1)\n"
@@ -158,15 +147,15 @@ msgid ""
 " vje     - vje like style\n"
 " wx2+    - WX2+ style"
 msgstr ""
-" verbose - Canna3.5 default style with verbose comments\n"
-" 1.1     - old Canna style (ver. 1.1)\n"
-" 1.2     - old Canna style (ver. 1.2)\n"
-" jdaemon - jdaemon style\n"
-" just    - Justsystem ATOK like style\n"
-" lan5    - LAN5 like style\n"
-" matsu   - MATSU word prosessor like style\n"
-" skk     - SKK like style\n"
-" tut     - for TUT-Code\n"
-" unix    - UNIX style\n"
-" vje     - vje like style\n"
-" wx2+    - WX2+ style"
+" verbose - estilo Canna3.5 por omissão com comentários verbosos\n"
+" 1.1     - estilo antigo Canna (ver. 1.1)\n"
+" 1.2     - estilo antigo Canna (ver. 1.2)\n"
+" jdaemon - estilo jdaemon\n"
+" just    - estilo à Justsystem ATOK\n"
+" lan5    - estilo à LAN5\n"
+" matsu   - estilo à processador word MATSU\n"
+" skk     - estilo à SKK\n"
+" tut     - para TUT-Code\n"
+" unix    - estilo UNIX\n"
+" vje     - estilo à vje\n"
+" wx2+    - estilo WX2+"

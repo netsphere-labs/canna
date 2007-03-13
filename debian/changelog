@@ -1,3 +1,9 @@
+canna (3.7p3-6) unstable; urgency=low
+
+  * update pt.po translation (Closes: #413767)
+
+ -- Atsushi Mitsuka <mitsuka@misao.gr.jp>  Tue, 13 Mar 2007 14:09:07 +0900
+
 canna (3.7p3-5) unstable; urgency=low
 
   * add gl.po translation (Closes: #412644)
