@@ -2,7 +2,7 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: Atsushi Mitsuka <mitsuka@misao.gr.jp>
-Build-Depends: debhelper (>= 4.1.59), libx11-dev, xutils, dpatch, po-debconf, autoconf2.13, ptex-bin
+Build-Depends: debhelper (>= 4.1.59), libx11-dev, xutils-dev, dpatch, po-debconf, autoconf2.13, ptex-bin
 Standards-Version: 3.6.2
 
 Package: canna

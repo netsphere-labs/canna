@@ -16,10 +16,10 @@ clean: unpatch
 # No need to run clean
 	dh_testdir
 	dh_testroot
-	-$(MAKE) clean
-	-$(MAKE) distclean
-	-$(MAKE) -C doc/man/guide/tex clean
-	-$(MAKE) -C doc/man/guide/tex distclean
+	[ ! -f Makefile ] || $(MAKE) clean
+	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex clean
+	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex distclean
 
 	# remove created symlinks
 	rm -f doc/intern/canna.sty doc/lisp/canna.sty doc/man/guide/tex/canna.sty doc/misc/canna.sty 

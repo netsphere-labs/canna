@@ -1,35 +1,34 @@
+# translation of canna debconf template to Euskara
 #
 #    Translators, if you are not familiar with the PO format, gettext
 #    documentation is worth reading, especially sections dedicated to
 #    this format, e.g. by running:
 #         info -n '(gettext)PO Files'
 #         info -n '(gettext)Header Entry'
-#
 #    Some information specific to po-debconf are available at
 #            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
 #    Developers do not need to manually edit POT or PO files.
 #
+# Xabier Bilbao <xabidu@gmail.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: canna 3.7p3-2\n"
+"Project-Id-Version: canna-eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-29 11:01+0100\n"
-"PO-Revision-Date: 2008-07-14 13:04+0100\n"
-"Last-Translator: Martin Bagge <brother@bsnet.se>\n"
-"Language-Team: Swedish <debian-l10n-swedish@lists.debian.org>\n"
+"PO-Revision-Date: 2008-07-16 00:52+0200\n"
+"Last-Translator: Xabier Bilbao <xabidu@gmail.com>\n"
+"Language-Team: Euskara <debian-l10n-basque@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: Sweden\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Do you want to run the Canna server ?"
-msgstr "Vill du köra Canna-servern ?"
+msgstr "Canna zerbitzaria exekutatu nahi duzu?"
 
 #. Type: boolean
 #. Description
@@ -39,14 +38,15 @@ msgid ""
 "are only interested in these utilities, you can disable the Canna server "
 "here."
 msgstr ""
-"Detta paket innehåller Canna-servern och server-relaterade verktyg. Om du "
-"bara är intresserad av dessa verktyg kan du stänga av Canna-servern här."
+"Pakete hau Canna zerbitzariak eta zerbitzariaren utilitate osagarriek "
+"osatzen dute. Utilitateetan soilik interesaturik bazaude, Canna zerbitzaria "
+"desgaitu dezakezu hemen. "
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Do you want to connect to the Canna server from a remote host?"
-msgstr "Vill du ansluta till Canna-servern från en fjärrvärd?"
+msgstr "Urruneko ostalari batetik konektatu nahi duzu Canna zerbitzarira?"
 
 #. Type: boolean
 #. Description
@@ -59,11 +59,13 @@ msgid ""
 "support UNIX domain socket and require the `-inet' option, even if they run "
 "on the same host."
 msgstr ""
-"Canna-servern tillåter bara anslutningar via UNIX-sockets när flaggan \"-inet"
-"\" inte är angiven. Det betyder att när Canna-servern startas upp utan "
-"flaggan \"-inet\" kommer bara klienter som körs på samma värd att kunna "
-"ansluta till servern. Vissa klienter såsom \"egg\" och \"yc-el\" saknar stöd "
-"för UNIX-socket och kräver flaggan \"-inet\" även om de körs på samma värd."
+"Canna zerbitzariak '-inet' aukera hautaturik ez denean soilik onartzen ditu "
+"UNIX domeinuko socket-en bitarteko konexioak. Honek esan nahi du Canna "
+"zerbitzaria '-inet' aukera gabe abiarazten denean ostalari berean "
+"exekutatzen diren bezeroak soilik konektatu ahalko direla zerbitzarira. "
+"Bezero batzuek, 'egg' eta 'yc-el' adibidez, ez dute UNIX domeinuko socket-ik "
+"onartzen eta, beraz, '-inet' aukera eskatzen dute, zerbitzari berean "
+"exekutatzen direnean ere."
 
 #. Type: boolean
 #. Description
@@ -73,22 +75,23 @@ msgid ""
 "want to use INET-domain-only software, you should run the server with the `-"
 "inet' option."
 msgstr ""
-"Om du vill ansluta till denna Canna-server från fjärrvärdar eller om du bara "
-"vill använda programvara i INET-domänen ska du köra servern med flaggan \"-"
-"inet\"."
+"Canna zerbitzari honetara urruneko ostalarietatik konektatu nahi baduzu, edo "
+"INET aukeraz soilik funtzionatzen duen softwarea erabili nahi baduzu, '-"
+"inet' aukerarekin exekutatu beharko zenuke zerbitzaria."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Manage /etc/hosts.canna with debconf ?"
-msgstr "Hantera /etc/hosts.canna med debconf ?"
+msgstr "Debconf-ek /etc/hosts.canna kudeatzea nahi duzu?"
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "/etc/hosts.canna controls which hosts can connect to this server."
 msgstr ""
-"/etc/hosts.canna kontrollerar vilka värdar som kan ansluta till denna server."
+"/etc/hosts.canna-k zerbizari honetara zer ostalari konekta daitezkeen "
+"kontrolatzen du."
 
 #. Type: boolean
 #. Description
@@ -97,14 +100,16 @@ msgid ""
 "By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
 "want to manage /etc/hosts.canna yourself."
 msgstr ""
-"Som standard kommer /etc/hosts.canna att hanteras med debconf. Vägra här om "
-"du vill hantera /etc/hosts.canna själv."
+"Lehenespenez, debconf-ek kudeatuko du /etc/hosts.canna. Uko egiozu hemen "
+"horri /etc/hosts.canna zuk kudeatu nahi baduzu. "
 
 #. Type: string
 #. Description
 #: ../templates:4001
 msgid "Please enter the name of each host allowed to connect to this server"
-msgstr "Ange namnen på de värdar som tillåts ansluta till denna server"
+msgstr ""
+"Sar ezazu hemen zerbitzari honetara konektatzera baimendu nahi duzun "
+"ostalari bakoitzaren izena."
 
 #. Type: string
 #. Description
@@ -113,8 +118,8 @@ msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
 msgstr ""
-"Ange namnen på de värdar som tillåts ansluta till denna Canna-server, "
-"avskilj med mellanslag."
+"Sartu hemen Canna zerbitzari honetara konektatzera baimendutako ostalarien "
+"izenak, zuriunez tartekaturik."
 
 #. Type: string
 #. Description
@@ -122,14 +127,14 @@ msgstr ""
 msgid ""
 "`unix'  is a special notation for allowing access via UNIX domain sockets."
 msgstr ""
-"\"unix\" är ett specialkommando för att tillåta tillgång via UNIX-"
-"domänsockets."
+"'unix' notazio berezi bat da, UNIX domeinuko socket-en bitartez konektatzeko "
+"aukera ematen duena. "
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:1001
 msgid "Canna input style"
-msgstr "Inmatningsstil för Canna"
+msgstr "Canna input estiloa"
 
 #. Type: select
 #. Description
@@ -138,8 +143,8 @@ msgid ""
 "Please choose the default canna input style below, which will be installed "
 "if there is no previous configuration:"
 msgstr ""
-"Välj standard för inmatningsstil för canna nedan, denna kommer att "
-"installeras om det inte redan finns en konfiguration:"
+"Hauta ezazu behean Canna input estilo lehenetsia, instalatua izan dadin "
+"aurretik emaniko konfiguraziorik ez badago."
 
 #. Type: select
 #. Description
@@ -158,15 +163,15 @@ msgid ""
 " vje     - vje like style\n"
 " wx2+    - WX2+ style"
 msgstr ""
-" verbose - Canna3.5 standardstil med informativa kommentarer\n"
-" 1.1     - gammal Canna-stil (ver. 1.1)\n"
-" 1.2     - gammal Canna-stil (ver. 1.2)\n"
-" jdaemon - jdaemon-stil\n"
-" just    - Justsystem ATOK-liknande stil\n"
-" lan5    - LAN5-liknande stil\n"
-" matsu   - MATSU-ordbehandlarliknande stil\n"
-" skk     - SKK-liknande stil\n"
-" tut     - för TUT-kod\n"
-" unix    - UNIX-stil\n"
-" vje     - vje-liknande stil\n"
-" wx2+    - WX2+-stil"
+" verbose - Canna3.5 estilo lehenetsia iruzkin xehatuekin\n"
+" 1.1     - Canna estilo zaharra (1.1 ber.)\n"
+" 1.2     - Canna estilo zaharra (1.2 ber.)\n"
+" jdaemon - jdaemon estiloa\n"
+" just    - Justsystem ATOK erako estiloa\n"
+" lan5    - LAN5 erako estiloa\n"
+" matsu   - MATSU hitz prozesatzailearen erako estiloa\n"
+" skk     - SKK erako estiloa\n"
+" tut     - TUT-Code-rako estiloa\n"
+" unix    - UNIX estiloa\n"
+" vje     - vje erako estiloa\n"
+" wx2+    - WX2+ estiloa"

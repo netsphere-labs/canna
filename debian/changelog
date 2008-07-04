@@ -1,3 +1,17 @@
+canna (3.7p3-6.1) unstable; urgency=low
+
+  * Non-maintainer upload to fix pending l10n issues.
+  * Debconf translations:
+    - Finnish. Closes: #469549
+    - Swedish. Closes: #490794
+    - Turkish. Closes: #491491
+    - Basque. Closes: #491886
+  * [Lintian] Use "chown foo:bar" instead of "chown foo.bar" in postinst
+  * [Lintian] No longer ignore errors by make in the clean target
+  * [Lintian] Build-Depends on xutils-dev instead of obsolete xutils
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 04 Jul 2008 08:47:39 +0200
+
 canna (3.7p3-6) unstable; urgency=low
 
   * update pt.po translation (Closes: #413767)

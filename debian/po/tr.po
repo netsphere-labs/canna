@@ -13,23 +13,23 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: canna 3.7p3-2\n"
+"Project-Id-Version: canna 3.7p3-6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-29 11:01+0100\n"
-"PO-Revision-Date: 2008-07-14 13:04+0100\n"
-"Last-Translator: Martin Bagge <brother@bsnet.se>\n"
-"Language-Team: Swedish <debian-l10n-swedish@lists.debian.org>\n"
+"PO-Revision-Date: 2008-07-17 18:43+0200\n"
+"Last-Translator: Mert Dirik <mertdirik@gmail.com>\n"
+"Language-Team: Debian L10n Turkish <debian-l10n-turkish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: Sweden\n"
+"X-Poedit-Language: Turkish\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
 msgid "Do you want to run the Canna server ?"
-msgstr "Vill du köra Canna-servern ?"
+msgstr "Canna sunucusunu çalıştırmak istiyor musunuz?"
 
 #. Type: boolean
 #. Description
@@ -39,14 +39,14 @@ msgid ""
 "are only interested in these utilities, you can disable the Canna server "
 "here."
 msgstr ""
-"Detta paket innehåller Canna-servern och server-relaterade verktyg. Om du "
-"bara är intresserad av dessa verktyg kan du stänga av Canna-servern här."
+"Bu paket Canna sunucusunu ve sunucuyla ilgili araçları içerir. Eğer sadece "
+"araçlarla ilgileniyorsanız burada Canna sunucusunu etkisizleştirebilirsiniz."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Do you want to connect to the Canna server from a remote host?"
-msgstr "Vill du ansluta till Canna-servern från en fjärrvärd?"
+msgstr "Canna sunucusuna uzak bir makineden bağlanmak istiyor musunuz?"
 
 #. Type: boolean
 #. Description
@@ -59,11 +59,12 @@ msgid ""
 "support UNIX domain socket and require the `-inet' option, even if they run "
 "on the same host."
 msgstr ""
-"Canna-servern tillåter bara anslutningar via UNIX-sockets när flaggan \"-inet"
-"\" inte är angiven. Det betyder att när Canna-servern startas upp utan "
-"flaggan \"-inet\" kommer bara klienter som körs på samma värd att kunna "
-"ansluta till servern. Vissa klienter såsom \"egg\" och \"yc-el\" saknar stöd "
-"för UNIX-socket och kräver flaggan \"-inet\" även om de körs på samma värd."
+"`-inet' seçeneği belirtilmediğinde Canna sunucusu sadece UNIX alan "
+"soketlerinden gelen bağlantıları kabul eder.  Bu, Canna sunucusu `-inet' "
+"seçeneği olmadan başlatıldığında sunucuya sadece aynı bilgisayardaki "
+"istemcilerin bağlanabileceği anlamına gelir. `egg' ve `yc-el' gibi bazı "
+"istemciler UNIX alan soketlerini desteklemez ve aynı makinede çalışsalar "
+"bile `-inet' seçeneğini gerektirirler."
 
 #. Type: boolean
 #. Description
@@ -73,22 +74,23 @@ msgid ""
 "want to use INET-domain-only software, you should run the server with the `-"
 "inet' option."
 msgstr ""
-"Om du vill ansluta till denna Canna-server från fjärrvärdar eller om du bara "
-"vill använda programvara i INET-domänen ska du köra servern med flaggan \"-"
-"inet\"."
+"Eğer bu Canna sunucusuna uzak makinelerden de bağlanmak istiyorsanız veya "
+"sadece INET alanıyla çalışan yazılımları kullanmak istiyorsanız sunucuyu `-"
+"inet' seçeneği ile çalıştırmalısınız."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Manage /etc/hosts.canna with debconf ?"
-msgstr "Hantera /etc/hosts.canna med debconf ?"
+msgstr "/etc/hosts.canna yapılandırması debconf ile yönetilsin mi?"
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "/etc/hosts.canna controls which hosts can connect to this server."
 msgstr ""
-"/etc/hosts.canna kontrollerar vilka värdar som kan ansluta till denna server."
+"/etc/hosts.canna dosyası bu sunucuya hangi makinelerin bağlanabileceğini "
+"belirler."
 
 #. Type: boolean
 #. Description
@@ -97,14 +99,15 @@ msgid ""
 "By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
 "want to manage /etc/hosts.canna yourself."
 msgstr ""
-"Som standard kommer /etc/hosts.canna att hanteras med debconf. Vägra här om "
-"du vill hantera /etc/hosts.canna själv."
+"Öntanımlı olarak bu dosya debconf aracılığıyla yönetilir. Eğer bu dosyayı "
+"kendiniz yönetmek istiyorsanız bu teklifi reddedin."
 
 #. Type: string
 #. Description
 #: ../templates:4001
 msgid "Please enter the name of each host allowed to connect to this server"
-msgstr "Ange namnen på de värdar som tillåts ansluta till denna server"
+msgstr ""
+"Lütfen bu sunucuya bağlanmasını istediğiniz her bir makinenin adını girin"
 
 #. Type: string
 #. Description
@@ -113,8 +116,8 @@ msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
 msgstr ""
-"Ange namnen på de värdar som tillåts ansluta till denna Canna-server, "
-"avskilj med mellanslag."
+"Lütfen bu Canna sunucuya bağlanmasını istediğiniz her bir makinenin adını "
+"boşluklarla ayrılmış olarak girin."
 
 #. Type: string
 #. Description
@@ -122,14 +125,15 @@ msgstr ""
 msgid ""
 "`unix'  is a special notation for allowing access via UNIX domain sockets."
 msgstr ""
-"\"unix\" är ett specialkommando för att tillåta tillgång via UNIX-"
-"domänsockets."
+"`unix', UNIX alan soketlerinden gelen bağlantıları kabul etmek için özel bir "
+"işarettir."
 
+# biçem tarz üslup
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:1001
 msgid "Canna input style"
-msgstr "Inmatningsstil för Canna"
+msgstr "Canna girdi biçemi"
 
 #. Type: select
 #. Description
@@ -138,8 +142,8 @@ msgid ""
 "Please choose the default canna input style below, which will be installed "
 "if there is no previous configuration:"
 msgstr ""
-"Välj standard för inmatningsstil för canna nedan, denna kommer att "
-"installeras om det inte redan finns en konfiguration:"
+"Lütfen aşağıdan öntanımlı canna girdi biçemini seçin. Eğer mevcut bir "
+"yapılandırma yoksa seçilen biçem kurulacak."
 
 #. Type: select
 #. Description
@@ -158,15 +162,15 @@ msgid ""
 " vje     - vje like style\n"
 " wx2+    - WX2+ style"
 msgstr ""
-" verbose - Canna3.5 standardstil med informativa kommentarer\n"
-" 1.1     - gammal Canna-stil (ver. 1.1)\n"
-" 1.2     - gammal Canna-stil (ver. 1.2)\n"
-" jdaemon - jdaemon-stil\n"
-" just    - Justsystem ATOK-liknande stil\n"
-" lan5    - LAN5-liknande stil\n"
-" matsu   - MATSU-ordbehandlarliknande stil\n"
-" skk     - SKK-liknande stil\n"
-" tut     - för TUT-kod\n"
-" unix    - UNIX-stil\n"
-" vje     - vje-liknande stil\n"
-" wx2+    - WX2+-stil"
+" verbose - ayrıntılı yorumlarla öntanımlı Canna3.5 biçemi\n"
+" 1.1     - eski Canna biçemi (sür. 1.1)\n"
+" 1.2     - eski Canna biçemi (sür. 1.2)\n"
+" jdaemon - jdaemon biçemi\n"
+" just    - Justsystem ATOK benzeri biçem\n"
+" lan5    - LAN5 benzeri biçem\n"
+" matsu   - MATSU kelime işlemcisi benzeri biçem\n"
+" skk     - SKK benzeri biçem\n"
+" tut     - TUT-Code için\n"
+" unix    - UNIX biçemi\n"
+" vje     - vje benzeri biçem\n"
+" wx2+    - WX2+ biçemi"
