@@ -14,8 +14,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: canna 3.7p3-6\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-29 11:01+0100\n"
+"Report-Msgid-Bugs-To: canna@packages.debian.org\n"
+"POT-Creation-Date: 2009-05-03 07:53+0200\n"
 "PO-Revision-Date: 2008-07-17 18:43+0200\n"
 "Last-Translator: Mert Dirik <mertdirik@gmail.com>\n"
 "Language-Team: Debian L10n Turkish <debian-l10n-turkish@lists.debian.org>\n"
@@ -27,91 +27,89 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
-msgid "Do you want to run the Canna server ?"
-msgstr "Canna sunucusunu çalıştırmak istiyor musunuz?"
+#: ../templates:2001
+msgid "Should the Canna server run automatically?"
+msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
+#: ../templates:2001
+#, fuzzy
+#| msgid ""
+#| "This package contains the Canna server and server-related utilities. If "
+#| "you are only interested in these utilities, you can disable the Canna "
+#| "server here."
 msgid ""
 "This package contains the Canna server and server-related utilities. If you "
-"are only interested in these utilities, you can disable the Canna server "
-"here."
+"are only interested in these utilities, you can disable the Canna server now."
 msgstr ""
 "Bu paket Canna sunucusunu ve sunucuyla ilgili araçları içerir. Eğer sadece "
 "araçlarla ilgileniyorsanız burada Canna sunucusunu etkisizleştirebilirsiniz."
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
-msgid "Do you want to connect to the Canna server from a remote host?"
-msgstr "Canna sunucusuna uzak bir makineden bağlanmak istiyor musunuz?"
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-msgid ""
-"The Canna server only allows connections via UNIX domain sockets when the `-"
-"inet' option is not specified.  This means that when the Canna server is "
-"started without the `-inet' option, only clients which run on the same host "
-"can connect to the server. Some clients such as, `egg' and `yc-el', do not "
-"support UNIX domain socket and require the `-inet' option, even if they run "
-"on the same host."
+#: ../templates:3001
+msgid "Should the Canna server run in network mode?"
 msgstr ""
-"`-inet' seçeneği belirtilmediğinde Canna sunucusu sadece UNIX alan "
-"soketlerinden gelen bağlantıları kabul eder.  Bu, Canna sunucusu `-inet' "
-"seçeneği olmadan başlatıldığında sunucuya sadece aynı bilgisayardaki "
-"istemcilerin bağlanabileceği anlamına gelir. `egg' ve `yc-el' gibi bazı "
-"istemciler UNIX alan soketlerini desteklemez ve aynı makinede çalışsalar "
-"bile `-inet' seçeneğini gerektirirler."
-
-#. Type: boolean
-#. Description
-#: ../templates:2001
-msgid ""
-"If you want to connect to this Canna server from remote hosts, or if you "
-"want to use INET-domain-only software, you should run the server with the `-"
-"inet' option."
-msgstr ""
-"Eğer bu Canna sunucusuna uzak makinelerden de bağlanmak istiyorsanız veya "
-"sadece INET alanıyla çalışan yazılımları kullanmak istiyorsanız sunucuyu `-"
-"inet' seçeneği ile çalıştırmalısınız."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
-msgid "Manage /etc/hosts.canna with debconf ?"
+msgid ""
+"By default the Canna server will run without support for network "
+"connections, and will only accept connections on UNIX domain sockets, from "
+"clients running on the same host."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"If you choose this option, network support will be activated, and the Canna "
+"server will accept connections on TCP sockets from clients that may be on "
+"remote hosts. Some clients (such as egg and yc-el) require this mode even if "
+"they run on the local host."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+#, fuzzy
+#| msgid "Manage /etc/hosts.canna with debconf ?"
+msgid "Manage /etc/hosts.canna automatically?"
 msgstr "/etc/hosts.canna yapılandırması debconf ile yönetilsin mi?"
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
-msgid "/etc/hosts.canna controls which hosts can connect to this server."
+#: ../templates:4001
+#, fuzzy
+#| msgid "/etc/hosts.canna controls which hosts can connect to this server."
+msgid ""
+"The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
 msgstr ""
 "/etc/hosts.canna dosyası bu sunucuya hangi makinelerin bağlanabileceğini "
 "belirler."
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
-"By default /etc/hosts.canna will be managed with debconf. Refuse here if you "
-"want to manage /etc/hosts.canna yourself."
+"You should not accept this option if you prefer managing the file's contents "
+"manually."
 msgstr ""
-"Öntanımlı olarak bu dosya debconf aracılığıyla yönetilir. Eğer bu dosyayı "
-"kendiniz yönetmek istiyorsanız bu teklifi reddedin."
 
 #. Type: string
 #. Description
-#: ../templates:4001
-msgid "Please enter the name of each host allowed to connect to this server"
+#: ../templates:5001
+#, fuzzy
+#| msgid "Please enter the name of each host allowed to connect to this server"
+msgid "Hosts allowed to connect to this Canna server:"
 msgstr ""
 "Lütfen bu sunucuya bağlanmasını istediğiniz her bir makinenin adını girin"
 
 #. Type: string
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
@@ -121,9 +119,11 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:4001
-msgid ""
-"`unix'  is a special notation for allowing access via UNIX domain sockets."
+#: ../templates:5001
+#, fuzzy
+#| msgid ""
+#| "`unix'  is a special notation for allowing access via UNIX domain sockets."
+msgid "You can use \"unix\" to allow access via UNIX domain sockets."
 msgstr ""
 "`unix', UNIX alan soketlerinden gelen bağlantıları kabul etmek için özel bir "
 "işarettir."
@@ -131,36 +131,43 @@ msgstr ""
 # biçem tarz üslup
 #. Type: select
 #. Description
-#: ../libcanna1g.templates:1001
-msgid "Canna input style"
+#: ../libcanna1g.templates:2001
+#, fuzzy
+#| msgid "Canna input style"
+msgid "Canna input style:"
 msgstr "Canna girdi biçemi"
 
 #. Type: select
 #. Description
-#: ../libcanna1g.templates:1001
+#: ../libcanna1g.templates:2001
+#, fuzzy
+#| msgid ""
+#| " verbose - Canna3.5 default style with verbose comments\n"
+#| " 1.1     - old Canna style (ver. 1.1)\n"
+#| " 1.2     - old Canna style (ver. 1.2)\n"
+#| " jdaemon - jdaemon style\n"
+#| " just    - Justsystem ATOK like style\n"
+#| " lan5    - LAN5 like style\n"
+#| " matsu   - MATSU word processor like style\n"
+#| " skk     - SKK like style\n"
+#| " tut     - for TUT-Code\n"
+#| " unix    - UNIX style\n"
+#| " vje     - vje like style\n"
+#| " wx2+    - WX2+ style"
 msgid ""
-"Please choose the default canna input style below, which will be installed "
-"if there is no previous configuration:"
-msgstr ""
-"Lütfen aşağıdan öntanımlı canna girdi biçemini seçin. Eğer mevcut bir "
-"yapılandırma yoksa seçilen biçem kurulacak."
-
-#. Type: select
-#. Description
-#: ../libcanna1g.templates:1001
-msgid ""
-" verbose - Canna3.5 default style with verbose comments\n"
-" 1.1     - old Canna style (ver. 1.1)\n"
-" 1.2     - old Canna style (ver. 1.2)\n"
-" jdaemon - jdaemon style\n"
-" just    - Justsystem ATOK like style\n"
-" lan5    - LAN5 like style\n"
-" matsu   - MATSU word processor like style\n"
-" skk     - SKK like style\n"
-" tut     - for TUT-Code\n"
-" unix    - UNIX style\n"
-" vje     - vje like style\n"
-" wx2+    - WX2+ style"
+"Please choose the default Canna input style:\n"
+" verbose: Canna3.5 default style with verbose comments;\n"
+" 1.1    : old Canna style (ver. 1.1);\n"
+" 1.2    : old Canna style (ver. 1.2);\n"
+" jdaemon: jdaemon style;\n"
+" just   : JustSystems ATOK style;\n"
+" lan5   : LAN5 style;\n"
+" matsu  : Matsu word processor style;\n"
+" skk    : SKK style;\n"
+" tut    : TUT-Code style;\n"
+" unix   : UNIX style;\n"
+" vje    : vje style;\n"
+" wx2+   : WX2+ style."
 msgstr ""
 " verbose - ayrıntılı yorumlarla öntanımlı Canna3.5 biçemi\n"
 " 1.1     - eski Canna biçemi (sür. 1.1)\n"
@@ -174,3 +181,47 @@ msgstr ""
 " unix    - UNIX biçemi\n"
 " vje     - vje benzeri biçem\n"
 " wx2+    - WX2+ biçemi"
+
+#~ msgid "Do you want to run the Canna server ?"
+#~ msgstr "Canna sunucusunu çalıştırmak istiyor musunuz?"
+
+#~ msgid "Do you want to connect to the Canna server from a remote host?"
+#~ msgstr "Canna sunucusuna uzak bir makineden bağlanmak istiyor musunuz?"
+
+#~ msgid ""
+#~ "The Canna server only allows connections via UNIX domain sockets when the "
+#~ "`-inet' option is not specified.  This means that when the Canna server "
+#~ "is started without the `-inet' option, only clients which run on the same "
+#~ "host can connect to the server. Some clients such as, `egg' and `yc-el', "
+#~ "do not support UNIX domain socket and require the `-inet' option, even if "
+#~ "they run on the same host."
+#~ msgstr ""
+#~ "`-inet' seçeneği belirtilmediğinde Canna sunucusu sadece UNIX alan "
+#~ "soketlerinden gelen bağlantıları kabul eder.  Bu, Canna sunucusu `-inet' "
+#~ "seçeneği olmadan başlatıldığında sunucuya sadece aynı bilgisayardaki "
+#~ "istemcilerin bağlanabileceği anlamına gelir. `egg' ve `yc-el' gibi bazı "
+#~ "istemciler UNIX alan soketlerini desteklemez ve aynı makinede çalışsalar "
+#~ "bile `-inet' seçeneğini gerektirirler."
+
+#~ msgid ""
+#~ "If you want to connect to this Canna server from remote hosts, or if you "
+#~ "want to use INET-domain-only software, you should run the server with the "
+#~ "`-inet' option."
+#~ msgstr ""
+#~ "Eğer bu Canna sunucusuna uzak makinelerden de bağlanmak istiyorsanız veya "
+#~ "sadece INET alanıyla çalışan yazılımları kullanmak istiyorsanız sunucuyu "
+#~ "`-inet' seçeneği ile çalıştırmalısınız."
+
+#~ msgid ""
+#~ "By default /etc/hosts.canna will be managed with debconf. Refuse here if "
+#~ "you want to manage /etc/hosts.canna yourself."
+#~ msgstr ""
+#~ "Öntanımlı olarak bu dosya debconf aracılığıyla yönetilir. Eğer bu dosyayı "
+#~ "kendiniz yönetmek istiyorsanız bu teklifi reddedin."
+
+#~ msgid ""
+#~ "Please choose the default canna input style below, which will be "
+#~ "installed if there is no previous configuration:"
+#~ msgstr ""
+#~ "Lütfen aşağıdan öntanımlı canna girdi biçemini seçin. Eğer mevcut bir "
+#~ "yapılandırma yoksa seçilen biçem kurulacak."

@@ -2,52 +2,67 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: Atsushi Mitsuka <mitsuka@misao.gr.jp>
-Build-Depends: debhelper (>= 4.1.59), libx11-dev, xutils-dev, dpatch, po-debconf, autoconf2.13, ptex-bin
+Build-Depends: debhelper (>= 7), libx11-dev, xutils-dev, dpatch, po-debconf, autoconf2.13, ptex-bin
 Standards-Version: 3.6.2
 
 Package: canna
 Architecture: any
-Depends: ${shlibs:Depends}, debconf | debconf-2.0, adduser (>= 3.34)
+Depends: ${misc:Depends}, ${shlibs:Depends}, adduser (>= 3.34)
 Conflicts: canna-server, libcanna1g (<= 3.5b2-33)
 Replaces: canna-server
 Suggests: canna-shion
-Description: Japanese input system (server and dictionary)
- Canna is a Japanese input system available in Free Software.
- Canna provides a unified user interface for inputting Japanese.
+Description: input system for Japanese - server and dictionary
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
  .
- Canna supports Nemacs, Mule, kinput2 and canuum.  All of these
- tools can be used by a single customization file, romaji-to-kana
- conversion rules and conversion dictionaries, and input Japanese in
- the same way.
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
  .
- Canna converts kana to kanji based on a client-server model and
- supports automatic kana-to-kanji conversion.
- .
- This package includes the cannaserver program and dictionary files.
+ This package provides the Canna server program and dictionary files.
 
 Package: canna-utils
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Conflicts: canna (<= 3.5b2-33), libcanna1g (<= 3.5b2-33)
-Description: Japanese input system (utility)
- Canna is a Japanese input system available in Free Software.
- This package includes canna client programs.
+Description: input system for Japanese - utilities
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides client programs for Canna.
 
 Package: libcanna1g
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, debconf
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Conflicts: canna (<= 3.5b2-33)
-Description: Canna Runtime Library
- Canna is a Japanese input system available in Free Software.
- This package includes canna shared libraries.
+Description: input system for Japanese - runtime library
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides shared libraries for Canna.
 
 Package: libcanna1g-dev
 Section: libdevel
 Architecture: any
-Depends: libcanna1g
+Depends: ${misc:Depends}, libcanna1g
 Conflicts: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
 Replaces: canna-dev
-Description: Canna Static Library and Headers
- Canna is a Japanese input system available in Free Software.
- This package includes header and static libraries.
+Description: input system for Japanese - development files
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides the headers and static libraries needed to develop
+ software based on Canna.

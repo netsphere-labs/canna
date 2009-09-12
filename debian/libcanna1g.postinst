@@ -4,12 +4,12 @@
 . /usr/share/debconf/confmodule
 db_version 2.0
 
+set -e
+
 case "$1" in
     configure)
-    if [ ! -f /etc/canna/default.canna ] ; then
 	db_get canna/default_style
 	cp /usr/share/canna/${RET}.canna /etc/canna/default.canna
-    fi
     ldconfig
     ;;
 
@@ -17,8 +17,6 @@ case "$1" in
     ;;
 
     *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 0
     ;;
 esac
 

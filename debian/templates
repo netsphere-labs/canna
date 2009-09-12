@@ -1,46 +1,51 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
 Template: canna/run_cannaserver
 Type: boolean
 Default: true
-_Description: Do you want to run the Canna server ?
+_Description: Should the Canna server run automatically?
  This package contains the Canna server and server-related
  utilities. If you are only interested in these utilities,
- you can disable the Canna server here.
+ you can disable the Canna server now.
 
 
 Template: canna/run_with_inet
 Type: boolean
 Default: false
-_Description: Do you want to connect to the Canna server from a remote host?
- The Canna server only allows connections via UNIX domain
- sockets when the `-inet' option is not specified.  This
- means that when the Canna server is started without the `-inet' option,
- only clients which run on the same host can connect to the server.
- Some clients such as, `egg' and `yc-el', do not support
- UNIX domain socket and require the `-inet' option, even if they run on
- the same host.
+_Description: Should the Canna server run in network mode?
+ By default the Canna server will run without support for network
+ connections, and will only accept connections on UNIX domain sockets,
+ from clients running on the same host.
  .
- If you want to connect to this Canna server from remote hosts, or
- if you want to use INET-domain-only software, you should run
- the server with the `-inet' option.
+ If you choose this option, network support will be activated, and the
+ Canna server will accept connections on TCP sockets from clients that
+ may be on remote hosts. Some clients (such as egg and yc-el) require
+ this mode even if they run on the local host.
 
 
 Template: canna/manage_allow_hosts_with_debconf
 Type: boolean
 Default: true
-_Description: Manage /etc/hosts.canna with debconf ?
- /etc/hosts.canna controls which hosts can connect to this server.
+_Description: Manage /etc/hosts.canna automatically?
+ The /etc/hosts.canna file lists hosts allowed to connect to the
+ Canna server.
  .
- By default /etc/hosts.canna will be managed with debconf.
- Refuse here if you want to manage /etc/hosts.canna yourself.
+ You should not accept this option if you prefer managing the
+ file's contents manually.
 
 
 Template: canna/allow_hosts
 Type: string
 Default: unix localhost
-_Description: Please enter the name of each host allowed to connect to this server
+_Description: Hosts allowed to connect to this Canna server:
  Please enter the names of the hosts allowed to connect to this Canna server,
  separated by spaces.
  .
- `unix'  is a special notation for allowing access
- via UNIX domain sockets.
-
+ You can use "unix" to allow access via UNIX domain sockets.

@@ -1,25 +1,26 @@
-# Esko Arajärvi <edu@iki.fi>, 2009.
+# Italian translation of canna's po-debconf file
+# COPYRIGHT (C) 2009 THE CANNA'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the canna package.
+# Vincenzo Campanella <vinz65@gmail.com>, 2009.
+#
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: canna 3.7p3-6\n"
+"Project-Id-Version: canna 3.7p3-6.2\n"
 "Report-Msgid-Bugs-To: canna@packages.debian.org\n"
 "POT-Creation-Date: 2009-05-03 07:53+0200\n"
-"PO-Revision-Date: 2009-04-29 22:21+0300\n"
-"Last-Translator: Esko Arajärvi <edu@iki.fi>\n"
-"Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
+"PO-Revision-Date: 2009-04-20 07:46+0200\n"
+"Last-Translator: Vincenzo Campanella <vinz65@gmail.com>\n"
+"Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Finnish\n"
-"X-Poedit-Country: FINLAND\n"
-"X-Generator: Lokalize 0.3\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Should the Canna server run automatically?"
-msgstr "Tulisiko Canna-palvelin käynnistää automaattisesti?"
+msgstr "Eseguire automaticamente il server Canna?"
 
 #. Type: boolean
 #. Description
@@ -28,15 +29,14 @@ msgid ""
 "This package contains the Canna server and server-related utilities. If you "
 "are only interested in these utilities, you can disable the Canna server now."
 msgstr ""
-"Tämä paketti sisältää Canna-palvelimen ja siihen liittyviä työkaluja. Jos "
-"haluat käyttää vain kyseisiä työkaluja, voit poistaa Canna-palvelimen "
-"käytöstä tässä."
+"Questo pacchetto contiene il server Canna e le relative utilità. Se si è "
+"interessati solo alle utilità è possibile disattivare ora il server Canna."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Should the Canna server run in network mode?"
-msgstr "Tulisiko Canna-palvelinta ajaa verkkotilassa?"
+msgstr "Eseguire il server Canna in modalità di rete?"
 
 #. Type: boolean
 #. Description
@@ -46,8 +46,9 @@ msgid ""
 "connections, and will only accept connections on UNIX domain sockets, from "
 "clients running on the same host."
 msgstr ""
-"Canna-palvelin ei oletuksena tue verkkoyhteyksiä vaan hyväksyy vain samalta "
-"koneelta UNIX-pistokkeiden kautta tulevat yhteydet."
+"In modo predefinito il server Canna viene eseguito senza il supporto per le "
+"connessioni di rete e accetterà connessioni sui socket di dominio UNIX da "
+"client che risiedono nel medesimo host."
 
 #. Type: boolean
 #. Description
@@ -58,16 +59,16 @@ msgid ""
 "remote hosts. Some clients (such as egg and yc-el) require this mode even if "
 "they run on the local host."
 msgstr ""
-"Jos valitset tämän vaihtoehdon, verkkotuki otetaan käyttöön ja Canna-"
-"palvelin hyväksyy myös TCP-yhteydet asiakkailta, jotka saattavat olla "
-"toisilla koneilla. Jotkin asiakkaat (kuten egg ja yc-el) vaativat tämän "
-"tilan, vaikka niitä ajettaisiin samalla koneella."
+"Se si sceglie questa opzione il supporto di rete verrà abilitato e il server "
+"Canna accetterà connessioni sui socket TCP da client che possono risiedere "
+"in host remoti. Alcuni client, come per esempio egg e yc-el, richiedono "
+"questa modalità anche se vengono eseguiti sull'host locale."
 
 #. Type: boolean
 #. Description
 #: ../templates:4001
 msgid "Manage /etc/hosts.canna automatically?"
-msgstr "Hallinnoidaanko tiedostoa /etc/hosts.canna automaattisesti?"
+msgstr "Gestire automaticamente «/etc/hosts.canna»?"
 
 #. Type: boolean
 #. Description
@@ -75,8 +76,8 @@ msgstr "Hallinnoidaanko tiedostoa /etc/hosts.canna automaattisesti?"
 msgid ""
 "The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
 msgstr ""
-"Tiedosto /etc/hosts.canna sisältää luettelon koneista, joilta Canna-"
-"palvelimeen saa ottaa yhteyden."
+"Il file «/etc/hosts.canna» contiene un elenco degli host che possono "
+"connettersi al server Canna."
 
 #. Type: boolean
 #. Description
@@ -85,14 +86,14 @@ msgid ""
 "You should not accept this option if you prefer managing the file's contents "
 "manually."
 msgstr ""
-"Älä valitse tätä vaihtoehtoa, jos haluat hallinnoida tiedoston sisältöä "
-"käsin."
+"Non si dovrebbe accettare questa opzione se si preferisce gestire "
+"manualmente il contenuto del file."
 
 #. Type: string
 #. Description
 #: ../templates:5001
 msgid "Hosts allowed to connect to this Canna server:"
-msgstr "Koneet, joilta tähän Canna-palvelimeen saa ottaa yhteyden:"
+msgstr "Host che possono connettersi a questo server Canna:"
 
 #. Type: string
 #. Description
@@ -101,20 +102,22 @@ msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
 msgstr ""
-"Anna välilyönnein eroteltuina kaikkien niiden koneiden nimet, joilta Canna-"
-"palvelimeen saa ottaa yhteyden."
+"Inserire i nomi, separati da spazi, degli host che possono connettersi a "
+"questo server Canna."
 
 #. Type: string
 #. Description
 #: ../templates:5001
 msgid "You can use \"unix\" to allow access via UNIX domain sockets."
-msgstr "Valinta ”unix” sallii yhteydet UNIXin pistokkeiden kautta."
+msgstr ""
+"È possibile usare «unix» per permettere l'accesso tramite socket di dominio "
+"UNIX."
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:2001
 msgid "Canna input style:"
-msgstr "Cannan syöttötyyli:"
+msgstr "Stile di input Canna:"
 
 #. Type: select
 #. Description
@@ -134,16 +137,16 @@ msgid ""
 " vje    : vje style;\n"
 " wx2+   : WX2+ style."
 msgstr ""
-"Valitse Cannan syöttötyylin oletusarvo:\n"
-" verbose: Canna3.5:n oletustyyli yksityiskohtaisin kommentein\n"
-" 1.1    : vanha Canna-tyyli (versio 1.1)\n"
-" 1.2    : vanha Canna-tyyli (versio 1.2)\n"
-" jdaemon: jdaemon-tyyli\n"
-" just   : JustSystems ATOK -tyyli\n"
-" lan5   : LAN5-tyyli\n"
-" matsu  : MATSU-kirjoituskonetyyli\n"
-" skk    : SKK-tyyli\n"
-" tut    : TUT-Code-tyyli\n"
-" unix   : UNIX-tyyli\n"
-" vje    : vje-tyyli\n"
-" wx2+   : WX2+-tyyli"
+"Scegliere lo stile di input predefinito di Canna:\n"
+"- verbose:  stile predefinito di Canna 3.5 con commenti prolissi;\n"
+"- 1.1:      vecchio stile di Canna (versione 1.1);\n"
+"- 1.2:      vecchio stile di Canna (versione 1.2);\n"
+"- jdaemon:  stile jdaemon;\n"
+"- just:     stile JustSystems ATOK;\n"
+"- lan5:     stile LAN5;\n"
+"- matsu:    stile elaboratore testi Matsu;\n"
+"- skk:      stile SKK;\n"
+"- tut:      stile codice TUT;\n"
+"- unix:     stile UNIX;\n"
+"- vje:      stile vje;\n"
+"- wx2+:     stile WX2+."

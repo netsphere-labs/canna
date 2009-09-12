@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 case "$1" in
     purge)
 	rm -f /etc/canna/default.canna
@@ -12,9 +14,6 @@ case "$1" in
 	;;
     
     *)
-    
-    echo "postrm called with unknown argument \`$1'" >&2
-    exit 0
     ;;
 esac
 

@@ -1,20 +1,27 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
 Template: canna/default_style
 Type: select
 Choices: verbose, 1.1, 1.2, jdaemin, just, lan5, matsu, skk, tut, unix, vje, wx2+
 Default: verbose
-_Description: Canna input style
- Please choose the default canna input style below, which will be installed if
- there is no previous configuration:
- .
-  verbose - Canna3.5 default style with verbose comments
-  1.1     - old Canna style (ver. 1.1)
-  1.2     - old Canna style (ver. 1.2)
-  jdaemon - jdaemon style
-  just    - Justsystem ATOK like style
-  lan5    - LAN5 like style
-  matsu   - MATSU word processor like style
-  skk     - SKK like style
-  tut     - for TUT-Code
-  unix    - UNIX style
-  vje     - vje like style
-  wx2+    - WX2+ style
+_Description: Canna input style:
+ Please choose the default Canna input style:
+  verbose: Canna3.5 default style with verbose comments;
+  1.1    : old Canna style (ver. 1.1);
+  1.2    : old Canna style (ver. 1.2);
+  jdaemon: jdaemon style;
+  just   : JustSystems ATOK style;
+  lan5   : LAN5 style;
+  matsu  : Matsu word processor style;
+  skk    : SKK style;
+  tut    : TUT-Code style;
+  unix   : UNIX style;
+  vje    : vje style;
+  wx2+   : WX2+ style.

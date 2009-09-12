@@ -1,3 +1,32 @@
+canna (3.7p3-6.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Allow dpkg-reconfigure to work by using debconf settings even 
+    when /etc/canna/default.canna already exists. Closes: #208538
+  * Bump debhelper compatibility level to 7
+  * As a consequence, drop the use of "dh_clean -k", replaced by dh_prep
+  * Drop useless output and "exit 0" when postrm and postinst scripts are
+    called with something else than "purge".
+  * Use "set -e" in *postinst, *config and *postrm scripts
+  * Drop .pc/ directory cruft from Debian diff
+  * Debconf templates and debian/control reviewed by the debian-l10n-
+    english team as part of the Smith review project. Closes: #523990
+  * [Debconf translation updates]
+    - Galician. Closes: #524763
+    - Japanese. Closes: #524782, #510710
+    - Swedish. Closes: #524788
+    - Italian. Closes: #525164
+    - Finnish. Closes: #526186
+    - Portuguese. Closes: #526711
+    - Russian. Closes: #526756
+    - German. Closes: #526769
+    - French. Closes: #526871
+    - Basque. Closes: #526873
+    - Spanish. Closes: #526930
+    - Czech (Miroslav Kure).  Closes: #545159
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 12 Sep 2009 15:33:55 +0200
+
 canna (3.7p3-6.1) unstable; urgency=low
 
   * Non-maintainer upload to fix pending l10n issues.

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 case "$1" in
     configure)
     # Source debconf library.
@@ -103,8 +105,6 @@ EOF
     ;;
     
     *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 0
     ;;
 esac
 
