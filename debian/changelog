@@ -1,3 +1,12 @@
+canna (3.7p3-6.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix FTBFS by adding texlive-latex-recommended to build
+    dependencies, to fix missing fancyvrb.sty.
+    Closes: #562367
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 25 Dec 2009 08:33:02 +0100
+
 canna (3.7p3-6.2) unstable; urgency=low
 
   * Non-maintainer upload.
