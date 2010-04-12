@@ -11,7 +11,7 @@ case "$1" in
     adduser --quiet --system --group --no-create-home  --home /var/lib/canna --gecos "Canna server" --disabled-password --disabled-login canna
     chown -R canna:canna /var/lib/canna
     chown -R canna:canna /var/log/canna
-    /usr/sbin/update-canna-dics_dir
+    update-canna-dics_dir
 
     # debconf processing for running cannaserver
 
