@@ -53,7 +53,7 @@ Description: input system for Japanese - runtime library
 Package: libcanna1g-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libcanna1g
+Depends: ${misc:Depends}, libcanna1g (= ${binary:Version})
 Conflicts: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
 Replaces: canna-dev
 Description: input system for Japanese - development files

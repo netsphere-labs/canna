@@ -5,7 +5,12 @@ set -e
 case "$1" in
     purge)
     rm -rf /var/log/canna
-    deluser --remove-home canna
+    # see http://lists.debian.org/debian-devel/2002/10/msg00345.html
+    # debhelper might cause this script to be called twice on purge
+    # therefore test, if the user exists before trying to remove it
+    if getent passwd canna >/dev/null ;  then
+      userdel --remove canna
+    fi
     rm -f /etc/default/canna
     rm -f /etc/hosts.canna
     rm -rf /var/lib/canna/dic/group

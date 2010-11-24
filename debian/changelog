@@ -1,3 +1,17 @@
+canna (3.7p3-6.5) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Urgency high due to RC bug fix
+  * Fix problem when trying to delete user twice on purge (postrm purge
+    might be indeed called twice; see http://lists.debian.org/debian-devel/2002/10/msg00345.html
+    for details) (Closes: #579312)
+  * Use userdel instead of the non-essential deluser in postrm
+  * Include danish debconf template (Closes: #589865)
+  * Also fix lintian error on weak library dependency for libcanna1g-dev
+    on libcanna1g by version the dependency with (= ${binary:Version})
+
+ -- Alexander Reichle-Schmehl <tolimar@debian.org>  Wed, 24 Nov 2010 11:31:07 +0100
+
 canna (3.7p3-6.4) unstable; urgency=low
 
   * Non-maintainer upload.
