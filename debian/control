@@ -1,15 +1,17 @@
 Source: canna
 Section: utils
 Priority: optional
-Maintainer: Atsushi Mitsuka <mitsuka@misao.gr.jp>
-Build-Depends: debhelper (>= 7), libx11-dev, xutils-dev, dpatch, po-debconf, autoconf2.13, ptex-bin, texlive-latex-recommended
-Standards-Version: 3.6.2
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Build-Depends: debhelper (>> 7.0.50~), libx11-dev, xutils-dev, po-debconf,
+ autoconf2.13, ptex-bin, texlive-latex-recommended, autotools-dev
+Standards-Version: 3.9.2
+Homepage: http://canna.sourceforge.jp/
+Vcs-Git: git://anonscm.debian.org/collab-maint/canna.git
+Vcs-Browser: http://anonscm.debian.org/git/collab-maint/canna.git
 
 Package: canna
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, adduser (>= 3.34)
-Conflicts: canna-server, libcanna1g (<= 3.5b2-33)
-Replaces: canna-server
 Suggests: canna-shion
 Description: input system for Japanese - server and dictionary
  Canna provides a unified user interface for Japanese input. It is based
@@ -24,7 +26,6 @@ Description: input system for Japanese - server and dictionary
 Package: canna-utils
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Conflicts: canna (<= 3.5b2-33), libcanna1g (<= 3.5b2-33)
 Description: input system for Japanese - utilities
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.
@@ -39,7 +40,6 @@ Package: libcanna1g
 Section: libs
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Conflicts: canna (<= 3.5b2-33)
 Description: input system for Japanese - runtime library
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.
@@ -54,8 +54,6 @@ Package: libcanna1g-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}, libcanna1g (= ${binary:Version})
-Conflicts: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
-Replaces: canna-dev
 Description: input system for Japanese - development files
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.

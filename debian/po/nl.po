@@ -1,55 +1,44 @@
-#
-#    Translators, if you are not familiar with the PO format, gettext
-#    documentation is worth reading, especially sections dedicated to
-#    this format, e.g. by running:
-#         info -n '(gettext)PO Files'
-#         info -n '(gettext)Header Entry'
-#
-#    Some information specific to po-debconf are available at
-#            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
-#    Developers do not need to manually edit POT or PO files.
+# Dutch translation of canna debconf templates.
+# Copyright (C) 2004-2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the canna package.
+# Luk Claes <luk.claes@ugent.be>, 2004.
+# Jeroen Schot <schot@a-eskwadraat.nl>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: canna 3.7-4\n"
+"Project-Id-Version: canna 3.7p3-6.5\n"
 "Report-Msgid-Bugs-To: canna@packages.debian.org\n"
 "POT-Creation-Date: 2009-05-03 07:53+0200\n"
-"PO-Revision-Date: 2004-03-29 09:38+0100\n"
-"Last-Translator: Luk Claes <luk.claes@ugent.be>\n"
+"PO-Revision-Date: 2012-01-24 14:14+0100\n"
+"Last-Translator: Jeroen Schot <schot@a-eskwadraat.nl>\n"
 "Language-Team: Debian l10n Dutch <debian-l10n-dutch@lists.debian.org>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid "Should the Canna server run automatically?"
-msgstr ""
+msgstr "De Canna-server automatisch uitvoeren?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-#, fuzzy
-#| msgid ""
-#| "This package contains the Canna server and server-related utilities. If "
-#| "you are only interested in these utilities, you can disable the Canna "
-#| "server here."
 msgid ""
 "This package contains the Canna server and server-related utilities. If you "
 "are only interested in these utilities, you can disable the Canna server now."
 msgstr ""
-"Dit pakket bevat de Canna-server en servergerelateerde utilities. Als u "
-"enkel geïnteresseerd bent in deze utilities, dan kunt u hier zorgen dat de "
-"Canna-server niet wordt uitgevoerd."
+"Dit pakket bevat de Canna-server en servergerelateerde hulpprogramma's. Als "
+"u enkel geÃ¯nteresseerd bent in deze hulpprogramma's, dan kunt u nu de Canna-"
+"server uitschakelen."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
 msgid "Should the Canna server run in network mode?"
-msgstr ""
+msgstr "De Canna-server in networkmodus uitvoeren?"
 
 #. Type: boolean
 #. Description
@@ -59,6 +48,9 @@ msgid ""
 "connections, and will only accept connections on UNIX domain sockets, from "
 "clients running on the same host."
 msgstr ""
+"Standaard wordt de Canna-server uitgevoerd zonder ondersteuning voor "
+"netwerkverbindingen en zal alleen verbindingen accepteren op UNX-"
+"domeinsockets van clients die op dezelfde computer worden uitgevoerd."
 
 #. Type: boolean
 #. Description
@@ -69,23 +61,26 @@ msgid ""
 "remote hosts. Some clients (such as egg and yc-el) require this mode even if "
 "they run on the local host."
 msgstr ""
+"Als u voor deze optie kiest zal de netwerkondersteuning worden ingeschakeld "
+"en zal de Canna-server verbindingen accepteren op TCP-sockets van clients "
+"die mogelijk op andere computers worden uitgevoerd. Voor sommige clients "
+"(zoals egg en yc-el) is deze modus nodig, ook al worden ze op de lokale "
+"computer uitgevoerd."
 
 #. Type: boolean
 #. Description
 #: ../templates:4001
-#, fuzzy
-#| msgid "Manage /etc/hosts.canna with debconf ?"
 msgid "Manage /etc/hosts.canna automatically?"
-msgstr "Wilt u /etc/hosts.canna met debconf beheren?"
+msgstr "/etc/hosts.canna automatisch beheren?"
 
 #. Type: boolean
 #. Description
 #: ../templates:4001
-#, fuzzy
 msgid ""
 "The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
 msgstr ""
-"/etc/hosts.canna bepaalt welke host met de server een verbinding kan maken."
+"Het bestand /etc/hosts.canna bepaalt welke computers verbinding mogen maken "
+"met de Canna-server."
 
 #. Type: boolean
 #. Description
@@ -94,46 +89,41 @@ msgid ""
 "You should not accept this option if you prefer managing the file's contents "
 "manually."
 msgstr ""
+"Kies niet voor deze optie als u de inhoud van het bestand handmatig wilt "
+"beheren."
 
 #. Type: string
 #. Description
 #: ../templates:5001
-#, fuzzy
 msgid "Hosts allowed to connect to this Canna server:"
-msgstr "Geef de naam van de hosts die toegang krijgen tot de server"
+msgstr "Computers die verbinding mogen maken met deze Canna-server:"
 
 #. Type: string
 #. Description
 #: ../templates:5001
-#, fuzzy
 msgid ""
 "Please enter the names of the hosts allowed to connect to this Canna server, "
 "separated by spaces."
 msgstr ""
-"Geef de namen van de hosts die toestemming krijgen om met deze Canna-server "
-"een verbinding te maken, gescheiden met spaties."
+"Geef de namen op van de compters die verbinding mogen maken met deze Canna-"
+"server, scheid de namen met spaties."
 
 #. Type: string
 #. Description
 #: ../templates:5001
-#, fuzzy
 msgid "You can use \"unix\" to allow access via UNIX domain sockets."
 msgstr ""
-"`unix' is een speciale notatie om de toegang via UNIX-domeinsockets toe te "
-"laten."
+"U kunt \"unix\" gebruiken om toegang via UNIX-domeinsockets toe te staan."
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:2001
-#, fuzzy
-#| msgid "Canna input style"
 msgid "Canna input style:"
-msgstr "Canna-invoerstijl"
+msgstr "Canna-invoerstijl:"
 
 #. Type: select
 #. Description
 #: ../libcanna1g.templates:2001
-#, fuzzy
 msgid ""
 "Please choose the default Canna input style:\n"
 " verbose: Canna3.5 default style with verbose comments;\n"
@@ -149,64 +139,16 @@ msgid ""
 " vje    : vje style;\n"
 " wx2+   : WX2+ style."
 msgstr ""
-"verbose - Canna3.5 standaard stijl met woordenrijke commentaar\n"
-"1.1 - oude Canna-stijl (ver. 1.1)\n"
-"1.2 - oude Canna-stijl (ver. 1.2)\n"
-"jdaemon - jdaemon-stijl\n"
-"just - zoals Justsystem ATOK-stijl\n"
-"lan5 - zoals LAN5-stijl\n"
-"matsu - zoals de MATSU-tekstverwerkingstijl\n"
-"skk - zoals de SKK-stijl\n"
-"tut - voor TUT-Code\n"
-"unix - UNIX-stijl\n"
-"vje - zoals de vje-stijl\n"
-"wx2+ - WX2+-stijl"
-
-#~ msgid "Do you want to run the Canna server ?"
-#~ msgstr "Wilt u de Canna-server uitvoeren?"
-
-#, fuzzy
-#~ msgid "Do you want to connect to the Canna server from a remote host?"
-#~ msgstr "Wilt u de Canna-server connecteren van een andere computer?"
-
-#, fuzzy
-#~ msgid ""
-#~ "The Canna server only allows connections via UNIX domain sockets when the "
-#~ "`-inet' option is not specified.  This means that when the Canna server "
-#~ "is started without the `-inet' option, only clients which run on the same "
-#~ "host can connect to the server. Some clients such as, `egg' and `yc-el', "
-#~ "do not support UNIX domain socket and require the `-inet' option, even if "
-#~ "they run on the same host."
-#~ msgstr ""
-#~ "De Canna-server aanvaardt enkel connecties via de UNIX-domeinsocket "
-#~ "wanneer de `-inet'-optie niet wordt  aangegeven. Dit betekent dat wanneer "
-#~ "de Canna-server opgestart wordt zonder de `-inet'-optie, uitsluitend "
-#~ "clients die op dezelfde host draaien, een verbinding kunnen maken met de "
-#~ "server. Enkele clients zoals `egg' en `yc-el' ondersteunen geen UNIX-"
-#~ "domeinsockets en vereisen de `-inet'-optie ook al draaien ze  op dezelfde "
-#~ "host."
-
-#, fuzzy
-#~ msgid ""
-#~ "If you want to connect to this Canna server from remote hosts, or if you "
-#~ "want to use INET-domain-only software, you should run the server with the "
-#~ "`-inet' option."
-#~ msgstr ""
-#~ "Als u een verbinding wilt maken met de Canna-server vanaf andere "
-#~ "computers of als u INET-domein-specifieke software wilt gebruiken, dan "
-#~ "moet u de server uitvoeren met de `-inet'-optie."
-
-#~ msgid ""
-#~ "By default /etc/hosts.canna will be managed with debconf. Refuse here if "
-#~ "you want to manage /etc/hosts.canna yourself."
-#~ msgstr ""
-#~ "Standaard zal /etc/hosts.canna met debconf beheerd worden. Weiger hier "
-#~ "als u zelf /etc/hosts.canna wilt beheren."
-
-#, fuzzy
-#~ msgid ""
-#~ "Please choose the default canna input style below, which will be "
-#~ "installed if there is no previous configuration:"
-#~ msgstr ""
-#~ "Kies de standaard canna-invoerstijl, welke zal worden geïnstalleerd als "
-#~ "er geen vorige configuratie is:"
+"Kies de standaard invoerstijl voor Canna:\n"
+" verbose: Canna3.5 standaard stijl met uitgebreid commentaar\n"
+" 1.1    : oude Canna-stijl (ver. 1.1)\n"
+" 1.2    : oude Canna-stijl (ver. 1.2)\n"
+" jdaemon: jdaemon-stijl\n"
+" just   : Justsystem ATOK-stijl\n"
+" lan5   : LAN5-stijl\n"
+" matsu  : MATSU-tekstverwerkingsstijl\n"
+" skk    : SKK-stijl\n"
+" tut    : TUT-Code\n"
+" unix   : UNIX-stijl\n"
+" vje    : vje-stijl\n"
+" wx2+   : WX2+-stijl"

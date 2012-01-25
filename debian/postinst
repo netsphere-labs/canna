@@ -10,6 +10,7 @@ case "$1" in
 
     adduser --quiet --system --group --no-create-home  --home /var/lib/canna --gecos "Canna server" --disabled-password --disabled-login canna
     chown -R canna:canna /var/lib/canna
+    mkdir -p /var/log/canna
     chown -R canna:canna /var/log/canna
     update-canna-dics_dir
 

@@ -1,105 +1,85 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
 
-include /usr/share/dpatch/dpatch.make
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-build: build-stamp
-build-stamp: patch-stamp
-# One of
-	dh_testdir
-	./mkrelease.sh && xmkmf
-	cd doc/man/guide/tex && xmkmf
-	$(MAKE) canna
-	$(MAKE) -C doc/man/guide/tex
-	touch build-stamp
-
-clean: unpatch
-# No need to run clean
-	dh_testdir
-	dh_testroot
+override_dh_auto_clean:
 	[ ! -f Makefile ] || $(MAKE) clean
 	[ ! -f Makefile ] || $(MAKE) distclean
 	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex clean
 	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex distclean
-
 	# remove created symlinks
-	rm -f doc/intern/canna.sty doc/lisp/canna.sty doc/man/guide/tex/canna.sty doc/misc/canna.sty 
-
+	rm -f doc/intern/canna.sty doc/lisp/canna.sty \
+		doc/man/guide/tex/canna.sty doc/misc/canna.sty 
 	# remove generated files 
 	rm -f configure canuum/configure canuum/config.h.in Canna.conf accanna.h.in
-	rm -f build-stamp 
+	rm -fr $(CURDIR)/debian/tmpDefCannaSrvDir
+	# restore autotools helper files
+	for i in $(CURDIR)/canuum/config.guess $(CURDIR)/canuum/config.sub; do \
+		[ -e $$i.dh-orig ] || continue; \
+		mv -f $$i.dh-orig $$i; \
+	done
+	dh_auto_clean
 
-	dh_clean
+override_dh_auto_build:
+	dh_testdir
+	dh_auto_clean
+	# update autotools helper files
+	for i in config.guess config.sub; do \
+		[ ! -e $(CURDIR)/canuum/$$i.dh-orig ] || continue; \
+		mv -f $(CURDIR)/canuum/$$i $(CURDIR)/canuum/$$i.dh-orig; \
+		cp -f /usr/share/misc/$$i $(CURDIR)/canuum/$$i; \
+	done
+	./mkrelease.sh && xmkmf
+	cd doc/man/guide/tex && xmkmf
+	$(MAKE) canna
+	$(MAKE) -C doc/man/guide/tex
 
-binary-indep: build
-
-binary-arch: build
-	dh_testdir -a
-	dh_testroot -a
-	dh_prep
-	dh_installdirs -a
-
+override_dh_install:
 	make install \
-		cannaBinDir=`pwd`/debian/canna/usr/bin \
-		cannaSrvDir=`pwd`/debian/canna/usr/sbin \
-		cannaLibDir=`pwd`/debian/canna/var/lib/canna \
-		cannaEtcDir=`pwd`/debian/canna/etc/canna \
-		cannaShareDir=`pwd`/debian/canna/usr/share/canna \
-		cannaManDir=`pwd`/debian/canna/usr/share/man \
-		cannaIncDir=`pwd`/debian/canna/usr/include/canna \
-		libCannaDir=`pwd`/debian/canna/usr/lib \
-		cannaDocDir=`pwd`/debian/canna/usr/share/doc/libcanna1g \
-		DicDir=`pwd`/debian/canna/var/lib/canna/dic \
-		ErrDir=`pwd`/debian/canna/var/log/canna
+		cannaBinDir=$(CURDIR)/debian/tmp/usr/bin \
+		cannaSrvDir=$(CURDIR)/debian/tmp/usr/sbin \
+		cannaLibDir=$(CURDIR)/debian/tmp/var/lib/canna \
+		cannaEtcDir=$(CURDIR)/debian/tmp/etc/canna \
+		cannaShareDir=$(CURDIR)/debian/tmp/usr/share/canna \
+		cannaManDir=$(CURDIR)/debian/tmp/usr/share/man \
+		cannaIncDir=$(CURDIR)/debian/tmp/usr/include/canna \
+		libCannaDir=$(CURDIR)/debian/tmp/usr/lib \
+		cannaDocDir=$(CURDIR)/debian/tmp/usr/share/doc/libcanna1g \
+		DicDir=$(CURDIR)/debian/tmp/var/lib/canna/dic \
+		ErrDir=$(CURDIR)/debian/tmp/var/log/canna
 	make install.man \
-		cannaManDir=`pwd`/debian/canna/usr/share/man \
+		cannaManDir=$(CURDIR)/debian/tmp/usr/share/man \
 		MANSUFFIX=1 LIBMANSUFFIX=3
-
-	# debug
-	find debian/canna/
-
-	(cd debian/canna/usr/bin/ && rm -f cpdic lsdic mkdic mvdic rmdic syncdic addwords delwords cannakill)
-	cp debian/canna/usr/bin/catdic debian/canna/usr/bin/cannakill
-	install -d -m 755 debian/canna/etc/canna/dics.dir.d
-	install -m 644 debian/canna/var/lib/canna/dic/canna/dics.dir debian/canna/etc/canna/dics.dir.d/00canna.dics.dir
-	rm -f debian/canna/var/lib/canna/dic/canna/dics.dir
+	(cd $(CURDIR)/debian/tmp/usr/bin/ && \
+		rm -f cpdic lsdic mkdic mvdic rmdic syncdic \
+			addwords delwords cannakill)
+	cp $(CURDIR)/debian/tmp/usr/bin/catdic \
+		$(CURDIR)/debian/tmp/usr/bin/cannakill
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/canna/dics.dir.d
+	install -m 644 $(CURDIR)/debian/tmp/var/lib/canna/dic/canna/dics.dir \
+		$(CURDIR)/debian/tmp/etc/canna/dics.dir.d/00canna.dics.dir
+	rm -f $(CURDIR)/debian/tmp/var/lib/canna/dic/canna/dics.dir
 	# 3.7 tries to install symlink to cannakill here, ignore it.
-	rm -f debian/canna/usr/sbin/cannakill
-
-	install -m 755 debian/update-canna-dics_dir debian/canna/usr/sbin
-
+	rm -f $(CURDIR)/debian/tmp/usr/sbin/cannakill
+	install -m 755 $(CURDIR)/debian/update-canna-dics_dir \
+		$(CURDIR)/debian/tmp/usr/sbin
 	# move /var/lib/canna/dic/*.cld and related file to template dir
-	install -d -m 755 debian/canna/usr/lib/canna/debian-template/
-	mv debian/canna/var/lib/canna/dic/canna/*.cld debian/canna/var/lib/canna/dic/canna/iroha.cbd debian/canna/var/lib/canna/dic/canna/fuzokugo.cbd debian/canna/usr/lib/canna/debian-template/
-	chown -R root:root debian/canna/usr/lib/canna/debian-template/
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	mv \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/*.cld \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/iroha.cbd \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/fuzokugo.cbd \
+		$(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	chown -R root:root $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	dh_install --sourcedir=debian/tmp
+	dh_installman -pcanna $(CURDIR)/cmd/catdic/chmoddic.man  \
+		$(CURDIR)/debian/manpages/update-canna-dics_dir.8 \
+		$(CURDIR)/debian/manpages/canlisp.1 \
+		$(CURDIR)/debian/manpages/forsort.1 \
+		$(CURDIR)/debian/manpages/mergeword.1
+	dh_installman -pcanna-utils $(CURDIR)/debian/manpages/chkconc.1 
 
-	dh_installdebconf
-	dh_installexamples
-	dh_installmenu
-	dh_movefiles --sourcedir=debian/canna
-	-rmdir -p debian/canna/usr/share/doc/libcanna1g/sample/src
-	-rmdir -p debian/canna/usr/include/canna debian/canna/usr/lib
-	dh_installdocs
-	dh_installexamples
-	#dh_undocumented crfreq.1 crxdic.1 crxgram.1 dpxdic.1\
-	#forcpp.1 forsort.1 kpdic.1 mergeword.1 syncdic.1
-	dh_installinit
-	dh_installman -pcanna ./cmd/catdic/chmoddic.man  \
-		debian/update-canna-dics_dir.8 \
-		debian/canlisp.1 \
-		debian/forsort.1 \
-		debian/mergeword.1
-	dh_installman -pcanna-utils ./debian/chkconc.1 
-	dh_installchangelogs ChangeLog
-	dh_strip
-	dh_link
-	dh_compress
-	dh_fixperms
-	dh_makeshlibs -V 
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-
-binary: binary-indep binary-arch
+%:
+	dh $@

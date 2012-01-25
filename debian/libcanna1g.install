@@ -1,12 +1,8 @@
 usr/share/doc/libcanna1g
-usr/lib/libcanna16.so.1.2
-usr/lib/libcanna16.so.1
-usr/lib/libcanna.so.1.2
-usr/lib/libcanna.so.1
-usr/lib/libRKC16.so.1.2
-usr/lib/libRKC16.so.1
-usr/lib/libRKC.so.1.2
-usr/lib/libRKC.so.1
+usr/lib/libcanna16.so.*
+usr/lib/libcanna.so.*
+usr/lib/libRKC16.so.*
+usr/lib/libRKC.so.*
 usr/share/canna/english.cbp
 usr/share/canna/jdaemon.cbp
 usr/share/canna/just.cbp

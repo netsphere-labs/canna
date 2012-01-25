@@ -1,3 +1,43 @@
+canna (3.7p3-7) unstable; urgency=low
+
+  * QA upload.
+  * Set the Maintainer field to Debian QA Group (see: #519388)
+    Thanks Atsushi Mitsuka <mitsuka@misao.gr.jp> for the previous works.
+  * debian/control: bumped Standards-Version: 3.9.2
+  * switched to 3.0 (quilt) from 1.0.
+    - debian/source/format: 3.0 (quilt)
+    - debian/patches/*: converted to quilt from dpatch.
+    - debian/control: dropped dpatch from b-d.
+  * switched to dh7
+    - debian/control: updated debhelper to (>> 7.0.50~) of b-d.
+    - do not use dh_movefiles.
+      + debian/rules: updated.
+      + debian/canna.install: new file.
+      + debian/canna-utils.install: renamed from *.files and updated.
+      + debian/libcanna1g.install: renamed from *.files and updated.
+      + debian/libcanna1g-dev.install: renamed from *.files and updated.
+      + debian/postinst: mkdir /var/log/canna before chown.
+    - it can handle nostrip build option (Closes: #436616).
+    - debian/postrm: remove /etc/canna directory.
+  * debian/control: dropped ancient Conflicts/Replaces.
+    - canna: C/R: canna-server, libcanna1g (<= 3.5b2-33)
+    - canna-utils: C: canna (<= 3.5b2-33), libcanna1g (<= 3.5b2-33)
+    - libcanna1g: C: canna (<= 3.5b2-33)
+    - libcanna1g-dev: C/R: canna-dev, libcanna1-dev, canna (<= 3.5b2-23)
+  * debian/po/nl.po: [INTL:nl] Dutch translaiton updated (Closes: #657008).
+    Thanks Jeroen Schot <schot@A-Eskwadraat.nl>.
+  * debian/control: add Homepage: and Vcs-* tags.
+  * eliminate lintian warning: ancient-autotools-helper-file
+    - debian/rules: update and restore canuum's autotools helper files.
+  * elimitate lintian warning: debian-watch-file-is-missing
+    - debian/watch: new file.
+  * eliminate lintian warning: spelling-error-in-{binary,manpages}
+    - debian/patches/06_fix_spelling_error.patch: new file.
+  * eliminate lintian warning: manpage-has-errors-from-man
+    - debian/patches/07_fix_manpages_error.patch: new file.
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Wed, 25 Jan 2012 13:18:18 +0900
+
 canna (3.7p3-6.5) unstable; urgency=high
 
   * Non-maintainer upload.

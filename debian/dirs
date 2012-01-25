@@ -1,5 +1,1 @@
-usr/bin
-usr/sbin
-usr/lib
-usr/share/man
-etc/canna
+etc/canna/dics.dir.d

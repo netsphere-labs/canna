@@ -1,0 +1,6 @@
+01_mkrelease_autoconf213_debian.patch
+02_debiandefines.patch
+03_debian_useshareddir.patch
+04_platex.patch
+06_fix_spelling_error.patch
+07_fix_manpages_error.patch

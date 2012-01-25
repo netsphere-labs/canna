@@ -18,6 +18,9 @@ case "$1" in
     rm -f /var/lib/canna/dic/canna/*.cld
     rm -f /var/lib/canna/dic/canna/*.cbd
     rm -f /var/lib/canna/dic/canna/dics.dir
+    rm -f /etc/canna/dics.dir.d/00canna.dics.dir
+    rm -rf /etc/canna/dics.dir.d
+    rm -rf /etc/canna
     ;;
     
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
