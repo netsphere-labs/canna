@@ -1,3 +1,11 @@
+canna (3.7p3-8) unstable; urgency=low
+
+  * QA upload.
+  * debian/patches/08_fix_ftbfs_on_hurd-i386.patch: new file.
+    - fix FTBFS on hurd-i386. use O_RDONLY instead of bare 0.
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Fri, 27 Jan 2012 14:35:32 +0900
+
 canna (3.7p3-7) unstable; urgency=low
 
   * QA upload.

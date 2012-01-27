@@ -4,3 +4,4 @@
 04_platex.patch
 06_fix_spelling_error.patch
 07_fix_manpages_error.patch
+08_fix_ftbfs_on_hurd-i386.patch
