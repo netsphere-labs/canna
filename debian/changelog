@@ -1,3 +1,13 @@
+canna (3.7p3-9) unstable; urgency=low
+
+  * QA upload.
+  * B-D: texlive-lang-cjk instead of ptex-bin (Closes: #666306).
+    - debian/control: updated B-D:
+    - debian/patches/04_platex.patch: added --kanji=euc option.
+  * debian/control: fix Vcs-Browser:
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Fri, 30 Mar 2012 23:51:21 +0900
+
 canna (3.7p3-8) unstable; urgency=low
 
   * QA upload.
