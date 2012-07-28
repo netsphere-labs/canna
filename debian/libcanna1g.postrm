@@ -5,6 +5,7 @@ set -e
 case "$1" in
     purge)
 	rm -f /etc/canna/default.canna
+	rm -fr /etc/canna
 	;;
     
     remove)

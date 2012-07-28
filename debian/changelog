@@ -1,3 +1,11 @@
+canna (3.7p3-10) unstable; urgency=low
+
+  * QA upload.
+  * Fix bug in postrm scripts (Closes: #681756). 
+  * Fix a dangling symlink (/usr/bin/chmoddic -> catdic) on canna package.
+
+ -- gustavo panizzo <gfa@zumbi.com.ar>  Sat, 28 Jul 2012 00:41:47 -0300
+
 canna (3.7p3-9) unstable; urgency=low
 
   * QA upload.
