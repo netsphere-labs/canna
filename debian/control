@@ -26,6 +26,8 @@ Description: input system for Japanese - server and dictionary
 Package: canna-utils
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
+Breaks: canna (<< 3.7p3-10)
+Replaces: canna (<< 3.7p3-10)
 Description: input system for Japanese - utilities
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.

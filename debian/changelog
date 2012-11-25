@@ -1,3 +1,12 @@
+canna (3.7p3-11) unstable; urgency=medium
+
+  * QA upload.
+  * debian/control:
+    - Add Breaks/Replaces (<< 3.7p3-10) to canna-utils, which now owns
+      /usr/bin/chmoddic (Closes: #694266).
+
+ -- Luca Falavigna <dktrkranz@debian.org>  Sun, 25 Nov 2012 10:13:32 +0100
+
 canna (3.7p3-10) unstable; urgency=low
 
   * QA upload.
