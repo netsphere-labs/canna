@@ -33,7 +33,11 @@ override_dh_auto_build:
 	done
 	./mkrelease.sh && xmkmf
 	cd doc/man/guide/tex && xmkmf
-	$(MAKE) canna
+	$(MAKE) canna \
+		CDEBUGFLAGS="-g -Wall" \
+		CCOPTIONS="$$(dpkg-buildflags --get CFLAGS) $$(dpkg-buildflags --get CPPFLAGS)" \
+		LOCAL_LDFLAGS="$$(dpkg-buildflags --get LDFLAGS)" \
+		SHLIBGLOBALSFLAGS="$$(dpkg-buildflags --get LDFLAGS)"
 	$(MAKE) -C doc/man/guide/tex
 
 override_dh_install:

@@ -1,3 +1,19 @@
+canna (3.7p3-12) unstable; urgency=low
+
+  * QA upload.
+  * enable hardening.
+    - debian/rules: add dpkg-buildflags.
+    - debian/patches/09_fix_format_security.patch: new file.
+  * debian/patches/10_fix_manpages_error.patch: new file.
+  * lintian-overrides: binary-without-manpage and spelling-error-in-binary
+    - debian/canna-utils.lintian-overrides: new file.
+    - debian/canna.lintian-overrides: new file.
+    - debian/libcanna1g.lintian-overrides: new file.
+  * debian/libcanna1g.symbols: new file.
+  * bumped Standards-Version to 3.9.4.
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Sun, 09 Jun 2013 04:46:26 +0900
+
 canna (3.7p3-11) unstable; urgency=medium
 
   * QA upload.

@@ -1,0 +1,8 @@
+canna: spelling-error-in-binary usr/sbin/cannaserver userA users
+canna: binary-without-manpage usr/bin/crfreq
+canna: binary-without-manpage usr/bin/crxdic
+canna: binary-without-manpage usr/bin/crxgram
+canna: binary-without-manpage usr/bin/dpxdic
+canna: binary-without-manpage usr/bin/forcpp
+canna: binary-without-manpage usr/bin/kpdic
+canna: binary-without-manpage usr/bin/syncdic

@@ -5,3 +5,5 @@
 06_fix_spelling_error.patch
 07_fix_manpages_error.patch
 08_fix_ftbfs_on_hurd-i386.patch
+09_fix_format_security.patch
+10_fix_manpages_error.patch
