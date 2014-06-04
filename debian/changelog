@@ -1,3 +1,17 @@
+canna (3.7p3-13) unstable; urgency=medium
+
+  * QA upload.
+  * debian/control: add texlive-lang-japanese to B-D: to fix FTBFS
+    (Closes: #750320).
+  * support init.d status
+    - debian/control: add canna-utils to canna Depends.
+    - debian/init: add status.
+  * debian/init: support /lib/lsb/init-functions.
+  * debian/libcanna1g.lintian-overrides: remove unused-override.
+  * bumped Standards-Version to 3.9.5.
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Wed, 04 Jun 2014 21:35:31 +0900
+
 canna (3.7p3-12) unstable; urgency=low
 
   * QA upload.
