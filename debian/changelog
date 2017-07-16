@@ -1,10 +1,3 @@
-canna (3.7p3-14~deb9u1) stretch; urgency=medium
-
-  * QA upload.
-  * Rebuild for stretch.
-
- -- Adrian Bunk <bunk@debian.org>  Mon, 12 Mar 2018 21:07:48 +0200
-
 canna (3.7p3-14) unstable; urgency=medium
 
   * QA upload.
