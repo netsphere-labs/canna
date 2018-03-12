@@ -12,7 +12,7 @@ Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/canna.git
 
 Package: canna
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, adduser (>= 3.34), canna-utils
+Depends: lsb-base, ${misc:Depends}, ${shlibs:Depends}, adduser (>= 3.34), canna-utils
 Suggests: canna-shion
 Description: input system for Japanese - server and dictionary
  Canna provides a unified user interface for Japanese input. It is based

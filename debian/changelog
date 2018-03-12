@@ -1,3 +1,19 @@
+canna (3.7p3-14~deb9u1) stretch; urgency=medium
+
+  * QA upload.
+  * Rebuild for stretch.
+
+ -- Adrian Bunk <bunk@debian.org>  Mon, 12 Mar 2018 21:07:48 +0200
+
+canna (3.7p3-14) unstable; urgency=medium
+
+  * QA upload.
+  * Make cannakill a symlink to catdic, fixing the file conflict
+    between canna-dbgsym and canna-utils-dbgsym. (Closes: #868541)
+  * Add the missing lsb-base dependency to canna.
+
+ -- Adrian Bunk <bunk@debian.org>  Sun, 16 Jul 2017 16:59:14 +0300
+
 canna (3.7p3-13.1) unstable; urgency=medium
 
   * Non-maintainer upload to fix FTBFS.

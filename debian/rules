@@ -59,8 +59,6 @@ override_dh_install:
 	(cd $(CURDIR)/debian/tmp/usr/bin/ && \
 		rm -f cpdic lsdic mkdic mvdic rmdic syncdic \
 			addwords delwords cannakill)
-	cp $(CURDIR)/debian/tmp/usr/bin/catdic \
-		$(CURDIR)/debian/tmp/usr/bin/cannakill
 	install -d -m 755 $(CURDIR)/debian/tmp/etc/canna/dics.dir.d
 	install -m 644 $(CURDIR)/debian/tmp/var/lib/canna/dic/canna/dics.dir \
 		$(CURDIR)/debian/tmp/etc/canna/dics.dir.d/00canna.dics.dir

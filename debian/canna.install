@@ -33,7 +33,6 @@ var/lib/canna/dic/canna/number.ctd
 var/lib/canna/dic/canna/software.ctd
 var/lib/canna/dic/canna/suffix.ctd
 usr/bin/canlisp
-usr/bin/cannakill
 usr/bin/crfreq
 usr/bin/crxdic
 usr/bin/crxgram
