@@ -1,0 +1,7 @@
+/* $Id: Imakefile,v 1.4 2003/01/26 04:36:34 aida_s Exp $ */
+#include "../../Canna.conf"
+#define SimpleCommand
+#define TargetName splitword
+#define SrcName splitwd
+#define ManSrcName splitwd
+#include "../cmd.tmpl"

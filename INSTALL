@@ -1,0 +1,573 @@
+/*
+ * INSTALL
+ */
+
+       This is the environment for installation of Canna.  You need
+imake on X11R6 to compile Canna.
+
+-1. Quick Install
+
+       If you have no time to read this document and you use the
+  default environment for installation, then you run as follows.
+  Canna will be installed in /usr/local/canna.
+
+  (1) When your machine is OS/2, first, see Appendix A.
+
+  (2)  Run as follows:
+
+	 % xmkmf
+	 % make canna
+	 % su
+	 # make install
+	 # make install.man
+
+	When there will be some errors, see the following.  If you
+  cannot become super user, then see "5. Compilation and Installation
+  of Canna when you cannot become super user".
+
+0. Overview
+
+       Show configuration of environment for Canna as follows:
+
+  1. Preparations
+  2. Compile Canna
+  3. Install Canna
+  4. How to Use Canna
+  5. Compilation and Installation of Canna when you cannot become
+     super user
+
+       If you have any problem to compile Canna, mail to
+  canna-dev@lists.sourceforge.jp. Please report detailed errors.
+
+  There are thee mailing lists.
+
+  * Canna@nec.co.jp (users mailing list)
+    For more information, see:
+    http://www.nec.co.jp/canna/c-mail.html
+
+  * canna-dev@lists.sourceforge.jp (developers mailing list)
+  * canna-cvs@lists.sourceforge.jp (cvs commitlog list)
+    Mailman interface is available at:
+    http://sourceforge.jp/mail/?group_id=285
+
+       Canna which contributed on X11R5 is Version 1.2.
+
+       For changes from previous versions, see CHANGES.jp. (Sorry, but
+  CHANGES.jp is in Japanese.)
+           
+1. Preparations
+
+1.1 Configure the Environment in Canna.conf
+
+       For compilation and installation of Canna, configure the
+  following environment in Canna.conf.
+
+    cannaBinDir        Directory to install commands.
+
+    cannaSrvDir        Directory to install cannaserver and cannakill.
+
+    cannaLibDir        Directory to install files for Canna.
+
+    cannaManDir        Directory to install documents.
+
+    cannaIncDir        Directory to install include file.
+
+    libCannaDir        Directory to install libraries such as
+                       libcanna etc.
+
+    ErrDir             Directory to put log file.
+
+    cannaOwner         Owner of dictionaries and kana-to-kanji
+                       server.  See 4.1.
+
+    cannaGroup         Group of dictionaries and kana-to-kanji
+                       server.  See 4.1.
+
+    cannaDsoRev        Revision of shared library.  Here is 1 when
+                       *.so.1.
+
+    sharedLibExtension Extension of shared library.  Generally, here
+                       is so.1.  On HP-UX, here is s1.
+
+    DicDir             Directory to install dictionaries.
+
+    pubdicDir          Directory of Pubdic+.  Pubdic+ offers the newest
+                       dictionaries.  In case you want to use Pubdic+,
+                       you should specify this parameter.  In this
+                       case, you must make iroha.t in the specified
+                       directory before you start to make Canna.
+
+    JAPNESEMAN         Which document install, Japanese or English.
+                       According to definition of this parameter,
+                       result of make is different.  Sorry, but
+                       English documents are not complete.
+
+    USE_OBSOLETE_STYLE_FILENAME
+
+                       If you want to use the obsolete styles of
+                       filename as Canna 3.4 has offered, define this
+                       parameter.  After version 3.5, several file
+                       extentions are changed as following:
+
+                               File           Before v3.4  After v3.5
+                         --------------------------------------------
+                         Romaji-to-Kana table    *.kp       *.cbp
+                         Binary dictionary       *.d        *.cbd
+                         Text dictionary         *.t        *.ctd
+                         Leaning dictionary      *.fq       *.cld
+
+    SupportOldWchar    If you got compile errors related to wchar_t
+                       define this to 0. Otherwise, leave this 1.
+		       Read INSTALL.jp for detail.
+
+    UseInet6	       Support IPv6 or not. Your operating system
+		       needs newer IPv6 implementation.
+
+    DIC_3_6_COMPAT     Create dictionaries which are compatible with
+		       Canna 3.6 or earlier. You can create old
+		       dictionary by "mkbindic -c 3.0" whether you
+		       specify DIC_3_6_COMPAT or not.
+    
+    ModernElfLink      This is an experimental option. Leave it NO unless
+		       you know what you are doing. Read INSTALL.jp for
+		       detail.
+
+
+       For example, the default setting is:
+
+                /* #define InstallAsUser */
+		/* #define ObsoleteInstallDir */
+		cannaPrefix = DefCannaPrefix
+		cannaExecPrefix = $(cannaPrefix)
+		cannaBinDir = $(cannaExecPrefix)/bin
+		cannaSrvDir = DefCannaSrvDir
+		XCOMM cannaLibDir = /var/lib/canna
+		XCOMM cannaLibDir = /var/db/canna
+		cannaLibDir = DefCannaLibDir
+		XCOMM cannaManDir = $(cannaPrefix)/share/man
+		cannaManDir = $(cannaPrefix)/man
+		cannaIncDir = $(cannaPrefix)/include/canna
+
+		libCannaDir = DefLibCannaDir
+		ErrDir  = DefErrDir
+		#define SupportOldWchar 1
+		#define UseInet6 0
+		/* #define DIC_3_6_COMPAT */
+		#define ModernElfLink NO
+                cannaOwner = bin
+                cannaGroup = bin
+                DicDir = $(cannaLibDir)/dic
+                #define JAPANESEMAN
+                pubdicDir = $(CANNAROOT)/dic/ideo/pubdic
+
+
+2. Compile Canna
+
+       Canna is compiled and installed with Imakefile on X11.
+  Imakefile is a Makefile which does not depend on machine.  Imake, it
+  is a program, creates Makefile for your machine from Imakefile.  You
+  need imake (or xmkmf, it is a shell script to call imake) when
+  compile a software based on X11.  Because of this, we advice to
+  install imake if you didn't install it.
+
+       Here, we assume that you installed imake.
+
+       When you have the environment for imake, enter the following.
+
+    xmkmf
+    make canna
+
+       In the first line, you will have new Makefile which based on
+  parameter of Canna.conf on the top directory.
+
+       In the second line, it will do the following:
+
+    (1) make Makefiles
+
+          Create new makefiles from Imakefile in all subdirectories.
+
+    (2) make clean
+
+          Clear all of the directories.
+
+    (3) make includes
+
+          Link each header files in the directory include, generate
+	  header files such as accanna.h, and construct the directory
+	  hierarchy.  Especially "configure" script runs to create
+	  "accanna.h".
+	  To onstruct directory hierarchy you need a program
+          "mkdirhier".  If you cannot find mkdirhier in $(BINDIR)
+	  (normally points to /usr/X11R6/bin), then install it in
+	  $(BINDIR).  It is found in xc/config/util (or xc/util) on
+	  distribution of X11.
+
+    (4) make depend
+
+          Reflect the relationship of files in each directories to
+          Makefile.  Additionally, run yacc and lex, and make symbolic
+          link files.  Here, you need the program makedepend.  If you
+          don't have makedepend, then install it.  It is found in
+	  xc/config (or xc/util) on distribution of X11.
+
+    (5) make
+
+          Compile programs.
+
+       If configure fails in some reason, you can rerun it by "make
+    reconfig".
+
+
+3. Install Canna
+
+3.1 Set up the Communication Environment
+
+       Set up the port number to communicate between a kana-to-kanji
+  conversion server and clients.  Add the following line in
+  /etc/services.
+
+    canna	5680/tcp
+
+       (If you use NIS, add the line in database on master server.)
+
+       If you have used Canna for a long time, you find the following
+  line in /etc/services.  In this case, leave the line and add the
+  above line in the file.
+
+    iroha	5680/tcp
+
+3.2 Installation
+
+       For installation of Canna, run any one of following commands in
+  top directory of Canna's sources.
+
+    (1) make install
+
+          Install from (3) to (5) below.
+
+    (2) make install.man
+
+          Install the documents of each command in $(cannaManDir).
+
+    (3) make instserver
+
+          Install the kana-to-kanji conversion server and its
+          environment.
+
+    (4) make instclient
+
+          Install the clients of Canna and its environment.
+
+    (5) make instsgs
+
+          Install the libraries, the header files and so on to compile
+          Canna.
+
+    (6) make instmost
+
+          Install everything except dictionaries.
+
+          Install in each directories specified in Canna.conf.
+
+3.3 Configuration of Directories
+
+       Below, I would like to describe the configuration of Canna's
+  sources.
+
+    -+ lib ----+- RK       Library of kana-to-kanji conversion engine
+     |         +- RKC      Library to communicate with kana-to-kanji 
+     |         |           conversion server
+     |         +- RKindep  Internal library which does not depend on
+     |         |           RK layer
+     |         +- canna    Library for clients
+     |         |
+     |         +- RKC16  -+
+     |         +- canna16-+Libraries which wchar_t defined 16bits
+     |
+     |                  These libraries are installed in $(libCannaDir).
+     |                 
+     + server           Directory of kana-to-kanji conversion server.
+     |                  The server is installed in $(cannaSrvDir).
+     |
+     + canna            The header files
+     |
+     + cmd ----+*       The commands.
+     |                  These are installed in $(cannaBinDir).
+     |
+     + ccustom          Editor for customization.  You can customize
+     |                  without knowledge of lisp language.
+     |
+     + dic ----+ ideo   The kana-to-kanji conversion dictionaries
+     |         + phono  The romaji-to-kana conversion rules
+     |
+     |                  These are installed in $(DicDir).
+     |
+     + canuum           Uum (Japanese input front-end processor) for Canna
+     |
+     + misc             Other files
+     |
+     + doc              Documents
+
+3.4 Other Files
+
+  (1) Log file
+
+      The kana-to-kanji conversion server outputs error messages in a
+  log file.  You can find the log file in directory which specified as
+  $(ErrDir), and it will be named "CANNA0msgs".  The default file is:
+
+        /var/log/CANNA0msgs
+
+
+4. How to Use Canna
+
+4.1 Owner or Group for Sever and Dictionaries
+
+       You should restrict the access of others to keep your
+  dictionaries safety.  It is advisable to create a user/group by the
+  name of "canna" and set the ownership of your dictionaries to
+  prevent unauthorized access.
+
+       At this time, for the cannaserver can read, write the
+  dictionaries, allow read, write by owner and group to the respective
+  directories and files of dictionaries.  Next, take away others'
+  permissions.  Then start cannaserver with root privilege and have
+  it run as "canna" user by specifying "-u canna".
+
+       By default, owner and group of Canna's dictionaries are "bin".
+
+       Set owner and group of your dictionaries or cannaserver to the
+  parameter $(cannaOwner) and $(cannaGroup) in Canna.conf.
+
+       Below, we assume you set owner and group to bin.
+
+4.2 Start Kana-to-kanji Conversion Server
+
+       Enter the following command to start kana-to-kanji conversion
+  server as super user.
+
+    # cannaserver -u bin
+
+       If you want to start it automatically each time the UNIX system
+  is started, set to start cannaserver in the starting script(ex. 
+  /etc/rc.local, etc.).  You should remove its socket when start
+  cannaserver since cannaserver cannot be started when the stale
+  socket exists.
+
+       Refer to the sample startup script misc/rc.canna for details,
+  which will be made by compiling the program following the steps
+  described in section 2.
+
+4.3 Stop Kana-to-kanji Conversion Server
+
+       Enter the following command to stop kana-to-kanji conversion
+  server.
+
+    # cannakill
+
+       The cannaserver save a part of information of dictionaries on
+  memory.  So you should run cannakill when you stop kana-to-kanji
+  conversion server.  If you kill cannaserver directly with SIGKILL,
+  etc., you may lost the information on memory.
+
+       If you want to stop it automatically each time the UNIX system
+  is stopped, set to stop cannaserver in the shutdown script.
+
+4.4 Dictionaries
+
+  (1) Kana-to-kanji conversion dictionaries
+
+       We call the directory "dic home directory" in which there are
+       kana-to-kanji conversion dictionaries.  This directory is
+       specified as $(DicDir) or specified in command line as follow:
+
+         ex.) In case you specify "dic home directory" to
+              /var/lib/canna/dic
+
+                # cannaserver /var/lib/canna/dic
+
+       Below, we show the configuration of "dic home directory".
+
+              -+-- *.cbp   Romaji-to-kana conversion rules
+               |           
+               +-- canna   Directory of your own system's dictionaries
+               |           
+               +-- user/*  Directory of user's dictionaries
+               |           
+               +-- group/* Directory of group's dictionaries
+                           
+       Allow cannaserver to read and write dic home directory, any
+       subdirectories and any files in there.  (See 4.1.)
+
+  (2) Romaji-to-kana conversion rules
+
+       In default, cannaserver searches romaji-to-kana conversion
+       rules in /usr/local/canna/share/dic.  If you want to use another
+       file as romaji-to-kana conversion rules, you should specify the
+       file in your own customization file "$HOME/.canna", the full
+       path must be given.
+
+4.5 Initialize(Customization) File
+
+       In Canna, each user can have a own initialize(customization)
+  file.  You can set your own environment to input Japanese easily by
+  editing the file.  You can specify key bindings, romaji-to-kana
+  conversion rules, kana-to-kanji conversion dictionaries, etc.
+
+5. Compilation and Installation of Canna when you cannot become super
+   user
+
+       You are able to compile and install as following when you
+  cannot become super user.
+
+5.1 Configure the Environment in Canna.conf
+
+       Specify the directories in which installed commands and
+  dictionaries to your own directories.  And, specify owner and group
+  of cannaserver to your own.  For example, as follows:
+
+                #define InstallAsUser
+                cannaPrefix = /home/kon/canna
+		...
+                cannaOwner = kon
+                cannaGroup = user
+
+5.2 Compilation and Installation
+
+       In case imake on X11R6 is installed on your machine, enter the
+  following commands to compile and install Canna.
+
+    xmkmf
+    make canna
+    make install
+    make install.man
+
+       If you are able to get the sources of X11R6, although
+  X11R6 was not installed on your machine, you should get xc/config of
+  the source from X11R6, and run make in config.
+
+       For compilation in config and subdirectories, compile as
+  following after rewriting BOOTSTRAPFLAG in config/cf/Makefile.ini
+  according to your machine.
+
+    make -f Makefile.ini
+
+       We use mkdirhier command to make canna.  But this command is
+  specified $(BINDIR) of X11.  To clear this problem, edit a suitable
+  file in config, or specify in Canna.conf as follow:
+
+    BINDIR=/home/kon/xutil
+
+       When finish, run imake as following in the top directory which
+  you compile Canna (there is Canna.conf in the directory).
+
+    ex.) 
+    % ../xc/config/imake/imake -I../xc/config/cf -DTOPDIR-=../xc/config \
+      -DCURDIR=../Canna35
+
+       And run follows:
+
+    % make Makefile
+    % make canna
+    % make install
+    % make install.man
+
+5.3 Set up the Communication Environment
+
+       You aren't able to rewrite /etc/services if you cannot become
+  super user.  But you can run cannaserver and use libraries with port
+  number 5680 without the description in /etc/services.  In this case,
+  cannaserver output warning messages in log file each time
+  cannaserver is started.
+
+Appendix A. Notes on Each OS
+
+A.1 OS/2 (This discription is originally written by Hiroshi Ueno.)
+    (This may be out-of-date.)
+
+   1) You need emx 0.9c or later to compile Canna.  For emx 0.9c, see
+      the following ftp site.
+
+        ftp://ftp.leo.org
+        ftp://hobbes.nmsu.edu
+
+   2) You need imake of XFree86 for OS/2.  For XFree86 for OS/2, see
+      the following URL.
+
+        http://borneo.gmd.de/~veit/os2/xf86os2.html
+
+      In case of XFree86 for OS/2 3.2, you must install XF32base.zip
+      and XF32prog.zip at least.
+
+   3) Add x:\XFree86\bin to the environment variable PATH (x: is the
+      drive name which the XFree86 was installed).  And you need the
+      environment variable X11ROOT.  If you install XFree86 in the
+      root directory on E drive, add the following line in CONFIG.SYS.
+
+        SET X11ROOT=E:
+
+   4) Change the following files in XFree86/lib/X11/config.
+
+      os2.cf:
+        #define InstallCmd install -> #define InstallCmd ginstall
+        #define BourneShell  /**/  -> #define BourneShell cmd
+
+      os2Lib.rules:
+        #define HasSharedLibraries YES -> #define HasSharedLibraries NO
+
+   5) You need sed/sort/awk/install of GNU.  For this, see
+      ftp://hobbes.nmsu.edu, you can find this as one of the following
+      file names.
+
+        gnused.zip
+        gnuawk.zip
+        gnufutil.zip (include install)
+        gnututil.zip (include sort)
+
+      Rename as following for the purpose of distinction from these
+      commands on OS/2.
+
+        sort.exe    -> gsort.exe
+        install.exe -> ginstall.exe
+   
+   6) Set the environment in Canna.conf as below.  For detail of
+      Canna.conf, see "1.1 Configure the Environment in Canna.conf".
+
+       CHOWN = echo
+       CHGRP = echo
+       CHMOD = echo
+
+   7) Enter the following.
+
+     [x:\Canna35] xmkmf
+     [x:\Canna35] x11make Makefile
+     [x:\Canna35] x11make canna
+     [x:\Canna35] x11make install
+
+   For detail, see "2. Compille Canna" and later.
+   
+That's all.
+
+/* Copyright 1994 NEC Corporation, Tokyo, Japan.
+ *
+ * Permission to use, copy, modify, distribute and sell this software
+ * and its documentation for any purpose is hereby granted without
+ * fee, provided that the above copyright notice appear in all copies
+ * and that both that copyright notice and this permission notice
+ * appear in supporting documentation, and that the name of NEC
+ * Corporation not be used in advertising or publicity pertaining to
+ * distribution of the software without specific, written prior
+ * permission.  NEC Corporation makes no representations about the
+ * suitability of this software for any purpose.  It is provided "as
+ * is" without express or implied warranty.
+ *
+ * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+ * PERFORMANCE OF THIS SOFTWARE. 
+ */
+
+($Id: INSTALL,v 1.8 2003/09/25 15:24:31 aida_s Exp $)

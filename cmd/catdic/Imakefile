@@ -1,0 +1,54 @@
+/* $Id: Imakefile,v 1.9 2003/10/02 07:40:30 aida_s Exp $ */
+#include "../../Canna.conf"
+#include "../cmd.tmpl"
+
+          DEFINES = $(SIGNAL_DEFINES) $(ENGINE_DEFS)
+         INCLUDES = -I$(CANNAROOT)/include
+             SRCS = can.c rutil.c RKdelline.c
+             OBJS = can.o rutil.o RKdelline.o
+           TARGET = catdic
+
+AllTarget(ProgramTargetName($(TARGET)))
+NormalProgramTarget($(TARGET),$(OBJS),$(DEPRKCLIB) $(DEPRKINDEPLIB),$(RKCLIB) $(RKINDEPLIB),)
+InstallProgram($(TARGET),$(cannaBinDir))
+InstallManPage(catdic,$(cannaManDir))
+InstallManPage(chmoddic,$(cannaManDir))
+InstallManPage(cpdic,$(cannaManDir))
+InstallManPage(lsdic,$(cannaManDir))
+InstallManPage(mkdic,$(cannaManDir))
+InstallManPage(mvdic,$(cannaManDir))
+InstallManPage(rmdic,$(cannaManDir))
+InstallManPage(addwords,$(cannaManDir))
+InstallManPage(delwords,$(cannaManDir))
+InstallManPage(cannakill,$(cannaManDir))
+DependTarget()
+LintTarget()
+
+#ifdef ObsoleteInstallDir
+# define cannakillDir $(cannaBinDir)
+# define cannakillLink(base) base
+#else
+# define cannakillDir $(cannaSrvDir)
+# define cannakillLink(base) $(cannaBinDir)/base
+#endif
+
+#define CannaInstalledProgram(prog) $(DESTDIR)$(cannaBinDir)/ProgramTargetName(prog)
+
+INSTALLED_CATDIC_ALIASES_BIN = \
+	CannaInstalledProgram(cpdic) \
+	CannaInstalledProgram(lsdic) \
+	CannaInstalledProgram(mkdic) \
+	CannaInstalledProgram(mvdic) \
+	CannaInstalledProgram(rmdic) \
+	CannaInstalledProgram(syncdic) \
+	CannaInstalledProgram(chmoddic) \
+	CannaInstalledProgram(addwords) \
+	CannaInstalledProgram(delwords)
+
+INSTALLED_CATDIC_ALIASES_OTHER = \
+	$(DESTDIR)cannakillDir/ProgramTargetName(cannakill)
+
+install::
+	$(RM) $(INSTALLED_CATDIC_ALIASES_BIN) $(INSTALLED_CATDIC_ALIASES_OTHER)
+	for p in $(INSTALLED_CATDIC_ALIASES_BIN); do $(LN) catdic $$p; done
+	for p in $(INSTALLED_CATDIC_ALIASES_OTHER); do $(LN) $(cannaBinDir)/catdic $$p; done

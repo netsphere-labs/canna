@@ -1,0 +1,34 @@
+/* $Id: Imakefile,v 1.2 2003/09/09 10:33:00 takasan Exp $ */
+#include "../../../../Canna.conf"
+
+  CANNAROOT = ../../../..
+  INCLUDES  = -I$(CANNAROOT)/include
+  JLATEXCMD = latex
+  DVI2PSCMD = dvi2ps
+  DVIPDFMX  = dvipdfmx
+
+   SRCS = cannaindex.c
+
+AllTarget(canna.dvi)
+
+ConvertPathName(canna.tex,canna-dist.tex)
+SingleProgramTarget(cannaindex,cannaindex.o,,)
+DependTarget()
+
+canna.dvi: canna.tex cannaindex
+	echo 'DUMMY' > candex.tex
+	$(JLATEXCMD) canna.tex
+	./cannaindex canna.idx > candex.tex
+	$(JLATEXCMD) canna.tex
+
+canna.ps: canna.dvi
+	$(DVI2PSCMD) canna.dvi > canna.ps
+
+canna.pdf: canna.dvi
+	$(DVIPDFMX) canna.dvi
+
+clean::
+	-$(RM) *.aux *.idx *.lof *.log *.lot *.toc
+
+clean::
+	$(RM) canna.tex canna.dvi canna.ps canna.pdf candex.tex

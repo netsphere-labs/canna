@@ -1,0 +1,155 @@
+Canna 3.6p4までの変更点については、OCHANGES.jpを参照してください。
+また、本ドキュメントでは細かい変更には触れていないため、詳しい点については
+はChangeLogを参照してください。ただし、辞書の変更点は、dic/ideo/ChangeLogに
+まとめられているため、そちらを参照してください。
+
+1. Canna 3.7までの主要な変更点
+
+Canna 3.6から3.7までの新機能、重要な修正、仕様変更を述べます。なお、
+この中には3.6のパッチの中で解決した問題も含まれています。
+
+1.1 重要な変更点
+
+・デフォルトのディレクトリ構成が変わりました。特にパッケージを作成する場合には
+  注意してください。
+・バイナリ辞書の形式が変わりました。以前の形式の辞書もマウントできますが、
+  新しく作った辞書は古いサーバではマウントできません。なお、mkbindicに-c 3.0
+  というオプションを与えると、3.5/3.6でも(3.2でも？)マウントできる辞書を
+  生成できます。
+・共有ライブラリのバージョンが全てのプラットフォームで1.2になりました。
+  バイナリ互換性は保たれていますが、プラットフォームによってはファイル名が
+  変わったために動的リンクに失敗することがあります。その場合はシンボリック
+  リンクを張ってください。
+・canuumが補助ライブラリlibsptを利用するようになりました。
+  http://www.j10n.org/libspt/
+  からダウンロードできます。詳しくは、canuum/README.jpを参照してください。
+・クライアントから不正なリクエストを送られると、バッファオーバーフローを
+  起こしたり、内部情報が漏れたりするというセキュリティ問題を修正しました。
+  (補足: これは3.6p1で既に解決しているので、3.7でないと危険というわけでは
+  ありません。)
+
+1.2 設定、カスタマイズに関する変更
+
+・ローマ字仮名変換やユーザーインターフェースに関係ない、サーバとの接続に
+  関する設定を独立して行うため、rkc.confという新しい設定ファイルを導入
+  しました。詳しい構文などはRKCCONF.jpで説明しています。
+・(setq chikuji-continue nil)としておかないと(setq renbun-continue nil)
+  が効かない問題を修正しました。renbun-continueのデフォルト値はnilでしたが、
+  tであるかのように動作していたため、この修正に伴いrenbun-continueのデフォルト
+  値をtに改めました。
+・サンプルファイルの構成が変化しました。
+
+1.3 ユーザーインターフェース、ローマ字仮名変換に関する変更
+
+・カナ変換時の自動登録が使えるようになりました。verbose.cannaにあるように、
+  use-dictionaryで:katakana "your-dictionary"のように設定することでこの機能を
+  有効に出来ます。
+・character-based-moveがtに設定されていると、単語登録の際に単語の編集がうまく
+  出来ない問題を修正しました。
+・「ん」を「n'」で入力できない問題を修正しました。
+・単語登録の品詞メニューで「その他」を選んだ時に不正な動作をする問題を修正
+  しました。
+・TTY ベースのアプリケーションや emacs で、カーソルキーやファンクションキー
+  を正常に入力できない不具合を修正しました。
+・字種変換、部分確定の際に誤った学習が行われる問題を修正しました。
+・サーバと通信する際、一定時間に返答が戻って来ないときは通信を中止するように
+  しました。詳しくはRKCCONF.jpを参照してください。
+
+1.4 仮名漢字変換に関する変更
+
+・辞書に様々な改良を加えました。
+・3.6p1で逐次入力とcpdicコマンドが動かなくなったので、修正しました。
+・mkbindicで同じ読みの単語同士の優先順位を変えないようにしました。
+・「化って」のような誤変換を起こりにくくしました。
+・バイナリ辞書をmakeし直しても、辞書の内容に変化が無ければ、以前の学習データ
+  をそのまま利用できるようにしました。ただしDIC_3_6_COMPATや-c 3.0を使って
+  旧形式の辞書とした場合は、この機能は利用できません。
+
+1.5 APIに関する変更
+
+・ワイドキャラクタAPIを変更しました。現在のところ、コンパイル時に無効にしない
+  限り、古いAPIも利用できますが、できるだけ新しいAPIを利用してください。
+  新しいAPIを利用する場合、jrkanji.hをインクルードする時に、
+
+#define CANNA_WCHAR16 /* もし必要なら */
+#define CANNA_NEW_WCHAR_AWARE
+#include <canna/jrkanji.h>
+
+  としてください。なお、ワイドキャラクタのAPIを使うと厄介なコード変換が必要
+  となるため、新しくクライアントを作るときは、EUCのAPIを利用することを推奨
+  します。
+・EUC版のKC_LISTCALLBACKを用意しました。第3引数にはjrEUCListCallbackStruct
+  へのポインタを渡してください。また、機能テスト用に、CANNA_EUC_LISTCALLBACK
+  というマクロを定義しました。
+
+1.6 その他
+
+・実験的な64ビットサポートを追加しました。CCやCCOPTIONSを適切に設定して、64
+  ビット用のコンパイラを呼び出すようにすると、64ビットで動作する実行ファイルが
+  作られるはずです。
+・IPv6に対応しました。ただし、比較的新しいIPv6の仕様に依存しているので、古い
+  仕様に基くシステムではコンパイルが出来ないことがあります。特に、Linuxでは
+  少なくともkernel 2.4.21/2.5.45以降と、それに対応したglibcが必要です。
+・Canna 1.x時代のEUCプロトコルのサポートを止めました。
+・sample/*とcmd/crrdic/*を削除しました。いずれも以前から通常のインストールでは
+  コンパイルされていなかった古いプログラムです。
+・ドキュメントを修正しました。特に、doc/man/guide以下のTeXドキュメントを大
+  幅に更新し、LaTeX2eに対応させた他、古い記述を修正しました。
+・その他、さまざまな潜在的な問題を修正しました。
+
+1.7 Canna 3.7b1からの変更点
+・辞書にいくつかの修正を加えました。
+・jrkanji.hにCANNA_JR_BEEP_FUNC_DECLAREDというマクロを追加しました。
+
+
+2. Canna 3.7におけるパッチ
+
+2.1 Canna 3.7p1での変更点
+・gcc以外のコンパイラで、いくつかのファイルがコンパイルエラーになる
+  問題を修正しました。
+・imakeのCFLAGS等にシェルの特殊文字が含まれる環境(特にAIX)に対応しました。
+・環境によってdic/ideo/pubdic/podがリンクエラーになる問題を修正しました。
+・MacOS X 10.3ではcppが変な#pragmaを吐くので対策しました。
+・Canna.confのModernElfLinkを少し賢く(Sun以外では逆にまずいかも)しました。
+・hppa版LinuxをHP-UXに誤認識する部分があったのを修正しました。
+・このファイルの「1. Canna 3.7までの主要な変更点」を加筆訂正しました。
+
+2.2 Canna 3.7p2での変更点
+・X.Org版imakeでmakeできない問題を修正しました。
+・ビッグエンディアンのマシンで3.7パッチを当てたkinput2を使うと正常に文字を
+  入力出来ないバグを修正しました。
+・先頭一文字選択を2回行うと異常な状態になるバグを修正しました。
+・emacsでcanna-parseを使うと落ちるバグを修正しました。
+・rkc.confを読み込むとき状況によって落ちてしまうバグを修正しました。
+・Pubdic+-fix01を取り込みました。辞書自体の変更は無く、付属ツールの修正と
+  ライセンスの明確化が行われています。
+・そのほか潜在的なバグの修正やドキュメントの訂正を行いました。
+
+2.2 Canna 3.7p3での変更点
+・FreeBSD, Solaris, AIXなどでmakeできない問題を修正しました。
+
+以上
+
+/* Copyright (c) 2003-2004 Canna Project. All rights reserved.
+ *
+ * Permission to use, copy, modify, distribute and sell this software
+ * and its documentation for any purpose is hereby granted without
+ * fee, provided that the above copyright notice appear in all copies
+ * and that both that copyright notice and this permission notice
+ * appear in supporting documentation, and that the name of the
+ * author and contributors not be used in advertising or publicity
+ * pertaining to distribution of the software without specific, written
+ * prior permission.  The author and contributors no representations
+ * about the suitability of this software for any purpose.  It is
+ * provided "as is" without express or implied warranty.
+ *
+ * THE AUTHOR AND CONTRIBUTORS DISCLAIMS ALL WARRANTIES WITH REGARD TO
+ * THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS, IN NO EVENT SHALL THE AUTHOR AND CONTRIBUTORS BE LIABLE FOR
+ * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ */
+
+($Id: CHANGES.jp,v 1.6.2.7 2004/05/19 15:47:33 aida_s Exp $)

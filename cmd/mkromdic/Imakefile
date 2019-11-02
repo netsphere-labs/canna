@@ -1,0 +1,19 @@
+/* $Id: Imakefile,v 1.4 2003/09/25 06:30:21 aida_s Exp $ */
+#include "../../Canna.conf"
+
+      CANNAROOT = ../..
+       PROGRAMS = mkromdic
+           SRCS = mkromdic.cpp
+
+        DEFINES = -I$(CANNAROOT)/include $(SCRIPTS_DEFINES) -DCPP='$(CPP)'
+
+AllTarget($(PROGRAMS))
+
+CppScriptTarget(mkromdic,mkromdic.cpp,$(DEFINES),/**/)
+InstallNamedProg(mkromdic,mkromdic,$(cannaBinDir))
+InstallManPage(mkromdic,$(cannaManDir))
+
+clean::
+	$(RM) $(PROGRAMS)
+
+depend::

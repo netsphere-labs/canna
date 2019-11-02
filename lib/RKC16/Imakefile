@@ -1,0 +1,3 @@
+/* $Id: Imakefile,v 1.7 2003/09/06 13:59:32 aida_s Exp $ */
+#define NARROW
+#include "../RKC/Imakefile"

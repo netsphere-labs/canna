@@ -1,0 +1,9 @@
+/* $Id: Imakefile,v 1.3 2003/01/26 04:36:31 aida_s Exp $ */
+#include "../../Canna.conf"
+CMDSUBDEFINES = -DCHECK_COMMAND
+#define SimpleCommand
+#define TargetName cannacheck
+#define SrcName main
+#define ManSrcName ccheck
+#define WantCannaLib
+#include "../cmd.tmpl"
