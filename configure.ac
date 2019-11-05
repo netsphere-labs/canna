@@ -1,22 +1,24 @@
+#                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_INIT([canna], [3.7p3], [canna-dev@lists.sourceforge.jp])
-AC_CONFIG_SRCDIR([WHATIS.jp])
-AC_CONFIG_HEADER([accanna.h])
 
-if test "x$IN_MAKE" != xyes; then
-  AC_MSG_ERROR([You cannot invloke configure directly.])
-fi
+AC_PREREQ([2.69])
+
+# [FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS]
+AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
+AC_CONFIG_SRCDIR([WHATIS.jp])
+AM_INIT_AUTOMAKE
+
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
+AC_PROG_CXX
 AC_PROG_CC
 
 # Checks for libraries.
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h locale.h memory.h netdb.h netinet/in.h stddef.h stdlib.h string.h]dnl
- [strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h]dnl
- [sys/select.h arpa/inet.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h locale.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -24,50 +26,77 @@ AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT8_T
+AC_TYPE_PID_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT8_T
 
 # Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
 AC_FUNC_SETPGRP
-AC_TYPE_SIGNAL
+AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero dup2 gethostbyaddr gethostbyname gethostname inet_ntoa isascii memchr]dnl
- [memset mkdir munmap select setlocale socket strchr strdup strrchr strspn]dnl
- [index bcopy memcpy setsid rename FD_ISSET strlcpy syslog vsyslog inet_aton] )
+AC_CHECK_FUNCS([bzero dup2 gethostbyaddr gethostbyname gethostname inet_ntoa memchr memset mkdir munmap select setlocale socket strchr strdup strrchr strspn strtol strtoul])
 
-AC_CHECK_TYPES([fd_set],,,[dnl
-#include <sys/types.h>
-#ifdef HAVE_SYS_SELECT_H
-# include <sys/select.h>
-#endif
-])
-AC_CHECK_TYPES([int32_t],,,[dnl
-#if defined(HAVE_INTTYPES_H)
-# include <inttypes.h>
-#elif defined(HAVE_STDINT_H)
-# include <stdint.h>
-#else
-# include <sys/types.h>
-#endif
-])
-AC_CHECK_TYPES([time_t])
-AC_CHECK_TYPES([in_addr_t],,,[dnl
-#include <sys/types.h>
-#include <netinet/in.h>
-])
-AC_CHECK_TYPES([socklen_t],,,[dnl
-#include <sys/types.h>
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#endif
-])
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
-AC_CONFIG_FILES([])
+AC_CONFIG_FILES([
+lib/RK/Makefile
+lib/canna/Makefile
+lib/RKC16/Makefile
+lib/Makefile
+lib/RKindep/Makefile
+lib/RKC/Makefile
+lib/canna16/Makefile
+cmd/dicar/Makefile
+cmd/dpxdic/Makefile
+cmd/crxgram/Makefile
+cmd/cannastat/Makefile
+cmd/forsort/Makefile
+cmd/crfreq/Makefile
+cmd/ctow/Makefile
+cmd/wtoc/Makefile
+cmd/splitwd/Makefile
+cmd/dpbindic/Makefile
+cmd/dpromdic/Makefile
+cmd/mkromdic/Makefile
+cmd/cannacheck/Makefile
+cmd/mergewd/Makefile
+cmd/Makefile
+cmd/mkbindic/Makefile
+cmd/cshost/Makefile
+cmd/chkconc/Makefile
+cmd/forcpp/Makefile
+cmd/catdic/Makefile
+cmd/crxdic/Makefile
+cmd/kpdic/Makefile
+cmd/canlisp/Makefile
+canna/Makefile
+doc/Makefile
+doc/man/guide/Makefile
+doc/man/guide/tex/Makefile
+Makefile
+dic/phono/Makefile
+dic/ideo/Makefile
+dic/ideo/pubdic/Makefile
+dic/ideo/grammar/Makefile
+dic/ideo/words/Makefile
+dic/Makefile
+ccustom/Makefile
+misc/initfiles/Makefile
+misc/Makefile
+server/Makefile
+  ])
 
 dnl PUBCONF_DEFINE(NAME,VALUE)
 define([PUBCONF_PREFIX],[CANNA_])
@@ -124,5 +153,6 @@ else
   ])
 ])
 
+AC_CONFIG_SUBDIRS([canuum])
 AC_OUTPUT
 # $Id: configure.ac,v 1.12.2.5 2004/05/19 15:47:33 aida_s Exp $

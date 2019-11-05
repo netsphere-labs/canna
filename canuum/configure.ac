@@ -34,14 +34,11 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 define([CANNA])
-AC_INIT(ifdef([CANNA],canna.c,Wnn/conv/cvt_head.h))
-AC_CONFIG_HEADER(config.h)
 
-ifdef([CANNA],[
-if test "x$IN_MAKE" != xyes; then
-  AC_MSG_ERROR([You cannot invloke configure directly.])
-fi
-])dnl CANNA
+AC_PREREQ([2.69])
+AC_INIT
+AC_CONFIG_SRCDIR([canna.c])
+AC_CONFIG_HEADERS([config.h])
 
 dnl ====================================================================
 dnl Check optional features
@@ -423,12 +420,11 @@ else
       dnl It's possible that a library is found but it doesn't work
       dnl e.g., shared library that cannot be found
       dnl compile and run a test program to be sure
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_TERMCAP_H
 # include <termcap.h>
 #endif
-main() {char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(0); }],
-			  res="OK", res="FAIL", res="FAIL")
+main() {char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(0); }]])],[res="OK"],[res="FAIL"],[res="FAIL"])
       if test "$res" = "OK"; then
 	break
       fi
@@ -439,15 +435,12 @@ main() {char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(0); }],
 fi
 if test "x$olibs" != "x$LIBS"; then
   AC_MSG_CHECKING(whether we talk terminfo)
-  AC_TRY_RUN([
+  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_TERMCAP_H
 # include <termcap.h>
 #endif
 main()
-{char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(!strcmp(s==0 ? "" : s, "1")); }],
-	  AC_MSG_RESULT([no -- we are in termcap land]),
-	  AC_MSG_RESULT([yes -- terminfo spoken here]); AC_DEFINE(HAVE_TERMINFO),
-	  AC_MSG_ERROR(failed to compile test program.))
+{char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(!strcmp(s==0 ? "" : s, "1")); }]])],[AC_MSG_RESULT(no -- we are in termcap land)],[AC_MSG_RESULT(yes -- terminfo spoken here); AC_DEFINE([HAVE_TERMINFO], [], [Whether have terminfo])],[AC_MSG_ERROR(failed to compile test program.)])
 else
   AC_MSG_RESULT(none found)
 fi
@@ -459,16 +452,6 @@ AC_TYPE_MODE_T
 AC_HEADER_TIME
 AC_CHECK_TYPE(time_t, long)
 
-dnl
-dnl socklen_t は sys/socket.h や bits/socket.h で定義されているので、
-dnl AC_CHECK_TYPE では検出できない
-dnl
-AC_MSG_CHECKING(for socklen_t)
-AC_EGREP_CPP(socklen_t, [#include <sys/socket.h>], AC_MSG_RESULT(yes), 
-[ 
-AC_DEFINE(socklen_t, int)
-AC_MSG_RESULT(no)
-])
 dnl code below is for the same thing with autoconf 2.53
 dnl AC_CHECK_TYPES(socklen_t,,
 dnl 	AC_DEFINE(socklen_t, int),
@@ -476,7 +459,7 @@ dnl	[INCLUDES = sys/socket.h])
 AC_MSG_CHECKING(for union wait)
 if test "$ac_cv_header_sys_wait_h" = yes; then
   AC_EGREP_CPP(union wait, [#include <sys/wait.h>],
-  [AC_DEFINE(HAVE_UNION_WAIT)
+  [AC_DEFINE([HAVE_UNION_WAIT], [], [Check for union wait])
   AC_MSG_RESULT(yes)], 
   [AC_MSG_RESULT(no)])
 else
@@ -493,7 +476,18 @@ dnl
 AC_PROG_GCC_TRADITIONAL
 
 dnl idea borrowed from EB Library http://www.sra.co.jp/people/m-kasahr/eb/
-AC_TYPE_SIGNAL
+AC_DIAGNOSE([obsolete],[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 if test "$ac_cv_type_signal" = void; then
   AC_DEFINE(RETSIGTYPE_VOID, 1, [Define if the signal function returns void.])
 fi
@@ -583,12 +577,14 @@ if test "x$kWnn" = "xkWnn"; then
   makefiles_kwnn_dic="kWnn/kdic/Makefile"
 fi
 
-AC_OUTPUT(${makefiles_generic} \
+AC_CONFIG_FILES([${makefiles_generic} \
 	${makefiles_wnn} ${makefiles_wnn_dic} \
 	${makefiles_cwnn} ${makefiles_cwnn_dic} \
-	${makefiles_kwnn} ${makefiles_kwnn_dic})
+	${makefiles_kwnn} ${makefiles_kwnn_dic}])
+AC_OUTPUT
 ])dnl not CANNA
 ifdef([CANNA],[
-dnl AC_OUTPUT(canuum.tmpl)
+dnl AC_CONFIG_FILES([canuum.tmpl])
+AC_OUTPUT
 AC_OUTPUT
 ])dnl not CANNA
