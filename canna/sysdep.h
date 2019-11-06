@@ -25,7 +25,7 @@
 #ifndef CANNA_SYSDEP_H
 #define CANNA_SYSDEP_H
 
-#include <canna/pubconf.h>
+#include "../pubconf.h"
 #if defined(CANNA_HAVE_INTTYPES_H)
 # include <inttypes.h>
 #elif defined(CANNA_HAVE_STDINT_H)

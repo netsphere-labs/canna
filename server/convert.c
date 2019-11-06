@@ -2111,7 +2111,7 @@ oreqproc Vector[] =
 } ;
 
 #ifdef EXTENSION
-static oreqproc ExtensionVector[] =
+oreqproc ExtensionVector[] =
 {
 #ifdef USE_EUC_PROTOCOL
 /* 0x00 */	{ ir_list_dictionary,	   ProcReq9 },

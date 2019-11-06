@@ -24,7 +24,7 @@
 
 #ifndef CCOMPAT_H
 #define CCOMPAT_H
-#include "cannaconf.h"
+#include "config.h"
 
 #if defined(__STDC__) || defined(__cplusplus)
 # define pro(x) x
@@ -53,7 +53,7 @@ extern void free();
 extern int  errno;
 #endif
 
-#include "canna/sysdep.h"
+#include "sysdep.h"
 
 #if defined(HAVE_STRCHR) && !defined(HAVE_INDEX) && !defined(index)
 # define index(s, c) strchr(s, c)

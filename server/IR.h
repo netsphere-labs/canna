@@ -25,7 +25,7 @@
 
 /* 自動判別支援コメント: これはEUC-JPだぞ。幅という字があれば大丈夫。 */
 
-#include "cannaconf.h"
+#include "config.h"
 #include "ccompat.h"
 #include <sys/types.h>
 
@@ -44,7 +44,7 @@ typedef long ir_time_t;
 #include    "protodefs.h"
 #define CANNAWC_DEFINED
 typedef Ushort cannawc;
-#include    "canna/RK.h"
+#include    "RK/RK.h"
 #include    "IRproto.h"
 #include    "IRwproto.h"
 #include    "net.h"
