@@ -968,8 +968,7 @@ int cxnum ;
 }
 
 int
-RkwNext(cxnum)
-int cxnum ;
+RkwNext(int cxnum)
 {
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
     register RkcBun	 *bun ;
@@ -986,8 +985,7 @@ int cxnum ;
 }
 
 int
-RkwPrev(cxnum)
-int cxnum ;
+RkwPrev(int cxnum)
 {
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
     register RkcBun	 *bun ;
@@ -1041,10 +1039,7 @@ Ushort *kanji ;
 }
 
 int
-RkwGetKanji(cxnum, kanji, maxkanji)
-int cxnum;
-wchar_t *kanji;
-int maxkanji;
+RkwGetKanji(int cxnum, wchar_t* kanji, int maxkanji)
 {
   int len;
 

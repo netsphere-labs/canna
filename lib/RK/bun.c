@@ -931,11 +931,9 @@ RkwNfer(cx_num)
   return(bun->nb_curcand = bun->nb_maxcand);
 }
 
-int RkwNext pro((int));
 
 int
-RkwNext(cx_num)
-     int	cx_num;
+RkwNext(int cx_num)
 {
   struct RkContext	*cx;
   struct nbun	*bun;
@@ -951,11 +949,9 @@ RkwNext(cx_num)
   return(bun->nb_curcand);
 }
 
-int RkwPrev pro((int));
 
 int
-RkwPrev(cx_num)
-     int	cx_num;
+RkwPrev(int cx_num)
 {
   struct RkContext	*cx;
   struct nbun		*bun;
@@ -1332,14 +1328,8 @@ getKanji(cx, cnum, dst, maxdst)
 /* RkGetKanji
  *	current bunsetu no kanji tuduri wo toru
  */
-
-int RkwGetKanji pro((int, Wchar *, int));
-
 int
-RkwGetKanji(cx_num, dst, maxdst)
-     int	cx_num;
-     Wchar	*dst;
-     int	maxdst;
+RkwGetKanji(int cx_num, Wchar* dst, int maxdst)
 {
   RkContext	*cx;
   struct nbun	*bun;

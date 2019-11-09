@@ -26,7 +26,7 @@ static char rcs_id[] = "$Id: util.c,v 1.8 2003/09/21 12:56:29 aida_s Exp $";
 
 #include "server.h"
 #if 1 /* unused */
-#include "widedef.h"
+#include "canna/widedef.h"
 #endif
 
 size_t

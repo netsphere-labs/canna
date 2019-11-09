@@ -25,7 +25,7 @@
 #ifndef	SERVER_H
 #define SERVER_H
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -38,7 +38,7 @@
 #include <sys/select.h>
 #endif
 
-#include "net.h"
+#include "canna/net.h"
 #include <unistd.h>
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>

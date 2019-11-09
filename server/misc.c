@@ -30,6 +30,7 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #ifdef HAVE_SYSLOG /* !__EMX__ */
 # include <syslog.h>
 #endif
+#include <grp.h> // initgroups()
 
 #ifdef USE_VARARGS
 #ifdef __STDC__
@@ -104,7 +105,7 @@ static int caught_signal = 0;
 static int openlog_done = 0;
 static int rkw_initialize_done = 0;
 
-static void Reset();
+static void Reset(int );
 
 #ifdef INET6
 #define USAGE "Usage: cannaserver [-p num] [-l num] [-u userid] [-syslog] [-inet] [-inet6] [-d] [dichome]"
@@ -282,11 +283,8 @@ char *argv[];
 }
 
 static void
-mysignal(sig, func)
-int sig;
-RETSIGTYPE (*func) pro((int));
+mysignal(int sig, void (*func)(int) )
 {
-#ifdef SA_RESTART
     struct sigaction new_action;
 
     sigemptyset(&new_action.sa_mask);
@@ -297,9 +295,6 @@ RETSIGTYPE (*func) pro((int));
 # endif
 	;
     sigaction(sig, &new_action, NULL);
-#else
-    signal(sig, func);
-#endif
 }
 
 int
@@ -516,9 +511,8 @@ const char *where;
     PrintMsg("out of memory\n");
 }
 
-static RETSIGTYPE
-Reset(sig)
-int	sig;
+// callback
+static void Reset(int sig)
 {
     caught_signal = sig;
 #ifdef SIGNALRETURNSINT

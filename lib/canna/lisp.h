@@ -25,7 +25,7 @@
 #include "canna.h"
 
 #include <stdio.h>
-#include "symbolname.h"
+#include "canna/symbolname.h"
 
 #define	YES	1
 #define NO	0

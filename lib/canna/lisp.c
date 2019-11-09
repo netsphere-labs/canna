@@ -28,7 +28,7 @@ static char rcsid[] = "$Id: lisp.c,v 1.11.2.1 2004/04/26 22:49:21 aida_s Exp $";
 ** main program of lisp 
 */
 #include "lisp.h"
-#include "patchlevel.h"
+#include "canna/patchlevel.h"
 
 #include <signal.h>
 

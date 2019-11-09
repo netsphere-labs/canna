@@ -25,7 +25,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: empty.c,v 1.2 2003/09/17 08:50:53 aida_s
 #endif /* lint */
 
 #include "canna.h"
-#include "patchlevel.h"
+#include "canna/patchlevel.h"
 
 extern KanjiModeRec yomi_mode, cy_mode;
 

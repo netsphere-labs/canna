@@ -77,7 +77,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 1.11.2.2 2003/12/27 23:30:5
 #include "RKindep/ecfuncs.h"
 #include <pwd.h>
 
-#include <patchlevel.h>
+#include <canna/patchlevel.h>
 
 
 typedef struct {

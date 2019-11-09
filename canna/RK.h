@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#include <sysdep.h>
+#include <canna/sysdep.h>
 
 typedef	struct {
    int		ylen;		/* yomigana no nagasa (in byte) */ 

@@ -27,8 +27,8 @@
 #ifndef _CANNA_H_
 #define _CANNA_H_
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include <stdio.h>
 
 #define CANNA_NEW_WCHAR_AWARE
@@ -47,7 +47,7 @@
 #define MBstowcs CANNA_mbstowcs
 #define WCstombs CANNA_wcstombs
 
-#include "sglobal.h"
+//#include "sglobal.h"
 
 #define XLookupKanji2			 IROHA_G300_XLookupKanji2
 #define XKanjiControl2			 IROHA_G301_XKanjiControl2

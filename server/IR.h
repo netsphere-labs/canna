@@ -26,7 +26,7 @@
 /* 自動判別支援コメント: これはEUC-JPだぞ。幅という字があれば大丈夫。 */
 
 #include "config.h"
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include <sys/types.h>
 
 
@@ -41,13 +41,13 @@ typedef long ir_time_t;
 
 #define EXTENSION
 
-#include    "protodefs.h"
+#include "canna/protodefs.h"
 #define CANNAWC_DEFINED
 typedef Ushort cannawc;
-#include    "RK/RK.h"
+#include  <canna/RK.h>
 #include    "IRproto.h"
 #include    "IRwproto.h"
-#include    "net.h"
+#include "canna/net.h"
 
 #define LENTODATA(len, data) ((void)(*(canna_uint32_t *)(data) = htonl(len)))
 #define DATATOLEN(data, len) ((void)((len) = ntohl(*(canna_uint32_t *)(data))))

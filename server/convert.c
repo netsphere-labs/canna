@@ -27,7 +27,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: convert.c,v 1.10.2.1 2003/12/27 17:15:24
 /* LINTLIBRARY */
 
 #include "server.h"
-#include <patchlevel.h>
+#include <canna/patchlevel.h>
 
 #if CANNA_LIGHT
 #ifdef EXTENSION
