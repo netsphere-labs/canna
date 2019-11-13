@@ -27,54 +27,6 @@
 #ifndef _WIDEDEF_H_
 #define _WIDEDEF_H_
 
-#ifdef __FreeBSD__
-# include <osreldate.h>
-#endif
-
-#if (defined(__FreeBSD__) && __FreeBSD_version < 500000) \
-    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
-# include <machine/ansi.h>
-#endif
-
-#if (defined(__FreeBSD__) && __FreeBSD_version < 500000) \
-    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
-# ifdef _BSD_WCHAR_T_
-#  undef _BSD_WCHAR_T_
-#  ifdef WCHAR16
-#   define _BSD_WCHAR_T_ unsigned short
-#  else
-#   define _BSD_WCHAR_T_ unsigned long
-#  endif
-#  if defined(__APPLE__) && defined(__WCHAR_TYPE__)
-#   undef __WCHAR_TYPE__
-#   define __WCHAR_TYPE__ _BSD_WCHAR_T_
-#  endif
-#  include <stddef.h>
-#  define _WCHAR_T
-# endif
-#elif defined(__FreeBSD__) && __FreeBSD_version >= 500000
-# ifdef WCHAR16
-typedef unsigned short wchar_t;
-#  define _WCHAR_T_DECLARED
-# endif
-# include <stddef.h>
-# define _WCHAR_T
-#else
-#if !defined(WCHAR_T) && !defined(_WCHAR_T) && !defined(_WCHAR_T_) \
- && !defined(__WCHAR_T) && !defined(_GCC_WCHAR_T) && !defined(_WCHAR_T_DEFINED)
-# ifdef WCHAR16
-typedef unsigned short wchar_t;
-# else
-/* replace this with #include or typedef appropriate for your system */
-typedef unsigned long wchar_t;
-# endif
-# define WCHAR_T
-# define _WCHAR_T
-# define _WCHAR_T_
-# define __WCHAR_T
-# define _GCC_WCHAR_T
-#define _WCHAR_T_DEFINED
-#endif
-#endif
+#include <stddef.h>
 
 #endif /* _WIDEDEF_H_ */

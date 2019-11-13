@@ -26,22 +26,13 @@
 #define CCOMPAT_H
 #include "config.h"
 
-#if defined(__STDC__) || defined(__cplusplus)
-# define pro(x) x
-#else
-# define pro(x) ()
+#ifndef pro
+  #define pro(x) x
 #endif
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#else
-extern char *malloc(), *realloc(), *calloc();
-extern void free();
-#endif
+#include <stdlib.h>
+#include <string.h>
 
-#ifdef HAVE_STRING_H
-# include <string.h>
-#endif
 #ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
@@ -49,9 +40,6 @@ extern void free();
 # include <memory.h>
 #endif
 #include <errno.h>
-#ifdef luna68k
-extern int  errno;
-#endif
 
 #include "sysdep.h"
 

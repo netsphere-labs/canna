@@ -38,14 +38,8 @@
 # endif
 #endif
 
-#ifdef pro
-#define CANNA_PRO_PREDEFINED
-#else
-#if defined(__STDC__) || defined(__cplusplus)
-#define pro(x) x
-#else
-#define pro(x) ()
-#endif
+#ifndef pro
+  #define pro(x) x
 #endif
 
 #include <canna/sysdep.h>
@@ -192,18 +186,12 @@ typedef struct {
 } jrEUCListCallbackStruct;
 
 #ifndef CANNAWC_DEFINED
-# if defined(_WCHAR_T) || defined(CANNA_NEW_WCHAR_AWARE)
-#  define CANNAWC_DEFINED
-#  ifdef CANNA_NEW_WCHAR_AWARE
-#   ifdef CANNA_WCHAR16
-typedef canna_uint16_t cannawc;
-#   else
-typedef canna_uint32_t cannawc;
-#   endif
-#  elif defined(_WCHAR_T) /* !CANNA_NEW_WCHAR_AWARE */
-typedef wchar_t cannawc;
-#  endif
-# endif
+  #define CANNAWC_DEFINED
+  #ifdef CANNA_WCHAR16
+typedef uint16_t cannawc;
+  #else
+typedef uint32_t cannawc;
+  #endif
 #endif
 
 #ifdef CANNAWC_DEFINED
@@ -309,11 +297,6 @@ int wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 }
 #endif
 
-#ifdef CANNA_PRO_PREDEFINED
-#undef CANNA_PRO_PREDEFINED
-#else
-#undef pro
-#endif
 
 #endif /* _JR_KANJI_H_ */
 

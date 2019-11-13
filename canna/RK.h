@@ -31,14 +31,8 @@
 # define canna_export(x) x
 #endif
 
-#ifdef pro
-#define CANNA_PRO_PREDEFINED
-#else
-#if defined(__STDC__) || defined(__cplusplus)
-#define pro(x) x
-#else
-#define pro(x) ()
-#endif
+#ifndef pro
+  #define pro(x) x
 #endif
 
 #include <canna/sysdep.h>
@@ -171,16 +165,12 @@ extern "C" {
 #endif
 
 #ifndef CANNAWC_DEFINED
-# if defined(CANNA_NEW_WCHAR_AWARE)
-#  define CANNAWC_DEFINED
-#  ifdef CANNA_WCHAR16
-typedef canna_uint16_t cannawc;
-#  else
-typedef canna_uint32_t cannawc;
-#  endif
-# elif defined(_WCHAR_T)
-#  error "You can't use old wide character for RK interface"
-# endif
+  #define CANNAWC_DEFINED
+  #ifdef CANNA_WCHAR16
+typedef uint16_t cannawc;
+  #else
+typedef uint32_t cannawc;
+  #endif
 #endif
 
 #ifdef CANNAWC_DEFINED
@@ -316,19 +306,19 @@ struct rkfuncs {
   int (*MountDic) pro((int, char *, int));
   int (*RemountDic) pro((int, char *, int));
   int (*UnmountDic) pro((int, char *));
-  int (*DefineDic) pro((int, char *, wchar_t *));
-  int (*DeleteDic) pro((int, char *, wchar_t *));
-  int (*GetHinshi) pro((int, wchar_t *, int));
-  int (*GetKanji) pro((int, wchar_t *, int));
-  int (*GetYomi) pro((int, wchar_t *, int));
+  int (*DefineDic) pro((int, char *, cannawc *));
+  int (*DeleteDic) pro((int, char *, cannawc *));
+  int (*GetHinshi) pro((int, cannawc *, int));
+  int (*GetKanji) pro((int, cannawc *, int));
+  int (*GetYomi) pro((int, cannawc *, int));
   int (*GetLex) pro((int, RkLex *, int));
   int (*GetStat) pro((int, RkStat *));
-  int (*GetKanjiList) pro((int, wchar_t *, int));
+  int (*GetKanjiList) pro((int, cannawc *, int));
   int (*FlushYomi) pro((int));
-  int (*GetLastYomi) pro((int, wchar_t *, int));
+  int (*GetLastYomi) pro((int, cannawc *, int));
   int (*RemoveBun) pro((int, int));
-  int (*SubstYomi) pro((int, int, int, wchar_t *, int));
-  int (*BgnBun) pro((int, wchar_t *, int, int));
+  int (*SubstYomi) pro((int, int, int, cannawc *, int));
+  int (*BgnBun) pro((int, cannawc *, int, int));
   int (*EndBun) pro((int, int));
   int (*GoTo) pro((int, int));
   int (*Left) pro((int));
@@ -340,7 +330,7 @@ struct rkfuncs {
   int (*Resize) pro((int, int));
   int (*Enlarge) pro((int));
   int (*Shorten) pro((int));
-  int (*StoreYomi) pro((int, wchar_t *, int));
+  int (*StoreYomi) pro((int, cannawc *, int));
   int (*SetAppName) pro((int, char *));
   int (*SetUserInfo) pro((char *, char *, char *));
   int (*QueryDic) pro((int, char *, char *, struct DicInfo *));
@@ -350,9 +340,9 @@ struct rkfuncs {
   int (*RenameDic) pro((int, char *, char *, int));
   int (*ChmodDic) pro((int, char *, int));
   int (*GetWordTextDic) pro((int, unsigned char	*, unsigned char *,
-			     wchar_t *, int));
-  int (*GetSimpleKanji) pro((int, char *, wchar_t *, int, wchar_t *, int,
-			     wchar_t *, int));
+			     cannawc *, int));
+  int (*GetSimpleKanji) pro((int, char *, cannawc *, int, cannawc *, int,
+			     cannawc *, int));
 };
 #endif /* ENGINE_SWITCH */
 
@@ -362,11 +352,6 @@ struct rkfuncs {
 #undef canna_export
 #endif
 
-#ifdef CANNA_PRO_PREDEFINED
-#undef CANNA_PRO_PREDEFINED
-#else
-#undef pro
-#endif
 
 #endif	/* _RK_h */
 /* don't add stuff after this line */
