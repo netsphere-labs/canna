@@ -20,8 +20,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
  */
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include "RKindep/strops.h"
 
 RCSID("$Id: strops.c,v 1.2 2003/09/06 13:59:33 aida_s Exp $");

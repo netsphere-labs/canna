@@ -20,13 +20,13 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
  */
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include "RKindep/file.h"
 #include <sys/types.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "net.h"
+#include "canna/net.h"
 #include <stdio.h>
 #include <assert.h>
 

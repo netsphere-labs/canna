@@ -39,7 +39,7 @@
 
 #define EXTENSION_NEW
 
-#include "cannaconf.h"
+#include "config.h"
 
 #if !defined(WINDOWS_STYLE_FILENAME) && !defined(USE_OBSOLETE_STYLE_FILENAME)
 #define WINDOWS_STYLE_FILENAME
@@ -57,7 +57,7 @@ typedef Wchar cannawc;
 #define CANNA_NEW_WCHAR_AWARE
 #include "canna/RK.h"
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 #include <unistd.h>
 #ifdef HAVE_FCNTL_H

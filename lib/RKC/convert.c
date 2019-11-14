@@ -26,11 +26,11 @@ static char rcs_id[] = "$Id: convert.c,v 1.9.2.1 2004/04/26 21:48:37 aida_s Exp 
 
 /* LINTLIBRARY */
 
-#include "sglobal.h"
+//#include "sglobal.h"
 #include "rkcw.h"
 #include "canna/RK.h"
 #include "rkc.h"
-#include "IRproto.h"
+#include "server/IRproto.h"
 #include "RKindep/file.h"
 
 #include <sys/types.h>

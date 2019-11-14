@@ -28,8 +28,8 @@
 #include "RKrename.h"
 #endif
 
-#include "ccompat.h"
-#include "rkcapi.h"
+#include "canna/ccompat.h"
+#include "canna/rkcapi.h"
 
 /* 文節情報レコード
  *

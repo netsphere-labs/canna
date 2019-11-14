@@ -50,7 +50,7 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 
 /* LINTLIBRARY */
 
-#include    "sglobal.h" 
+//#include    "sglobal.h" 
 #include    "rkcw.h"
 #include    "canna/RK.h"
 #include    "rkc.h"

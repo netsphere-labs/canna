@@ -20,8 +20,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
  */
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include "RKindep/ecfuncs.h"
 
 RCSID("$Id: cfuncs.c,v 1.2.2.1 2003/12/27 17:15:24 aida_s Exp $");

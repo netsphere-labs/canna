@@ -23,7 +23,7 @@
 /* sccs_id[]="@(#) NEC UNIX( PC-UX/EWS-UX ) rkw.h 2.3 91/11/11 12:01:34"; */
 /* $Id: rkcw.h,v 1.9 2003/09/17 08:50:53 aida_s Exp $ */
 
-#include "cannaconf.h"
+#include "config.h"
 
 #define exp(x) x
 
@@ -35,7 +35,8 @@
 #define DEBUG
 #define UNIXCONN
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
+
 #ifndef CANNAWC_DEFINED
 # define CANNAWC_DEFINED
 # ifdef CANNA_WCHAR16
@@ -46,11 +47,7 @@ typedef canna_uint32_t cannawc;
 #endif
 
 
-#ifndef NULL
-#define NULL 0
-#endif
-
-#include "protodefs.h"
+#include "canna/protodefs.h"
 
 /* function prototypes .. */
 

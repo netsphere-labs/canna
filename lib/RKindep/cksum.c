@@ -56,8 +56,8 @@
  * SUCH DAMAGE.
  */
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include "RKindep/cksum.h"
 
 RCSID("$Id: cksum.c,v 1.4 2003/09/25 14:37:24 aida_s Exp $");
