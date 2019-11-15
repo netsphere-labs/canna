@@ -20,7 +20,7 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
  */
 
-#include "sglobal.h"
+#include "canna/sglobal.h"
 #include "rkcw.h"
 #include "canna/RK.h"
 #include "rkc.h"

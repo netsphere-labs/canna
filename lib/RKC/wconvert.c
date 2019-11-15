@@ -55,7 +55,7 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 
 #include <stdio.h>
 
-#include "sglobal.h"
+#include "canna/sglobal.h"
 #include "rkcw.h"
 #include "canna/RK.h"
 #include "RKindep/file.h"

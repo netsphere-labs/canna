@@ -24,7 +24,7 @@
 static char rcs_id[] = "$Id: wutil.c,v 1.7 2003/09/17 15:13:27 aida_s Exp $";
 #endif
 
-#include "sglobal.h"
+#include "canna/sglobal.h"
 #include "rkcw.h"
 
 /*********************************************************************

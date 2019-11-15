@@ -51,7 +51,7 @@
 #define MBstowcs CANNA_mbstowcs
 #define WCstombs CANNA_wcstombs
 
-//#include "sglobal.h"
+#include "canna/sglobal.h"
 
 #define XLookupKanji2			 IROHA_G300_XLookupKanji2
 #define XKanjiControl2			 IROHA_G301_XKanjiControl2

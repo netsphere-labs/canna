@@ -5,6 +5,7 @@ AC_PREREQ([2.69])
 
 # [FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS]
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([WHATIS.jp])
 AM_INIT_AUTOMAKE
 

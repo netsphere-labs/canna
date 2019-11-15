@@ -32,9 +32,7 @@
 /* NFD and FD_SET macros are based on canuum/wnn_os.h */
 #include <unistd.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_SELECT_H
-# include <sys/select.h>
-#endif
+#include <sys/select.h>
 #include <limits.h>
 #ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
@@ -60,7 +58,6 @@
 # define RKI_NFD NOFILE
 #endif
 
-#if (defined(HAVE_FD_ISSET) || defined(FD_ISSET)) && defined(HAVE_FD_SET)
 typedef fd_set rki_fd_set;
 # define RKI_FD_SET(fd, set) FD_SET(fd, set)
 # define RKI_FD_CLR(fd, set) FD_CLR(fd, set)
@@ -71,22 +68,6 @@ typedef fd_set rki_fd_set;
 # else
 #  define RKI_FD_SETSIZE (sizeof(fd_set) * 8)
 # endif
-#else
-typedef unsigned long rki_fd_mask;
-# define BINTSIZE (sizeof(unsigned long) * 8)
-# define RKI_FD_SETSIZE RKI_NFD
-# define RKI_FD_SET_WIDTH ((RKI_FD_SETSIZE + BINTSIZE - 1U) / BINTSIZE)
-typedef struct {
-  rki_fd_mask fds_bits[RKI_FD_SET_WIDTH];
-} rki_fd_set;
-# define RKI_FD_SET(fd, set) \
-    ((set)->fds_bits[fd/BINTSIZE] |= (1<<(fd%BINTSIZE)))
-# define RKI_FD_CLR(fd, set) \
-    ((set)->fds_bits[fd/BINTSIZE] &= ~(1<<(fd%BINTSIZE)))
-# define RKI_FD_ISSET(fd, set) \
-    ((set)->fds_bits[fd/BINTSIZE] &  (1<<(fd%BINTSIZE)))
-# define RKI_FD_ZERO(set) bzero((set)->fds_bits, RKI_FD_SET_WIDTH)
-#endif
 
 #ifdef __cplusplus
 extern "C" {
