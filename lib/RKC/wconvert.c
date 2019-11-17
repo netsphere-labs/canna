@@ -65,7 +65,7 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 #include <sys/types.h>
 #include <signal.h>
 
-#include "net.h"
+#include "canna/net.h"
 
 #ifndef CANNAHOSTFILE
 #define CANNAHOSTFILE	    "/usr/lib/canna/cannahost"

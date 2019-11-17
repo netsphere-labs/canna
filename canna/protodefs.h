@@ -43,7 +43,7 @@ typedef unsigned char BYTE;
 
 #define IR_SERVICE_NAME	    "canna"
 #define IR_DEFAULT_PORT	    5680
-#define IR_UNIX_PATH	    IR_UNIX_DIR "/" IR_UNIX_SOCKNAME
+#define IR_UNIX_PATH    "/tmp/.iroha_unix/IROHA"
 #define NAME_LENGTH	    15
 #define HOST_NAME	    15
 			

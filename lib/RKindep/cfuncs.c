@@ -26,45 +26,10 @@
 
 RCSID("$Id: cfuncs.c,v 1.2.2.1 2003/12/27 17:15:24 aida_s Exp $");
 
-#undef malloc
-#undef calloc
-
-#if !HAVE_MALLOC
-void *
-RkiMalloc(size)
-size_t size;
-{
-  return malloc(size ? size : 1);
-}
-
-void *
-RkiCalloc(num, size)
-size_t num;
-size_t size;
-{
-  return calloc(num ? num : 1, size ? size : 1);
-}
-#endif /* !HAVE_MALLOC */
-
-#ifndef HAVE_MEMSET
-void *
-RkiMemset(buf, ch, size)
-void *buf;
-int ch;
-size_t size;
-{
-  char *p = (char *)buf;
-  char *endp = p + size;
-  while (p < endp)
-    *p++ = (char)ch;
-  return buf;
-}
-#endif /* !HAVE_MSEMSET */
 
 #ifndef HAVE_STRDUP
 char *
-RkiStrdup(str)
-const char *str;
+RkiStrdup(const char* str)
 {
   size_t len = strlen(str) + 1;
   char *p;

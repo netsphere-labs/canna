@@ -2,6 +2,8 @@
 AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib
 
 lib_LTLIBRARIES = libcanna.la
+
+libcanna_la_LDFLAGS = -version-info 1:3:0
 libcanna_la_SOURCES = lisp.c defaultmap.c \
     bushu.c chikuji.c commondata.c empty.c henkan.c hex.c \
     ichiran.c jishu.c kctrl.c keydef.c \

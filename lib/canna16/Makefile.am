@@ -1,8 +1,8 @@
 
-AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib
-
 lib_LTLIBRARIES = libcanna16.la
-libcanna16_la_CFLAGS = -DCANNA_WCHAR16
+
+libcanna16_la_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -DCANNA_WCHAR16
+libcanna16_la_LDFLAGS = -version-info 1:3:0
 libcanna16_la_SOURCES = ../canna/lisp.c ../canna/defaultmap.c \
     ../canna/bushu.c ../canna/chikuji.c ../canna/commondata.c ../canna/empty.c ../canna/henkan.c ../canna/hex.c \
     ../canna/ichiran.c ../canna/jishu.c ../canna/kctrl.c ../canna/keydef.c \

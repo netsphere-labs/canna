@@ -189,33 +189,21 @@ int bufsize, requiredsize, *len_return;
   }
 }
 
-static
-#ifndef SIGNALRETURNSINT
-void
-#endif
-DoSomething(sig)
-int sig;
-/* ARGSUSED */
+/*
+static void DoSomething(int sig)
 {
     errno = EPIPE;
     signal(SIGPIPE, DoSomething);
 }
-
-#define WriteServer RkcSendERequest
+*/
 
 int
-RkcSendERequest( Buffer, size )
-const BYTE *Buffer ;
-int size ;
+RkcSendERequest( const BYTE* Buffer, int size )
 {
     register int todo, retval = YES;
     register int write_stat;
     register const BYTE *bufindex;
-#ifdef SIGNALRETURNSINT
-    static int (*Sig)();
-#else /* !SIGNALRETURNSINT */
-    static void (*Sig)();
-#endif /* !SIGNALRETURNSINT */
+    void (*Sig)(int);
     struct timeval timeout, timeout2;
     rki_fd_set wfds, wfds2;
 
@@ -227,7 +215,10 @@ int size ;
     errno = 0 ;
     bufindex = Buffer ;
     todo = size ;
-    Sig = signal(SIGPIPE, DoSomething);
+    Sig = signal(SIGPIPE, SIG_IGN);
+    if ( Sig == SIG_ERR )
+        return NO;
+
     while (size) {
 	timeout2 = timeout;
 	wfds2 = wfds;
@@ -244,7 +235,7 @@ int size ;
 	      goto fail;
 	  }
 	}
-      }
+
         write_stat = write(ServerFD, (char *)bufindex, (unsigned)todo);
 	if (write_stat >= 0) {
 	    size -= write_stat;
@@ -274,7 +265,6 @@ fail:
     close( ServerFD ) ;
     retval = NO;
     errno = EPIPE ;
-    break;
 last:
     signal(SIGPIPE, Sig);
     return retval;
@@ -294,7 +284,7 @@ BYTE *name;
     LTOL4(proto, p); p += SIZEOFLONG;
     LTOL4(len, p);   p += SIZEOFLONG;
     strcpy((char *)p, (char *)name);
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -310,7 +300,7 @@ int proto;
   BYTE lbuf[4];
 
   LTOL4(proto, lbuf);
-  return WriteServer(lbuf, sizeof(lbuf));
+  return RkcSendERequest(lbuf, sizeof(lbuf));
 }
 
 static
@@ -321,7 +311,7 @@ int proto, con;
 
   LTOL4(proto, lbuf); p = lbuf + SIZEOFLONG;
   LTOL4(con, p);
-  return WriteServer(lbuf, sizeof(lbuf));
+  return RkcSendERequest(lbuf, sizeof(lbuf));
 }
 
 static
@@ -333,7 +323,7 @@ int proto, con, val;
   LTOL4(proto, lbuf); p = lbuf + SIZEOFLONG;
   LTOL4(con, p); p += SIZEOFLONG;
   LTOL4(val, p);
-  return WriteServer(lbuf, sizeof(lbuf));
+  return RkcSendERequest(lbuf, sizeof(lbuf));
 }
 
 static
@@ -346,7 +336,7 @@ int proto, con, bun, val;
   LTOL4(con, p); p += SIZEOFLONG;
   LTOL4(bun, p); p += SIZEOFLONG;
   LTOL4(val, p);
-  return WriteServer(lbuf, sizeof(lbuf));
+  return RkcSendERequest(lbuf, sizeof(lbuf));
 }
 
 static
@@ -360,7 +350,7 @@ int proto, con, bun, val;
   LTOL4(bun, p); p += SIZEOFLONG;
   LTOL4(val, p); p += SIZEOFLONG;
   LTOL4(max, p);
-  return WriteServer(lbuf, sizeof(lbuf));
+  return RkcSendERequest(lbuf, sizeof(lbuf));
 }
 
 static
@@ -378,7 +368,7 @@ BYTE *name;
     LTOL4(bun, p);   p += SIZEOFLONG;
     LTOL4(nlen, p);  p += SIZEOFLONG;
     strncpy((char *)p, (char *)name, nlen);
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -404,7 +394,7 @@ RkcContext *cx;
 
       LTOL4(kn, p); p += SIZEOFLONG;
     }
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -426,7 +416,7 @@ BYTE *name;
     LTOL4(nlen, p);  p += SIZEOFLONG;
     strncpy((char *)p, (char *)name, nlen); p += nlen;
     LTOL4(val, p);
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -449,7 +439,7 @@ BYTE *name, *val;
     strncpy((char *)p, (char *)name, nlen); p += nlen;
     LTOL4(vlen, p);  p += SIZEOFLONG;
     strncpy((char *)p, (char *)val, vlen);
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -473,7 +463,7 @@ BYTE *name, *dest;
     LTOL4(dlen, p);  p += SIZEOFLONG;
     strncpy((char *)p, (char *)dest, dlen); p += dlen;
     LTOL4(val, p);
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
@@ -494,7 +484,7 @@ BYTE *name;
     LTOL4(nlen, p);  p += SIZEOFLONG;
     strncpy((char *)p, (char *)name, nlen); p += nlen;
     LTOL4(val, p);   p += SIZEOFLONG;
-    res = WriteServer(bufp, sz);
+    res = RkcSendERequest(bufp, sz);
     if (bufp != lbuf) free((char *)bufp);
     return res;
   }
