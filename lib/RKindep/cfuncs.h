@@ -34,9 +34,8 @@ extern "C" {
 #endif
 
 
-#ifndef HAVE_STRDUP
-extern char *RkiStrdup pro((const char *str));
-# define strdup(s) RkiStrdup(s)
+#ifdef _MSC_VER
+  #define strdup(s) _strdup(s)
 #endif
 
 #ifdef __cplusplus

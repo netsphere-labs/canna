@@ -27,20 +27,6 @@
 RCSID("$Id: cfuncs.c,v 1.2.2.1 2003/12/27 17:15:24 aida_s Exp $");
 
 
-#ifndef HAVE_STRDUP
-char *
-RkiStrdup(const char* str)
-{
-  size_t len = strlen(str) + 1;
-  char *p;
-  p = malloc(len);
-  if (!p)
-    return NULL;
-  strcpy(p, str);
-  return p;
-}
-#endif /* !HAVE_MSEMSET */
-
 #ifndef HAVE_STRLCPY
 size_t
 RkiAltStrlcpy(dst, src, size)

@@ -20,6 +20,7 @@ AC_PROG_CC
 # AC_PROG_RANLIB
 # AM_PROG_LIBTOOL is deprecated.
 LT_INIT
+AC_PROG_LN_S
 
 ############################
 # Checks for libraries.
@@ -46,7 +47,7 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
-AC_PROG_GCC_TRADITIONAL
+#AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_MMAP
@@ -54,7 +55,7 @@ AC_FUNC_SETPGRP
 AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero dup2 gethostbyaddr gethostbyname gethostname inet_ntoa memchr memset mkdir munmap select setlocale socket strchr strdup strrchr strspn strtol strtoul])
+AC_CHECK_FUNCS([dup2 gethostname inet_ntoa memchr memset mkdir munmap select setlocale socket strchr strrchr strspn strtol strtoul])
 
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])

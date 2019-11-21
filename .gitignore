@@ -4,7 +4,6 @@
 
 # config files
 Canna.conf
-pubconf.h
 
 # autoconf
 autom4te.cache/
