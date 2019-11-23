@@ -10,4 +10,4 @@ libcanna16_la_SOURCES = ../canna/lisp.c ../canna/defaultmap.c \
     ../canna/uiutil.c ../canna/uldefine.c ../canna/uldelete.c ../canna/ulhinshi.c ../canna/ulkigo.c \
     ../canna/ulmount.c ../canna/ulserver.c ../canna/util.c ../canna/yesno.c ../canna/bunsetsu.c \
     ../canna/engine.c ../canna/RKroma.c ../canna/RKkana.c ../canna/obind.c
-
+libcanna16_la_LIBADD = ../RK/libRK.a

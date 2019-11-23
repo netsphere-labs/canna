@@ -11,3 +11,4 @@ libcanna_la_SOURCES = lisp.c defaultmap.c \
     uiutil.c uldefine.c uldelete.c ulhinshi.c ulkigo.c \
     ulmount.c ulserver.c util.c yesno.c bunsetsu.c \
     engine.c RKroma.c RKkana.c obind.c
+libcanna_la_LIBADD = ../RK/libRK.a
