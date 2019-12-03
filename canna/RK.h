@@ -166,6 +166,7 @@ extern "C" {
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
+  // cannawc は、EUC-JP を1文字 = 1ワイド文字にしたもの。
   #ifdef CANNA_WCHAR16
 typedef uint16_t cannawc;
   #else
@@ -213,10 +214,10 @@ canna_export(int) RkwGetHinshi pro((int, cannawc *, int));
 canna_export(int) RkwGetKanji pro((int, cannawc *, int));
 canna_export(int) RkwGetKanjiList pro((int, cannawc *, int));
 canna_export(int) RkwGetLex pro((int, RkLex *, int));
-canna_export(int) RkwCvtHira pro((cannawc *, int, cannawc *, int));
-canna_export(int) RkwCvtKana pro((cannawc *, int, cannawc *, int));
-canna_export(int) RkwCvtHan pro((cannawc *, int, cannawc *, int));
-canna_export(int) RkwCvtZen pro((cannawc *, int, cannawc *, int));
+canna_export(int) RkwCvtHira pro((cannawc *, int, const cannawc *, int));
+canna_export(int) RkwCvtKana pro((cannawc *, int, const cannawc *, int));
+canna_export(int) RkwCvtHan pro((cannawc *, int, const cannawc *, int));
+canna_export(int) RkwCvtZen pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCvtEuc pro((cannawc *, int, cannawc *, int));
 canna_export(int) RkwCreateDic pro((int, char *, int));
 canna_export(int) RkwQueryDic pro((int, char *, char *, struct DicInfo *));
@@ -277,9 +278,9 @@ int	RkGetKanji pro((int, unsigned char *, int));
 int	RkGetKanjiList pro((int, unsigned char *, int));
 int	RkGetLex pro((int, RkLex *, int));
 int	RkCvtHira pro((unsigned char *, int, unsigned char *, int));
-int	RkCvtKana pro((unsigned char *, int, unsigned char *, int));
-int	RkCvtHan pro((unsigned char *, int, unsigned char *, int));
-int	RkCvtZen pro((unsigned char *, int, unsigned char *, int));
+int	RkCvtKana pro((unsigned char *, int, const unsigned char *, int));
+int	RkCvtHan pro((unsigned char *, int, const unsigned char *, int));
+int	RkCvtZen pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtNone pro((unsigned char *, int, unsigned char *, int));
 int	RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
 int	RkQueryDic pro((int, char *, char *, struct DicInfo *));

@@ -282,14 +282,14 @@ int createKanjiContext pro((void));
 int jrCloseKanjiContext pro((const int, jrKanjiStatusWithValue *));
 
 #ifdef CANNAWC_DEFINED
-#ifdef CANNA_NEW_WCHAR_AWARE
-# define wcKanjiString cannawcKanjiString
-# define wcKanjiControl cannawcKanjiControl
-# define wcCloseKanjiContext cannawcCloseKanjiContext
-#endif /*CANNA_NEW_WCHAR_AWARE */
+// New APIs
+#define wcKanjiString cannawcKanjiString
+#define wcKanjiControl cannawcKanjiControl
+#define wcCloseKanjiContext cannawcCloseKanjiContext
+
 int wcKanjiString pro((const int, const int, cannawc *, const int,
 			    wcKanjiStatus *));
-int wcKanjiControl pro((const int, const int, char *));
+int wcKanjiControl pro((int, int, char*));
 int wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 #endif /* CANNAWC_DEFINED */
 

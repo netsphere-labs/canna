@@ -1168,7 +1168,7 @@ int _RkSetBitNum pro((unsigned char *, unsigned long, int, int, int));
 int FQsync pro((struct RkContext *, struct DM *, struct DM *, char *));
 
 int RkwCvtSuuji pro((Wchar *, int, Wchar *, int, int));
-int RkwCvtNone pro((Wchar *, int, Wchar *, int));
+int RkwCvtNone pro((cannawc*, int, const cannawc*, int));
 
 int _RkRowNumber pro((unsigned char *));
 int RkTestGram pro((const struct RkKxGram *, int, int));

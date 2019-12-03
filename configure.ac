@@ -61,7 +61,7 @@ AC_CHECK_SIZEOF([void *])
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
 AC_CONFIG_FILES([
   Makefile
-lib/RK/Makefile
+  lib/RK/Makefile
 lib/canna/Makefile
 lib/RKC16/Makefile
 lib/Makefile

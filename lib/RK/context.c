@@ -169,8 +169,7 @@ _RkInitialize(ddhome, numCache)
 }
 
 int
-RkwInitialize(ddhome)
-     char	*ddhome;
+RkwInitialize( char* ddhome )
 {
   /*
    * Word:	????
@@ -419,8 +418,7 @@ RkwCreateContext()
 }
 
 int
-RkwCloseContext(cx_num)
-     int	cx_num;
+RkwCloseContext( int cx_num )
 {
   struct RkContext	*cx;
   int				i;
@@ -479,14 +477,12 @@ RkwCloseContext(cx_num)
 #endif
   return 0;
 }
+
 /* RkDuplicateContext
  *	onaji naiyou no context wo sakuseisuru
  */
-int RkwDuplicateContext pro((int));
-
 int
-RkwDuplicateContext(cx_num)
-     int	cx_num;
+RkwDuplicateContext( int cx_num )
 {
   struct RkContext	*sx;
   int			dup = -1;
@@ -848,10 +844,7 @@ RkwGetDirList(cx_num, ddname, maxddname)
  *	mount the dictionary onto the specified context.
  */
 int
-RkwDefineDic(cx_num, name, word)
-     int	cx_num;
-     char	*name;
-     Wchar	*word;
+RkwDefineDic(int cx_num, char* name, cannawc* word)
 {
   struct RkContext	*cx;
   int			i;
@@ -902,10 +895,7 @@ RkwDefineDic(cx_num, name, word)
  *	mount the dictionary onto the specified context.
  */
 int
-RkwDeleteDic(cx_num, name, word)
-     int	cx_num;
-     char	*name;
-     Wchar	*word;
+RkwDeleteDic(int cx_num, char* name, cannawc* word)
 {
   struct RkContext	*cx;
   int			i;

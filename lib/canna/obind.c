@@ -74,7 +74,7 @@ extern char *context_table;
 
 exp(int) wcKanjiString pro((const int, const int, wchar_t *, const int,
 			    owcKanjiStatus *));
-exp(int) wcKanjiControl pro((const int, const int, char *));
+int wcKanjiControl pro((int, int, char *));
 exp(int) wcCloseKanjiContext pro((const int, owcKanjiStatusWithValue *));
 
 static size_t
@@ -555,11 +555,8 @@ owcKanjiStatus  *kanji_status_return;
 		       kanji_status_return);
 }
 
-exp(int)
-wcKanjiControl(context, request, arg)
-int context;
-int request;
-char *arg;
+int
+wcKanjiControl( int context, int request, char* arg )
 {
   return owcKanjiControl2((unsigned int)0, (unsigned int)context,
 			request, (BYTE *)arg);
@@ -585,7 +582,7 @@ owcKanjiStatusWithValue *ksva;
 
 exp(int) wcKanjiString pro((const int, const int, cannawc *, const int,
 			    wcKanjiStatus *));
-exp(int) wcKanjiControl pro((const int, const int, char *));
+int wcKanjiControl pro((int, int, char *));
 exp(int) wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 
 static int
@@ -604,11 +601,8 @@ wcKanjiStatus  *kanji_status_return;
   return wc_unsupported();
 }
 
-exp(int)
-wcKanjiControl(context, request, arg)
-int context;
-int request;
-char *arg;
+int
+wcKanjiControl( int context, int request, char* arg )
 {
   return wc_unsupported();
 }

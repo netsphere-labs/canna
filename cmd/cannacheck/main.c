@@ -28,8 +28,8 @@ static char rcs_id[] = "@(#) 102.1 $Id: main.c,v 1.6.2.2 2003/12/27 17:15:21 aid
 #define CANNA_NEW_WCHAR_AWARE
 #include <canna/jrkanji.h>
 #include <canna/RK.h>
-#include "ccompat.h"
-#include "rkcapi.h"
+#include "canna/ccompat.h"
+#include "canna/rkcapi.h"
 
 int IROHA_verbose = 0;
   

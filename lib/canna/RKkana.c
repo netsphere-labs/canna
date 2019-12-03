@@ -1,3 +1,5 @@
+﻿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -30,20 +32,24 @@ static char rcsid[]="@(#) 102.1 $Id: RKkana.c,v 1.3 2003/09/17 08:50:53 aida_s E
 /*********************************************************************
  *                      wchar_t replace begin                        *
  *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
+#ifndef CANNAWC_DEFINED
+  #define CANNAWC_DEFINED
+  #ifdef CANNA_WCHAR16
+typedef uint16_t cannawc;
+  #else
+typedef uint32_t cannawc;
+  #endif
 #endif
-#define wchar_t cannawc
 
 /* RkCvtZen
- *	hankaku moji wo zenkaku moji ni suru 
+ * 半角文字を全角文字にする.
+ * 値は EUC-JP. 半角 => 全角では, SS3 (0x8F) に続いて3バイトになる組み合わせは
+ * ない.
  */
-static
-unsigned short
-hiragana[] = 
+static cannawc hiragana[] = 
 {
 /* 0x00 */
-	0x0000,	0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
+  0x0000,	0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
 /* 0x10 */
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
@@ -91,9 +97,8 @@ hiragana[] =
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
 };
-static
-unsigned short	
-hankaku[] = {
+
+static cannawc hankaku[] = {
 /*0x00*/
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000,		0x0000, 0x0000, 0x0000, 0x0000,
@@ -146,6 +151,7 @@ hankaku[] = {
 
 #ifdef OBSOLETE_RKKANA
 
+// @param count lengthだけ加算.
 #define	ADDCODE(dst, maxdst, count, code, length) {\
     if ( (unsigned long)(length) <= (unsigned long)(maxdst) ) {\
 	(maxdst) -= (length); (count) += (length);\
@@ -188,7 +194,7 @@ unsigned long code;
 }
 
 #define ADDCODE(dst, maxdst, count, code, length) \
-{ int llen = _ADDCODE(dst, maxdst, count, (unsigned long)code, length); \
+{ int llen = _ADDCODE(dst, maxdst, count, (unsigned long) code, length); \
   if (llen > 0 && (dst)) { (dst) += llen; (maxdst) -= llen; (count) += llen; }}
 
 #endif /* !OBSOLETE_RKKANA */
@@ -196,145 +202,140 @@ unsigned long code;
 /* RkCvtZen
  *	hankaku moji(ASCII+katakana) wo taiou suru zenkaku moji ni suru
  *	dakuten,handakuten shori mo okonau.
+ * @return 書き込んだバイト数. ナル終端を含まない.
  */
-int	
-RkCvtZen(zen, maxzen, han, maxhan)
-unsigned char	*zen;
-int		maxzen;
-unsigned char	*han;
-int		maxhan;
+int RkCvtZen(
+    unsigned char* zen, int maxzen, const unsigned char* han, int maxhan)
 {
-    unsigned char	*z = zen;
-    unsigned char	*h = han;
-    unsigned char	*H = han + maxhan;
-    unsigned short	hi, lo;
-    unsigned 		byte;
-    int 		count = 0;
-    unsigned long	code;
+  unsigned char	*z = zen;
+  const unsigned char* h = han;
+  const unsigned char* H = han + maxhan;
+  unsigned short       hi, lo;
+  int byte;
+  int 		count = 0;
+  unsigned long	code;
 
-    if ( --maxzen <= 0 )
-	return count;
-    while ( h < H ) {
-	hi = *h++;
-	byte = 2;
-	if ( hi == 0x8e ) {	/* hankaku katakana */
-	    if ( !(code = hiragana[lo = *h++]) )
-	    	code = (hi<<8)|lo;
-	    byte = (code>>8) ? 2 : 1;
-	    if ( (code>>8) == 0xa4 ) {
-		code |= 0x100;
-	    /* dakuten/handakuten ga tuku baai */
-		if ( h + 1 < H && h[0] == 0x8e ) {
-		    lo = h[1];
-		    switch(code&255) {
-	    /* u */ case 0xa6:
-			if ( lo == 0xde ) code = 0xa5f4, h += 2;
-			break;
-	    /* ha */case 0xcf: case 0xd2: case 0xd5: case 0xd8: case 0xdb:
-			if ( lo == 0xdf ) {
-			    code += 2, h += 2;
-			    break;
-			};
-	    /* ka */case 0xab: case 0xad: case 0xaf: case 0xb1: case 0xb3:
-	    /* sa */case 0xb5: case 0xb7: case 0xb9: case 0xbb: case 0xbd:
-	    /* ta */case 0xbf: case 0xc1: case 0xc4: case 0xc6: case 0xc8:
-			if ( lo == 0xde ) {
-			    code += 1, h += 2;
+  if ( --maxzen <= 0 )
+    return count;
+  while ( h < H ) {
+    hi = *h++;
+    byte = 2;
+    if ( hi == 0x8e ) {	/* hankaku katakana */
+      if ( !(code = hiragana[lo = *h++]) )
+        code = (hi<<8)|lo;
+      byte = (code>>8) ? 2 : 1;
+      if ( (code>>8) == 0xa4 ) {
+        code |= 0x100;
+        /* dakuten/handakuten ga tuku baai */
+        if ( h + 1 < H && h[0] == 0x8e ) {
+          lo = h[1];
+          switch (code&255)
+          {
+          /* u */ case 0xa6:
+            if ( lo == 0xde ) code = 0xa5f4, h += 2;
+            break;
+          /* ha */case 0xcf: case 0xd2: case 0xd5: case 0xd8: case 0xdb:
+            if ( lo == 0xdf ) {
+              code += 2, h += 2;
+              break;
+            }
+          case 0xab: case 0xad: case 0xaf: case 0xb1: case 0xb3: /* ka */
+          case 0xb5: case 0xb7: case 0xb9: case 0xbb: case 0xbd: /* sa */
+          case 0xbf: case 0xc1: case 0xc4: case 0xc6: case 0xc8: /* ta */
+            if ( lo == 0xde ) {
+			    code += 1; h += 2;
 			    break;
 			};
 		    };
 		};
 	    };
-	}
-	else if (hi == 0x8f) {
-	  ADDCODE(z, maxzen, count, hi, 1);
-	  code = (((unsigned long)h[0]) << 8)
-                   | ((unsigned long)h[1]); h += 2;
-	  byte = 2;
-	}
-	else if ( hi & 0x80 )
-	  code = (hi<<8)|*h++;
-	else  {
+    }
+    else if ( hi == 0x8f ) { // 補助漢字
+      ADDCODE(z, maxzen, count, hi, 1);
+      code = (((unsigned long) h[0]) << 8) | ((unsigned long) h[1]); h += 2;
+      byte = 2;
+    }
+    else if ( hi & 0x80 ) // JIS X 0208
+      code = (hi<<8) | *h++;
+    else {
 	  if ( !(code = hiragana[hi]) ) 
 	    code = hi;
 	  byte = (code>>8) ? 2 : 1;
-	}
-	ADDCODE(z, maxzen, count, code, byte);
-    };
-    if ( z )
-	*z = 0;
-    return count;
+    }
+    ADDCODE(z, maxzen, count, code, byte);
+  } // while
+  
+  if ( z )
+    *z = 0;
+  return count;
 }
+
 /* RkCvtHan
  *	zenkaku kana moji wo hankaku moji ni suru 
  */
-int	
-RkCvtHan(han, maxhan, zen, maxzen)
-unsigned char	*han;
-int		maxhan;
-unsigned char	*zen;
-int		maxzen;
+int
+RkCvtHan(unsigned char* han, int maxhan, const unsigned char* zen, int maxzen)
 {
-    unsigned char	*h = han;
-    unsigned char	*z = zen;
-    unsigned char	*Z = zen + maxzen;
-    unsigned short	hi, lo;
-    unsigned short	byte;
-    int 		count = 0;
-    unsigned long	code;
+  unsigned char	*h = han;
+  const unsigned char* z = zen;
+  const unsigned char* Z = zen + maxzen;
+  unsigned short hi, lo;
+  int byte;
+  int 		count = 0;
+  unsigned long	code; // 4バイト必要.
 
-    if ( --maxhan <= 0 )
-	return 0;
-    while ( z < Z ) {
-	hi = *z++;
-	byte = 1;
-	switch(hi) {
-	case	0xa1:	/* kigou */
-	    lo = *z++;
-	    if ( !(code = hankaku[lo&0x7f]) )
-		code = (hi<<8)|lo;
-	    byte = (code>>8) ? 2 : 1;
-	    break;
-	case	0xa3:	/* eisuuji */
-	    lo = *z++;
-	    if ( 0xb0 <= lo && lo <= 0xb9 ) code = (lo - 0xb0) + '0';
-	    else
-	    if ( 0xc1 <= lo && lo <= 0xda ) code = (lo - 0xc1) + 'A';
-	    else
-	    if ( 0xe1 <= lo && lo <= 0xfa ) code = (lo - 0xe1) + 'a';
-	    else
-					    code = (hi<<8)|lo, byte = 2;
-	    break;
-	case	0xa4:	/* hiragana */
-	case	0xa5:	/* katakana */
-	    lo = *z++;
-	    if ( (code = hankaku[lo]) &&
-		(lo <= (unsigned short)(hi==0xa4 ? 0xf3: 0xf6)) ) {
-		if ( code>>8 ) {
-		    code = 0x8e000000|((code>>8)<<16)|0x00008e00|(code&255);
-		    byte = 4;
-		}
-		else {
-		    code = 0x00008e00|(code&255);
-		    byte = 2;
-		};
-	    }
-	    else
-		code = (hi<<8)|lo, byte = 2;
-	    break;
-	default:
-	    if (hi == 0x8f) {
-	      ADDCODE(h, maxhan, count, hi, 1);
-	      code = (((unsigned long)z[0]) << 8)
-                       | ((unsigned long)z[1]); z += 2;
-	      byte = 2;
-	    }
-	    else if ( hi & 0x80 ) { 	/* kanji */
-		code = (hi<<8)|(*z++);
-		byte = 2;
-	    }
-	    else
-		switch(hi) {
+  if ( --maxhan <= 0 )
+    return 0;
+  while ( z < Z ) {
+    hi = *z++;
+    byte = 1;
+    switch(hi)
+    {
+    case	0xa1:	/* kigou */
+      lo = *z++;
+      if ( !(code = hankaku[lo&0x7f]) )
+        code = (hi<<8)|lo;
+      byte = (code>>8) ? 2 : 1;
+      break;
+    case	0xa3:	/* eisuuji */
+      lo = *z++;
+      if ( 0xb0 <= lo && lo <= 0xb9 ) code = (lo - 0xb0) + '0';
+      else
+        if ( 0xc1 <= lo && lo <= 0xda ) code = (lo - 0xc1) + 'A';
+        else
+          if ( 0xe1 <= lo && lo <= 0xfa ) code = (lo - 0xe1) + 'a';
+          else
+            code = (hi<<8)|lo, byte = 2;
+      break;
+    case	0xa4:	/* hiragana */
+    case	0xa5:	/* katakana */
+      lo = *z++;
+      if ( (code = hankaku[lo]) &&
+           (lo <= (unsigned short)(hi==0xa4 ? 0xf3: 0xf6)) ) {
+        if ( code>>8 ) {
+          code = 0x8e000000|((code>>8)<<16)|0x00008e00|(code&255);
+          byte = 4;
+        }
+        else {
+          code = 0x00008e00|(code&255);
+          byte = 2;
+        }
+      }
+      else
+        code = (hi<<8)|lo, byte = 2;
+      break;
+    default:
+      if (hi == 0x8f) {
+        ADDCODE(h, maxhan, count, hi, 1);
+        code = (((unsigned long)z[0]) << 8) | ((unsigned long)z[1]); z += 2;
+        byte = 2;
+      }
+      else if ( hi & 0x80 ) { 	/* kanji */
+        code = (hi<<8)|(*z++);
+        byte = 2;
+      }
+      else
+        switch(hi) {
 		/*
 		case	',':	code = 0x8ea4; byte = 2; break;
 		case	'-': 	code = 0x8eb0; byte = 2; break;
@@ -344,61 +345,62 @@ int		maxzen;
 		};
 	    break;
 	};
-	ADDCODE(h, maxhan, count, code, byte);
-    };
-    if ( h )
+    ADDCODE(h, maxhan, count, code, byte);
+  }
+
+  if ( h )
 	*h = 0;
-    return count;
+  return count;
 }
+
 /* RkCvtKana/RkCvtHira
  *	zenkaku hiragana wo katakana ni suru 
  */
-int	
-RkCvtKana(kana, maxkana, hira, maxhira)
-unsigned char	*kana;
-int		maxkana;
-unsigned char	*hira;
-int		maxhira;
+int
+RkCvtKana(
+    unsigned char* kana, int maxkana, const unsigned char* hira, int maxhira)
 {
-    register unsigned char	*k = kana;
-    register unsigned char	*h = hira;
-    register unsigned char	*H = hira + maxhira;
-    unsigned short	hi;
-    unsigned short	byte;
-    int 		count = 0;
-    unsigned long	code;
+  unsigned char	*k = kana;
+  const unsigned char	*h = hira;
+  const unsigned char	*H = hira + maxhira;
+  unsigned short hi;
+  int byte;
+  int 		count = 0;
+  unsigned long	code;
 
-    if ( --maxkana <= 0 )
-	return 0;
-    while ( h < H ) {
-	hi = *h++;
-	if (hi == 0x8f) {
-	  ADDCODE(k, maxkana, count, hi, 1);
-	  code = (((unsigned long)h[0]) << 8) 
-                   | ((unsigned long)h[1]); h += 2;
-	  byte = 2;
-	}
-	else if ( hi & 0x80 ) {
-	    int		dakuon;
+  if ( --maxkana <= 0 )
+    return 0;
+  while ( h < H ) {
+    hi = *h++;
+    if (hi == 0x8f) {
+      ADDCODE(k, maxkana, count, hi, 1);
+      code = (((unsigned long) h[0]) << 8) | ((unsigned long) h[1]); h += 2;
+      byte = 2;
+    }
+    else if ( hi & 0x80 ) {
+      int		dakuon;
 
-	    code = (hi == 0xa4) ? (0xa500|(*h++)) : ((hi<<8)|(*h++));
-	    byte = 2;
-	/* hiragana U + " */
-	    dakuon = ( h + 1 < H && 
-              ((((unsigned long)h[0])<<8)|((unsigned long)h[1])) == 0xa1ab );
-	    if ( hi == 0xa4 && code == 0xa5a6 && dakuon ) {
-		code = 0xa5f4;
-		h += 2;
-	    };
-	}
-	else 
-	    code = hi, byte = 1;
-	ADDCODE(k, maxkana, count, code, byte);
-    };
-    if ( k )
-	*k = 0;
-    return count;
+      code = (hi == 0xa4) ? (0xa500|(*h++)) : ((hi<<8)|(*h++));
+      byte = 2;
+      /* hiragana U + " */
+      dakuon = ( h + 1 < H && 
+            ((((unsigned long)h[0])<<8)|((unsigned long)h[1])) == 0xa1ab );
+      if ( hi == 0xa4 && code == 0xa5a6 && dakuon ) {
+        code = 0xa5f4;
+        h += 2;
+      }
+    }
+    else {
+      code = hi; byte = 1;
+    }
+    ADDCODE(k, maxkana, count, code, byte);
+  }
+  
+  if ( k )
+    *k = 0;
+  return count;
 }
+
 int	
 RkCvtHira(hira, maxhira, kana, maxkana)
 unsigned char	*hira;
@@ -721,13 +723,12 @@ int		format;
     return count;
 }
 
-/* �磻�ɥ���饯�� */
+/* ワイドキャラクタ対応関数 */
 
 #define CBUFSIZE     512
 
-RkwCvtHan(dst, maxdst, src, srclen)
-wchar_t *dst, *src;
-int maxdst, srclen;
+int
+RkwCvtHan(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int len = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
@@ -761,9 +762,8 @@ int maxdst, srclen;
   return len;
 }
 
-RkwCvtHira(dst, maxdst, src, srclen)
-wchar_t *dst, *src;
-int maxdst, srclen;
+int
+RkwCvtHira(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int len = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
@@ -797,10 +797,9 @@ int maxdst, srclen;
 #endif
   return len;
 }
-  
-RkwCvtKana(dst, maxdst, src, srclen)
-wchar_t *dst, *src;
-int maxdst, srclen;
+
+int
+RkwCvtKana(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int len = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
@@ -834,10 +833,9 @@ int maxdst, srclen;
 #endif
   return len;
 }
-  
-RkwCvtZen(dst, maxdst, src, srclen)
-wchar_t *dst, *src;
-int maxdst, srclen;
+
+int
+RkwCvtZen(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int len = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
@@ -872,9 +870,8 @@ int maxdst, srclen;
   return len;
 }
 
-RkwCvtNone(dst, maxdst, src, srclen)
-wchar_t *dst, *src;
-int maxdst, srclen;
+int
+RkwCvtNone(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int i;
   int len = (maxdst < srclen) ? maxdst : srclen;
@@ -882,13 +879,13 @@ int maxdst, srclen;
   for (i = 0 ; i < len ; i++) {
     *dst++ = *src++;
   }
-/*  *dst = *src; �ʤ�Ǥ��줬ɬ�פʤΡ� */
+/*  *dst = *src; なんでこれが必要なの？ */
   return len;
 }
 
 RkwMapRoma(romaji, dst, maxdst, src, srclen, flags, status)
 struct RkRxDic *romaji;
-wchar_t *dst, *src;
+cannawc *dst, *src;
 int maxdst, srclen, flags, *status;
 {
   int len = 0, ret;
@@ -928,31 +925,24 @@ int maxdst, srclen, flags, *status;
   return len;
 }
 
-#ifdef __STDC__
-RkwMapPhonogram(struct RkRxDic *romaji, wchar_t *dst, int maxdst,
-		wchar_t *src, int srclen, wchar_t key, int flags,
+
+RkwMapPhonogram(struct RkRxDic *romaji, cannawc *dst, int maxdst,
+		cannawc *src, int srclen, cannawc key, int flags,
 		int *ulen, int *dlen, int *tlen, int *rule)
-#else
-RkwMapPhonogram(romaji, dst, maxdst, src, srclen, key, flags,
-		ulen, dlen, tlen, rule)
-struct RkRxDic *romaji;
-wchar_t *dst, *src, key;
-int maxdst, srclen, flags, *ulen, *dlen, *tlen, *rule;
-#endif
 {
   int status = 0;
   char tmpch;
   int len, ret, fdlen, fulen, ftlen;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char cbuf1[CBUFSIZE], cbuf2[CBUFSIZE];
-  wchar_t wbuf[CBUFSIZE];
+  cannawc wbuf[CBUFSIZE];
 #else
   char *cbuf1, *cbuf2;
-  wchar_t *wbuf;
+  cannawc *wbuf;
 
   cbuf1 = malloc(CBUFSIZE);
   cbuf2 = malloc(CBUFSIZE);
-  wbuf = (wchar_t *)malloc(sizeof(wchar_t) * CBUFSIZE);
+  wbuf = (cannawc *)malloc(sizeof(cannawc) * CBUFSIZE);
   if (!cbuf1 || !cbuf2 || !wbuf) {
     if (cbuf1) {
       (void)free(cbuf1);
@@ -997,7 +987,7 @@ int maxdst, srclen, flags, *ulen, *dlen, *tlen, *rule;
 
 RkwCvtRoma(romaji, dst, maxdst, src, srclen, flags)
 struct RkRxDic *romaji;
-wchar_t *dst, *src;
+cannawc *dst, *src;
 int maxdst, srclen, flags;
 {
   int ret = 0, len;
@@ -1025,10 +1015,10 @@ int maxdst, srclen, flags;
 		    (unsigned char *)cbuf1, len, flags);
     cbuf2[len] = (unsigned char)0;
     ret = MBstowcs(dst, cbuf2, maxdst);
-    dst[ret] = (wchar_t)0;
+    dst[ret] = (cannawc)0;
   } else {
     ret = 0;
-    *dst = (wchar_t)0;
+    *dst = (cannawc)0;
   }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
   free(cbuf2);
@@ -1037,10 +1027,6 @@ int maxdst, srclen, flags;
   return ret;
 }
 
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
 /*********************************************************************
  *                       wchar_t replace end                         *
  *********************************************************************/

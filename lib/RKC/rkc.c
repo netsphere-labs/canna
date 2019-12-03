@@ -71,10 +71,15 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 /*********************************************************************
  *                      wchar_t replace begin                        *
  *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
+#ifndef CANNAWC_DEFINED
+  #define CANNAWC_DEFINED
+  // cannawc は、EUC-JP を1文字 = 1ワイド文字にしたもの。
+  #ifdef CANNA_WCHAR16
+typedef uint16_t cannawc;
+  #else
+typedef uint32_t cannawc;
+  #endif
 #endif
-#define wchar_t cannawc
 
 static RkcContext *RkcCX[MAX_CX] ;
 
@@ -124,7 +129,7 @@ static char *ProtoVerTbl[] = {
 static struct {
   Ushort cbuf[CBUFSIZE];
   char buffer[BUFSIZE];
-  wchar_t wbuf[CBUFSIZE];
+  cannawc wbuf[CBUFSIZE];
 } rkc; /* general buffer。ただし、RkwXXX のなかだけで使うことにしよう。*/
 
 /*
@@ -296,6 +301,7 @@ FindGroupname()
   }
   return (char *)NULL;
 }
+
 /*
  *  RkwInitialize ()
  *
@@ -308,8 +314,7 @@ FindGroupname()
  *  0 or -1
  */
 int
-RkwInitialize( hostname ) /* とりあえずrkcの場合は、引き数を無視する */
-char *hostname ;
+RkwInitialize( char* hostname ) /* とりあえずrkcの場合は、引き数を無視する */
 {
     register int    i;
     register long  server ;
@@ -471,8 +476,7 @@ RkwFinalize()
  *  0 or -1
  */
 int
-RkwCloseContext(cxnum)
-int cxnum ;
+RkwCloseContext( int cxnum )
 {
     register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
@@ -558,8 +562,7 @@ RkwCreateContext()
  *  コンテクスト番号 or -1
  */
 int
-RkwDuplicateContext( src_cx )
-int src_cx ;
+RkwDuplicateContext( int src_cx )
 {
     register RkcContext *cx_dest, *cx_src = getCC( src_cx, NOCHECK ) ;
     register int	dest_cx ;
@@ -645,10 +648,7 @@ Ushort *wordrec ;
  *  コンテクスト番号 or -1
  */
 int
-RkwDefineDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname;
-wchar_t *wordrec;
+RkwDefineDic(int cxnum, char* dicname, cannawc* wordrec)
 {
     if( !dicname || !wordrec )
 	return( -1 ) ;
@@ -672,10 +672,7 @@ Ushort *wordrec ;
 }
 
 int
-RkwDeleteDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname;
-wchar_t *wordrec;
+RkwDeleteDic(int cxnum, char* dicname, cannawc* wordrec)
 {
   if( !dicname || !wordrec ) return -1;
 
@@ -860,7 +857,7 @@ Ushort *yomi ;
 int
 RkwBgnBun(cxnum, yomi, maxyomi, mode)
 int cxnum;
-wchar_t *yomi;
+cannawc *yomi;
 int maxyomi;
 int mode;
 {
@@ -1039,7 +1036,7 @@ Ushort *kanji ;
 }
 
 int
-RkwGetKanji(int cxnum, wchar_t* kanji, int maxkanji)
+RkwGetKanji(int cxnum, cannawc* kanji, int maxkanji)
 {
   int len;
 
@@ -1098,7 +1095,7 @@ Ushort *kouho ;
 int
 RkwGetKanjiList(cxnum, kanjis, maxkanjis)
 int cxnum;
-wchar_t *kanjis;
+cannawc *kanjis;
 int maxkanjis;
 {
   int nkanji, len, i, j = 0, k = 0;
@@ -1126,10 +1123,10 @@ int maxkanjis;
     if (k + len > maxkanjis - 2)				/* S005 */
       break;							/* S005 */
     k += ushort2wchar(cbuf + j, len, kanjis + k, maxkanjis);	/* S005 */
-    kanjis[k++] = (wchar_t)0;
+    kanjis[k++] = (cannawc)0;
     j += len + 1;
   }
-  kanjis[k] = (wchar_t)0;
+  kanjis[k] = (cannawc)0;
   retval = i;
   }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -1320,7 +1317,7 @@ Ushort *yomi ;
 int
 RkwStoreYomi(cxnum, yomi, maxyomi)
 int cxnum;
-wchar_t *yomi;
+cannawc *yomi;
 int maxyomi;
 {
   int len;
@@ -1383,7 +1380,7 @@ Ushort	*yomi;
 int
 RkwGetYomi(cxnum, yomi, maxyomi)
 int cxnum;
-wchar_t *yomi;
+cannawc *yomi;
 int maxyomi;
 {
   int len;
@@ -1692,7 +1689,7 @@ exp(int)
 RkwGetWordTextDic(cxnum, dirname, dicname, info, infolen)
 int cxnum, infolen ;
 unsigned char *dirname, *dicname;
-wchar_t *info;
+cannawc *info;
 {
   int len;
 
@@ -1785,7 +1782,7 @@ Ushort	*yomi;
 int
 RkwSubstYomi( cxnum, ys, ye, yomi, nyomi )
 int cxnum, ys, ye, nyomi;
-wchar_t *yomi;
+cannawc *yomi;
 {
   RkcContext *cx = getCC( cxnum, CHECK );
   int len;
@@ -1843,7 +1840,7 @@ Ushort	*yomi;
 int
 RkwGetLastYomi( cxnum, yomi, maxyomi )
 int cxnum;
-wchar_t *yomi;
+cannawc *yomi;
 int maxyomi;
 {
   int len;
@@ -1943,7 +1940,7 @@ Ushort *yomi, *kanjis, *hinshis;
 int
 RkwGetSimpleKanji( cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis, hinshis, maxhinshis )
 int cxnum, maxyomi, maxkanjis, maxhinshis ;
-wchar_t *yomi, *kanjis, *hinshis;
+cannawc *yomi, *kanjis, *hinshis;
 char *dicname;
 {
   Ushort cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
@@ -1969,7 +1966,7 @@ char *dicname;
 		   hinshis + l, maxhinshis - l) + 1;
     m += ushortstrlen(cbuf3 + m) + 1;
   }
-  kanjis[k] = hinshis[l] = (wchar_t)0;
+  kanjis[k] = hinshis[l] = (cannawc)0;
   return ( nkanji );
 }
 
@@ -2015,7 +2012,7 @@ Ushort *dst;
 int
 RkwGetHinshi( cxnum, dst, maxdst )
 int cxnum, maxdst;
-wchar_t *dst;
+cannawc *dst;
 {
   int len;
 
@@ -2050,7 +2047,7 @@ Ushort *yomi;
 int
 RkwStoreRange( cxnum, yomi, maxyomi )
 int cxnum, maxyomi;
-wchar_t *yomi;
+cannawc *yomi;
 {
   int len;
 
@@ -2926,10 +2923,3 @@ int buffer_size;
     return( -1 ) ;
 }							/* S000:end */
 
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/

@@ -1104,7 +1104,7 @@ extern IchiranBeginningOfKouho pro((uiContext));
 extern IchiranEndOfKouho pro((uiContext));
 extern IchiranQuit pro((uiContext));
 extern IchiranNop pro((uiContext));
-extern RkwCvtNone pro((cannawc *, int, cannawc *, int));
+extern RkwCvtNone pro((cannawc *, int, const cannawc *, int));
 extern RkwSetAppName pro((int, char *));
 extern void close_engine pro((void));
 extern char *KanjiInitError pro((void));

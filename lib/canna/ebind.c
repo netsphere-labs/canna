@@ -31,19 +31,23 @@ static char rcsid[] = "$Id: ebind.c,v 1.6 2003/09/17 08:50:53 aida_s Exp $";
 /*********************************************************************
  *                      wchar_t replace begin                        *
  *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
+#ifndef CANNAWC_DEFINED
+  #define CANNAWC_DEFINED
+  #ifdef CANNA_WCHAR16
+typedef uint16_t cannawc;
+  #else
+typedef uint32_t cannawc;
+  #endif
 #endif
-#define wchar_t cannawc
 
 extern int howToReturnModeInfo;
 
-static wchar_t *inbuf = 0;
+static cannawc *inbuf = 0;
 static int inbufsize = 0;
 
 static
 StoreWCtoEUC(wbuf, wbuflen, wks, ebuf, maxebuf, ks, ch, nbytes)
-wchar_t *wbuf;
+cannawc *wbuf;
 int wbuflen;
 wcKanjiStatus *wks;
 char *ebuf;
@@ -70,7 +74,7 @@ int nbytes;
   else {
     ret = (wbuflen > 0) ? WCstombs(ebuf, wbuf, maxebuf) : 0;
     if (ks->info & KanjiYomiInfo) {
-      wchar_t *ep;
+      cannawc *ep;
       len = WCstombs(ebuf + ret + 1, wbuf + wbuflen + 1,
 		     maxebuf - ret - 1);
       ep = wbuf + wbuflen + 1;
@@ -93,7 +97,7 @@ int nbytes;
   if (inbufsize < totallen) {
     inbufsize = totallen; /* inbufsize will be greater than 0 */
     if (inbuf) free(inbuf);
-    inbuf = (wchar_t *)malloc(inbufsize * sizeof(wchar_t));
+    inbuf = (cannawc *)malloc(inbufsize * sizeof(cannawc));
     if (!inbuf) {
       inbufsize = 0;
       jrKanjiError = "\245\341\245\342\245\352\244\254\302\255\244\352\244\336\244\273\244\363";
@@ -102,7 +106,7 @@ int nbytes;
     }
   }
 
-  rest = inbufsize * sizeof(wchar_t);
+  rest = inbufsize * sizeof(cannawc);
   p = (char *)inbuf;
 
   if (wks->length < 0) {
@@ -204,7 +208,7 @@ jrKanjiStatus *kanji_status_return;
   if (inbufsize < bytes_buffer) {
     inbufsize = bytes_buffer; /* inbufsize will be greater than 0 */
     if (inbuf) free(inbuf);
-    inbuf = (wchar_t *)malloc(inbufsize * sizeof(wchar_t));
+    inbuf = (cannawc *)malloc(inbufsize * sizeof(cannawc));
     if (!inbuf) {
       inbufsize = 0;
       jrKanjiError = "\245\341\245\342\245\352\244\254\302\255\244\352\244\336\244\273\244\363";
@@ -213,16 +217,16 @@ jrKanjiStatus *kanji_status_return;
     }
   }
 
-  inbuf[0] = (wchar_t)(unsigned char)buffer_return[0];
+  inbuf[0] = (cannawc)(unsigned char)buffer_return[0];
   for (i = 1 ; i < nbytes ; i++) {
-    inbuf[i] = (wchar_t)(unsigned char)buffer_return[i];
+    inbuf[i] = (cannawc)(unsigned char)buffer_return[i];
   }
   ch = buffer_return[0] & 0xff;
   ret = XwcLookupKanji2(dpy, win, inbuf, inbufsize, nbytes, functionalChar,
 			&wks);
   if (ret >= inbufsize)
     ret = inbufsize - 1;
-  inbuf[ret] = (wchar_t)0;
+  inbuf[ret] = (cannawc)0;
 
   return StoreWCtoEUC(inbuf, ret, &wks,
 		      (char *)buffer_return, bytes_buffer, kanji_status_return,
@@ -233,7 +237,7 @@ int
 EUCListCallback(client_data, func, items, nitems, cur_item)
 char *client_data;
 int func;
-wchar_t **items;
+cannawc **items;
 int nitems, *cur_item;
 {
   const jrEUCListCallbackStruct *elistcb;
@@ -282,14 +286,14 @@ BYTE *arg;
   jrListCallbackStruct list_cb;
   int ch;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  wchar_t arg2[256];
-  wchar_t wbuf[320], wbuf1[320], wbuf2[320];
+  cannawc arg2[256];
+  cannawc wbuf[320], wbuf1[320], wbuf2[320];
 #else
-  wchar_t *arg2, *wbuf, *wbuf1, *wbuf2;
-  arg2 = (wchar_t *)malloc(sizeof(wchar_t) * 256);
-  wbuf = (wchar_t *)malloc(sizeof(wchar_t) * 320);
-  wbuf1 = (wchar_t *)malloc(sizeof(wchar_t) * 320);
-  wbuf2 = (wchar_t *)malloc(sizeof(wchar_t) * 320);
+  cannawc *arg2, *wbuf, *wbuf1, *wbuf2;
+  arg2 = (cannawc *)malloc(sizeof(cannawc) * 256);
+  wbuf = (cannawc *)malloc(sizeof(cannawc) * 320);
+  wbuf1 = (cannawc *)malloc(sizeof(cannawc) * 320);
+  wbuf2 = (cannawc *)malloc(sizeof(cannawc) * 320);
   if (!arg2 || !wbuf || !wbuf1 || !wbuf2) {
     if (arg2) {
       (void)free((char *)arg2);
@@ -323,18 +327,18 @@ BYTE *arg;
     if (((jrKanjiStatusWithValue *)arg)->ks->mode) {
       len2 = MBstowcs(wbuf2, (char *)((jrKanjiStatusWithValue *)arg)->ks->mode,
 		      320);
-      wbuf2[len2] = (wchar_t)0;
+      wbuf2[len2] = (cannawc)0;
       wks.mode = wbuf2;
     }
     else {
-      wks.mode = (wchar_t *)0;
+      wks.mode = (cannawc *)0;
     }
     /* 下へ続く */
   case KC_DEFINEKANJI: /* echoStr と length を与えるタイプ */
     /* echoStr をワイドにして与えてみよう */
     len1 = MBstowcs(wbuf1,
 		    (char *)((jrKanjiStatusWithValue *)arg)->ks->echoStr, 320);
-    wbuf1[len1] = (wchar_t)0;
+    wbuf1[len1] = (cannawc)0;
     wks.echoStr = wbuf1;
     wks.length = len1;
     /* 下へ続く */
@@ -378,7 +382,7 @@ BYTE *arg;
     goto return_ret;
   }
   else {
-    wksv.buffer[ret] = (wchar_t)0;
+    wksv.buffer[ret] = (cannawc)0;
     ((jrKanjiStatusWithValue *)arg)->val =
       StoreWCtoEUC(wksv.buffer, wksv.val, wksv.ks,
 		   (char *)((jrKanjiStatusWithValue *)arg)->buffer,
@@ -440,10 +444,3 @@ jrKanjiControl(context, request, arg)
 			request, (BYTE *)arg);
 }
 
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/
