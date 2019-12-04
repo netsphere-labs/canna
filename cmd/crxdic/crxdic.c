@@ -24,7 +24,7 @@
 static char rcsid[]="@(#) 102.1 $Id: crxdic.c,v 1.11.2.2 2003/12/27 17:15:21 aida_s Exp $";
 #endif
 
-#include "RKintern.h"
+#include "RK/RKintern.h"
 #include <stdio.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -32,7 +32,7 @@ static char rcsid[]="@(#) 102.1 $Id: crxdic.c,v 1.11.2.2 2003/12/27 17:15:21 aid
 #include <ctype.h>
 #include <fcntl.h>
 #include <assert.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include "RKindep/file.h"
 #include "RKindep/cksum.h"
 

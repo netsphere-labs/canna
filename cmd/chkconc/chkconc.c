@@ -1,6 +1,7 @@
-#include "RKintern.h"
+
+#include "RK/RKintern.h"
 #include <stdio.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include "RKindep/file.h"
 
 #if !defined( HYOUJUN_GRAM )

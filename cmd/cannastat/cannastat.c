@@ -46,7 +46,7 @@
 #ifdef ENGINE_SWITCH
 #include "RKrename.h"
 #endif
-#include "ccompat.h"
+#include "canna/ccompat.h"
 RCSID("$Id: cannastat.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $");
 
 #include    <stdio.h>
@@ -55,9 +55,9 @@ RCSID("$Id: cannastat.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $");
 #include    <errno.h>
 #include    <assert.h>
 
-#include    "net.h"
-#include    "IR.h"
-#include    "rkcapi.h"
+#include    "canna/net.h"
+#include    "../../server/IR.h"
+#include    "canna/rkcapi.h"
 
 #define PROTO	1
 #define ALL	2

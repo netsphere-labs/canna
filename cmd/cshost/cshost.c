@@ -46,9 +46,9 @@ static char rcs_id[] = "$Id: cshost.c,v 1.3.2.2 2003/12/27 17:15:22 aida_s Exp $
 #include    <stdio.h>
 #include    <sys/types.h>
 
-#include    "IR.h"
-#include    "net.h"
-#include    "rkcapi.h"
+#include    "server/IR.h"
+#include    "canna/net.h"
+#include    "canna/rkcapi.h"
 #include    "RKindep/ecfuncs.h"
 #include    <assert.h>
 

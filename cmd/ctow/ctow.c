@@ -28,12 +28,9 @@ static char rcs[]="@(#) 112.1 $Id: ctow.c,v 1.3.2.3 2003/12/27 17:15:22 aida_s E
  */
 #include	<stdio.h>
 #include        <ctype.h>
-#include	"ccompat.h"
+#include	"canna/ccompat.h"
 #include	<unistd.h>
-
-#if  defined(__STDC__) || defined(SVR4)
 #include <locale.h>
-#endif
 
 #ifdef SVR4
 extern char *gettxt();
