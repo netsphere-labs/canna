@@ -30,18 +30,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: kctrl.c,v 1.10 2003/09/21 09:08:17 aida_
 #include <sys/types.h>
 #include <canna/mfdef.h>
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifndef CANNAWC_DEFINED
-  #define CANNAWC_DEFINED
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
-typedef uint32_t cannawc;
-  #endif
-#endif
-
 #define DEFAULT_COLUMN_WIDTH	70
 
 extern char *CANNA_initfilename;

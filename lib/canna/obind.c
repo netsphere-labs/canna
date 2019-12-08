@@ -66,8 +66,8 @@ typedef struct {
   int (*callback_func) pro((char *, int, wchar_t **, int, int *));
 } owcListCallbackStruct;
 
-typedef canna_uint16_t cannawc16;
-typedef canna_uint32_t cannawc32;
+typedef uint16_t cannawc16;
+typedef uint32_t cannawc32;
 
 extern int howToReturnModeInfo;
 extern char *context_table;

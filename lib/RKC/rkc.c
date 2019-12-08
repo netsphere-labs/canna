@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -27,25 +29,25 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 /*
  * MODIFICATION HISTORY
  *	S000	funahasi@oa2	Fri Oct  2 20:14:13 JST 1992
- *		- debugÍÑ´Ø¿ô RkThrough()¤Î¤¿¤á¤Ë protocol¤òÄÉ²Ã
+ *		- debugç”¨é–¢æ•° RkThrough()ã®ãŸã‚ã« protocolã‚’è¿½åŠ 
  *	S001	funahasi@oa2	Tue Oct 13 15:40:08 JST 1992
- *		- version2.x°ÊÁ°¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë»ş RkQueryDic()¤¬ -1
- *		  ¤òÊÖ¤¹¤è¤¦»ÅÍÍ¤òÊÑ¹¹
+ *		- version2.xä»¥å‰ã®ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹æ™‚ RkQueryDic()ãŒ -1
+ *		  ã‚’è¿”ã™ã‚ˆã†ä»•æ§˜ã‚’å¤‰æ›´
  *	S002	funahasi@oa2	Thu Nov  5 13:22:49 JST 1992
- *		- RkQueryDic()¤Î°ú¤­¿ô¤Ë userÌ¾¤ò»ØÄê½ĞÍè¤ë¤è¤¦»ÅÍÍ¤òÊÑ¹¹
- *		- fixed bug RkBgnBun()¤Çµì¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë¾ì¹ç¡¤mode¤«¤é
- *		  ¥³¡¼¥ÉÊÑ´¹ÉôÊ¬¤À¤±¤ò¼è¤ê½Ğ¤¹½èÍı¤ò½¤Àµ
+ *		- RkQueryDic()ã®å¼•ãæ•°ã« useråã‚’æŒ‡å®šå‡ºæ¥ã‚‹ã‚ˆã†ä»•æ§˜ã‚’å¤‰æ›´
+ *		- fixed bug RkBgnBun()ã§æ—§ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹å ´åˆï¼Œmodeã‹ã‚‰
+ *		  ã‚³ãƒ¼ãƒ‰å¤‰æ›éƒ¨åˆ†ã ã‘ã‚’å–ã‚Šå‡ºã™å‡¦ç†ã‚’ä¿®æ­£
  *	S003	funahasi@oa2	Fri Nov 13 01:19:52 JST 1992
- *		- fixed bug version1.1¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³½ĞÍè¤Ê¤¤
- *		  rkc_get_yomi()¤ò¹Ô¤Ã¤Æ¤¤¤ë¤Î¤¬¸¶°ø
- *		- RkwSetAppName()¤¬Ìµ¤«¤Ã¤¿¤Î¤ÇÄÉ²Ã
- *		- fixed bug version2.1¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³½ĞÍè¤Ê¤¤
- *		  rkc_set_app_name()¤ò¹Ô¤Ã¤Æ¤¤¤ë¤Î¤¬¸¶°ø
+ *		- fixed bug version1.1ã®ã‚µãƒ¼ãƒã«æ¥ç¶šå‡ºæ¥ãªã„
+ *		  rkc_get_yomi()ã‚’è¡Œã£ã¦ã„ã‚‹ã®ãŒåŸå› 
+ *		- RkwSetAppName()ãŒç„¡ã‹ã£ãŸã®ã§è¿½åŠ 
+ *		- fixed bug version2.1ã®ã‚µãƒ¼ãƒã«æ¥ç¶šå‡ºæ¥ãªã„
+ *		  rkc_set_app_name()ã‚’è¡Œã£ã¦ã„ã‚‹ã®ãŒåŸå› 
  *	S004	funahasi@oa2	Fri Dec  4 02:04:38 JST 1992
- *		- cannastat, cshos¤Î¤¿¤á¤Ë rkc¤ÎÆâÉô´Ø¿ô¤ò¸Æ¤Ó½Ğ¤¹
- *		  ¥¤¥ó¥¿¥Õ¥§¡¼¥¹¤òÄÉ²Ã
+ *		- cannastat, cshosã®ãŸã‚ã« rkcã®å†…éƒ¨é–¢æ•°ã‚’å‘¼ã³å‡ºã™
+ *		  ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹ã‚’è¿½åŠ 
  *	S005	funahasi@oa2	Thu Feb 18 12:18:41 JST 1993
- *		- fixed bug Rk[w]GetKanjiList()¤¬»ÅÍÍ¤È°Û¤Ê¤Ã¤Æ¤¤¤ë¡¥
+ *		- fixed bug Rk[w]GetKanjiList()ãŒä»•æ§˜ã¨ç•°ãªã£ã¦ã„ã‚‹ï¼
  */
 
 /* LINTLIBRARY */
@@ -63,23 +65,10 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #include    <signal.h>
 #include    <unistd.h>
 	
-/* CX:	¥³¥ó¥Æ¥¯¥¹¥È¥Æ¡¼¥Ö¥ë
- *	É¬Í×¤Ê¥ì¥³¡¼¥É¤À¤±¤òmalloc¤ÇºîÀ®¤¹¤ë¡£
+/* CX:	ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆãƒ†ãƒ¼ãƒ–ãƒ«
+ *	å¿…è¦ãªãƒ¬ã‚³ãƒ¼ãƒ‰ã ã‘ã‚’mallocã§ä½œæˆã™ã‚‹ã€‚
  *	^^^^^^^^^^^^^^^^^^
  */
-
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifndef CANNAWC_DEFINED
-  #define CANNAWC_DEFINED
-  // cannawc ¤Ï¡¢EUC-JP ¤ò1Ê¸»ú = 1¥ï¥¤¥ÉÊ¸»ú¤Ë¤·¤¿¤â¤Î¡£
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
-typedef uint32_t cannawc;
-  #endif
-#endif
 
 static RkcContext *RkcCX[MAX_CX] ;
 
@@ -89,8 +78,8 @@ static RkcContext *RkcCX[MAX_CX] ;
 #define AUTO_YOMI_SIZE	512
 
 static short
-rkc_call_flag = 0x00   ; /* RkInitialize¤¬¸Æ¤Ğ¤ì¤ÆRkFinalize¤¬¸Æ¤Ğ¤ì¤ë¤Ş¤Ç */
-			 /* BUSY¥Ó¥Ã¥È¤¬Î©¤Ã¤Æ¤¤¤ë			   */
+rkc_call_flag = 0x00   ; /* RkInitializeãŒå‘¼ã°ã‚Œã¦RkFinalizeãŒå‘¼ã°ã‚Œã‚‹ã¾ã§ */
+			 /* BUSYãƒ“ãƒƒãƒˆãŒç«‹ã£ã¦ã„ã‚‹			   */
 
 static short ProtocolMinor = 0 ;
 static short ProtocolMajor = 0;
@@ -111,14 +100,14 @@ static char *ServerNameSpecified;
 static RkcConfigErrorProc config_error_handler;
 
 /*
- * ¥µ¥İ¡¼¥È¤¹¤ë¥×¥í¥È¥³¥ë¤Î¥ê¥¹¥È
- * ¤³¤Î½ç¤Ë¥×¥í¥È¥³¥ë¤ò»ÈÍÑ¤·¡¤¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤è¤¦¤È¤¹¤ë
+ * ã‚µãƒãƒ¼ãƒˆã™ã‚‹ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã®ãƒªã‚¹ãƒˆ
+ * ã“ã®é †ã«ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ç”¨ã—ï¼Œã‚µãƒ¼ãƒã«æ¥ç¶šã—ã‚ˆã†ã¨ã™ã‚‹
  */
 static char *ProtoVerTbl[] = {
-    W_VERSION,/* ¥µ¡¼¥Ğ¤ÈÆ±¤¸¥á¥¸¥ã¡¼ÈÖ¹æ¤Î»ş¤Ï¡¢¥µ¡¼¥Ğ¤Î
-                                    ¥Ğ¡¼¥¸¥ç¥ó¤Î¥×¥í¥È¥³¥ë¤ò»È¤Ã¤Æ¤¤¤ë¡£*/
-    "2.1",    /* ¥µ¡¼¥Ğ¤è¤ê¥á¥¸¥ã¡¼ÈÖ¹æ¤¬¾®¤µ¤¤»ş¤Ï¡¢
-              ¾®¤µ¤¤Êı¤Î¥×¥í¥È¥³¥ë¤ò»È¤¦¡£(¤³¤³¤Ï¥Ş¥¯¥í¤Ë¤·¤¿Êı¤¬¤è¤¤¤Í)*/ 
+    W_VERSION,/* ã‚µãƒ¼ãƒã¨åŒã˜ãƒ¡ã‚¸ãƒ£ãƒ¼ç•ªå·ã®æ™‚ã¯ã€ã‚µãƒ¼ãƒã®
+                                    ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ã£ã¦ã„ã‚‹ã€‚*/
+    "2.1",    /* ã‚µãƒ¼ãƒã‚ˆã‚Šãƒ¡ã‚¸ãƒ£ãƒ¼ç•ªå·ãŒå°ã•ã„æ™‚ã¯ã€
+              å°ã•ã„æ–¹ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ã†ã€‚(ã“ã“ã¯ãƒã‚¯ãƒ­ã«ã—ãŸæ–¹ãŒã‚ˆã„ã­)*/ 
 #ifdef USE_EUC_PROTOCOL
     E_VERSION,	/* ver1.2 */
     "1.0",
@@ -130,15 +119,15 @@ static struct {
   Ushort cbuf[CBUFSIZE];
   char buffer[BUFSIZE];
   cannawc wbuf[CBUFSIZE];
-} rkc; /* general buffer¡£¤¿¤À¤·¡¢RkwXXX ¤Î¤Ê¤«¤À¤±¤Ç»È¤¦¤³¤È¤Ë¤·¤è¤¦¡£*/
+} rkc; /* general bufferã€‚ãŸã ã—ã€RkwXXX ã®ãªã‹ã ã‘ã§ä½¿ã†ã“ã¨ã«ã—ã‚ˆã†ã€‚*/
 
 /*
- * ¥¯¥é¥¤¥¢¥ó¥È¡¦¥³¥ó¥Æ¥¯¥¹¥È¥æ¡¼¥Æ¥£¥ê¥Æ¥£´Ø¿ô
+ * ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒ»ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°
  */
 
 
 /*
- * ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë¡£
+ * æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
  */
 static
 RkcContext  *
@@ -165,7 +154,7 @@ newCC()
 }
 
 /*
- * »ØÄê¤µ¤ì¤¿Ê¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤Ş¤¿¤Ï¡¢¸õÊäÎó¤ÎÎÎ°è¤ò²òÊü¤¹¤ë
+ * æŒ‡å®šã•ã‚ŒãŸæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã¾ãŸã¯ã€å€™è£œåˆ—ã®é ˜åŸŸã‚’è§£æ”¾ã™ã‚‹
  */
 static
 void
@@ -178,9 +167,9 @@ register int	    from ;
     for( ; from < cx->maxbun; from++ ) {
 	bun = &cx->bun[ from ] ;
 	if( bun->flags == NUMBER_KOUHO ) {
-	    /* Âè°ì¸õÊä¤·¤«Æş¤Ã¤Æ¤¤¤Ê¤¤Ê¸Àá¤Ï¡¢¼Âºİ¤Ë¤Ïmalloc¤·¤¿¤ï¤±¤Ç¤Ï¤Ê¤¯
-	     * ¥µ¡¼¥Ğ¤«¤éÄÌÃÎ¤µ¤ì¤¿³ÆÊ¸Àá¤ÎÂè°ì¸õÊäÎó¤ÎÃæ¤Ø¤Î¥İ¥¤¥ó¥¿¤ò
-	     * ÀßÄê¤·¤Æ¤¤¤ë¤À¤±¤À¤«¤é¥Õ¥ê¡¼¤·¤Ê¤¤¡£
+	    /* ç¬¬ä¸€å€™è£œã—ã‹å…¥ã£ã¦ã„ãªã„æ–‡ç¯€ã¯ã€å®Ÿéš›ã«ã¯mallocã—ãŸã‚ã‘ã§ã¯ãªã
+	     * ã‚µãƒ¼ãƒã‹ã‚‰é€šçŸ¥ã•ã‚ŒãŸå„æ–‡ç¯€ã®ç¬¬ä¸€å€™è£œåˆ—ã®ä¸­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’
+	     * è¨­å®šã—ã¦ã„ã‚‹ã ã‘ã ã‹ã‚‰ãƒ•ãƒªãƒ¼ã—ãªã„ã€‚
 	     */
 	    RkcFree( (char *)bun->kanji ) ;
 	    bun->kanji = (Ushort *)NULL ;
@@ -191,7 +180,7 @@ register int	    from ;
 }
 
 /*
- * »ØÄê¤µ¤ì¤¿¥³¥ó¥Æ¥¯¥¹¥È¤ò²òÊü¤¹¤ë¡£
+ * æŒ‡å®šã•ã‚ŒãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’è§£æ”¾ã™ã‚‹ã€‚
  */
 static
 void
@@ -220,8 +209,8 @@ int clientcx ;
 }
 
 /*
- * ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ¤ËÂĞ±ş¤·¤¿¥³¥ó¥Æ¥¯¥¹¥È¤ò¼èÆÀ¤¹¤ë¡£
- * (¥¯¥é¥¤¥¢¥ó¥ÈÂ¦)
+ * ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå·ã«å¯¾å¿œã—ãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
+ * (ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´)
  */
 #define NOCHECK    0
 #define CHECK	   1
@@ -236,7 +225,7 @@ int	clientcx, type ;
         cx = RkcCX[clientcx];
 	if (cx)
 	    if( (type == CHECK) && (cx->bgnflag != BUSY) )
-		/* ÊÑ´¹Ãæ¤Î»ş,maxbun¤ÏºÇÄã£±¤Ç¤¢¤ë */
+		/* å¤‰æ›ä¸­ã®æ™‚,maxbunã¯æœ€ä½ï¼‘ã§ã‚ã‚‹ */
 		cx = (RkcContext *)NULL ;
     }
     return( cx ) ;
@@ -307,14 +296,14 @@ FindGroupname()
  *
  *  Description:
  *  -----------
- *  ¤«¤Ê´Á»úÊÑ´¹¤Î½é´ü²½
+ *  ã‹ãªæ¼¢å­—å¤‰æ›ã®åˆæœŸåŒ–
  *
  *  Returns:
  *  -------
  *  0 or -1
  */
 int
-RkwInitialize( char* hostname ) /* ¤È¤ê¤¢¤¨¤ºrkc¤Î¾ì¹ç¤Ï¡¢°ú¤­¿ô¤òÌµ»ë¤¹¤ë */
+RkwInitialize( const char* hostname ) /* ã¨ã‚Šã‚ãˆãšrkcã®å ´åˆã¯ã€å¼•ãæ•°ã‚’ç„¡è¦–ã™ã‚‹ */
 {
     register int    i;
     register long  server ;
@@ -347,37 +336,37 @@ RkwInitialize( char* hostname ) /* ¤È¤ê¤¢¤¨¤ºrkc¤Î¾ì¹ç¤Ï¡¢°ú¤­¿ô¤òÌµ»ë¤¹¤ë */
         goto init_err;
     }
 
-    /* ¥æ¡¼¥¶Ì¾¤ò¼èÆÀ¤¹¤ë */
+    /* ãƒ¦ãƒ¼ã‚¶åã‚’å–å¾—ã™ã‚‹ */
     username = FindLogname() ;
 
     if( !username || !(data = malloc( strlen(username) + strlen(W_VERSION)+2 )))
 	    goto init_err;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤ò½é´ü²½¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ */
     for( i=0; i < MAX_CX; i++)
 	RkcCX[ i ] = (RkcContext *)NULL ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx = newCC()) == (RkcContext *)NULL ) {
         RkcFree(data);
         goto init_err;
     }
 
-    /* ºÇ½é¤Ï¥ï¥¤¥É¥­¥ã¥é¥Ù¡¼¥¹¤Î¥×¥í¥È¥³¥ë¤ò»ÈÍÑ¤¹¤ë */
+    /* æœ€åˆã¯ãƒ¯ã‚¤ãƒ‰ã‚­ãƒ£ãƒ©ãƒ™ãƒ¼ã‚¹ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ç”¨ã™ã‚‹ */
     for( i = 0; *ProtoVerTbl[i]; i++ ){
 	strcpy( data, ProtoVerTbl[i] );
 	strcat( data, ":" );
 	strcat( data, username );
-	ProtocolMajor = *ProtoVerTbl[i] - '0'; /* Major¤¬1·å¤¿¤±ÂĞ±ş */
+	ProtocolMajor = *ProtoVerTbl[i] - '0'; /* MajorãŒ1æ¡ãŸã‘å¯¾å¿œ */
         PROTOCOL = (ProtocolMajor > 1);
 
 #ifdef USE_EUC_PROTOCOL
 	RKCP = PROTOCOL > 0 ? &wideproto : &eucproto;
 #endif
 
-        /* ¥µ¡¼¥Ğ¤Ë½é´ü²½¤òÍ×µá¤·¡¢¥µ¡¼¥Ğ¤Î¥³¥ó¥Æ¥¯¥¹¥È¤ò¼èÆÀ¤¹¤ë */
+        /* ã‚µãƒ¼ãƒã«åˆæœŸåŒ–ã‚’è¦æ±‚ã—ã€ã‚µãƒ¼ãƒã®ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ */
 	if ((server = (*RKCP->initialize)( data )) < 0) {
-	    /* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	    /* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	    if( (ServerFD = rkc_Connect_Iroha_Server( ConnectIrohaServerName )) < 0 ) { /* S004 */
 		freeCC( cx->client ) ;
 		RkcFree(data);
@@ -397,15 +386,15 @@ RkwInitialize( char* hostname ) /* ¤È¤ê¤¢¤¨¤ºrkc¤Î¾ì¹ç¤Ï¡¢°ú¤­¿ô¤òÌµ»ë¤¹¤ë */
       goto init_err;
     }
 
-    /* ¥µ¡¼¥Ğ¤Î¥Ş¥¤¥Ê¡¼¥Ğ¡¼¥¸¥ç¥ó¤òÆÀ¤ë */
+    /* ã‚µãƒ¼ãƒã®ãƒã‚¤ãƒŠãƒ¼ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å¾—ã‚‹ */
     ProtocolMinor = 
       (short)((unsigned long)(server & 0xffff0000) >> (unsigned)0x10);
 
-    /* ¥µ¡¼¥Ğ¤«¤é¼èÆÀ¤·¤¿¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ¤òÆş¤ì¤ë */
+    /* ã‚µãƒ¼ãƒã‹ã‚‰å–å¾—ã—ãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå·ã‚’å…¥ã‚Œã‚‹ */
     cx->server = server & 0x0000ffff ;
     rkc_call_flag = BUSY ;
 
-    /* ¥×¥í¥È¥³¥ë¥Ğ¡¼¥¸¥ç¥ó¤¬ 3.2 °Ê¾å¤À¤Ã¤¿¤é¥°¥ë¡¼¥×Ì¾¤òÄÌÃÎ¤¹¤ë */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒ 3.2 ä»¥ä¸Šã ã£ãŸã‚‰ã‚°ãƒ«ãƒ¼ãƒ—åã‚’é€šçŸ¥ã™ã‚‹ */
     if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
       char *gname = FindGroupname();
 
@@ -424,7 +413,7 @@ RkwInitialize( char* hostname ) /* ¤È¤ê¤¢¤¨¤ºrkc¤Î¾ì¹ç¤Ï¡¢°ú¤­¿ô¤òÌµ»ë¤¹¤ë */
  *
  *  Description:
  *  -----------
- *  ¤«¤Ê´Á»úÊÑ´¹¤Î½ªÎ»
+ *  ã‹ãªæ¼¢å­—å¤‰æ›ã®çµ‚äº†
  */
 void
 RkwFinalize()
@@ -434,8 +423,8 @@ RkwFinalize()
     if( rkc_call_flag != BUSY )
 		return;
 
-    /* Á´¥³¥ó¥Æ¥¯¥¹¥È¤ò²òÊü¤¹¤ë
-     *	    ÊÑ´¹Ãæ¤Î¥³¥ó¥Æ¥¯¥¹¥È¤Ï¤É¤¦¤¹¤ë¤Î¤« ?
+    /* å…¨ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’è§£æ”¾ã™ã‚‹
+     *	    å¤‰æ›ä¸­ã®ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã¯ã©ã†ã™ã‚‹ã®ã‹ ?
      */
     for( i = 0; i < MAX_CX; i++ ){
 	if( RkcCX[ i ] ) {
@@ -465,7 +454,7 @@ RkwFinalize()
  *
  *  Description:
  *  -----------
- *  ¥³¥ó¥Æ¥¯¥¹¥È¤Î³«Êü
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®é–‹æ”¾
  *
  *  Input:
  *  -----
@@ -492,15 +481,15 @@ RkwCloseContext( int cxnum )
 /* 
  * KillServer 
  *
- * Version 3.3 °ÊÁ°¤Î¥µ¡¼¥Ğ¤Ë¤ÏÁ÷¤é¤Ê¤¤ Ìá¤êÃÍ OLDSRV = -110
- * Version 3.3 ¤Î¥µ¡¼¥Ğ¤Ë¤ÏÁ÷¤ë 
+ * Version 3.3 ä»¥å‰ã®ã‚µãƒ¼ãƒã«ã¯é€ã‚‰ãªã„ æˆ»ã‚Šå€¤ OLDSRV = -110
+ * Version 3.3 ã®ã‚µãƒ¼ãƒã«ã¯é€ã‚‹ 
  *
  */
 int
 RkwKillServer()
 {
 /*
-  Protocol Version 3.3 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
+  Protocol Version 3.3 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
 */
 
   if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 2)) {
@@ -517,11 +506,11 @@ RkwKillServer()
  *
  *  Description:
  *  -----------
- *  ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤ÎºîÀ®
+ *  æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®ä½œæˆ
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
 RkwCreateContext()
@@ -532,12 +521,12 @@ RkwCreateContext()
     if( rkc_call_flag != BUSY )
 	return( -1 ) ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx = newCC()) == (RkcContext *)NULL )
 	return( -1 ) ;
 
     if ((server = (*RKCP->create_context)()) == -1) {
-	/* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	/* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	freeCC( cx->client ) ;
 	return( -1 ) ;
     }
@@ -551,7 +540,7 @@ RkwCreateContext()
  *
  *  Description:
  *  -----------
- *  ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤ÎºîÀ®
+ *  æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®ä½œæˆ
  *
  *  Input:
  *  -----
@@ -559,7 +548,7 @@ RkwCreateContext()
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
 RkwDuplicateContext( int src_cx )
@@ -570,12 +559,12 @@ RkwDuplicateContext( int src_cx )
     if( !cx_src || (rkc_call_flag != BUSY) )
 	return( -1 ) ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx_dest = newCC()) == (RkcContext *)NULL )
 	return( -1 ) ;
 
     if ((dest_cx = (*RKCP->duplicate_context)(cx_src)) == -1) {
-	/* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	/* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	freeCC( cx_dest->client ) ;
 	return( -1 ) ;
     }
@@ -589,7 +578,7 @@ RkwDuplicateContext( int src_cx )
  *
  *  Description:
  *  -----------
- *  ¼­½ñ¥ê¥¹¥È¤ËÄÉ²Ã¤Ç¤­¤ë¼­½ñÌ¾¤Î¼èÆÀ
+ *  è¾æ›¸ãƒªã‚¹ãƒˆã«è¿½åŠ ã§ãã‚‹è¾æ›¸åã®å–å¾—
  *
  *  Input:
  *  -----
@@ -597,7 +586,7 @@ RkwDuplicateContext( int src_cx )
  *
  *  Returns:
  *  -------
- *  ¼­½ñÌ¾¤Î¸Ä¿ô or -1
+ *  è¾æ›¸åã®å€‹æ•° or -1
  */
 int
 RkwGetDicList(cxnum, dicnames, max)
@@ -619,7 +608,7 @@ int max ;
 }
 
 static int
-_RkwDefineDic( cxnum, dicname, wordrec )	/* Ã±¸ìÅĞÏ¿ */
+_RkwDefineDic( cxnum, dicname, wordrec )	/* å˜èªç™»éŒ² */
 int cxnum ;
 char *dicname ;
 Ushort *wordrec ;
@@ -637,7 +626,7 @@ Ushort *wordrec ;
  *
  *  Description:
  *  -----------
- *  Ã±¸ìÅĞÏ¿
+ *  å˜èªç™»éŒ²
  *
  *  Input:
  *  -----
@@ -645,7 +634,7 @@ Ushort *wordrec ;
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
 RkwDefineDic(int cxnum, char* dicname, cannawc* wordrec)
@@ -658,7 +647,7 @@ RkwDefineDic(int cxnum, char* dicname, cannawc* wordrec)
 }
 
 static int
-_RkwDeleteDic( cxnum, dicname, wordrec )	  /* Ã±¸ìºï½ü */
+_RkwDeleteDic( cxnum, dicname, wordrec )	  /* å˜èªå‰Šé™¤ */
 int cxnum ;
 char *dicname ;
 Ushort *wordrec ;
@@ -738,7 +727,7 @@ char *dicnames_return ;
 }
 
 int
-RkwSetDicPath( cxnum, path ) /* ¥µ¡¼¥Á¥Ñ¥¹¤òÀßÄê */
+RkwSetDicPath( cxnum, path ) /* ã‚µãƒ¼ãƒãƒ‘ã‚¹ã‚’è¨­å®š */
 int cxnum ;
 char *path ;
 /* ARGSUSED */
@@ -748,36 +737,36 @@ char *path ;
 
 /*
  * StoreFirstKouho
- *	¥«¥ì¥ó¥ÈÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤òµá¤á¡¢³ÊÇ¼¤¹¤ë
+ *	ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã‚’æ±‚ã‚ã€æ ¼ç´ã™ã‚‹
  */
 static void
 StoreFirstKouho( cx, bun_max )
 register RkcContext *cx ;
 int bun_max ;
 {
-    /* ¤³¤³¤Ï¡¢¤è¤¯¹Í¤¨¤Ê¤¤¤È¹½Â¤¤Ş¤ÇÊÑ¤¨¤¿°ÕÌ£¤¬Ìµ¤¯¤Ê¤ë¤·
-     *	 ¸å¤Ç¤¨¤é¤¤ÌÜ¤ËÁø¤¦¤«¤âÃÎ¤ì¤Ê¤¤
+    /* ã“ã“ã¯ã€ã‚ˆãè€ƒãˆãªã„ã¨æ§‹é€ ã¾ã§å¤‰ãˆãŸæ„å‘³ãŒç„¡ããªã‚‹ã—
+     *	 å¾Œã§ãˆã‚‰ã„ç›®ã«é­ã†ã‹ã‚‚çŸ¥ã‚Œãªã„
      */
     register	int		i ;
     register	RkcBun		*bun ;
     register	Ushort	*kouhobuf ;
 
-    /* ¥«¥ì¥ó¥ÈÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤Î¸õÊä¤ò²òÊü¤¹¤ë */	
+    /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å€™è£œã‚’è§£æ”¾ã™ã‚‹ */	
     freeBUN( cx, cx->curbun ) ; 
 
-    /* ¤³¤³¤Ë¤Ï¡¢rkc_*(rkcConvert.c)¤ÇÂè°ì¸õÊäÎó¤¬³ÊÇ¼¤µ¤ì¤Æ¤¤¤ë */
+    /* ã“ã“ã«ã¯ã€rkc_*(rkcConvert.c)ã§ç¬¬ä¸€å€™è£œåˆ—ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ */
     kouhobuf = cx->Fkouho ;
 
-    /* ¥¼¥íÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÂè°ì¸õÊä¤Î¥İ¥¤¥ó¥¿¤òÀßÄê¤¹¤ë */
+    /* ã‚¼ãƒ­æ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®ç¬¬ä¸€å€™è£œã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹ */
     for( i = 0; i < bun_max; i++ ) {
 	bun = &cx->bun[ i ] ;
-	/* ¥«¥ì¥ó¥ÈÊ¸Àá¤Ş¤Ç¤ÎÊ¸Àá¤Ç¸õÊä°ìÍ÷¤ò´û¤Ë¼èÆÀ¤·¤Æ¤¤¤ëÊ¸Àá¤Ï¡¢
-	 * ¥İ¥¤¥ó¥¿¤ÎºÆÀßÄê¤Ï¤·¤Ê¤¤¡£
+	/* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã¾ã§ã®æ–‡ç¯€ã§å€™è£œä¸€è¦§ã‚’æ—¢ã«å–å¾—ã—ã¦ã„ã‚‹æ–‡ç¯€ã¯ã€
+	 * ãƒã‚¤ãƒ³ã‚¿ã®å†è¨­å®šã¯ã—ãªã„ã€‚
 	 */
 	if( bun->flags != NUMBER_KOUHO ) {
 	    bun->kanji = kouhobuf ;
-	    bun->curcand = 0 ;		/*  Ê¸Àá0Ê¸Àá1Ê¸Àá2Ê¸Àá3Ê¸Àá4@@ */
-	    bun->maxcand = 1 ;		/*  ¢¬	 ¢¬   ¢¬   ¢¬	¢¬	*/
+	    bun->curcand = 0 ;		/*  æ–‡ç¯€0æ–‡ç¯€1æ–‡ç¯€2æ–‡ç¯€3æ–‡ç¯€4@@ */
+	    bun->maxcand = 1 ;		/*  â†‘	 â†‘   â†‘   â†‘	â†‘	*/
 	    bun->flags = FIRST_KOUHO ;	/*	bun->kaji		*/
 	}
 	kouhobuf += ushortstrlen( (Ushort *)kouhobuf)+1 ;
@@ -786,7 +775,7 @@ int bun_max ;
 }
 
 /*
- *    Ï¢Ê¸ÀáÊÑ´¹³«»Ï
+ *    é€£æ–‡ç¯€å¤‰æ›é–‹å§‹
  */
 static int	
 _RkwBgnBun(cxnum, yomi, maxyomi, mode)
@@ -799,11 +788,11 @@ Ushort *yomi ;
     if( (maxyomi <= 0) || !cx )
 	return( -1 ) ;
 
-    /* RkBgnBun¤À¤±¤Ï¡¢BUSY¥Õ¥é¥°¤¬Î©¤Ã¤Æ¤¤¤ë¤ÈÆş¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤ */
+    /* RkBgnBunã ã‘ã¯ã€BUSYãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹ã¨å…¥ã£ã¦ã¯ã„ã‘ãªã„ */
     if( cx->bgnflag == BUSY )
 	return( -1 ) ;
 
-    /* µì¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë¾ì¹ç¡¤mode¤«¤é¥³¡¼¥ÉÊÑ´¹ÉôÊ¬¤À¤±¤ò¼è¤ê½Ğ¤¹ */
+    /* æ—§ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹å ´åˆï¼Œmodeã‹ã‚‰ã‚³ãƒ¼ãƒ‰å¤‰æ›éƒ¨åˆ†ã ã‘ã‚’å–ã‚Šå‡ºã™ */
     if( ProtocolMajor < 3 ){
         int code;
 
@@ -816,8 +805,8 @@ Ushort *yomi ;
 	mode &= mask;					/* S002 */
     }
 
-    /* maxyomi¤ÎÊ¸Àá¿ô¤À¤±¥¢¥í¥±¡¼¥È¤·¤Æ¤ª¤¯ */
-    /* ¤³¤ì°Ê¾å¤ÎÊ¸Àá¿ô¤ÏÂ¸ºß¤·¤Ê¤¤¤Ï¤º */
+    /* maxyomiã®æ–‡ç¯€æ•°ã ã‘ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã—ã¦ãŠã */
+    /* ã“ã‚Œä»¥ä¸Šã®æ–‡ç¯€æ•°ã¯å­˜åœ¨ã—ãªã„ã¯ãš */
 
     cx->curbun = cx->maxbun = 0 ;
     if( yomi != NULL ){
@@ -867,7 +856,7 @@ int mode;
       len = wchar2ushort(yomi, maxyomi, rkc.cbuf, CBUFSIZE);
       return _RkwBgnBun(cxnum, rkc.cbuf, len, mode);
     }
-    else {  /* ¼«Æ°ÊÑ´¹³«»Ï */
+    else {  /* è‡ªå‹•å¤‰æ›é–‹å§‹ */
       return _RkwBgnBun(cxnum, (Ushort *)NULL, maxyomi, mode);
     }
 }
@@ -881,7 +870,7 @@ int cxnum, mode ;
 
     if( cx ) {
 	/*
-	 * rkc_convert_end¤Ç³Ø½¬¤¹¤Ù¤­¸õÊä¤ò¥µ¡¼¥Ğ¤ËÃÎ¤é¤»¤ë
+	 * rkc_convert_endã§å­¦ç¿’ã™ã¹ãå€™è£œã‚’ã‚µãƒ¼ãƒã«çŸ¥ã‚‰ã›ã‚‹
 	 */
 	if ((ret = (*RKCP->convert_end)(cx, mode )) >= 0) {
 	    freeBUN( cx, 0 ) ;
@@ -903,7 +892,7 @@ int cxnum, mode ;
 }
 
 /* LoadKouho
- *	É¬Í×¤Ë±ş¤¸¤ÆÁ´¸õÊä¤òÆÉ¤ß½Ğ¤¹
+ *	å¿…è¦ã«å¿œã˜ã¦å…¨å€™è£œã‚’èª­ã¿å‡ºã™
  */
 static
 int
@@ -914,11 +903,11 @@ register RkcContext	 *cx ;
     int 		ret ;
 
     if( bun->flags == FIRST_KOUHO ) {
-	/*	¸õÊä¤òÁ´¤ÆÆÉ¤ß½Ğ¤¹¡£
-	 *	ÆÉ¤ß½Ğ¤·¤Ë¼ºÇÔ¤·¤¿¤é¡¢ÀèÆ¬¸õÊä¤·¤«¤Ê¤¤¤Õ¤ê¤ò¤¹¤ë
+	/*	å€™è£œã‚’å…¨ã¦èª­ã¿å‡ºã™ã€‚
+	 *	èª­ã¿å‡ºã—ã«å¤±æ•—ã—ãŸã‚‰ã€å…ˆé ­å€™è£œã—ã‹ãªã„ãµã‚Šã‚’ã™ã‚‹
 	 */
 	if ((ret = (*RKCP->get_kanji_list)(cx)) >= 0) {
-	    /* ÆÉ¤ß¤À¤·À®¸ù */
+	    /* èª­ã¿ã ã—æˆåŠŸ */
 	    bun->curcand = 0 ;
 	    bun->maxcand = ret ;
 	} else if( errno == EPIPE )
@@ -958,7 +947,7 @@ int cxnum ;
 	bun = &cx->bun[ cx->curbun ];	
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
-	bun->curcand = bun->maxcand - 1; /* ÆÉ¤ß¤Ï¡¢ºÇ¸å¤Ë¤¢¤ë(0¥ª¥ê¥¸¥ó) */
+	bun->curcand = bun->maxcand - 1; /* èª­ã¿ã¯ã€æœ€å¾Œã«ã‚ã‚‹(0ã‚ªãƒªã‚¸ãƒ³) */
 	return( bun->curcand ) ;
     }
     return( 0 );
@@ -992,7 +981,7 @@ RkwPrev(int cxnum)
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
 	if ( --bun->curcand < 0 )
-	    bun->curcand = bun->maxcand-1 ; /* £°¥ª¥ê¥¸¥ó */
+	    bun->curcand = bun->maxcand-1 ; /* ï¼ã‚ªãƒªã‚¸ãƒ³ */
 	return( bun->curcand ) ;
     }
     return( 0 );
@@ -1025,7 +1014,7 @@ Ushort *kanji ;
 
     if( cx ){
 	bun = &cx->bun[ cx->curbun ] ;
-			     /* ÆÉ¤ß¤·¤«¤Ê¤¤¾ì¹ç¤ÏÆÉ¤ß¤òÊÖ¤¹ */
+			     /* èª­ã¿ã—ã‹ãªã„å ´åˆã¯èª­ã¿ã‚’è¿”ã™ */
 	src_kouho = SeekKouho( bun, (bun->maxcand ? bun->curcand : 0) ) ;
 	if( ushortstrlen( (Ushort *)src_kouho ) > maxkanji )
 	    return( 0 ) ;
@@ -1076,7 +1065,7 @@ Ushort *kouho ;
 	    return( 0 ) ;
 	if( !kouho )
 	    return( bun->maxcand ? bun->maxcand : 1 ) ;
-	/* ¸õÊä¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* å€™è£œã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	src_kouho = bun->kanji ;
 	dest_kouho = kouho ;
 	for( total = ushortstrlen( src_kouho ) + 1, i = 0;
@@ -1093,10 +1082,7 @@ Ushort *kouho ;
 }
 
 int
-RkwGetKanjiList(cxnum, kanjis, maxkanjis)
-int cxnum;
-cannawc *kanjis;
-int maxkanjis;
+RkwGetKanjiList( int cxnum, cannawc* kanjis, int maxkanjis )
 {
   int nkanji, len, i, j = 0, k = 0;
   int retval;
@@ -1192,16 +1178,16 @@ RKReSize( cxnum, len )
 int cxnum, len ;
 {
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
-    int ret;		/* ÁíÊ¸Àá¿ô */
+    int ret;		/* ç·æ–‡ç¯€æ•° */
 
     if( cx ) {	
-	/* Ê¸ÀáÄ¹¤¬ÊÑ¹¹¤Ç¤­¤ë¤«¤É¤¦¤«¥Á¥§¥Ã¥¯¤¹¤ë */
+	/* æ–‡ç¯€é•·ãŒå¤‰æ›´ã§ãã‚‹ã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 	register RkcBun *bun = &cx->bun[ cx->curbun ] ;
 
-	/* ¥«¥ì¥ó¥ÈÊ¸Àá¤¬¸õÊäÎó¤ò´û¤ËÆÉ¤ß¹ş¤ó¤Ç¤¤¤ë¾ì¹ç¤Î½èÍı */
+	/* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ãŒå€™è£œåˆ—ã‚’æ—¢ã«èª­ã¿è¾¼ã‚“ã§ã„ã‚‹å ´åˆã®å‡¦ç† */
 	if( bun->flags == NUMBER_KOUHO ) {
-	     /* Ê¸Àá½Ì¤á¤Ç¥«¥ì¥ó¥ÈÆÉ¤ß¤ÎÄ¹¤µ¤¬MIN_YOMI¤Î¾ì¹ç¤Ï²¿¤â¤»¤º¤Ë */
-	     /* ¥«¥ì¥ó¥ÈÊ¸Àá¿ô¤òÊÖ¤¹ */
+	     /* æ–‡ç¯€ç¸®ã‚ã§ã‚«ãƒ¬ãƒ³ãƒˆèª­ã¿ã®é•·ã•ãŒMIN_YOMIã®å ´åˆã¯ä½•ã‚‚ã›ãšã« */
+	     /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€æ•°ã‚’è¿”ã™ */
 	    int yomilen = ushortstrlen((Ushort *)SeekKouho( bun,
 				       (bun->maxcand ? (bun->maxcand-1) : 0)));
 
@@ -1244,7 +1230,7 @@ int cxnum, len ;
 		    return( cx->maxbun ) ;
 	    }
 	}
-	/* ¡»Ê¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç³ÊÇ¼¤µ¤ì¤ë */	
+	/* ã€‡æ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§æ ¼ç´ã•ã‚Œã‚‹ */	
 	if ((ret = (*RKCP->resize)(cx, len)) <= 0) {
 	    return( -1 ) ;
 	}
@@ -1276,14 +1262,14 @@ int cxnum, len ;
 }
 
 int
-RkwEnlarge( cxnum )  /* Ê¸Àá¿­¤Ğ¤· */
+RkwEnlarge( cxnum )  /* æ–‡ç¯€ä¼¸ã°ã— */
 int cxnum ;
 {
     return( RKReSize( cxnum, ENLARGE  ) ) ;
 }
 
 int
-RkwShorten(cxnum)    /* Ê¸Àá½Ì¤á */
+RkwShorten(cxnum)    /* æ–‡ç¯€ç¸®ã‚ */
 int cxnum ;
 {
     return( RKReSize( cxnum, SHORTEN ) ) ;
@@ -1353,7 +1339,7 @@ Ushort	*yomi;
     if( cx ){
 	bun = &cx->bun[ cx->curbun ] ;		
 	if( !PROTOCOL && (ProtocolMinor == 0) ) {
-	    /* Ver 1.0 ¤Ç¤Ï¡¤¼è¤ê¤¢¤¨¤º¸õÊä°ìÍ÷¤ò¼è¤Ã¤Æ¤¯¤ë */
+	    /* Ver 1.0 ã§ã¯ï¼Œå–ã‚Šã‚ãˆãšå€™è£œä¸€è¦§ã‚’å–ã£ã¦ãã‚‹ */
 	    if( LoadKouho( cx ) < 0 )
 	      retval = -1;
 	}
@@ -1509,10 +1495,10 @@ RkcConnectIrohaServer( servername )
 char* servername;
 {
     /* XXX:
-     * RkcDisconnectIrohaServer¤ËÁêÅö¤¹¤ë¥¤¥ó¥¿¡¼¥Õ¥§¡¼¥¹¤¬Ìµ¤¤¤Î¤Ç¡¢
-     * ¤³¤ì¤Ï¥á¥â¥ê¥ê¡¼¥¯¤ò°ú¤­µ¯¤³¤¹¡£º£¤Î¤È¤³¤í¤³¤ÎAPI¤Ï¸Å¤¤cannastat¤¬
-     * ver 1.x¤Î¥µ¡¼¥Ğ¤ÈÄÌ¿®¤¹¤ë¾ì¹ç¤Ë¤À¤±»È¤¦¤Î¤Ç¡¢¤³¤ÎÌäÂê¤ÏÌµ»ë¤¹¤ë
-     * ¤³¤È¤Ë¤¹¤ë¡£
+     * RkcDisconnectIrohaServerã«ç›¸å½“ã™ã‚‹ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ãŒç„¡ã„ã®ã§ã€
+     * ã“ã‚Œã¯ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã‚’å¼•ãèµ·ã“ã™ã€‚ä»Šã®ã¨ã“ã‚ã“ã®APIã¯å¤ã„cannastatãŒ
+     * ver 1.xã®ã‚µãƒ¼ãƒã¨é€šä¿¡ã™ã‚‹å ´åˆã«ã ã‘ä½¿ã†ã®ã§ã€ã“ã®å•é¡Œã¯ç„¡è¦–ã™ã‚‹
+     * ã“ã¨ã«ã™ã‚‹ã€‚
      */
     rkc_configure();
     return( rkc_Connect_Iroha_Server( servername ) );
@@ -1638,7 +1624,7 @@ char *dicname, *newdicname;
     return (*RKCP->rename_dictionary)(cx, dicname, newdicname, mode);
 }
 
-/* CopyDic ¤ò Æş¤ì¤ë¡£ */
+/* CopyDic ã‚’ å…¥ã‚Œã‚‹ã€‚ */
 
 exp(int)
 RkwCopyDic(cxnum, dirname, dicname, newdicname, mode )
@@ -1651,7 +1637,7 @@ char *dirname,*dicname, *newdicname ;
       return -1;
     }
 /*
-  Protocol Version 3.2 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
+  Protocol Version 3.2 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
 */
 
   if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
@@ -1663,7 +1649,7 @@ char *dirname,*dicname, *newdicname ;
 
 }
 
-/* ¤³¤³¤Ş¤Ç */
+/* ã“ã“ã¾ã§ */
 
 static
 _RkwGetWordTextDic( cxnum, dirname, dicname, info, infolen )
@@ -1716,9 +1702,9 @@ RkwRenameDic(){}
 RkwGetWordTextDic(){}
 #endif /* EXTENSION */
 
-/* Ãà¼¡¼«Æ°ÊÑ´¹µ¡Ç½´Ø¿ô				*/
+/* é€æ¬¡è‡ªå‹•å¤‰æ›æ©Ÿèƒ½é–¢æ•°				*/
 /*						*/
-/* Ãà¼¡¼«Æ°ÊÑ´¹µ¡Ç½Æ³Æş¤Ë¤è¤Ã¤ÆÄÉ²Ã¤µ¤ì¤ë´Ø¿ô	*/
+/* é€æ¬¡è‡ªå‹•å¤‰æ›æ©Ÿèƒ½å°å…¥ã«ã‚ˆã£ã¦è¿½åŠ ã•ã‚Œã‚‹é–¢æ•°	*/
 
 static int
 _RkwSubstYomi( cxnum, ys, ye, yomi, nyomi )
@@ -1754,7 +1740,7 @@ Ushort	*yomi;
 	}
 
 	pbun = cx->maxbun;
-	cx->maxbun = 0; /* StoreFirstKouho ¤Ç¤¢¤ó¤Ş¤ê¤â¤Î¤ò¼Î¤Æ¤Ê¤¤¤è¤¦¤Ë */
+	cx->maxbun = 0; /* StoreFirstKouho ã§ã‚ã‚“ã¾ã‚Šã‚‚ã®ã‚’æ¨ã¦ãªã„ã‚ˆã†ã« */
 	StoreFirstKouho(cx, nbun);
 
 	if (nbun != pbun) {
@@ -1861,7 +1847,7 @@ int maxyomi;
 }
 
 /*
- * ÀèÆ¬Ê¸Àá¤«¤é»ØÄê¤µ¤ì¤¿Ê¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤Ş¤¿¤Ï¡¢¸õÊäÎó¤ÎÎÎ°è¤ò²òÊü¤¹¤ë
+ * å…ˆé ­æ–‡ç¯€ã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸæ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã¾ãŸã¯ã€å€™è£œåˆ—ã®é ˜åŸŸã‚’è§£æ”¾ã™ã‚‹
  */
 static
 void
@@ -1875,9 +1861,9 @@ register int to;
     for( i = 0; i < to; i++ ) {
 	bun = &cx->bun[ i ] ;
 	if( bun->flags == NUMBER_KOUHO ) {
-	    /* Âè°ì¸õÊä¤·¤«Æş¤Ã¤Æ¤¤¤Ê¤¤Ê¸Àá¤Ï¡¢¼Âºİ¤Ë¤Ïmalloc¤·¤¿¤ï¤±¤Ç¤Ï¤Ê¤¯
-	     * ¥µ¡¼¥Ğ¤«¤éÄÌÃÎ¤µ¤ì¤¿³ÆÊ¸Àá¤ÎÂè°ì¸õÊäÎó¤ÎÃæ¤Ø¤Î¥İ¥¤¥ó¥¿¤ò
-	     * ÀßÄê¤·¤Æ¤¤¤ë¤À¤±¤À¤«¤é¥Õ¥ê¡¼¤·¤Ê¤¤¡£
+	    /* ç¬¬ä¸€å€™è£œã—ã‹å…¥ã£ã¦ã„ãªã„æ–‡ç¯€ã¯ã€å®Ÿéš›ã«ã¯mallocã—ãŸã‚ã‘ã§ã¯ãªã
+	     * ã‚µãƒ¼ãƒã‹ã‚‰é€šçŸ¥ã•ã‚ŒãŸå„æ–‡ç¯€ã®ç¬¬ä¸€å€™è£œåˆ—ã®ä¸­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’
+	     * è¨­å®šã—ã¦ã„ã‚‹ã ã‘ã ã‹ã‚‰ãƒ•ãƒªãƒ¼ã—ãªã„ã€‚
 	     */
 	    RkcFree( (char *)bun->kanji ) ;
 	    bun->kanji = (Ushort *)NULL ;
@@ -1897,7 +1883,7 @@ int cx_num, mode;
 
     if( cx ) {
 	/*
-	 * rkcw_remove_bun ¤Ç³Ø½¬¤¹¤Ù¤­¸õÊä¤ò¥µ¡¼¥Ğ¤ËÃÎ¤é¤»¤ë
+	 * rkcw_remove_bun ã§å­¦ç¿’ã™ã¹ãå€™è£œã‚’ã‚µãƒ¼ãƒã«çŸ¥ã‚‰ã›ã‚‹
 	 */
 	if ((ret = (*RKCP->remove_bun)(cx, mode)) < 0)
 	    return( -1 );
@@ -1987,7 +1973,7 @@ struct DicInfo *status;
 	    return( -1 ) ;
 
     if( !status ) {
-      struct DicInfo buffer; /* ¥À¥ß¡¼ */
+      struct DicInfo buffer; /* ãƒ€ãƒŸãƒ¼ */
 
       return (*RKCP->query_dic)(cx, username, dicname, &buffer);
     }
@@ -2076,11 +2062,11 @@ unsigned char *locale;
  *
  *  Description:
  *  -----------
- *  ¼­½ñ¥Õ¥¡¥¤¥ë¤Ø¤ÎÆ±´ü½èÍı
+ *  è¾æ›¸ãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®åŒæœŸå‡¦ç†
  *
  *  Input:
  *  -----
- *  dicname: ¼­½ñÌ¾@¼­½ñÌ¾@...@@
+ *  dicname: è¾æ›¸å@è¾æ›¸å@...@@
  *
  *  Returns:
  *  -------
@@ -2107,11 +2093,11 @@ char *dicname;
  *
  *  Description:
  *  -----------
- *  ¥¢¥×¥ê¥±¡¼¥·¥ç¥óÌ¾¤ÎÅĞÏ¿
+ *  ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³åã®ç™»éŒ²
  *
  *  Input:
  *  -----
- *  apname: ¥¢¥×¥ê¥±¡¼¥·¥ç¥óÌ¾
+ *  apname: ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å
  *
  *  Returns:
  *  -------
@@ -2140,13 +2126,13 @@ int RkSetAppName pro((int, char *));
  *
  *  Description:
  *  -----------
- *  ¼­½ñ¤Î¥¢¥¯¥»¥¹¸¢¤ÎÊÑ¹¹
+ *  è¾æ›¸ã®ã‚¢ã‚¯ã‚»ã‚¹æ¨©ã®å¤‰æ›´
  *
  *  Input:
  *  -----
- *  dicname: ¼­½ñ¤ÎÌ¾Á°
+ *  dicname: è¾æ›¸ã®åå‰
  *
- *  mode: ¥â¡¼¥É
+ *  mode: ãƒ¢ãƒ¼ãƒ‰
  *
  *  Returns:
  *  -------
@@ -2277,19 +2263,19 @@ char *dicnames_return;
 }
 
 int
-RkSetDicPath( cxnum, path ) /* ¥µ¡¼¥Á¥Ñ¥¹¤òÀßÄê */
+RkSetDicPath( cxnum, path ) /* ã‚µãƒ¼ãƒãƒ‘ã‚¹ã‚’è¨­å®š */
 int cxnum ;
 char *path ;
 /* ARGSUSED */
 {
     /*
-     * ¥µ¡¼¥Ğ¤¬Î©¤Á¾å¤¬¤ë¤È¤­¤ËÀßÄê¤¹¤ë¤Î¤ÇRKC¤Ç¤Ï²¿¤â¤»¤º¤ËÊÖ¤¹
+     * ã‚µãƒ¼ãƒãŒç«‹ã¡ä¸ŠãŒã‚‹ã¨ãã«è¨­å®šã™ã‚‹ã®ã§RKCã§ã¯ä½•ã‚‚ã›ãšã«è¿”ã™
      */
     return( 0 ) ;
 }
 
 int
-RkGetDirList( cxnum, ddname, maxddname )   /* ¼­½ñ¥ê¥¹¥È¤ò¼èÆÀ */
+RkGetDirList( cxnum, ddname, maxddname )   /* è¾æ›¸ãƒªã‚¹ãƒˆã‚’å–å¾— */
 int cxnum ;
 char *ddname ;
 int maxddname ;
@@ -2328,7 +2314,7 @@ int mode;
       len = euc2ushort(yomi, maxyomi, cbuf, CBIGBUFSIZE);
       return( _RkwBgnBun(cxnum, cbuf, len, mode) );
     }
-    else {  /* ¼«Æ°ÊÑ´¹³«»Ï */
+    else {  /* è‡ªå‹•å¤‰æ›é–‹å§‹ */
       return _RkwBgnBun(cxnum, (Ushort *)NULL, maxyomi, mode);
     }
 }
@@ -2450,8 +2436,8 @@ int
 RkResize(cxnum, len)
 int cxnum, len ;
 {
-    /* ¤³¤Î len ¤Ï¥Ğ¥¤¥È¤ä¤±¤É¡¤RkwResize ¤Ë¤ÏÊ¸»ú¿ô¤òÅÏ¤µ¤Ê¤¢¤«¤ó¤Î¤È
-       ¤Á¤ã¤¦¤ä¤í¤«? ¤³¤ó¤Ê¤ó¡¤¤É¤Ê¤¤¤ä¤Ã¤ÆÊÑ´¹¤·¤¿¤é¤¨¤¨¤ó¤ä¤í? */
+    /* ã“ã® len ã¯ãƒã‚¤ãƒˆã‚„ã‘ã©ï¼ŒRkwResize ã«ã¯æ–‡å­—æ•°ã‚’æ¸¡ã•ãªã‚ã‹ã‚“ã®ã¨
+       ã¡ã‚ƒã†ã‚„ã‚ã‹? ã“ã‚“ãªã‚“ï¼Œã©ãªã„ã‚„ã£ã¦å¤‰æ›ã—ãŸã‚‰ãˆãˆã‚“ã‚„ã‚? */
     Ushort cbuf[CBUFSIZE];
     char tmpbuf[BUFSIZE];
     register int euclen, uslen = 0;
@@ -2462,10 +2448,10 @@ int cxnum, len ;
 	if( len <= 0 )
 	    return( cx->maxbun );
 
-	/* ¤·¤ã¤¢¤Ê¤¤¤«¤é¡¤ÆÉ¤ß¤ò¼è¤Ã¤Æ¤­¤ÆÊ¸»ú¿ô¤òÄ´¤Ù¤¿¤í */
+	/* ã—ã‚ƒã‚ãªã„ã‹ã‚‰ï¼Œèª­ã¿ã‚’å–ã£ã¦ãã¦æ–‡å­—æ•°ã‚’èª¿ã¹ãŸã‚ */
 	curbun = cx->curbun;
 	for( ; (cx->curbun < cx->maxbun) && len; (cx->curbun)++ ) {
-	    /* ¤³¤ó¤Ê¤ó¤·¤È¤Ã¤¿¤é¤á¤Á¤ã¤¯¤Á¤ã¸úÎ¨°­¤¤¤¬¤Ê...¤È¤Û¤Û */
+	    /* ã“ã‚“ãªã‚“ã—ã¨ã£ãŸã‚‰ã‚ã¡ã‚ƒãã¡ã‚ƒåŠ¹ç‡æ‚ªã„ãŒãª...ã¨ã»ã» */
 	    if( (ret = _RkwGetYomi( cx, cbuf, CBUFSIZE )) < 0 ) {
 		cx->curbun = curbun;
 		return( -1 ) ;
@@ -2487,14 +2473,14 @@ int cxnum, len ;
 }
 
 int
-RkEnlarge( cxnum )  /* Ê¸Àá¿­¤Ğ¤· */
+RkEnlarge( cxnum )  /* æ–‡ç¯€ä¼¸ã°ã— */
 int cxnum ;
 {
     return( RKReSize( cxnum, ENLARGE  ) ) ;
 }
 
 int
-RkShorten(cxnum)    /* Ê¸Àá½Ì¤á */
+RkShorten(cxnum)    /* æ–‡ç¯€ç¸®ã‚ */
 int cxnum ;
 {
     return( RKReSize( cxnum, SHORTEN ) ) ;
@@ -2893,18 +2879,18 @@ exp(struct rkfuncs) RkFuncs = {
  *
  *  Description:
  *  -----------
- *  command¤Ç¼¨¤µ¤ì¤ëµ¡Ç½¤ò¼Â¹Ô¤¹¤ë
+ *  commandã§ç¤ºã•ã‚Œã‚‹æ©Ÿèƒ½ã‚’å®Ÿè¡Œã™ã‚‹
  *
  *  Input:
  *  -----
- *  command: ¥³¥Ş¥ó¥ÉÈÖ¹æ
- *  buf: ¥Ç¡¼¥¿/·ë²Ì¤ÎÀèÆ¬¥İ¥¤¥ó¥¿
- *  content_size: ¥Ç¡¼¥¿¤Î¥µ¥¤¥º
- *  buffer_size: ·ë²ÌÎÎ°è¤Î¥µ¥¤¥º
+ *  command: ã‚³ãƒãƒ³ãƒ‰ç•ªå·
+ *  buf: ãƒ‡ãƒ¼ã‚¿/çµæœã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿
+ *  content_size: ãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º
+ *  buffer_size: çµæœé ˜åŸŸã®ã‚µã‚¤ã‚º
  *
  *  Returns:
  *  -------
- *  buf¤Ë³ÊÇ¼¤µ¤ì¤¿Âç¤­¤µ or -1
+ *  bufã«æ ¼ç´ã•ã‚ŒãŸå¤§ãã• or -1
  */
 int
 RkThrough( cxnum, command, buf, content_size, buffer_size )

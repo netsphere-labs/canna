@@ -186,11 +186,7 @@ extern int canna_server_lo;
 #ifdef __STDC__
 # define USE_VARARGS
 #endif
-#if defined(USE_VARARGS) && defined(__STDC__)
-# define vapro(x) x
-#else
-# define vapro(x) ()
-#endif
+#define vapro(x) x
 
 #ifdef DEBUG
 void Dmsg vapro((int Pri, const char *f, ...));

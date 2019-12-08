@@ -42,8 +42,8 @@ typedef long ir_time_t;
 #define EXTENSION
 
 #include "canna/protodefs.h"
-#define CANNAWC_DEFINED
-typedef Ushort cannawc;
+//#define CANNAWC_DEFINED
+//typedef Ushort cannawc;
 #include  <canna/RK.h>
 #include    "IRproto.h"
 #include    "IRwproto.h"

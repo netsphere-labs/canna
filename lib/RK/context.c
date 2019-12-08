@@ -30,6 +30,7 @@ static char rcsid[]="$Id: context.c,v 1.5 2003/09/17 08:50:52 aida_s Exp $";
 #include <canna/jrkanji.h>
 
 #include <errno.h>
+#include <stdio.h>
 
 static unsigned long now_context = 0L;
 
@@ -47,13 +48,12 @@ struct RkParam SX;
  */
 static struct RkContext	*CX;
 
-#ifdef MMAP
 /* If you compile with Visual C++, then please comment out the next 3 lines. */
 #include <sys/types.h>  /* mmap */
+#include <sys/stat.h>
 #include <sys/mman.h>   /* mmap */
 #include <fcntl.h>      /* mmap */
 int fd_dic = -1;        /* mmap */
-#endif
 
 #ifdef WINDOWS_STYLE_FILENAME
 #define DEFAULTGRAMDIC "/canna/fuzokugo.cbd"
@@ -63,10 +63,9 @@ int fd_dic = -1;        /* mmap */
 #define DEFAULTGRAMDIC "/canna/fuzokugo.d"
 #endif
 
-static int	
-_RkInitialize(ddhome, numCache)
-     char	*ddhome;
-     int	numCache;
+// @return -1 Failed.
+static int
+_RkInitialize(const char* ddhome, int numCache)
 {
   int			i = strlen(ddhome);
   struct RkParam	*sx = &SX;
@@ -89,42 +88,59 @@ _RkInitialize(ddhome, numCache)
     goto return_con;
   }
 
-  gramdic = malloc(strlen(DEFAULTGRAMDIC) + i + 1);
-  if (gramdic) {
+    gramdic = (char*) malloc(strlen(DEFAULTGRAMDIC) + i + 1);
+    if (!gramdic) {
+        fprintf(stderr, "malloc() failed.\n");
+        return -1;
+    }
+    
     strcpy(gramdic, ddhome);
     strcat(gramdic, DEFAULTGRAMDIC);
     SG.gramdic = RkOpenGram(gramdic);
-    (void)free(gramdic);
-    if (SG.gramdic) {
-      /* confirm user/ and group/ directory */
-      path = malloc(strlen(ddhome) + strlen(USER_DIC_DIR) + 2);
-      if (path) {
-	strcpy(path, ddhome);
-	strcat(path, "/");
-	strcat(path, USER_DIC_DIR);
-	if (mkdir(path, MKDIR_MODE) < 0 &&
-	    errno != EEXIST) {
-	  free(path);
-	}
-	else {
-	  free(path);
+    if ( !SG.gramdic ) {
+        fprintf(stderr, "RkOpenGram() failed: '%s'\n", gramdic);
+        free(gramdic);
+        return -1;
+    }
+    free(gramdic);
+        
+    /* confirm user/ and group/ directory */
+    path = (char*) malloc(strlen(ddhome) + strlen(USER_DIC_DIR) + 2);
+    if ( !path ) {
+        RkCloseGram(SG.gramdic);
+        return -1;
+    }
+    strcpy(path, ddhome);
+    strcat(path, "/");
+    strcat(path, USER_DIC_DIR);
+    if (mkdir(path, MKDIR_MODE) < 0 && errno != EEXIST) {
+        fprintf(stderr, "mkdir() failed: %s\n", path);
+        free(path);
+        RkCloseGram(SG.gramdic);
+        return -1;
+    }
+    free(path);
 
-	  path = malloc(strlen(ddhome) + strlen(GROUP_DIC_DIR) + 2);
-	  if (path) {
-	    strcpy(path, ddhome);
-	    strcat(path, "/");
-	    strcat(path, GROUP_DIC_DIR);
-	    if (mkdir(path, MKDIR_MODE) < 0 &&
-		errno != EEXIST) {
-	      free(path);
-	    }
-	    else {
-	      free(path);
+    path = (char*) malloc(strlen(ddhome) + strlen(GROUP_DIC_DIR) + 2);
+    if ( !path ) {
+        RkCloseGram(SG.gramdic);
+        return -1;
+    }
+    strcpy(path, ddhome);
+    strcat(path, "/");
+    strcat(path, GROUP_DIC_DIR);
+    if (mkdir(path, MKDIR_MODE) < 0 && errno != EEXIST) {
+        fprintf(stderr, "mkdir() failed: %s\n", path);
+        free(path);
+        RkCloseGram(SG.gramdic);
+        return -1;
+    }        
+    free(path);
 
-	      sx->word = (struct nword *)0;
-	      dd->dd_next = dd->dd_prev = dd;
-	      sx->ddhome = allocStr(ddhome);
-	      if (sx->ddhome) {
+    sx->word = (struct nword *)0;
+    dd->dd_next = dd->dd_prev = dd;
+    sx->ddhome = allocStr(ddhome);
+    if (sx->ddhome) {
 		SG.P_BB  = RkGetGramNum(SG.gramdic, "BB");
 		SG.P_NN  = RkGetGramNum(SG.gramdic, "NN");
 		SG.P_T00 = RkGetGramNum(SG.gramdic, "T00");
@@ -154,22 +170,17 @@ _RkInitialize(ddhome, numCache)
 		  free((char *)CX);
 		  now_context = 0L;
 		}
-		free(sx->ddhome);
-	      }
-	    }
-	  }
-	}
-      }
-      RkCloseGram(SG.gramdic);
+        free(sx->ddhome);
     }
-  }
+    RkCloseGram(SG.gramdic);
+
   con = -1;
  return_con:
   return con;
 }
 
 int
-RkwInitialize( char* ddhome )
+RkwInitialize( const char* ddhome )
 {
   /*
    * Word:	????

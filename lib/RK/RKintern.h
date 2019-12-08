@@ -40,6 +40,7 @@
 #define EXTENSION_NEW
 
 #include "config.h"
+#include <stdint.h>
 
 #if !defined(WINDOWS_STYLE_FILENAME) && !defined(USE_OBSOLETE_STYLE_FILENAME)
 #define WINDOWS_STYLE_FILENAME
@@ -49,11 +50,10 @@
 #define USE_MALLOC_FOR_BIG_ARRAY
 #endif
 
-typedef unsigned short Wchar;
+#define Wchar cannawc
 
 #define RK_INTERNAL
-typedef Wchar cannawc;
-#define CANNAWC_DEFINED
+//#define CANNAWC_DEFINED
 #define CANNA_NEW_WCHAR_AWARE
 #include "canna/RK.h"
 
@@ -118,8 +118,8 @@ typedef unsigned char   Wrec;
 
 #define	euc_iscodeG0(c)	isascii(c)
 #define	euc_iscodeG1(c)	(((c) & 0x80) && !((c) & RK_SS2) && !((c) & RK_SS3))
-#define	euc_iscodeG2(c)	((c) & RK_SS2)
-#define	euc_iscodeG3(c)	((c) & RK_SS3)
+#define	euc_iscodeG2(c)	((c) == RK_SS2)
+#define	euc_iscodeG3(c)	((c) == RK_SS3)
 
 /* RkUnion
  *	private data at each class.
@@ -1167,7 +1167,7 @@ long _RkPackBits pro((unsigned char *, long, int, unsigned *, int));
 int _RkSetBitNum pro((unsigned char *, unsigned long, int, int, int));
 int FQsync pro((struct RkContext *, struct DM *, struct DM *, char *));
 
-int RkwCvtSuuji pro((Wchar *, int, Wchar *, int, int));
+int RkwCvtSuuji pro((cannawc*, int, cannawc*, int, int));
 int RkwCvtNone pro((cannawc*, int, const cannawc*, int));
 
 int _RkRowNumber pro((unsigned char *));

@@ -58,16 +58,15 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([dup2 gethostname inet_ntoa memchr memset mkdir munmap select setlocale socket strchr strrchr strspn strtol strtoul])
 
 AC_CHECK_SIZEOF([void *])
+AC_CHECK_SIZEOF(wchar_t)
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
 AC_CONFIG_FILES([
   Makefile
   lib/RK/Makefile
 lib/canna/Makefile
-lib/RKC16/Makefile
 lib/Makefile
 lib/RKindep/Makefile
 lib/RKC/Makefile
-lib/canna16/Makefile
 cmd/dicar/Makefile
 cmd/dpxdic/Makefile
 cmd/crxgram/Makefile

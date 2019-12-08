@@ -1022,7 +1022,7 @@ extern void clearYomiContext pro((yomiContext));
 extern abandonContext pro((uiContext, yomiContext));
 extern void RomajiClearYomi pro((uiContext));
 extern RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
-extern RkCvtNone pro((unsigned char *, int, unsigned char *, int));
+extern RkCvtNone pro((unsigned char *, int, const unsigned char *, int));
 extern selectOne
   pro((uiContext, cannawc **, int *, int, int, unsigned, int, int,
        canna_callback_t, canna_callback_t, canna_callback_t,canna_callback_t));

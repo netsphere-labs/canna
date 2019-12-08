@@ -166,18 +166,30 @@ extern "C" {
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
-  // cannawc は、EUC-JP を1文字 = 1ワイド文字にしたもの。
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
+  // 'cannawc' は、EUC-JP を1文字 = 1ワイド文字にしたもの。
+  // wchar_t は Unicode または opaque. 過去の互換性のため、wchar_t と同じ大きさ
+  // になるように, cannawc を定める.
+  // See man 5 euc.
+  // G0 ISO 646 IRV              0x0000 - 0x007f.
+  // G1 JIS X 0208 Kanji         the values having the bits 0x8080 set.
+  // G2 JIS X 0201 Hankaku-kana. 0x0080 - 0x00ff.
+  // G3 JIS X 0212 Hojo-Kanji.   0x8000 - 0xff7f excluding the values which
+  //                             have the 0x0080 bit set.
+  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
 typedef uint32_t cannawc;
+    #undef CANNA_WCHAR16
+    #undef WCHAR16
+  #else
+typedef uint16_t cannawc;
+    #define CANNA_WCHAR16
+    #define WCHAR16
   #endif
-#endif
+#endif // !CANNAWC_DEFINED
 
 #ifdef CANNAWC_DEFINED
 
 canna_export(void) RkwFinalize pro((void));
-canna_export(int) RkwInitialize pro((char *));
+canna_export(int) RkwInitialize pro((const char *));
 canna_export(int) RkwCreateContext pro((void));
 canna_export(int) RkwCloseContext pro((int));
 canna_export(int) RkwDuplicateContext pro((int));
@@ -281,7 +293,7 @@ int	RkCvtHira pro((unsigned char *, int, unsigned char *, int));
 int	RkCvtKana pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtHan pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtZen pro((unsigned char *, int, const unsigned char *, int));
-int	RkCvtNone pro((unsigned char *, int, unsigned char *, int));
+int	RkCvtNone pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
 int	RkQueryDic pro((int, char *, char *, struct DicInfo *));
 

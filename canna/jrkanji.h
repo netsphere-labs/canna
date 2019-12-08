@@ -31,12 +31,6 @@
 #ifndef _JR_KANJI_H_
 #define _JR_KANJI_H_
 
-#ifndef _WCHAR_T
-# if defined(WCHAR_T) || defined(_WCHAR_T_) || defined(__WCHAR_T) \
-  || defined(_GCC_WCHAR_T) || defined(_WCHAR_T_DEFINED)
-#  define _WCHAR_T
-# endif
-#endif
 
 #ifndef pro
   #define pro(x) x
@@ -187,12 +181,17 @@ typedef struct {
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
+  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
 typedef uint32_t cannawc;
+    #undef CANNA_WCHAR16
+    #undef WCHAR16
+  #else
+typedef uint16_t cannawc;
+    #define CANNA_WCHAR16
+    #define WCHAR16
   #endif
-#endif
+#endif // !CANNAWC_DEFINED
+
 
 #ifdef CANNAWC_DEFINED
 

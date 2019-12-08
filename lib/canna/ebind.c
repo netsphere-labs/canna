@@ -28,18 +28,6 @@ static char rcsid[] = "$Id: ebind.c,v 1.6 2003/09/17 08:50:53 aida_s Exp $";
 
 #define MAX_BYTE_PER_CHAR 4
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifndef CANNAWC_DEFINED
-  #define CANNAWC_DEFINED
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
-typedef uint32_t cannawc;
-  #endif
-#endif
-
 extern int howToReturnModeInfo;
 
 static cannawc *inbuf = 0;

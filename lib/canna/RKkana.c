@@ -29,18 +29,6 @@ static char rcsid[]="@(#) 102.1 $Id: RKkana.c,v 1.3 2003/09/17 08:50:53 aida_s E
 /* LINTLIBRARY */
 #include "canna.h"
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifndef CANNAWC_DEFINED
-  #define CANNAWC_DEFINED
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
-typedef uint32_t cannawc;
-  #endif
-#endif
-
 /* RkCvtZen
  * 半角文字を全角文字にする.
  * 値は EUC-JP. 半角 => 全角では, SS3 (0x8F) に続いて3バイトになる組み合わせは
@@ -276,29 +264,29 @@ int RkCvtZen(
 int
 RkCvtHan(unsigned char* han, int maxhan, const unsigned char* zen, int maxzen)
 {
-  unsigned char	*h = han;
-  const unsigned char* z = zen;
-  const unsigned char* Z = zen + maxzen;
-  unsigned short hi, lo;
-  int byte;
-  int 		count = 0;
-  unsigned long	code; // 4バイト必要.
+    unsigned char	*h = han;
+    const unsigned char* z = zen;
+    const unsigned char* Z = zen + maxzen;
+    unsigned short hi, lo;
+    int byte;
+    int 		count = 0;
+    unsigned long	code; // 4バイト必要.
 
-  if ( --maxhan <= 0 )
-    return 0;
-  while ( z < Z ) {
-    hi = *z++;
-    byte = 1;
-    switch(hi)
-    {
-    case	0xa1:	/* kigou */
-      lo = *z++;
+    if ( --maxhan <= 0 )
+        return 0;
+    while ( z < Z ) {
+        hi = *z++;
+        byte = 1;
+        switch(hi)
+        {
+        case	0xa1:	/* kigou */
+            lo = *z++;
       if ( !(code = hankaku[lo&0x7f]) )
         code = (hi<<8)|lo;
       byte = (code>>8) ? 2 : 1;
       break;
-    case	0xa3:	/* eisuuji */
-      lo = *z++;
+        case	0xa3:	/* eisuuji */
+            lo = *z++;
       if ( 0xb0 <= lo && lo <= 0xb9 ) code = (lo - 0xb0) + '0';
       else
         if ( 0xc1 <= lo && lo <= 0xda ) code = (lo - 0xc1) + 'A';
@@ -360,18 +348,18 @@ int
 RkCvtKana(
     unsigned char* kana, int maxkana, const unsigned char* hira, int maxhira)
 {
-  unsigned char	*k = kana;
-  const unsigned char	*h = hira;
-  const unsigned char	*H = hira + maxhira;
-  unsigned short hi;
-  int byte;
-  int 		count = 0;
-  unsigned long	code;
+    unsigned char	*k = kana;
+    const unsigned char	*h = hira;
+    const unsigned char	*H = hira + maxhira;
+    unsigned short hi;
+    int byte;
+    int 		count = 0;
+    unsigned long	code;
 
-  if ( --maxkana <= 0 )
-    return 0;
-  while ( h < H ) {
-    hi = *h++;
+    if ( --maxkana <= 0 )
+        return 0;
+    while ( h < H ) {
+        hi = *h++;
     if (hi == 0x8f) {
       ADDCODE(k, maxkana, count, hi, 1);
       code = (((unsigned long) h[0]) << 8) | ((unsigned long) h[1]); h += 2;
@@ -401,16 +389,12 @@ RkCvtKana(
   return count;
 }
 
-int	
-RkCvtHira(hira, maxhira, kana, maxkana)
-unsigned char	*hira;
-int		maxhira;
-unsigned char	*kana;
-int		maxkana;
+int
+RkCvtHira(unsigned char* hira, int maxhira, unsigned char* kana, int maxkana)
 {
-    register unsigned char	*h = hira;
-    register unsigned char	*k = kana;
-    register unsigned char	*K = kana + maxkana;
+    unsigned char	*h = hira;
+    unsigned char	*k = kana;
+    unsigned char	*K = kana + maxkana;
     unsigned short		hi;
     unsigned short		byte;
     int 			count = 0;
@@ -449,16 +433,13 @@ int		maxkana;
 	*h = 0;
     return count;
 }
-int	
-RkCvtNone(dst, maxdst, src, maxsrc)
-unsigned char	*dst;
-int		maxdst;
-unsigned char	*src;
-int		maxsrc;
+
+int
+RkCvtNone(unsigned char* dst, int maxdst, const unsigned char* src, int maxsrc)
 {
-    register unsigned char	*d = dst;
-    register unsigned char	*s = src;
-    register unsigned char	*S = src + maxsrc;
+    unsigned char	*d = dst;
+    const unsigned char	*s = src;
+    const unsigned char	*S = src + maxsrc;
     unsigned short		byte;
     int 			count = 0;
     unsigned long		code;
@@ -727,6 +708,7 @@ int		format;
 
 #define CBUFSIZE     512
 
+// @return -1 malloc() failed.
 int
 RkwCvtHan(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
@@ -738,15 +720,15 @@ RkwCvtHan(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 
   cbuf = malloc(CBUFSIZE);
   cbuf2 = malloc(CBUFSIZE);
-  if (!cbuf || !cbuf2) {
+    if (!cbuf || !cbuf2) {
     if (cbuf) {
       (void)free(cbuf);
     }
     if (cbuf2) {
       (void)free(cbuf2);
     }
-    return len;
-  }
+        return -1;
+    }
 #endif
 
   len = CNvW2E(src, srclen, cbuf, CBUFSIZE);
@@ -1027,6 +1009,3 @@ int maxdst, srclen, flags;
   return ret;
 }
 
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/

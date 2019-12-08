@@ -38,13 +38,17 @@
 #include "canna/ccompat.h"
 
 #ifndef CANNAWC_DEFINED
-# define CANNAWC_DEFINED
-# ifdef CANNA_WCHAR16
-typedef canna_uint16_t cannawc;
-# else
-typedef canna_uint32_t cannawc;
-# endif
-#endif
+  #define CANNAWC_DEFINED
+  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
+typedef uint32_t cannawc;
+    #undef CANNA_WCHAR16
+    #undef WCHAR16
+  #else
+typedef uint16_t cannawc;
+    #define CANNA_WCHAR16
+    #define WCHAR16
+  #endif
+#endif // !CANNAWC_DEFINED
 
 
 #include "canna/protodefs.h"

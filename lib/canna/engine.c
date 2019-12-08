@@ -350,8 +350,7 @@ int *map, *mip;
 }
 
 int
-RkwInitialize(host)
-char *host;
+RkwInitialize( const char* host )
 {
   return Rk ? (*Rk->Initialize)(host) : -1;
 }

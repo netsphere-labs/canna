@@ -197,7 +197,8 @@ struct rkcproto {
 #endif
 
 #define SIZEOFSHORT 2 /* for protocol */
-#define SIZEOFLONG  4 /* for protocol */
+/* for protocol: not 'long' length. */
+#define SIZEOFLONG  4 
 
 #define MAX_CX 100
 

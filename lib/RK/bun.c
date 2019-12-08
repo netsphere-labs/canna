@@ -1329,7 +1329,7 @@ getKanji(cx, cnum, dst, maxdst)
  *	current bunsetu no kanji tuduri wo toru
  */
 int
-RkwGetKanji(int cx_num, Wchar* dst, int maxdst)
+RkwGetKanji(int cx_num, cannawc* dst, int maxdst)
 {
   RkContext	*cx;
   struct nbun	*bun;

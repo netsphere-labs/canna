@@ -28,18 +28,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: jrbind.c,v 1.4 2003/09/17 08:50:53 aida_
 #include <canna/mfdef.h>
 #include <sys/types.h>
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifndef CANNAWC_DEFINED
-  #define CANNAWC_DEFINED
-  #ifdef CANNA_WCHAR16
-typedef uint16_t cannawc;
-  #else
-typedef uint32_t cannawc;
-  #endif
-#endif
-
 #define ACTHASHTABLESIZE 64
 #define KEYHASHTABLESIZE 16
    

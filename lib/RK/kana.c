@@ -428,18 +428,12 @@ RkCvtKana(
   return count;
 }
 
-int RkCvtHira pro((unsigned char *, int, unsigned char *, int));
-
 int
-RkCvtHira(hira, maxhira, kana, maxkana)
-     unsigned char	*hira;
-     int		maxhira;
-     unsigned char	*kana;
-     int		maxkana;
+RkCvtHira(unsigned char* hira, int maxhira, unsigned char* kana, int maxkana)
 {
-  unsigned char	*h = hira;
-  unsigned char	*k = kana;
-  unsigned char	*K = kana + maxkana;
+    unsigned char	*h = hira;
+    unsigned char	*k = kana;
+    unsigned char	*K = kana + maxkana;
   Wchar		hi;
   Wchar		byte;
   int 			count = 0;
@@ -473,18 +467,12 @@ RkCvtHira(hira, maxhira, kana, maxkana)
   return count;
 }
 
-int RkCvtNone pro((unsigned char *, int, unsigned char *, int));
-
 int
-RkCvtNone(dst, maxdst, src, maxsrc)
-     unsigned char	*dst;
-     int		maxdst;
-     unsigned char	*src;
-     int		maxsrc;
+RkCvtNone(unsigned char* dst, int maxdst, const unsigned char* src, int maxsrc)
 {
-  unsigned char	*d = dst;
-  unsigned char	*s = src;
-  unsigned char	*S = src + maxsrc;
+    unsigned char	*d = dst;
+    const unsigned char	*s = src;
+    const unsigned char	*S = src + maxsrc;
   Wchar		byte;
   int 		count = 0;
   unsigned long	code;
@@ -987,6 +975,7 @@ RkwCvtSuuji(dst, maxdst, src, maxsrc, format)
 unsigned char	*ustoeuc();
 Wchar		*euctous();
 
+// @return -1 malloc() failed.
 int
 RkwCvtHan(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
@@ -997,14 +986,14 @@ RkwCvtHan(cannawc* dst, int maxdst, const cannawc* src, int srclen)
   unsigned char *cbuf, *cbuf2;
   cbuf = (unsigned char *)malloc(CBUFSIZE);
   cbuf2 = (unsigned char *)malloc(CBUFSIZE);
-  if (!cbuf || !cbuf2) {
-    if (cbuf) (void)free((char *)cbuf);
-    if (cbuf2) (void)free((char *)cbuf2);
-    return 0;
-  }
+    if (!cbuf || !cbuf2) {
+        if (cbuf) (void)free((char *)cbuf);
+        if (cbuf2) (void)free((char *)cbuf2);
+        return -1;
+    }
 #endif
 
-  len = ustoeuc(src, srclen, cbuf, CBUFSIZE) - cbuf;
+  len = ustoeuc(src, srclen, cbuf, CBUFSIZE) - cbuf; ●長い文字列はオーバフローでは?
   len = RkCvtHan(cbuf2, CBUFSIZE, cbuf, len);
   if (len > 0) {
     if (dst) {
@@ -1055,7 +1044,7 @@ RkwCvtHira(cannawc* dst, int maxdst, const cannawc* src, int srclen)
   return len;
 }
 
-int  
+int
 RkwCvtKana(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   unsigned int	len;
@@ -1089,7 +1078,7 @@ RkwCvtKana(cannawc* dst, int maxdst, const cannawc* src, int srclen)
   return len;
 }
 
-int  
+int
 RkwCvtZen(cannawc* dst, int maxdst, const cannawc* src, int srclen)
 {
   int len;

@@ -121,9 +121,7 @@ Usage()
 extern void getserver_version pro((void));
 
 void
-EarlyInit ( argc, argv )
-int argc;
-char *argv[];	
+EarlyInit ( int argc, char* argv[] )
 {
     char *ddname = (char *)NULL;
     char buf[ MAXDATA ];
@@ -135,9 +133,9 @@ char *argv[];
 
     for( i = 1; i < argc; i++ ) {
 	if( argv[i][0] == '/' ) {
-	    ddname = malloc(strlen(argv[i]) + 1);
+            ddname = (char*) malloc(strlen(argv[i]) + 1);
 	    if( ddname )
-		strcpy( (char *)ddname, argv[ i ] );
+                strcpy( ddname, argv[ i ] );
 	}
 
 	if( !strcmp( argv[i], "-p") ) {
@@ -200,10 +198,10 @@ char *argv[];
 #endif
 
     if( !ddname ) {
-	ddname = malloc(strlen(DICHOME) + 1);
+        ddname = (char*) malloc(strlen(DICHOME) + 1);
 	if( !ddname )
-	    FatalError("cannaserver:Initialize failed\n");
-	strcpy( (char *)ddname, DICHOME );
+            FatalError("cannaserver:Initialize failed: malloc()\n");
+        strcpy( ddname, DICHOME );
     }
 
     if (userID != NULL) {
@@ -263,7 +261,7 @@ char *argv[];
    ir_debug( Dmsg(5, "辞書ホームディレクトリィ = %s\n", ddname ); )
 
     if ((context = RkwInitialize( (char *)ddname )) < 0)
-	FatalError("cannaserver:Initialize failed\n") ;
+        FatalError("cannaserver:Initialize failed: RkwInitialize()\n") ;
     rkw_initialize_done = 1;
     free( (char *)ddname ) ;
     RkwCloseContext( context ) ;
