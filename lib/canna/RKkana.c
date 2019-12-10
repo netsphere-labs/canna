@@ -203,23 +203,23 @@ int RkCvtZen(
   int 		count = 0;
   unsigned long	code;
 
-  if ( --maxzen <= 0 )
-    return count;
-  while ( h < H ) {
-    hi = *h++;
-    byte = 2;
-    if ( hi == 0x8e ) {	/* hankaku katakana */
-      if ( !(code = hiragana[lo = *h++]) )
-        code = (hi<<8)|lo;
-      byte = (code>>8) ? 2 : 1;
-      if ( (code>>8) == 0xa4 ) {
-        code |= 0x100;
+    if ( --maxzen <= 0 )
+        return count;
+    while ( h < H ) {
+        hi = *h++;
+        byte = 2;
+        if ( hi == 0x8e ) {	/* hankaku katakana */
+            if ( !(code = hiragana[lo = *h++]) )
+                code = (hi<<8)|lo;
+            byte = (code>>8) ? 2 : 1;
+            if ( (code>>8) == 0xa4 ) {
+                code |= 0x100;
         /* dakuten/handakuten ga tuku baai */
         if ( h + 1 < H && h[0] == 0x8e ) {
           lo = h[1];
           switch (code&255)
           {
-          /* u */ case 0xa6:
+          case 0xa6: /* u */
             if ( lo == 0xde ) code = 0xa5f4, h += 2;
             break;
           /* ha */case 0xcf: case 0xd2: case 0xd5: case 0xd8: case 0xdb:
@@ -270,7 +270,7 @@ RkCvtHan(unsigned char* han, int maxhan, const unsigned char* zen, int maxzen)
     unsigned short hi, lo;
     int byte;
     int 		count = 0;
-    unsigned long	code; // 4バイト必要.
+    uint32_t code; // 4バイト必要.
 
     if ( --maxhan <= 0 )
         return 0;
@@ -366,13 +366,13 @@ RkCvtKana(
       byte = 2;
     }
     else if ( hi & 0x80 ) {
-      int		dakuon;
+      int	dakuon;
 
       code = (hi == 0xa4) ? (0xa500|(*h++)) : ((hi<<8)|(*h++));
       byte = 2;
       /* hiragana U + " */
-      dakuon = ( h + 1 < H && 
-            ((((unsigned long)h[0])<<8)|((unsigned long)h[1])) == 0xa1ab );
+      dakuon = ( h + 1 < H &&
+            ((((unsigned long) h[0])<<8)| ((unsigned long) h[1])) == 0xa1ab );
       if ( hi == 0xa4 && code == 0xa5a6 && dakuon ) {
         code = 0xa5f4;
         h += 2;
@@ -390,24 +390,24 @@ RkCvtKana(
 }
 
 int
-RkCvtHira(unsigned char* hira, int maxhira, unsigned char* kana, int maxkana)
+RkCvtHira(unsigned char* hira, int maxhira, const unsigned char* kana, int maxkana)
 {
     unsigned char	*h = hira;
-    unsigned char	*k = kana;
-    unsigned char	*K = kana + maxkana;
-    unsigned short		hi;
-    unsigned short		byte;
+    const unsigned char	*k = kana;
+    const unsigned char	*K = kana + maxkana;
+    unsigned short	hi;
+    unsigned short	byte;
     int 			count = 0;
     unsigned long		code;
 
     if ( --maxhira <= 0 )
 	return 0;
     while ( k < K ) {
-	hi = *k++;
-	if (hi == 0x8f) {
-	  ADDCODE(h, maxhira, count, hi, 1);
-	  code = (((unsigned long)k[0]) << 8) 
-                   | ((unsigned long)k[1]); k += 2;
+        hi = *k++;
+        if (hi == 0x8f) {
+            ADDCODE(h, maxhira, count, hi, 1);
+            code = (((unsigned long) k[0]) << 8) | ((unsigned long) k[1]); 
+k += 2;
 	  byte = 2;
 	}
 	else if ( hi & 0x80 ) {
@@ -418,15 +418,14 @@ RkCvtHira(unsigned char* hira, int maxhira, unsigned char* kana, int maxkana)
 		code = 0xa4a6a1ab;
 		byte = 4;
 	    }
-	    else
-	    if ( code == 0xa4f5 ) 
+	    else if ( code == 0xa4f5 ) 
 		code = 0xa4ab;
-	    else
-	    if ( code == 0xa4f6 ) 
+	    else if ( code == 0xa4f6 ) 
 		code = 0xa4b1;
 	}
-	else 
-	    code = hi, byte = 1;
+        else {
+	    code = hi; byte = 1;
+        }
 	ADDCODE(h, maxhira, count, code, byte);
     };
     if ( h )
@@ -440,43 +439,77 @@ RkCvtNone(unsigned char* dst, int maxdst, const unsigned char* src, int maxsrc)
     unsigned char	*d = dst;
     const unsigned char	*s = src;
     const unsigned char	*S = src + maxsrc;
-    unsigned short		byte;
-    int 			count = 0;
-    unsigned long		code;
+    unsigned short	byte;
+    int 		count = 0;
+    unsigned long	code;
 
     if ( --maxdst <= 0 )
 	return 0;
     while ( s < S ) {
 	code = *s++;
 	byte = 1;
-	if (code == 0x8f) {
-	  ADDCODE(d, maxdst, count, code, 1);
-	  code = (((unsigned long)s[0]) << 8) 
-                   | ((unsigned long)s[1]); s += 2;
-	  byte = 2;
-	}
-	else if ( code & 0x80 ) 
-	    code = (code<<8)|(*s++), byte = 2;
+        if (code == 0x8f) {
+            ADDCODE(d, maxdst, count, code, 1);
+            code = (((unsigned long) s[0]) << 8) | ((unsigned long) s[1]); 
+            s += 2;
+            byte = 2;
+        }
+        else if ( code & 0x80 ) {
+            code = (code<<8)|(*s++); byte = 2;
+        }
 	ADDCODE(d, maxdst, count, code, byte);
-    };
+    }
     if ( d )
 	*d = 0;
     return count;
 }
 
+#ifdef USE_SJIS_TEXT_DIC
+
+#endif /* USE_SJIS_TEXT_DIC */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* RkEuc
  * 	shift jis --> euc 
  */
+// RK/kana.c, canna/RKkana.c の両方で定義されている.
+// canna/romaji.c で使われている.
 int
-RkCvtEuc(euc, maxeuc, sj, maxsj)
-unsigned char	*euc;
-int		maxeuc;
-unsigned char	*sj;
-int		maxsj;
+RkCvtEuc(unsigned char* euc, int maxeuc, const unsigned char* sj, int maxsj)
 {
     unsigned char	*e = euc;
-    unsigned char	*s = sj;
-    unsigned char	*S = sj + maxsj;
+    const unsigned char	*s = sj;
+    const unsigned char	*S = sj + maxsj;
     unsigned short	hi, lo;
     unsigned short	byte;
     int 		count = 0;
@@ -525,23 +558,25 @@ int		maxsj;
 	*e = 0;
     return count;
 }
+
+
 /* RkCvtSuuji
  * 	arabia suuji wo kansuuji ni kaeru
  */
-static unsigned suujinew[] = {
+static cannawc suujinew[] = {
 	0xa1bb, 0xb0ec, 0xc6f3, 0xbbb0, 0xbbcd, 
 	0xb8de, 0xcfbb, 0xbcb7, 0xc8ac, 0xb6e5,
 };
-static unsigned suujiold[] = {
+static cannawc suujiold[] = {
 	0xa1bb, 0xb0ed, 0xc6f5, 0xbbb2, 0xbbcd, 
 	0xb8e0, 0xcfbb, 0xbcb7, 0xc8ac, 0xb6e5,
 };
-static unsigned kurai4[] = {
+static cannawc kurai4[] = {
 	0, 0xcbfc, 0xb2af, 0xc3fb, 0xb5fe, 0,		
 };
 
-static unsigned kurai3new[] = { 0, 0xbdbd, 0xc9b4, 0xc0e9, };
-static unsigned kurai3old[] = { 0, 0xbdbd, 0xc9b4, 0xc0e9, };
+static cannawc kurai3new[] = { 0, 0xbdbd, 0xc9b4, 0xc0e9, };
+static cannawc kurai3old[] = { 0, 0xbdbd, 0xc9b4, 0xc0e9, };
 
 int
 RkCvtSuuji(dst, maxdst, src, maxsrc, format)

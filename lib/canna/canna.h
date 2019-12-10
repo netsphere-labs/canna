@@ -1000,8 +1000,8 @@ extern void generalReplace
   pro((cannawc *, BYTE *, int *, int *, int *, int, cannawc *, int, int));
 extern ChikujiSubstYomi pro((uiContext));
 extern TanMuhenkan pro((uiContext));
-extern CANNA_mbstowcs pro((cannawc *, char *, int));
-extern CANNA_wcstombs pro((char *, cannawc *, int));
+extern size_t CANNA_mbstowcs pro((cannawc* dest, const char* src, size_t n));
+extern size_t CANNA_wcstombs pro((char* dest, const cannawc* src, size_t n));
 extern makeRkError pro((uiContext, char *));
 extern void moveStrings pro((cannawc *, BYTE *, int, int, int));
 extern TanBackwardBunsetsu pro((uiContext));
@@ -1021,7 +1021,10 @@ extern YomiExit pro((uiContext, int));
 extern void clearYomiContext pro((yomiContext));
 extern abandonContext pro((uiContext, yomiContext));
 extern void RomajiClearYomi pro((uiContext));
+
+// Convert Shift-JIS to EUC-JP.
 extern RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
+
 extern RkCvtNone pro((unsigned char *, int, const unsigned char *, int));
 extern selectOne
   pro((uiContext, cannawc **, int *, int, int, unsigned, int, int,
