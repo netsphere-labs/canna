@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -95,7 +95,7 @@ static int RkThrough pro((int cx, int command, char *buf,
       int content_size, int buffer_size));
 
 #ifdef DEBUG
-static char *conveuc pro((Ushort *src));
+static char *conveuc pro((Ushort *src)); ●●また似たような関数が・・・
 static const char null[] = "NULL";
 #endif /* DEBUG */
 static IRwReq	Request ;
@@ -232,7 +232,7 @@ char **protonames;
   char **cp;
 
   /* まずリプライするのに必要なバッファの長さを求めよう */
-  requiredsize = 
+  requiredsize =
     HEADER_SIZE
   + SIZEOFCHAR            /* 終了状態 */
   + SIZEOFCHAR            /* メジャーバージョン */
@@ -305,7 +305,7 @@ char **protonames;
     STOS2(nproto, p);  p += SIZEOFSHORT;
     STOS2(fillednamelen, p); p += SIZEOFSHORT;
     for (i = 0, cp = protonames ; i < nproto ; i++, cp++) {
-      strcpy((char *)p, *cp); 
+      strcpy((char *)p, *cp);
       len = strlen((char *)p) + 1;
       p += len;
     }
@@ -351,7 +351,7 @@ char **protonames;
       STOS2(clientinfolen, q);
     }
   }
-  
+
   retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
@@ -654,7 +654,7 @@ ClientPtr *clientp;
   AddrList *ser_hostaddrs = NULL, *local_hostaddrs = NULL;
   int client_ok;
   static char   buf[ BUFSIZE ]; /* protodefs.h BUFSIZE 4096 */
-  
+
   /* サーバ側のユーザ名の取得：取得できなかった場合は"root" */
 #ifdef __CYGWIN32__
   char *logname = getlogin();
@@ -669,7 +669,7 @@ ClientPtr *clientp;
   }
 #endif
   ir_debug( Dmsg(5, "サーバを起動したユーザ名:[%s]\n", susername);)
-  
+
   /* ユーザ名の比較 */
   if ( client->username ){
     ir_debug( Dmsg(5, "終了要求したユーザ名:[%s]\n", client->username);)
@@ -682,7 +682,7 @@ ClientPtr *clientp;
   }else{
     goto not_owner;
   }
-  
+
   cli_hostaddrp = &client->hostaddr;
   if (client->hostaddr.family == AF_UNIX)
     goto addr_ok;	/*  unixドメインの場合(0)、通過ok  */
@@ -702,7 +702,7 @@ ClientPtr *clientp;
     stat = NOTUXSRV;
     return SendType2Reply(client, wKillServer, !EXTPROTO, stat);
   }
-  
+
 addr_ok:
   /* 終了処理 */
   PrintMsg("irw_killserver:cannaserver end\n");
@@ -710,7 +710,7 @@ addr_ok:
   return SendType2Reply(client, wKillServer, !EXTPROTO, 0);
 }
 
-static	
+static
 irw_create_context( clientp )
 ClientPtr *clientp ;
 {
@@ -893,7 +893,7 @@ ClientPtr *clientp ;
 	  (dicnames = malloc((int)Request.type3.buflen))) {
 	stat = RkwGetDirList(cxnum, dicnames, (int)Request.type3.buflen);
       }
-    }	
+    }
     retval = SendType6Reply(client, wGetDirectoryList, !EXTPROTO, stat,
 			    dicnames, namesize(dicnames, stat));
     if (dicnames != (char *)local_buffer) free(dicnames);
@@ -967,7 +967,7 @@ ClientPtr *clientp ;
 	  (dicnames = malloc((int)Request.type3.buflen))) {
 	stat = RkwGetMountList(cxnum, dicnames, (int)Request.type3.buflen);
       }
-    }	
+    }
 
     retval = SendType6Reply(client, wGetMountDictionaryList, !EXTPROTO, stat,
 			    dicnames, namesize(dicnames, stat));
@@ -1004,7 +1004,7 @@ ClientPtr *clientp ;
 	    PrintMsg( "%s kana-kanji convert failed\n",
 		    irwerrhdr(client, wBeginConvert));
 	}
-    }	
+    }
     retval =
       SendType7Reply(client, wBeginConvert, !EXTPROTO, stat, size, bufp);
     if (bufp != (Ushort *)local_buffer) free((char *)bufp);
@@ -1024,16 +1024,16 @@ ClientPtr *clientp ;
       if (mode) { /* 学習するなら */
         len = req->number;
 	if (len) {
-	    if( RkwGoTo( cxnum, 0 ) != 0 ) {	
+	    if( RkwGoTo( cxnum, 0 ) != 0 ) {
 
 		PrintMsg("%s ir_convert_end: RkwGoTo failed\n",
 			irwerrhdr(client, wEndConvert));
 	    }
 	    ir_debug( Dmsg(5, "学習させる候補\n") );
 
-	    /* カレント候補を先頭に移動クライアントが選んだ候補を */	
-	    /* RKに知らせる */		
-	    for( i = 0; i < len; i++ ){ 
+	    /* カレント候補を先頭に移動クライアントが選んだ候補を */
+	    /* RKに知らせる */
+	    for( i = 0; i < len; i++ ){
 		if( req->kouho[ i ] != RkwXfer( cxnum, req->kouho [ i ] ) ) {
 
 		    PrintMsg("%s irw_convert_end: RkwXfer failed\n",
@@ -1041,7 +1041,7 @@ ClientPtr *clientp ;
 		}
 		ir_debug( DebugDispKanji( cxnum, i ) );
 
-		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) { 	
+		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) {
 
 		    PrintMsg("%s irw_convert_end: RkwRight failed\n",
 			    irwerrhdr(client, wEndConvert));
@@ -1234,7 +1234,7 @@ char *dirname, *dicname;
       }
       else if (!strncmp(dp, DDGROUP, DDGROUPLEN) && dp[DDGROUPLEN] == '/') {
 	if (!client->groupname ||
-	    strncmp(dp + DDGROUPLEN + 1, client->groupname, 
+	    strncmp(dp + DDGROUPLEN + 1, client->groupname,
 		    (len = strlen(client->groupname)))) {
 	  check = 1; /* yes */
 	}
@@ -1382,7 +1382,7 @@ ClientPtr *clientp ;
 	}
 	ir_debug( Dmsg(5, "辞書リスト\n") );
       }
-    }	
+    }
 
 protoerr:
     retval = SendType6Reply(client, wListDictionary, EXTPROTO, stat,
@@ -1417,7 +1417,7 @@ ClientPtr *clientp;
   wReq15 *req = &Request.type15;
   ClientPtr client = *clientp;
   int cxnum = Request.type15.context, stat = BADCONT;
-  
+
   if (validcontext(cxnum, client, wChmodDictionary)) {
     ir_debug(Dmsg(5, "dicname = %s\n", (req->dicname) ? req->dicname : null));
 
@@ -1451,7 +1451,7 @@ ClientPtr *clientp ;
 {
     wReq15 *req = &Request.type15 ;
     ClientPtr client = *clientp ;
-    int cxnum = Request.type15.context, diclen ; 
+    int cxnum = Request.type15.context, diclen ;
     int stat = -1 ;
 
     if (validcontext(cxnum, client, wRenameDictionary)) {
@@ -1726,7 +1726,7 @@ ClientPtr *clientp ;
 	    PrintMsg( "%s kana-kanji convert failed\n",
 		    irwerrhdr(client, wAutoConvert));
 	}
-    }	
+    }
     return SendType2Reply(client, wAutoConvert, !EXTPROTO, stat);
 }
 
@@ -1772,7 +1772,7 @@ ClientPtr *clientp ;
     if (validcontext(cxnum, client, wFlushYomi)) {
         len = req->number;
 	if (len) {
-	    if( RkwGoTo( cxnum, 0 ) != 0 ) {	
+	    if( RkwGoTo( cxnum, 0 ) != 0 ) {
 
 		PrintMsg("[%s](%s) irw_flush_yomi: RkwGoTo failed\n",
 			 client->username, WideProtoName[wFlushYomi - 1]);
@@ -1780,15 +1780,15 @@ ClientPtr *clientp ;
 	    ir_debug( Dmsg(10, "RKに教える候補\n") );
 
 	    /* カレント候補を先頭に移動 */
-	    /* クライアントが選んだ候補をRKに知らせる */		
-	    for( i = 0; i < len; i++ ){ 
+	    /* クライアントが選んだ候補をRKに知らせる */
+	    for( i = 0; i < len; i++ ){
 		if ((int)req->kouho[i] != RkwXfer(cxnum, (int)req->kouho[i])) {
 		    PrintMsg("%s irw_flush_yomi: RkwXfer failed\n",
 			    irwerrhdr(client, wFlushYomi));
 		}
 		ir_debug( DebugDispKanji( cxnum, i ) );
 
-		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) { 	
+		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) {
 
 		    PrintMsg("%s irw_flush_yomi: RkwRight failed\n",
 			    irwerrhdr(client, wFlushYomi));
@@ -1858,9 +1858,9 @@ ClientPtr *clientp ;
       maxbun = curbun = RkwGoTo(cxnum, (int)req->number);
       ir_debug( Dmsg(5, "学習させる候補\n") );
 
-      /* カレント候補を先頭に移動クライアントが選んだ候補を */	
-      /* ＲＫに知らせる */		
-      for( i = 0; !i || (curbun != maxbun); i++ ){ 
+      /* カレント候補を先頭に移動クライアントが選んだ候補を */
+      /* ＲＫに知らせる */
+      for( i = 0; !i || (curbun != maxbun); i++ ){
 	curkouho = req->kouho[curbun];
 	if( curkouho != RkwXfer( cxnum, curkouho ) ) {
 	  PrintMsg("%s irw_remove_yomi: RkwXfer failed\n",
@@ -1921,8 +1921,8 @@ ClientPtr *clientp ;
   ClientPtr client = *clientp ;
   int cxnum = Request.type15.context, stat = -1;
   struct DicInfo *dicinfo = (struct DicInfo *)local_buffer;
-  char *username, *usernamelong = (char *)0;	
-  int retval;    /* S003 */  
+  char *username, *usernamelong = (char *)0;
+  int retval;    /* S003 */
   /* ここから */
   if (client->version_hi > 2 &&
       validcontext(cxnum, client, wQueryDictionary)) {
@@ -1945,22 +1945,22 @@ ClientPtr *clientp ;
       else {
 	username++;
       }
-      
+
       /* ここまで */
       ir_debug( Dmsg(5, "dicname = %s\n", Request.type15.dicname) );
       ir_debug( Dmsg(5, "username = %s\n", username) );
-      
+
       stat = (RkwQueryDic(cxnum, (unsigned char *)username,
 			  (unsigned char *)Request.type15.dicname,
 			  dicinfo) < 0) ? -1 : 0;
-      
+
       if (stat < 0) {
 	dicinfo->di_dic = dicinfo->di_file = (unsigned char *)"";
       }
 
       ir_debug(Dmsg(5, "dic = %s\n", dicinfo->di_dic));
       ir_debug(Dmsg(5, "file = %s\n", dicinfo->di_file));
-      
+
     }
     else {
       dicinfo->di_dic = dicinfo->di_file = (unsigned char *)"";
@@ -2027,7 +2027,7 @@ ClientPtr *clientp ;
 	RkwGoTo(cxnum, curbun);
 
 	maxyomi = req->yomi ? ushortstrlen( req->yomi ) : 0;
-	if ((ret = RkwStoreRange(cxnum, req->yomi, maxyomi)) < 0) { 
+	if ((ret = RkwStoreRange(cxnum, req->yomi, maxyomi)) < 0) {
 	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
 		     client->username, WideProtoName[wStoreRange - 1]);
 	} else {
@@ -2185,7 +2185,7 @@ const char *hostname;
       PrintMsg( "[%s] Request error[%d]\n", username0, req->type ) ;
       return -1;
     }
-	
+
     /* プロトコルのタイプ毎にデータを呼んでくる関数を呼ぶ */
 #ifdef EXTENSION
     if( req->none ) {
@@ -2823,8 +2823,7 @@ Ushort *yomi;
 
 #ifdef DEBUG
 static char *
-conveuc(src)
-Ushort *src;
+conveuc(const cannawc* src)
 {
     static char dest[CBUFSIZE];
     ushort2euc(src, ushortstrlen(src), dest, CBUFSIZE);
@@ -2868,19 +2867,19 @@ const reqproc WideVector[] =
 /* 0x10 */	{ irw_convert_end,	   ProcWideReq10 },
 /* 0x11 */	{ irw_get_kanjilist,	   ProcWideReq6 },
 /* 0x12 */	{ irw_get_yomi,		   ProcWideReq6 },
-/* 0x13 */	{ irw_subst_yomi,	   ProcWideReq4 },	
-/* 0x14 */	{ irw_store_yomi,	   ProcWideReq11 },	
-/* 0x15 */	{ irw_store_range,	   ProcWideReq11 },	
-/* 0x16 */	{ irw_get_last_yomi,	   ProcWideReq3 },	
-/* 0x17 */	{ irw_flush_yomi,	   ProcWideReq10 },	
-/* 0x18 */	{ irw_remove_yomi,	   ProcWideReq10 },	
-/* 0x19 */	{ irw_get_simple_kanji,	   ProcWideReq13 },	
-/* 0x1a */	{ irw_resize,		   ProcWideReq7 },	
-/* 0x1b */	{ irw_get_hinshi,	   ProcWideReq8 }, 
-/* 0x1c */	{ irw_get_lex,		   ProcWideReq9 }, 
-/* 0x1d */	{ irw_get_stat,		   ProcWideReq7 },	
-/* 0x1e */	{ irw_set_locale,	   ProcWideReq15 }, 
-/* 0x1f */	{ irw_autoconv,		   ProcWideReq5 }, 
+/* 0x13 */	{ irw_subst_yomi,	   ProcWideReq4 },
+/* 0x14 */	{ irw_store_yomi,	   ProcWideReq11 },
+/* 0x15 */	{ irw_store_range,	   ProcWideReq11 },
+/* 0x16 */	{ irw_get_last_yomi,	   ProcWideReq3 },
+/* 0x17 */	{ irw_flush_yomi,	   ProcWideReq10 },
+/* 0x18 */	{ irw_remove_yomi,	   ProcWideReq10 },
+/* 0x19 */	{ irw_get_simple_kanji,	   ProcWideReq13 },
+/* 0x1a */	{ irw_resize,		   ProcWideReq7 },
+/* 0x1b */	{ irw_get_hinshi,	   ProcWideReq8 },
+/* 0x1c */	{ irw_get_lex,		   ProcWideReq9 },
+/* 0x1d */	{ irw_get_stat,		   ProcWideReq7 },
+/* 0x1e */	{ irw_set_locale,	   ProcWideReq15 },
+/* 0x1f */	{ irw_autoconv,		   ProcWideReq5 },
 /* 0x20 */	{ irw_query_extension,	   ProcWideReq17 },
 /* 0x21 */	{ irw_set_app_name,	   ProcWideReq15 },
 /* 0x22 */	{ irw_notice_group_name,   ProcWideReq15 },
@@ -2913,7 +2912,7 @@ const char *ExtensionRequest[] = {
 const reqproc ExtensionWideVector[] =
 {
 /* 0x00 */	{ ir_error,		   ProcWideReq0 },
-/* 0x01 */	{ irw_server_stat,	   ProcWideReq1 },		
+/* 0x01 */	{ irw_server_stat,	   ProcWideReq1 },
 /* 0x02 */	{ irw_host_ctl,		   ProcWideReq1 },
 /* 0x03 */	{ irw_create_dictionary,   ProcWideReq15 },
 /* 0x04 */	{ irw_remove_dictionary,   ProcWideReq15 },
@@ -2964,7 +2963,7 @@ const char *WideProtoName[] = {
     "NoticeGroupName",
     "Through",							/* S000 */
     "KillServer"
-} ;			
+} ;
 
 #ifdef DEBUG
 const char *DebugProcWide[][2] = {
@@ -2972,40 +2971,40 @@ const char *DebugProcWide[][2] = {
     { "ir_initialize",		"ProcReq0" },
     { "irw_finalize",		"ProcReq1" },
     { "irw_create_context",	"ProcReq1" },
-    { "irw_duplicate_context",	"ProcReq2" },	
-    { "irw_close_context",	"ProcReq2" },	
-    { "irw_dictionary_list",	"ProcReq3" },	
-    { "irw_get_dir_list",	"ProcReq3" },	
-    { "irw_mount_dictionary",	"ProcReq15" },	
-    { "irw_umount_dictionary",	"ProcReq15" },	
-    { "irw_rmount_dictionary",	"ProcReq15" },	
-    { "irw_mount_list",		"ProcReq3" },	
+    { "irw_duplicate_context",	"ProcReq2" },
+    { "irw_close_context",	"ProcReq2" },
+    { "irw_dictionary_list",	"ProcReq3" },
+    { "irw_get_dir_list",	"ProcReq3" },
+    { "irw_mount_dictionary",	"ProcReq15" },
+    { "irw_umount_dictionary",	"ProcReq15" },
+    { "irw_rmount_dictionary",	"ProcReq15" },
+    { "irw_mount_list",		"ProcReq3" },
     { "irw_query_dictionary",	"ProcReq15" },
-    { "irw_define_dic",		"ProcReq12" },	
-    { "irw_delete_dic",		"ProcReq12" },	
-    { "irw_convert",		"ProcReq14" },	
-    { "irw_convert_end",	"ProcReq10" },	
-    { "irw_get_kanjilist",	"ProcReq6" },	
-    { "irw_get_yomi",		"ProcReq6" },	
-    { "irw_subst_yomi",		"ProcReq4" },	
-    { "irw_store_yomi",		"ProcReq11" },	
-    { "irw_store_range",	"ProcReq11" },	
-    { "irw_get_last_yomi",	"ProcReq3" },	
-    { "irw_flush_yomi",		"ProcReq10" },	
-    { "irw_remove_yomi",	"ProcReq10" },	
-    { "irw_get_simple_kanji",	"ProcReq13" },	
-    { "irw_resize",		"ProcReq7" },	
-    { "irw_get_hinshi",		"ProcReq8" }, 
-    { "irw_get_lex",		"ProcReq9" }, 
-    { "irw_get_stat",		"ProcReq7" },	
-    { "irw_set_locale",		"ProcReq15" }, 
-    { "irw_autoconv",		"ProcReq5" }, 
+    { "irw_define_dic",		"ProcReq12" },
+    { "irw_delete_dic",		"ProcReq12" },
+    { "irw_convert",		"ProcReq14" },
+    { "irw_convert_end",	"ProcReq10" },
+    { "irw_get_kanjilist",	"ProcReq6" },
+    { "irw_get_yomi",		"ProcReq6" },
+    { "irw_subst_yomi",		"ProcReq4" },
+    { "irw_store_yomi",		"ProcReq11" },
+    { "irw_store_range",	"ProcReq11" },
+    { "irw_get_last_yomi",	"ProcReq3" },
+    { "irw_flush_yomi",		"ProcReq10" },
+    { "irw_remove_yomi",	"ProcReq10" },
+    { "irw_get_simple_kanji",	"ProcReq13" },
+    { "irw_resize",		"ProcReq7" },
+    { "irw_get_hinshi",		"ProcReq8" },
+    { "irw_get_lex",		"ProcReq9" },
+    { "irw_get_stat",		"ProcReq7" },
+    { "irw_set_locale",		"ProcReq15" },
+    { "irw_autoconv",		"ProcReq5" },
     { "irw_query_extension",	"ProcReq17" },
     { "irw_set_app_name",	"ProcReq15" },
     { "irw_notice_group_name",	"ProcReq15" },
     { "irw_through",		"ProcReq19" },			/* S000 */
     { "irw_killserver",		"ProcReq1" }
-} ;			
+} ;
 #endif
 
 /*

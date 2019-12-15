@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * PUBDIC+ PROJECT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL PUBDIC+ PROJECT BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include <stdio.h>
@@ -65,124 +65,24 @@ static int hinshi_direction = INORDER; /* see above */
 # define WCG3 0x8000
 # define WCMSK 0x8080
 
-int
-Mbstowcs(d, ss, n)
-Wchar *d;
-char *ss;
-int n;
-{
-  register Wchar *p = d;
-  register int ch;
-  register unsigned char *s = (unsigned char *)ss;
+// lib/canna/util.c と統合
+//size_t
+//CANNA_mbstowcs(cannawc* d, const char* ss, size_t n)
 
-  while ((ch = *s++) && (p - d < n)) {
-    if (ch & MSB) {
-      if (ch == SS2) { /* kana */
-	*p++ = (Wchar)*s++;
-      }
-      else if (ch == SS3) {
-	*p++ = (Wchar)((*s << 8) | (*(s + 1) & MSK));
-	s += 2;
-      }
-      else {
-	*p++ = (Wchar)((ch << 8) | (*s++ & 0xff));
-      }
-    }
-    else {
-      *p++ = (Wchar)ch;
-    }
-  }
-  *p = (Wchar)0;
-  return p - d;
-}
+// lib/canna/util.c と統合
+//int
+//Wcstombs(d, s, n)
+//char *d;
+//Wchar *s;
+//int n;
+
+#define Wscmp WStrcmp
+#define Wscpy WStrcpy
+#define Wslen WStrlen
+
 
 int
-Wcstombs(d, s, n)
-char *d;
-Wchar *s;
-int n;
-{
-  register unsigned char *p = (unsigned char *)d;
-  register Wchar ch;
-
-  while ((ch = *s++) && ((char *)p - d + 2 < n)) {
-    switch (ch & WCMSK) {
-    case WCG0:
-      *p++ = ch & 0xff;
-      break;
-
-    case WCG1:
-      *p++ = (ch >> 8) & 0xff;
-      *p++ = ch & 0xff;
-      break;
-
-    case WCG2:
-      *p++ = SS2;
-      *p++ = ch & 0xff;
-      break;
-
-    case WCG3:
-      *p++ = SS3;
-      *p++ = (ch >> 8) & 0xff;
-      *p++ = (ch & 0xff) | MSB;
-      break;
-    }
-  }
-  *p = '\0';
-  return (char *)p - d;
-}
-
-int
-Wscmp(s1, s2)
-register Wchar *s1, *s2;
-{
-  register int res;
-
-  /* 以下のコードはいささかトリッキーなので、説明を加えておこう。
-     以下ではこのコメント内にあるようなことをしたいわけである。
-
-  while (*s1 && *s2 && && *s1 == *s2) {
-    s1++; s2++;
-  }
-  return *s1 - *s2;
-
-     すなわち、s1 も s2 も EOS ('\0') を指していなくて、しかも値が
-     異なる間はそれぞれのポインタを進める。いずれかが EOS になるか、
-     値が違ってきた場合には、*s1 - *s2 を返す。
-   */
-
-  while (!(res = *s1 - *s2++) && *s1++)
-    ;
-  return res;
-}
-
-Wchar *
-Wscpy(d, s)
-Wchar *d;
-register Wchar *s;
-{
-  register Wchar *p = d, ch;
-
-  while (ch = *s++) {
-    *p++ = ch;
-  }
-  *p = (Wchar)0;
-  return d;
-}
-
-int
-Wslen(s)
-Wchar *s;
-{
-  register Wchar *p = s;
-
-  while (*p) p++;
-  return p - s;
-}
-
-int
-Watoi(s)
-Wchar *s;
+Watoi(const cannawc* s)
 {
   register int res = 0;
   register Wchar ch;
@@ -350,7 +250,7 @@ replace_hinshi()
 
   f = fopen(hinshi_table, "r");
   if (!f) {
-    (void)fprintf(stderr, 
+    (void)fprintf(stderr,
 	    "%s: can not open the table file of parts of speech \"%s\".\n",
 	    program, hinshi_table);
     exit(1);
@@ -370,7 +270,7 @@ replace_hinshi()
 
       xx = (Wchar *)malloc((Wslen(to) + 1) * sizeof(Wchar));
       if (xx) {
-	Wchar *cp;	
+	Wchar *cp;
 	int n = 1;
 
 	(void)Wscpy(xx, to);
@@ -570,7 +470,7 @@ store_description()
 
   f = fopen(description_table, "r");
   if (!f) {
-    (void)fprintf(stderr, 
+    (void)fprintf(stderr,
 	    "%s: can not open the table file of parts of speech \"%s\".\n",
 	    program, description_table);
     exit(1);
@@ -809,7 +709,7 @@ for_all_interned(fn)
 void (*fn)();
 {
   int i;
-  struct dicpack *p; 
+  struct dicpack *p;
 
   for (i = 0 ; i < DICBUFSIZE ; i++) {
     for (p = dic[i] ; p ; p = p->next) {
@@ -1233,7 +1133,7 @@ char *argv[];
 	bunrui = argv[i + 1];
 	shrinkargs(argv + i, 2, argc - i); argc -= 2;
 	break;
-	
+
       case 'c':
 	common_out = argv[i + 1];
 	shrinkargs(argv + i, 2, argc - i); argc -= 2;
@@ -1259,7 +1159,7 @@ char *argv[];
 	wnn_type_output = 0;
 	shrinkargs(argv + i, 1, argc - i); argc -= 1;
 	break;
-	
+
       case 'j':
 	extract_kana = 1;
 	shrinkargs(argv + i, 1, argc - i); argc -= 1;
@@ -1409,7 +1309,7 @@ char *argv[];
   pdic = (struct dicpack **)malloc(ndicentries * sizeof(struct dicpack *));
   if (pdic) {
     int i, j;
-    struct dicpack *p; 
+    struct dicpack *p;
 
     for (i = 0, j = 0 ; i < DICBUFSIZE ; i++) {
       for (p = dic[i] ; p ; p = p->next) {

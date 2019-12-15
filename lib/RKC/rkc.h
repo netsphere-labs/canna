@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* sccs_id[]="@(#) NEC UNIX( PC-UX/EWS-UX ) rkc.h 2.4 91/11/11 12:01:18"; */
@@ -64,7 +64,9 @@ typedef struct _RkcContext {
     short	    maxyomi;
 } RkcContext ;
 
-extern int ushort2euc(), euc2ushort(), ushort2wchar(), wchar2ushort(),
+#define ushort2euc CNvW2E
+
+extern euc2ushort(), ushort2wchar(), wchar2ushort(),
     wcharstrlen(), ushortstrlen(), ushortstrcpy() ;
 
 typedef long (*initialize_t) pro((char *));
@@ -168,7 +170,7 @@ struct rkcproto {
  *		unsigned char	w
  *		unsigned short	wx
  *		unsigned long	wxyz
- */	
+ */
 #define LOMASK(x)	((x)&255)
 #define	LTOL4(l, l4)	{\
 	(l4)[0] = LOMASK((l)>>24); (l4)[1] = LOMASK((l)>>16);\
@@ -198,7 +200,7 @@ struct rkcproto {
 
 #define SIZEOFSHORT 2 /* for protocol */
 /* for protocol: not 'long' length. */
-#define SIZEOFLONG  4 
+#define SIZEOFLONG  4
 
 #define MAX_CX 100
 

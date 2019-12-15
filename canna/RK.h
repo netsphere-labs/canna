@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: RK.h,v 1.10 2003/09/21 10:16:49 aida_s Exp $ */
@@ -38,7 +38,7 @@
 #include <canna/sysdep.h>
 
 typedef	struct {
-   int		ylen;		/* yomigana no nagasa (in byte) */ 
+   int		ylen;		/* yomigana no nagasa (in byte) */
    int		klen;		/* kanji no nagasa (in byte) */
    int		rownum;		/* row number */
    int		colnum;		/* column number */
@@ -50,7 +50,7 @@ typedef	struct {
    int		candnum;	/* kouho bangou */
    int		maxcand;  	/* sou kouho suu */
    int		diccand;	/* jisho ni aru kouho suu */
-   int		ylen;		/* yomigana no nagasa (in byte) */ 
+   int		ylen;		/* yomigana no nagasa (in byte) */
    int		klen;		/* kanji no nagasa (in byte) */
    int		tlen;		/* tango no kosuu */
 }		RkStat;
@@ -83,7 +83,7 @@ struct DicInfo {
 #define RK_MAKE_KANSUUJI	0x08
 
 /* RkRxDic
- *	romaji/kana henkan jisho 
+ *	romaji/kana henkan jisho
  */
 struct RkRxDic	{
     int                 dic;		/* dictionary version: see below */
@@ -230,7 +230,7 @@ canna_export(int) RkwCvtHira pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCvtKana pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCvtHan pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCvtZen pro((cannawc *, int, const cannawc *, int));
-canna_export(int) RkwCvtEuc pro((cannawc *, int, cannawc *, int));
+canna_export(int) RkwCvtEuc pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCreateDic pro((int, char *, int));
 canna_export(int) RkwQueryDic pro((int, char *, char *, struct DicInfo *));
 canna_export(void) RkwCloseRoma pro((struct RkRxDic *));
@@ -289,12 +289,12 @@ int	RkGetHinshi pro((int, unsigned char *, int));
 int	RkGetKanji pro((int, unsigned char *, int));
 int	RkGetKanjiList pro((int, unsigned char *, int));
 int	RkGetLex pro((int, RkLex *, int));
-int	RkCvtHira pro((unsigned char *, int, unsigned char *, int));
+int	RkCvtHira pro((unsigned char *, int, const unsigned char* src, int));
 int	RkCvtKana pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtHan pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtZen pro((unsigned char *, int, const unsigned char *, int));
 int	RkCvtNone pro((unsigned char *, int, const unsigned char *, int));
-int	RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
+int	RkCvtEuc pro((unsigned char *, int, const unsigned char* src, int));
 int	RkQueryDic pro((int, char *, char *, struct DicInfo *));
 
 #ifdef __cplusplus

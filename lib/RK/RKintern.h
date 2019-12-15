@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* LINTLIBRARY */
@@ -25,7 +25,7 @@
 #ifndef		_RKintern_h
 #define		_RKintern_h
 
-#define BUNMATU 
+#define BUNMATU
 
 /* BUNMATU マクロを define すると、北陸先端科学技術大学院大学情報科学
    研究科の藤枝和宏(fujieda@jaist.ac.jp)さんが、『かんな』のかな漢字変
@@ -156,7 +156,7 @@ typedef union _rkunion {
  *		unsigned char	w
  *		unsigned short	wx
  *		unsigned long	wxyz
- */	
+ */
 #define LOMASK(x)	((x)&255)
 /* #include	"type.h" */
 /*
@@ -310,12 +310,12 @@ struct NP {
 /*
  * definition of off_t added by Kenji Rikitake 27-MAR-1995
  *
- * Include necessary headers for lseek() here. 
- * note: sys/types.h only applies for BSD/OS 2.0. 
+ * Include necessary headers for lseek() here.
+ * note: sys/types.h only applies for BSD/OS 2.0.
  * Use the appropriate files for other systems.
  */
 
-#include <sys/types.h>	
+#include <sys/types.h>
 
 struct ND {
   unsigned long time;
@@ -372,8 +372,8 @@ struct RkXwrec {
  *	xxxx NODE....
  *	    xxxx niha, DIRECTORY no ookisa ga byte de hairu.
  *
- *	4 byte no NODE kara kousei 
- *	
+ *	4 byte no NODE kara kousei
+ *
  *	+--+--+--+--+
  *	|KY|X1 X2 X3|
  *	+--+--+--+--+
@@ -416,7 +416,7 @@ struct WRT{
 struct CTdata{
        struct CTdata *next;
        unsigned long ct[2];
-};       
+};
 
 struct RUT{
        unsigned long sz;
@@ -430,7 +430,7 @@ struct RUT{
 (((((unsigned long)(x)[0] << 8) | (x)[1]) << 4) | (((unsigned long)(x)[2] & 0xf0) >> 4))
 
 #define a_tick(x) (unsigned long) \
-((((((unsigned long)(x)[2] & 0x0f) << 8) | (unsigned long)(x)[3]) << 8) | (x)[4]) 
+((((((unsigned long)(x)[2] & 0x0f) << 8) | (unsigned long)(x)[3]) << 8) | (x)[4])
 
 #define WriteVal(csn, tick, buf){\
    (buf)[0] = (unsigned char)(((csn)>>12) & 0xff);\
@@ -443,7 +443,7 @@ struct RUT{
 #define WriteCT(csn, tick, arr){\
    (arr)[0] = (unsigned long) (csn);\
    (arr)[1] = (unsigned long) (tick);\
-}  
+}
 
 #define freeWRT(wruc) {\
      free(wruc->buf);\
@@ -459,14 +459,14 @@ struct RUT{
  *	    xxxx niha, WORD no ookisa ga byte de hairu.
  *
  * tango:
- *	unsigned char	yomi[];			yomigana 
- *	unsigned char	nkouho;			kouho no kazu 
+ *	unsigned char	yomi[];			yomigana
+ *	unsigned char	nkouho;			kouho no kazu
  *		unsigned char	flags;		kouho no nagasa + flags
  *		unsigned char	row;		kouho no row bangou
  *		unsigned char	col;		kouho no col bangou
  *		unsigned char	freq		kouho no shiyou hindo
  *		unsigned char	kouho[];
- *	
+ *
  */
 
 #define	NW_PREFIX	2	/* the length of kouho prefix in byte */
@@ -480,7 +480,7 @@ struct RUT{
 #define	candlen(flag)	((flag) & NW_LEN)
 #define wordlen(flag)	((candlen(flag) << 1) + NW_PREFIX)
 /* RkWcand
- *	data structure used to handle the word record 
+ *	data structure used to handle the word record
  */
 typedef struct RkWcand {
     Wrec		*addr;		/* houho sentou address */
@@ -530,7 +530,7 @@ extern struct RkGram SG;
 
 
 /* ncache
- *	tango record no caching list 
+ *	tango record no caching list
  *  ncache ha, jisho kara itido yomikomareta tango record wo cache kanri suru
  * tameno jouhou kouzou dearu.
  *  tango record ha key (dicnum, address) de skibetu sareru.
@@ -570,9 +570,9 @@ struct nread {
 };
 
 /* nword
- *	bunsetsu kaiseki kekka 
+ *	bunsetsu kaiseki kekka
  * 	jisho kara no tango yomidasi kekka
- * nword ha, jisho kara search sareta tango record wo kirokusi, 
+ * nword ha, jisho kara search sareta tango record wo kirokusi,
  * bunsetsu kaiseki ni yori sakusei sareru bunsetsu tree wo hyougen suru.
  */
 struct nword {
@@ -592,7 +592,7 @@ struct nword {
 /* nw_klen ha fuyou ni naru kanousei ari */
     struct DM		*nw_freq;	/* pointer to frequncy file */
 };
-/* 
+/*
  * word flags
  */
 #define NW_MWD		0x80
@@ -626,7 +626,7 @@ struct nword {
 
 /* nbun
  *	bunsetsu queue
- * renbunsetsu henkan kekka wo kiroku 
+ * renbunsetsu henkan kekka wo kiroku
  */
 struct nbun {
     struct nword	*nb_cand;	/* kouho wo kousei suru word
@@ -649,7 +649,7 @@ typedef struct DM {
     struct DM		*dm_prev;
     struct DF		*dm_file;	/* ptr to the file containing this */
 /* attributes */
-    char		*dm_dicname;		
+    char		*dm_dicname;
     char		*dm_nickname;
     unsigned		dm_class;	/* MWD/SWD/PRE/SUC */
     unsigned		dm_flags;	/* flags */
@@ -819,7 +819,7 @@ struct nstore {
 /* context
  *	ncontext ha rennbunnsetu hennkann client wo seigyo suru jouhou
  *		jisho kankyou
- *		renbunsetsu henkan sagyou ryouiki 
+ *		renbunsetsu henkan sagyou ryouiki
  */
 struct 	nqueue {
     struct nword	*tree;
@@ -873,7 +873,7 @@ typedef struct TN {
 #define	TN_WDEL		4		/* wrec has been deleted */
 #define	IsWordNode(tn)	((tn)->tn_flags&TN_WORD)
 
-/* td_and_n structure 
+/* td_and_n structure
  *
  * tupple of td and n for RkGetWordTextDic()
  */
@@ -1018,7 +1018,7 @@ int			_RkCalcUnlog2();
 #define RkGetContext(cx_num)\
     ((IsCxNum(cn) && IS_LIVECTX(&CX[cn])) ? \
      (&CX[cx_num]) : ((struct RkContext *)0))
-    
+
 #define RkGetXContext(cx_num)\
     ((IsCxNum(cn) && IS_LIVECTX(&CX[cn]) && \
       ((IS_XFERCTX(cx)) || (IS_XAUTCTX(cx))) ? \
@@ -1028,7 +1028,7 @@ int			_RkCalcUnlog2();
     ((IsCxNum(cn) && IS_LIVECTX(&CX[cn]) && \
       !(IS_XFERCTX(cx)) && !(IS_XAUTCTX(cx))) ? \
       (&CX[cx_num]) : ((struct RkContext *)0))
-    
+
 #endif
 
 
@@ -1088,7 +1088,7 @@ void			_RkRehashCache();
 #define RK_LINK_BMAX	MAXNAMLEN
 #else
 #define RK_LINK_BMAX	14
-#endif 
+#endif
 #endif
 #define	RK_MEMBER_BMAX	255
 #define	RK_NICK_BMAX	255
@@ -1096,7 +1096,7 @@ void			_RkRehashCache();
 #define RK_LINE_BMAX    1024
 #define RK_BUFFER_SIZE  1024
 
-/* 
+/*
  * RK_KEY_WMAX <= RK_LEN_WMAX
  */
 #define	RK_KEY_WMAX		0x7f
@@ -1153,8 +1153,11 @@ void _RkFreeQue pro((struct nstore *, int, int));
 void freeTdn pro((struct RkContext *));
 void _RkFreeBunq pro((struct nstore *));
 int _RkRealizeDD pro((struct DD *));
-int RkCvtWide pro((Wchar *, int, char *, int));
-int RkCvtNarrow pro((char *, int, Wchar *, int));
+
+int RkCvtWide pro((cannawc* dest, int, const unsigned char* src, int));
+cannawc* euctous(const unsigned char* src, int srclen, cannawc* dest, int destlen);
+
+int RkCvtNarrow pro((unsigned char* dest, int, const cannawc* src, int));
 
 #if defined(MMAP)
 int _RkDoInvalidateCache pro((long, unsigned long));
@@ -1167,7 +1170,7 @@ long _RkPackBits pro((unsigned char *, long, int, unsigned *, int));
 int _RkSetBitNum pro((unsigned char *, unsigned long, int, int, int));
 int FQsync pro((struct RkContext *, struct DM *, struct DM *, char *));
 
-int RkwCvtSuuji pro((cannawc*, int, cannawc*, int, int));
+int RkwCvtSuuji pro((cannawc*, int, const cannawc* src, int, int));
 int RkwCvtNone pro((cannawc*, int, const cannawc*, int));
 
 int _RkRowNumber pro((unsigned char *));
@@ -1189,11 +1192,17 @@ int DMcheck pro((char *, char *));
 int copyFile pro((struct DM *, struct DM *));
 int DDchmod pro((struct DD *, int));
 int DMchmod pro((struct DM *, int));
-int uslen pro((Wchar *));
-unsigned char *ustoeuc pro((Wchar *, int, unsigned char *, int));
+
+#define uslen WStrlen
+//int uslen pro((Wchar *));
+
+#define usncopy WStrncpy
+
+unsigned char *ustoeuc pro((const cannawc* src, int srclen,
+                            unsigned char* dest, int destlen));
 int _RkSubstYomi pro((struct RkContext *, int, int, Wchar *, int));
-int HowManyChars pro((Wchar *, int));
-int HowManyBytes pro((Wchar *, int));
+int HowManyChars pro((const cannawc*, int));
+int HowManyBytes pro((const cannawc*, int));
 int _RkFlushYomi pro((struct RkContext *));
 int parse_string pro((char *));
 

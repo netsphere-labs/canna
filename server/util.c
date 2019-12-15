@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -25,56 +25,15 @@ static char rcs_id[] = "$Id: util.c,v 1.8 2003/09/21 12:56:29 aida_s Exp $";
 #endif
 
 #include "server.h"
-#if 1 /* unused */
 #include "canna/widedef.h"
-#endif
 
+
+∥∥引凶手支’’’
 size_t
-ushort2euc(src, srclen, dest, destlen)
-const Ushort *src;
-char *dest;
-size_t srclen, destlen;
+euc2ushort(const char* src, size_t srclen, cannawc* dest, size_t destlen)
 {
-  register size_t i, j;
-  register Ushort wc;
-
-  for (i = 0, j = 0 ; i < srclen && j + 2 < destlen ; i++) {
-    wc = src[i];
-    switch (wc & 0x8080) {
-    case 0:
-      /* ASCII */
-      dest[j++] = (char)((unsigned)wc & 0x7f);
-      break;
-    case 0x0080:
-      /* �噫悒咱� */
-      dest[j++] = (char)0x8e; /* SS2 */
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8000:
-      /* 陸儂 */
-      dest[j++] = (char)0x8f; /* SS3 */
-      dest[j++] = (char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8080:
-      /* 期儂 */
-      dest[j++] = (char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    }
-  }
-  dest[j] = '\0';
-  return j;
-}
-
-size_t
-euc2ushort(src, srclen, dest, destlen)
-const char *src;
-Ushort *dest;
-size_t srclen, destlen;
-{
-  register size_t i, j;
-  register unsigned ec;
+    size_t i, j;
+    unsigned ec;
 
   for (i = 0, j = 0 ; i < srclen && j + 1 < destlen ; i++) {
     ec = (unsigned)(unsigned char)src[i];
@@ -131,7 +90,7 @@ size_t srclen, destlen;
       break;
     case 3:
       /* 期儂 */
-      *dest = (Ushort)(0x8080 
+      *dest = (Ushort)(0x8080
 			     | (((unsigned)*src & 0x3f80) << 1)
 			     | ((unsigned)*src & 0x7f));
       break;
@@ -356,11 +315,11 @@ ClientPtr cl;
 int cn;
 {
   int i, n = cl->ncon, *contexts = cl->context_flag;
-  
+
   for (i = 0 ; i < n ; i++) {
     if (contexts[i] == cn) {
       return 1;
-    }   
+    }
   }
   return 0;
 }

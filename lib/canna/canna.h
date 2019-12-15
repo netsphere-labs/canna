@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -139,7 +139,7 @@ typedef struct _deldicinfo {
   cannawc *name;
   cannawc hcode[INDPHLENGTH];
 } deldicinfo;
-  
+
 /*
  * glineinfo -- 候補一覧表示のための内部情報を格納しておくための構造体。
  * それぞれのメンバは以下の意味を持つ。
@@ -259,7 +259,7 @@ typedef struct  _yomiContextRec {
   cannawc   romaji_buffer[ROMEBUFSIZE];
   /* ローマ字バッファは rStartp, rEndp の２つのインデックスによって管理され
    * る。rStartp はカナに変換できなかったローマ字の最初の文字へのインデッ
-   * クスであり、rEndp は新たにローマ字を入力する時に、格納すべき 
+   * クスであり、rEndp は新たにローマ字を入力する時に、格納すべき
    * romaji_buffer 内のインデックスである。新たに入力されるローマ字は、
    * romaji_buffer + rEndp より先に格納され、そのローマ字をカナに変換す
    * る時は、romaji_buffer + rStartp から rEndp - rStartp バイトの文字が
@@ -521,16 +521,16 @@ typedef struct {
   char *sp, *ep;
 } wcKanjiAttributeInternal;
 
-/* 
+/*
 
   uiContext はローマ字かな変換、カナ漢字変換に使われる構造体である。
   XLookupKanjiString などによる変換は、ウィンドウに分離された複数の入
   力ポートに対応しているので、入力中のローマ字の情報や、カナ漢字変換
   の様子などをそれぞれのウィンドウ毎に分離して保持しておかなければな
   らない。この構造体はそのために使われる構造体である。
- 
+
   構造体のメンバがどのようなものがあるかは、定義を参照すること
- 
+
  */
 
 typedef struct _uiContext {
@@ -606,8 +606,8 @@ typedef struct _uiContext {
 #define QUIT_CALLBACK		2
 #define AUX_CALLBACK		3
 
-/* 
- * カナ漢字変換のための様々なキーマップテーブル 
+/*
+ * カナ漢字変換のための様々なキーマップテーブル
  * キーマップテーブルは処理関数へのポインタの配列となっている。
  */
 
@@ -630,7 +630,7 @@ struct callback {
 };
 
 /* ローマ字かな変換テーブル */
-     
+
 extern struct RkRxDic *romajidic;
 extern struct RkRxDic *RkwOpenRoma pro((char *));
 
@@ -840,7 +840,7 @@ struct CannaConfig { /* 以下のコメントはダイアログなどに記述するときなどに
   BYTE indexHankaku;  /* (互換用) 一覧時のインデックスを半角にする */
   BYTE allowNextInput; /* 候補一覧表示時、次の入力が可能にする */
   BYTE doKatakanaGakushu; /* Isn't this used? */
-  BYTE doHiraganaGakushu; /* Isn't this used? */ 
+  BYTE doHiraganaGakushu; /* Isn't this used? */
   BYTE ChikujiContinue; /* 逐次自動変換時次の入力で既変換部分を確定しない */
   BYTE RenbunContinue;  /* 連文節変換時次の入力で既変換部分を確定しない */
   BYTE MojishuContinue; /* 字種変換時次の入力で既変換部分を確定しない */
@@ -980,7 +980,7 @@ extern int initRomeStruct pro((uiContext, int));
 /* extern int kanjiControl pro((int, uiContext, caddr_t)); */
 extern int getBaseMode pro((yomiContext));
 extern int RkwMapPhonogram
-  pro((struct RkRxDic *, cannawc *, int, cannawc *, int, cannawc, int,
+  pro((struct RkRxDic *, cannawc *, int, const cannawc *, int, cannawc, int,
        int *, int *, int *, int *));
 extern int RkMapPhonogram
   pro((struct RkRxDic *, unsigned char *, int, unsigned char *, int,
@@ -993,7 +993,7 @@ extern int RkCvtRoma
   pro((struct RkRxDic *, unsigned char *, int, unsigned char *, int,
        unsigned));
 extern int RkwCvtRoma
-  pro((struct RkRxDic *, cannawc *, int, cannawc *, int, int));
+  pro((struct RkRxDic *, cannawc *, int, const cannawc *, int, int));
 extern int exitJishu pro((uiContext));
 extern RomajiFlushYomi pro((uiContext, cannawc *, int));
 extern void generalReplace
@@ -1023,7 +1023,7 @@ extern abandonContext pro((uiContext, yomiContext));
 extern void RomajiClearYomi pro((uiContext));
 
 // Convert Shift-JIS to EUC-JP.
-extern RkCvtEuc pro((unsigned char *, int, unsigned char *, int));
+extern int RkCvtEuc pro((unsigned char *, int, const unsigned char *, int));
 
 extern RkCvtNone pro((unsigned char *, int, const unsigned char *, int));
 extern selectOne
@@ -1040,7 +1040,9 @@ extern WToupper pro((cannawc));
 extern WTolower pro((cannawc));
 extern TanKakutei pro((uiContext));
 extern Yomisearchfunc pro((uiContext, KanjiMode, int, int, int));
-extern CNvW2E pro((cannawc *, int, char *, int));
+
+// cannawc -> EUC-JP
+extern CNvW2E pro((const cannawc* src, int srclen, unsigned char* dest, size_t));
 extern void initKigoTable pro((void));
 extern NothingForGLine pro((uiContext));
 extern NothingForGLineWithBeep pro((uiContext));

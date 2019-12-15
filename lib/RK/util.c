@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -91,103 +91,11 @@ static char	*Hdrtag[] = {
   0,
 };
 
-int
-uslen(us)
-     Wchar	*us;
-{
-  Wchar *ous = us;
-  
-  if (!us)
-    return 0;
-  while (*us & RK_WMASK)
-    us++;
-  return (us - ous);
-}
-
-void
-usncopy(dst, src, len)
-     Wchar	*dst, *src;
-     int	len;
-{
-  while (len-- > 0 && (*dst++ = *src++)) /* EMPTY */;
-}
-
-unsigned char *
-ustoeuc(src, srclen, dest, destlen)
-     Wchar		*src;
-     unsigned char	*dest;
-     int		srclen, destlen;
-{
-    if (!src || !dest || !srclen || !destlen)
-	return dest;
-    while (*src && --srclen >= 0 && --destlen >= 0) {
-	if (us_iscodeG0(*src)) {
-	    *dest++ = (unsigned char)*src++;
-	} else if (us_iscodeG2(*src)) {
-	    *dest++ = RK_SS2;
-	    *dest++ = (unsigned char)*src++;
-	    destlen--;
-	} else if (destlen > 2) {
-	  if (us_iscodeG3(*src)) {
-	    *dest++ = RK_SS3;
-	  }
-	  *dest++ = (unsigned char)(*src >> 8);
-	  *dest++ = (unsigned char)(*src++ | 0x80);
-	  destlen--;
-	};
-    };
-    *dest = (unsigned char)0;
-    return dest;
-}
-
-Wchar *
-euctous(src, srclen, dest, destlen)
-     unsigned char	*src;
-     Wchar		*dest;
-     int		srclen, destlen;
-{
-  Wchar	*a = dest;
-    
-  if (!src || !dest || !srclen || !destlen)
-    return(a);
-  while (*src && (srclen-- > 0) && (destlen-- > 0)) {
-    if (!(*src & 0x80) ) {
-      *dest++ = (Wchar)*src++;
-    } else if (srclen-- > 0) {
-      if (*src == RK_SS2) {
-	src++;
-	*dest++ = (Wchar)(0x0080 | (*src++ & 0x7f));
-      } else if ((*src == RK_SS3) && (srclen-- > 0)) {
-	src++;
-	*dest++ = (Wchar)(0x8000 | ((src[0] & 0x7f) << 8) | (src[1] & (0x7f)));
-	src += 2;
-      } else {
-	*dest++ = (Wchar)(0x8080 | ((src[0] & 0x7f) << 8) | (src[1] & 0x7f));
-	src += 2;
-      }
-    } else {
-      break;
-    }
-  }
-  if (destlen-- > 0)
-    *dest = (Wchar)0;
-  return dest;
-}
 
 static FILE	*log = (FILE *)0;
 
 void
-_Rkpanic(
-#ifdef __STDC__
-    const char *fmt, ...
-#else
-    fmt, p, q, r
-#endif
-    )
-#ifndef __STDC__
-     const char	*fmt;
-/* VARARGS2 */
-#endif
+_Rkpanic( const char* fmt, ... )
 {
   FILE *target = log ? log : stderr;
 #ifdef __STDC__
@@ -223,12 +131,12 @@ _RkCalcUnlog2(x)
   return((1 << x) - 1);
 }
 
-int 
+int
 _RkCalcLog2(n)
      int n;
 {
   int	lg2;
-  
+
   n--;
   for (lg2 = 0; n > 0; lg2++)
     n >>= 1;
@@ -247,7 +155,7 @@ _RkClearHeader(hd)
      struct HD	*hd;
 {
   int	i;
-    
+
   if (hd) {
     for (i = 0; i < HD_MAXTAG; i++) {
       if (hd->flag[i] > 0) {
@@ -523,46 +431,6 @@ _RkGetOffset(dic, pos)
   _Rkpanic("Cannot get Offset", 0, 0, 0);
 }
 
-int
-HowManyChars(yomi, len)
-     Wchar	*yomi;
-     int	len;
-{
-  int chlen, bytelen;
-
-  for (chlen = 0, bytelen = 0; bytelen < len; chlen++) {
-    Wchar ch = yomi[chlen];
-    
-    if (us_iscodeG0(ch))
-      bytelen++;
-    else if (us_iscodeG3(ch))
-      bytelen += 3;
-    else
-      bytelen += 2;
-  }
-  return(chlen);
-}
-
-int
-HowManyBytes(yomi, len)
-     Wchar	*yomi;
-     int	len;
-{
-  int chlen, bytelen;
-
-  for (chlen = 0, bytelen = 0; chlen < len; chlen++) {
-    Wchar ch = yomi[chlen];
-
-    if (us_iscodeG0(ch))
-      bytelen++;
-    else if (us_iscodeG3(ch))
-      bytelen += 3;
-    else {
-      bytelen += 2;
-    }
-  }
-  return(bytelen);
-}
 
 #ifdef TEST
 

@@ -12,24 +12,21 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
 static char rcsid[]="@(#) 112.1 $Id: mergewd.c,v 1.1.1.1.4.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
 
-#include	"RKintern.h" 
-#include	<stdio.h>
-
-#if defined(__STDC__) || defined(SVR4)
+#include "RKintern.h"
+#include <stdio.h>
 #include <locale.h>
-#endif
 
 #ifdef SVR4
 extern char *gettxt();
@@ -44,68 +41,18 @@ extern char *gettxt();
 /*        1    + 1      + ?     */
 /* wrec = ylen  + yomi  + knum  + fqoffset + rec */
 /*        1byte + ?byte + 2byte + 3byte    + rec */
-#define ckrecSiz(k)		(NW_PREFIX+us_len(k))
-#define ckwrecSiz(y,s)		(1+us_len(y)+2+3+s)
+#define ckrecSiz(k)		(NW_PREFIX + WStrlen(k))
+#define ckwrecSiz(y,s)		(1 + WStrlen(y) +2+3+s)
 #ifndef AIXV3
 typedef unsigned char	uchar;
 #endif
 
 
-int
-us_len(us)
-  unsigned short *us;
-{
-    unsigned short *ous = us;
-    
-    if (!us)
-	return 0;
-    while (*us & RK_WMASK)
-	us++;
-    return (us - ous);
-}
-
-Wchar *
-euctous(src, srclen, dest, destlen)
-  unsigned char		*src;
-  Wchar			*dest;
-  int			srclen, destlen;
-{
-    unsigned short	*a=dest;
-    
-    if (!src || !dest || !srclen || !destlen)
-	return a;
-    while (*src && (srclen-- > 0) && (destlen-- > 0)) {
-	if (!(*src & 0x80) ) {
-	    *dest++ = (Wchar)*src++;
-	} else if (srclen-- > 0) {
-	    if (*src == RK_SS2) {
-		src++;
-		*dest++ = (Wchar)(0x0080 | (*src++ & 0x7f));
-	    } else if ((*src == RK_SS3) && (srclen-- > 0)) {
-		src++;
-		*dest++ = (Wchar)(0x8000 |
-				  ((src[0] & 0x7f) << 8) |
-				  (src[1] & (0x7f)));
-		src += 2;
-	    } else {
-		*dest++ = (Wchar)(0x8080 |
-				  ((src[0] & 0x7f) << 8) |
-				  (src[1] & 0x7f));
-		src += 2;
-	    }
-	} else {
-	    break;
-	}
-    }
-    if (destlen-- > 0) {
-      *dest = (unsigned short)0;
-    }
-    return dest;
-}
+//cannawc*
+//euctous(const unsigned char* src, int srclen, cannawc* dest, int destlen)
 
 
-
-main(n, args)
+int main(n, args)
 int	n;
 char	*args[];
 {
@@ -120,7 +67,7 @@ char	*args[];
     int		rec = 0;
     int		first = 0;
     FILE *fp;
-    
+
 #if defined(__STDC__) || defined(SVR4)
     (void)setlocale(LC_ALL,"");
 #endif
@@ -148,7 +95,7 @@ char	*args[];
       while (*s && !RkwIsGraphicChar(*s)) s++;
       d = kanji;
       while ( (*d = *s++) != 0 )	d++;
-      
+
       euctous(yomi, strlen((char *)yomi), wyomi, sizeof(yomi)/sizeof(Wchar));
       euctous(kanji, strlen((char *)kanji), wkanji, sizeof(kanji)/sizeof(Wchar));
       if (!strcmp((char *)Yomi, (char *)yomi)) {
@@ -161,7 +108,7 @@ char	*args[];
 	      strcpy((char *)Pair, (char *)pair);
 	      strcat((char *)Kanji, " ");
 	      strcat((char *)Kanji, (char *)Pair);
-	      
+
 	      strcat((char *)Kanji, " ");
 	      strcat((char *)Kanji, (char *)kanji);
 	      strcpy((char *)fkanji, (char *)kanji);
@@ -182,7 +129,7 @@ char	*args[];
 	      strcpy((char *)fkanji, (char *)kanji);
 	      krec += ckrecSiz(wkanji);
 	    }
-	    else 
+	    else
 	      (void)fprintf(stderr, gettxt("cannacmd:33",
 			   "%s: *over word [%d %d]\n"), Yomi, kouho, rec);
 	    kouho++;
@@ -204,7 +151,7 @@ char	*args[];
 	strcpy((char *)Yomi, (char *)yomi);
 	strcpy((char *)Pair, (char *)pair);
 	strcpy((char *)fkanji, (char *)kanji);
-			
+
 	strcpy((char *)Kanji, " ");
 	strcat((char *)Kanji, (char *)Pair);
 	strcat((char *)Kanji, " ");
@@ -219,7 +166,7 @@ char	*args[];
     if (fp != stdin) {
       fclose(fp);
     }
-    
+
     if ( Yomi[0] ) {
       wrec = ckwrecSiz(wyomi, rec);
       printf("%s%s\n", Yomi, Kanji);

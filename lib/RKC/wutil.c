@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -67,43 +67,6 @@ int srclen;
   return j;
 }
 
-int
-ushort2euc(src, srclen, dest, destlen)
-Ushort *src;
-char *dest;
-int srclen, destlen;
-{
-  register int i, j;
-  register Ushort wc;
-
-  for (i = 0, j = 0 ; i < srclen && j + 2 < destlen ; i++) {
-    wc = src[i];
-    switch (wc & 0x8080) {
-    case 0:
-      /* ASCII */
-      dest[j++] = (unsigned char)((unsigned)wc & 0x7f);
-      break;
-    case 0x0080:
-      /* 染逞カナ */
-      dest[j++] = (char)0x8e; /* SS2 */
-      dest[j++] = (unsigned char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8000:
-      /* 嘲机 */
-      dest[j++] = (char)0x8f; /* SS3 */
-      dest[j++] = (unsigned char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (unsigned char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8080:
-      /* 戳机 */
-      dest[j++] = (unsigned char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (unsigned char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    }
-  }
-  dest[j] = (unsigned char)0;
-  return j;
-}
 
 int
 eucchars(src, srclen)
@@ -123,6 +86,7 @@ int srclen;
   return j;
 }
 
+↑これも猴近する
 int
 euc2ushort(src, srclen, dest, destlen)
 char *src;
@@ -196,7 +160,7 @@ int srclen, destlen;
       break;
     case 3:
       /* 戳机 */
-      *dest = (Ushort)(0x8080 
+      *dest = (Ushort)(0x8080
 			     | (((unsigned)*src & 0x3f80) << 1)
 			     | ((unsigned)*src & 0x7f));
       break;
