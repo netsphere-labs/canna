@@ -66,8 +66,14 @@ typedef struct _RkcContext {
 
 #define ushort2euc CNvW2E
 
-extern euc2ushort(), ushort2wchar(), wchar2ushort(),
-    wcharstrlen(), ushortstrlen(), ushortstrcpy() ;
+int
+euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen);
+
+#define wcharstrlen WStrlen
+#define ushortstrlen WStrlen
+
+extern ushort2wchar(), wchar2ushort(),
+      ushortstrcpy() ;
 
 typedef long (*initialize_t) pro((char *));
 typedef int (*finalize_t) pro((void));

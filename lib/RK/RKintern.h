@@ -106,10 +106,11 @@ typedef unsigned char   Wrec;
 #define RK_WMASK	WMASK
 #define WNILL		(unsigned short)0x0000
 #define WNULL		(unsigned short *)0
-#define	us_iscodeG0(wc)	(((wc) & 0x8080) == 0x0000)
-#define	us_iscodeG1(wc)	(((wc) & 0x8080) == 0x8080)
-#define	us_iscodeG2(wc)	(((wc) & 0x8080) == 0x0080)
-#define	us_iscodeG3(wc)	(((wc) & 0x8080) == 0x8000)
+
+#define us_iscodeG0(wc)	(((wc) & 0x8080) == 0x0000)
+#define us_iscodeG1(wc)	(((wc) & 0x8080) == 0x8080)
+#define us_iscodeG2(wc)	(((wc) & 0x8080) == 0x0080)
+#define us_iscodeG3(wc)	(((wc) & 0x8080) == 0x8000)
 
 #define RK_SS2 (unsigned char)0x8e
 #define RK_SS3 (unsigned char)0x8f
@@ -1202,7 +1203,11 @@ unsigned char *ustoeuc pro((const cannawc* src, int srclen,
                             unsigned char* dest, int destlen));
 int _RkSubstYomi pro((struct RkContext *, int, int, Wchar *, int));
 int HowManyChars pro((const cannawc*, int));
-int HowManyBytes pro((const cannawc*, int));
+
+int
+ushort2eucsize(const cannawc* yomi, int len);
+#define HowManyBytes ushort2eucsize
+
 int _RkFlushYomi pro((struct RkContext *));
 int parse_string pro((char *));
 

@@ -13,27 +13,71 @@ WStrlen(const cannawc* ws)
     return res;
 }
 
+
+// @return 見つからなかった場合, NULL.
+cannawc*
+ushortmemchr(const cannawc* ws, cannawc ch, size_t len)
+{
+    const cannawc *p, *end;
+    for (p = ws, end = ws + len; p < end; ++p) {
+        if (*p == ch)
+            return (cannawc*) p;
+    }
+    return NULL;
+}
+
+
+// シグネチャが違う.
+// @return 書き込んだワイド文字数 (ナル終端を含まない). WStrlen(wsrc) と同じ.
+int
+ushortstrcpy(cannawc* wdest, const cannawc* wsrc)
+{
+    assert(wdest);
+    assert(wsrc);
+
+    int ret;
+    // ws1 と ws2 が重なっている場合を考慮.
+    if ( wsrc < wdest ) {
+        int len = WStrlen(wsrc);
+        ret = len;
+        wdest[len] = 0;
+        while (len--)
+            wdest[len] = wsrc[len];
+    }
+    else if ( wdest < wsrc ) {
+        ret = 0;
+        while (*wsrc) {
+            *wdest++ = *wsrc++;
+            ret++;
+        }
+        *wdest = 0;
+    }
+
+    return ret;
+}
+
+
 cannawc*
 WStrcpy(cannawc* ws1, const cannawc* ws2)
 {
     assert(ws2);
     assert(ws1);
 
-    // ws1 と ws2 が重なっている場合を考慮.
-    if (ws2 < ws1) {
-        int len = WStrlen(ws2);
-        ws1[len] = 0;
-        while (len--)
-            ws1[len] = ws2[len];
-    }
-    else if (ws1 < ws2) {
-        cannawc* ws = ws1;
-        while (*ws2)
-            *ws++ = *ws2++;
-        *ws = 0;
-    }
-
+    ushortstrcpy(ws1, ws2);
     return ws1;
+}
+
+// @param n wdest の大きさ.
+// @return 書き込んだワイド文字数. ナル終端を含まない.
+int
+ushortstrncpy(cannawc* wdest, const cannawc* wsrc, int n)
+{
+    int res = 0;
+    while (res < n - 1 && (*wdest = *wsrc) != 0) {
+        wdest++; wsrc++; res++;
+    }
+    *wdest = 0;
+    return res;
 }
 
 
@@ -214,6 +258,11 @@ euctous(const unsigned char* src, int srclen, cannawc* dest, int destlen)
     return dest + r;
 }
 
+// 引数の並びが違う
+int euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen)
+{
+    return RkCvtWide(dest, destlen, src, srclen);
+}
 
 // @param dest  If dest is NULL, destlen is ignored.
 // @return 変換された wide-character の数. ナル終端は含まない.
@@ -327,20 +376,19 @@ HowManyChars(const cannawc* yomi, int len)
 
 // ワイド文字を多バイトに変換するときに, 何バイト必要か.
 int
-HowManyBytes(const cannawc* yomi, int len)
+ushort2eucsize(const cannawc* yomi, int len)
 {
-  int chlen, bytelen;
+    int chlen, bytelen;
 
-  for (chlen = 0, bytelen = 0; chlen < len; chlen++) {
-    Wchar ch = yomi[chlen];
+    for (chlen = 0, bytelen = 0; chlen < len; chlen++) {
+        Wchar ch = yomi[chlen];
 
-    if (us_iscodeG0(ch))
-      bytelen++;
-    else if (us_iscodeG3(ch))
-      bytelen += 3;
-    else {
-      bytelen += 2;
+        if (us_iscodeG0(ch))
+            bytelen++;
+        else if (us_iscodeG3(ch))
+            bytelen += 3;
+        else   // G1, G2
+            bytelen += 2;
     }
-  }
-  return bytelen;
+    return bytelen;
 }

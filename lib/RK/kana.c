@@ -176,27 +176,32 @@ static cannawc hankaku[] = {
 }
 
 
-// @return ワイド文字数.
-static int
-euccharlen(const unsigned char* s, int bytelen)
+#define euccharlen eucchars
+
+// @return ワイド文字数. If invalid EUC sequence, -1.
+int eucchars(const unsigned char* s, int bytelen)
 {
     assert(s);
 
-  unsigned char	ch;
-  int		res = 0;
+    unsigned char	ch;
+    int		res = 0;
 
-  while ((ch = *s++) && bytelen--) {
-    res++;
-    if (ch & 0x80) {
-      if (ch == RK_SS3) {
-	s++;
-	bytelen--;
-      }
-      s++;
-      bytelen--;
+    while ((ch = *s++) && bytelen--) {
+        if ( (ch & 0x80) != 0 ) {
+            if (ch == RK_SS3 ) {
+                if ( !(s[0] & 0x80) || !(s[1] & 0x80) )
+                    return -1;
+                s += 2;
+            }
+            else { // G1, G2
+                if ( !(*s++ & 0x80) )
+                    return -1;
+            }
+        }
+        res ++;
     }
-  }
-  return res;
+
+    return res;
 }
 
 /* RkCvtZen
