@@ -25,7 +25,8 @@
 #ifndef		_RKintern_h
 #define		_RKintern_h
 
-#define BUNMATU
+// Internal APIs
+#include "canna/sglobal.h"
 
 /* BUNMATU マクロを define すると、北陸先端科学技術大学院大学情報科学
    研究科の藤枝和宏(fujieda@jaist.ac.jp)さんが、『かんな』のかな漢字変
@@ -33,6 +34,8 @@
    す。これにより文章末にしか現れない文字が文節の途中に出て来ることが
    なくなり変換効率が向上します。このコードをかいて下さいました藤枝さ
    んに感謝します。 */
+#define BUNMATU
+
 
 #define LOGIC_HACK
 /* 藤枝＠ＪＡＩＳＴのハックを有効にする */
