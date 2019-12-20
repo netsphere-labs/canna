@@ -78,6 +78,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 1.11.2.2 2003/12/27 23:30:5
 #include <pwd.h>
 
 #include <canna/patchlevel.h>
+#include "canna/sglobal.h"
 
 
 typedef struct {
@@ -95,9 +96,17 @@ static int RkThrough pro((int cx, int command, char *buf,
       int content_size, int buffer_size));
 
 #ifdef DEBUG
-static char *conveuc pro((Ushort *src)); ●●また似たような関数が・・・
+static char *
+conveuc(const cannawc* src)
+{
+    static char dest[CBUFSIZE];
+    ushort2euc(src, ushortstrlen(src), dest, CBUFSIZE);
+    return dest;
+}
+
 static const char null[] = "NULL";
 #endif /* DEBUG */
+
 static IRwReq	Request ;
 static BYTE local_buffer[ LOCAL_BUFSIZE ];
 
@@ -2821,15 +2830,6 @@ Ushort *yomi;
 
 #endif /* WIDE_PROTO */
 
-#ifdef DEBUG
-static char *
-conveuc(const cannawc* src)
-{
-    static char dest[CBUFSIZE];
-    ushort2euc(src, ushortstrlen(src), dest, CBUFSIZE);
-    return(dest);
-}
-#endif /* DEBUG */
 							/* S000:begin */
 /* #ifdef DEBUG_TOOL */
 static int

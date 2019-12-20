@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -28,6 +28,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: convert.c,v 1.10.2.1 2003/12/27 17:15:24
 
 #include "server.h"
 #include <canna/patchlevel.h>
+#include "canna/sglobal.h"
 
 #if CANNA_LIGHT
 #ifdef EXTENSION
@@ -163,7 +164,7 @@ BYTE **datap;
 	    } else {
 		*status = -1;
 		PrintMsg( "First Kouho Buffer allocate failed!!\n" );
-		return 0;	
+		return 0;
 	    }
 	}
 	strcpy(dst, src);
@@ -415,7 +416,7 @@ ClientPtr *clientp ;
     if( SetDicHome( client, cxnum ) > 0 ) {
       set_cxt(client, cxnum);
       stat = cxnum;
-    } else {	
+    } else {
 	Req0 *req0 = &Request.Request0 ;
 
 	RkwCloseContext(cxnum);
@@ -590,7 +591,7 @@ ClientPtr *clientp ;
     cxnum = req->context;
     if (chk_cxt(client, cxnum)) {
 	max = MIN( req->number, LOCAL_BUFSIZE ) ;
-	
+
 	ret = RkwGetDirList( cxnum, (char *)dicnames, max) ;
 	if( ret >= 0 ) {
 	   ir_debug( Dmsg(5,"辞書リスト\n" ); )
@@ -598,7 +599,7 @@ ClientPtr *clientp ;
 	}
     } else {
 	print_context_error(client);
-    }	
+    }
     return SendTypeE2Reply(client, ret, (ret < 0)? 0: ret, dicnames, size);
 }
 
@@ -647,7 +648,7 @@ ClientPtr *clientp ;
 {
     Req9 *req = &Request.Request9  ;
     ClientPtr client = *clientp ;
-    int cxnum, where ;	
+    int cxnum, where ;
     int ret = -1 ;
 
     cxnum = req->context;
@@ -682,7 +683,7 @@ ClientPtr *clientp ;
 	}
     } else {
 	print_context_error(client);
-    }	
+    }
 
     return SendTypeE2Reply(client, ret, (ret < 0)? 0: ret, dicnames, size);
 }
@@ -718,7 +719,7 @@ ClientPtr *clientp ;
     } else {
 	print_context_error(client);
 	*datap = (char)0 ;
-    }	
+    }
     ret = SendTypeE2Reply(client, stat, (stat < 0)? 0: stat, datap, size);
     if (datap != lbuf) free((char *)datap);
     return ret;
@@ -736,20 +737,20 @@ ClientPtr *clientp ;
 	len = req->number ;
 	if( len ) {
 	    mode = 1 ;
-	    if( RkwGoTo( cxnum, 0 ) != 0 ) {	
+	    if( RkwGoTo( cxnum, 0 ) != 0 ) {
 		PrintMsg("%s ir_convert_end: RkwGoTo failed\n",
 			irerrhdr(client));
 	    }
 	   ir_debug( Dmsg( 5,"学習させる候補\n" ); )
-	    /* カレント候補を先頭に移動クライアントが選んだ候補を */	
-	    /* ＲＫに知らせる */		
-	    for( i = 0; i < len; i++ ){ 
+	    /* カレント候補を先頭に移動クライアントが選んだ候補を */
+	    /* ＲＫに知らせる */
+	    for( i = 0; i < len; i++ ){
 		if( req->kouho[ i ] != RkwXfer( cxnum, req->kouho [ i ] ) ) {
 		    PrintMsg("%s ir_convert_end: RkwXfer failed\n",
 			    irerrhdr(client));
 		}
-	       ir_debug( DebugDispKanji( cxnum, i ); )	
-		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) { 	
+	       ir_debug( DebugDispKanji( cxnum, i ); )
+		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) {
 		    PrintMsg("%s ir_convert_end: RkwRight failed\n",
 			    irerrhdr(client));
 		}
@@ -782,7 +783,7 @@ ClientPtr *clientp ;
     cxnum = req->context;
     if (chk_cxt(client, cxnum)) {
 	bunsetuno = req->number ;
-	maxkanji = MIN( req->datalen, LOCAL_BUFSIZE ) ; 
+	maxkanji = MIN( req->datalen, LOCAL_BUFSIZE ) ;
        ir_debug( Dmsg(5,"maxkanji [ %d ]\n", maxkanji ); )
 	if( RkwGoTo(cxnum, bunsetuno) == bunsetuno ) {
 	    ret = RkwGetKanjiList( cxnum, (Ushort *)cbuf, CBIGBUFSIZE );
@@ -951,7 +952,7 @@ ClientPtr *clientp ;
 	}
     } else {
 	PrintMsg( "[%s@%s](%s) Context Err\n", client->username, client->hostname, ProtoName[ req->Type - 1 ]	) ;
-    }	
+    }
 
     return SendTypeE2Reply(client, ret, (ret < 0)? 0: ret, dicnames, size);
 }
@@ -999,7 +1000,7 @@ ClientPtr *clientp ;
 {
     Req10 *req = &Request.Request10 ;
     ClientPtr client = *clientp ;
-    int cxnum ; 
+    int cxnum ;
     int ret = -1 ;
 
     cxnum = req->context;
@@ -1077,7 +1078,7 @@ BYTE *src, *dest;
 	dest += SIZEOFLONG;
 	LTOL4(stat->diccand, dest);	/* jisho ni aru kouho suu */
 	dest += SIZEOFLONG;
-	LTOL4(stat->ylen, dest);	/* yomigana no nagasa (in byte) */ 
+	LTOL4(stat->ylen, dest);	/* yomigana no nagasa (in byte) */
 	dest += SIZEOFLONG;
 	LTOL4(stat->klen, dest);	/* kanji no nagasa (in byte) */
 	dest += SIZEOFLONG;
@@ -1135,7 +1136,7 @@ BYTE *src, *dest;
 	RkLex *lex = (RkLex *)src;
 
 	for (i = 0; i < tangosu; i++, lex++) {
-	    LTOL4(lex->ylen, dest);	/* yomigana no nagasa (in byte) */ 
+	    LTOL4(lex->ylen, dest);	/* yomigana no nagasa (in byte) */
 	    dest += SIZEOFLONG;
 	    LTOL4(lex->klen, dest);	/* kanji no nagasa (in byte) */
 	    dest += SIZEOFLONG;
@@ -1166,7 +1167,7 @@ ClientPtr *clientp ;
 	RkwGoTo( cxnum, req->number ) ;
 	RkwXfer( cxnum, req->kouho ) ;
 
-	tangosu = RkeGetLex( cxnum, lex, MIN( req->max, LOCAL_BUFSIZE/sizeof( RkLex ) )	); 
+	tangosu = RkeGetLex( cxnum, lex, MIN( req->max, LOCAL_BUFSIZE/sizeof( RkLex ) )	);
 	size = tangosu * SIZEOFLONG * 5;
 
     } else {
@@ -1191,7 +1192,7 @@ ClientPtr client ;
     Dmsg(5,"ホスト名         :%s\n", client->hostname ) ;
     sprintf( buf,"%02ld:%02ld:%02ld", wtime/3600, (wtime%3600)/60, (wtime%3600)%60 ) ;
     Dmsg(5,"ユーザ消費時間   :%s\n\n", buf ) ;
-}	
+}
 #endif
 
 static int
@@ -1302,7 +1303,7 @@ ClientBuf *client_buf ;
 	    LTOL4( len, sendp ) ; sendp += SIZEOFLONG ;
 	    bcopy( who->username, sendp, len ) ; sendp += len ;
 	};
-	
+
 	/* ホスト名セット */
 	if (!who->hostname) {
 	    len = 1 ;
@@ -1368,11 +1369,11 @@ ClientBuf *client_buf ;
 	who = OutPut[ i ] ;
        ir_debug( DispDebug( who ); )
         id = ClientBuf_getfd(who->client_buf);
-	Wp->id = htonl( id ) ;		
-	Wp->usr_no = htonl( who->usr_no ) ;	
-	Wp->used_time = htonl( who->used_time ) ;	
+	Wp->id = htonl( id ) ;
+	Wp->usr_no = htonl( who->usr_no ) ;
+	Wp->used_time = htonl( who->used_time ) ;
 	Wp->idle_date = htonl( who->idle_date ) ;
-	Wp->connect_date = htonl( who->connect_date ) ; 
+	Wp->connect_date = htonl( who->connect_date ) ;
 	for( j = 0; j < OLD_MAXREQUESTNO; j++ )
 	    Wp->pcount[ j ] = htonl( who->pcount[ j ] ) ;
 	strncpy( Wp->username, who->username, 10 ) ;
@@ -1385,7 +1386,7 @@ ClientBuf *client_buf ;
 	  }
 	}
 	Wp ++ ;
-    }	
+    }
 
     /* サーバのバージョンを通知する */
     sendp += SetServerVersion( sendp ) ;
@@ -1522,7 +1523,7 @@ const char *hostname;
     ir_debug(Dmsg(5,"Client: <%s@%s> [%d]\n",
 		   username0, hostname0, req0->Type ));
 
-    if( (0 > req0->Type) || 
+    if( (0 > req0->Type) ||
 #ifdef EXTENSION
        ( (req0->Type > REALREQUEST) && (req0->Type < EXTBASEPROTONO) ) ||
 	    (req0->Type > (MAXEXTREQUESTNO+EXTBASEPROTONO))
@@ -1536,7 +1537,7 @@ const char *hostname;
 	PrintMsg( "Request error[ %d ]\n", req0->Type ) ;
 	return -1;
     }
-	
+
 #ifdef EXTENSION
     /* プロトコルのタイプ毎にデータを呼んでくる関数を呼ぶ */
     if( req0->Type >= EXTBASEPROTONO ) {
@@ -1926,9 +1927,9 @@ char *dirnames;
 {
   if (dirnames) {
     char *buf, *wp;
-  
+
     buf = dirnames;
-    
+
     while( *buf ){
       wp = buf + 5;
       if( !strncmp( (char *)buf, "iroha", 5 ) && (( *wp=='\0' ) || ( *wp==':' )) ){
@@ -2054,27 +2055,27 @@ oreqproc Vector[] =
 /* 0x01 */	{ ir_error /* hack */,	   ProcReq2 },
 /* 0x02 */	{ ir_finalize,		   ProcReq0 },
 /* 0x03 */	{ ir_create_context,	   ProcReq0 },
-/* 0x04 */	{ ir_duplicate_context,    ProcReq1 },	
-/* 0x05 */	{ ir_close_context,	   ProcReq1 },	
-/* 0x06 */	{ ir_dictionary_list,	   ProcReq3 },	
-/* 0x07 */	{ ir_get_yomi,		   ProcReq5 },	
-/* 0x08 */	{ ir_define_dic,	   ProcReq7 },	
-/* 0x09 */	{ ir_delete_dic,	   ProcReq7 },	
-/* 0x0a */	{ ir_set_dic_path,	   ProcReq8 },	
-/* 0x0b */	{ ir_get_dir_list,	   ProcReq3 },	
-/* 0x0c */	{ ir_mount_dictionary,	   ProcReq8 },	
-/* 0x0d */	{ ir_umount_dictionary,    ProcReq8 },	
-/* 0x0e */	{ ir_rmount_dictionary,    ProcReq9 },	
-/* 0x0f */	{ ir_mount_list,	   ProcReq3 },	
-/* 0x10 */	{ ir_convert,		   ProcReq8 },	
-/* 0x11 */	{ ir_convert_end,	   ProcReq4 },	
-/* 0x12 */	{ ir_get_kanjilist,	   ProcReq5 },	
-/* 0x13 */	{ ir_resize,		   ProcReq5 },	
-/* 0x14 */	{ ir_store_yomi,	   ProcReq9 },	
-/* 0x15 */	{ ir_get_lex,		   ProcReq11 }, 
-/* 0x16 */	{ ir_get_stat,		   ProcReq5 },	
-/* 0x17 */	{ ir_error /* hack */,	   ProcReq0 },		
-/* 0x18 */	{ ir_error /* hack */,	   ProcReq0 },		
+/* 0x04 */	{ ir_duplicate_context,    ProcReq1 },
+/* 0x05 */	{ ir_close_context,	   ProcReq1 },
+/* 0x06 */	{ ir_dictionary_list,	   ProcReq3 },
+/* 0x07 */	{ ir_get_yomi,		   ProcReq5 },
+/* 0x08 */	{ ir_define_dic,	   ProcReq7 },
+/* 0x09 */	{ ir_delete_dic,	   ProcReq7 },
+/* 0x0a */	{ ir_set_dic_path,	   ProcReq8 },
+/* 0x0b */	{ ir_get_dir_list,	   ProcReq3 },
+/* 0x0c */	{ ir_mount_dictionary,	   ProcReq8 },
+/* 0x0d */	{ ir_umount_dictionary,    ProcReq8 },
+/* 0x0e */	{ ir_rmount_dictionary,    ProcReq9 },
+/* 0x0f */	{ ir_mount_list,	   ProcReq3 },
+/* 0x10 */	{ ir_convert,		   ProcReq8 },
+/* 0x11 */	{ ir_convert_end,	   ProcReq4 },
+/* 0x12 */	{ ir_get_kanjilist,	   ProcReq5 },
+/* 0x13 */	{ ir_resize,		   ProcReq5 },
+/* 0x14 */	{ ir_store_yomi,	   ProcReq9 },
+/* 0x15 */	{ ir_get_lex,		   ProcReq11 },
+/* 0x16 */	{ ir_get_stat,		   ProcReq5 },
+/* 0x17 */	{ ir_error /* hack */,	   ProcReq0 },
+/* 0x18 */	{ ir_error /* hack */,	   ProcReq0 },
 /* 0x19 */	{ ir_host_ctl,		   ProcReq0 },
 /* 0x1a */	{ ir_query_extension,	   ProcReq12 }
 #else /* !USE_EUC_PROTOCOL */
@@ -2083,27 +2084,27 @@ oreqproc Vector[] =
 #if 0
 /* 0x02 */	{ ir_error,		   ProcReq0 },
 /* 0x03 */	{ ir_error,		   ProcReq0 },
-/* 0x04 */	{ ir_error,		   ProcReq0 },	
-/* 0x05 */	{ ir_error,		   ProcReq0 },	
-/* 0x06 */	{ ir_error,		   ProcReq0 },	
-/* 0x07 */	{ ir_error,		   ProcReq0 },	
-/* 0x08 */	{ ir_error,		   ProcReq0 },	
-/* 0x09 */	{ ir_error,		   ProcReq0 },	
-/* 0x0a */	{ ir_error,		   ProcReq0 },	
-/* 0x0b */	{ ir_error,		   ProcReq0 },	
-/* 0x0c */	{ ir_error,		   ProcReq0 },	
-/* 0x0d */	{ ir_error,		   ProcReq0 },	
-/* 0x0e */	{ ir_error,		   ProcReq0 },	
-/* 0x0f */	{ ir_error,		   ProcReq0 },	
-/* 0x10 */	{ ir_error,		   ProcReq0 },	
-/* 0x11 */	{ ir_error,		   ProcReq0 },	
-/* 0x12 */	{ ir_error,		   ProcReq0 },	
-/* 0x13 */	{ ir_error,		   ProcReq0 },	
-/* 0x14 */	{ ir_error,		   ProcReq0 },	
-/* 0x15 */	{ ir_error,		   ProcReq0 }, 
-/* 0x16 */	{ ir_error,		   ProcReq0 },	
-/* 0x17 */	{ ir_error,		   ProcReq0 },		
-/* 0x18 */	{ ir_error,		   ProcReq0 },		
+/* 0x04 */	{ ir_error,		   ProcReq0 },
+/* 0x05 */	{ ir_error,		   ProcReq0 },
+/* 0x06 */	{ ir_error,		   ProcReq0 },
+/* 0x07 */	{ ir_error,		   ProcReq0 },
+/* 0x08 */	{ ir_error,		   ProcReq0 },
+/* 0x09 */	{ ir_error,		   ProcReq0 },
+/* 0x0a */	{ ir_error,		   ProcReq0 },
+/* 0x0b */	{ ir_error,		   ProcReq0 },
+/* 0x0c */	{ ir_error,		   ProcReq0 },
+/* 0x0d */	{ ir_error,		   ProcReq0 },
+/* 0x0e */	{ ir_error,		   ProcReq0 },
+/* 0x0f */	{ ir_error,		   ProcReq0 },
+/* 0x10 */	{ ir_error,		   ProcReq0 },
+/* 0x11 */	{ ir_error,		   ProcReq0 },
+/* 0x12 */	{ ir_error,		   ProcReq0 },
+/* 0x13 */	{ ir_error,		   ProcReq0 },
+/* 0x14 */	{ ir_error,		   ProcReq0 },
+/* 0x15 */	{ ir_error,		   ProcReq0 },
+/* 0x16 */	{ ir_error,		   ProcReq0 },
+/* 0x17 */	{ ir_error,		   ProcReq0 },
+/* 0x18 */	{ ir_error,		   ProcReq0 },
 /* 0x19 */	{ ir_error,		   ProcReq0 },
 /* 0x1a */	{ ir_error,	   	   ProcReq0 }
 #endif
@@ -2131,32 +2132,32 @@ oreqproc ExtensionVector[] =
 
 const char *ProtoName[] = {
     "IR_INIT",
-    "IR_FIN",	
-    "IR_CRE_CON",	
+    "IR_FIN",
+    "IR_CRE_CON",
     "IR_DUP_CON",
     "IR_CLO_CON",
-    "IR_DIC_LIST",	
+    "IR_DIC_LIST",
     "IR_GET_YOMI",
-    "IR_DEF_DIC",	
-    "IR_UNDEF_DIC",	
-    "IR_DIC_PATH",	
-    "IR_DIR_LIST",	
-    "IR_MNT_DIC",	
+    "IR_DEF_DIC",
+    "IR_UNDEF_DIC",
+    "IR_DIC_PATH",
+    "IR_DIR_LIST",
+    "IR_MNT_DIC",
     "IR_UMNT_DIC",
     "IR_RMNT_DIC",
     "IR_MNT_LIST",
-    "IR_CONVERT",	
-    "IR_CONV_END",	
-    "IR_KAN_LST",	
+    "IR_CONVERT",
+    "IR_CONV_END",
+    "IR_KAN_LST",
     "IR_RESIZE",
-    "IR_STO_YOMI",		
-    "IR_GET_LEX",	
-    "IR_GET_STA",	
-    "IR_SER_STAT",	
-    "IR_SER_STAT2",	
+    "IR_STO_YOMI",
+    "IR_GET_LEX",
+    "IR_GET_STA",
+    "IR_SER_STAT",
+    "IR_SER_STAT2",
     "IR_HOST_CTL",
     "IR_QUERY_EXT",
-} ;			
+} ;
 
 #ifdef DEBUG
 const char *DebugProc[][2] = {
@@ -2187,11 +2188,11 @@ const char *DebugProc[][2] = {
     { "ir_server_stat2",	      "ProcReq0" } ,
     { "ir_host_ctl",		      "ProcReq0" } ,
     { "ir_query_extension",	      "ProcReq12" }
-} ;			
+} ;
 #endif
 
 const char *ExtensionName[][2] = {
-    /* Request Name		Start Protocol Number */					
+    /* Request Name		Start Protocol Number */
 #ifdef EXTENSION
     { REMOTE_DIC_UTIL,		"65536" }, /* 0x10000 */
 #endif /* EXTENSION */

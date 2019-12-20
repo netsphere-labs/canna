@@ -7,6 +7,7 @@ AC_PREREQ([2.69])
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([WHATIS.jp])
+# manual によれば -Wcategory が書けるはずだが, 反映されない.
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS([config.h])
@@ -17,7 +18,8 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 AC_PROG_CXX
 AC_PROG_CC
-# AC_PROG_RANLIB
+AC_PROG_CC_STDC
+AM_PROG_AR
 # AM_PROG_LIBTOOL is deprecated.
 LT_INIT
 AC_PROG_LN_S
@@ -60,6 +62,10 @@ AC_CHECK_FUNCS([dup2 gethostname inet_ntoa memchr memset mkdir munmap select set
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF(wchar_t)
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
+
+# DEBUG
+test -z "$GCC" || CFLAGS="$CFLAGS -Wall"  
+
 AC_CONFIG_FILES([
   Makefile
   lib/RK/Makefile

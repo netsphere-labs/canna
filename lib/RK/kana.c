@@ -30,6 +30,7 @@ static char rcsid[]="@(#) 102.1 $Id: kana.c,v 1.2 2003/09/17 08:50:52 aida_s Exp
 #include "RKintern.h"
 #include "canna/canna.h"
 #include <assert.h>
+#include "canna/sglobal.h"
 
 #define SUUJI_THROUGH		0
 #define SUUJI_HANKAKU		1

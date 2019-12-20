@@ -1,6 +1,7 @@
 
 #include "RKintern.h"
 #include <assert.h>
+#include "canna/sglobal.h"
 
 size_t
 WStrlen(const cannawc* ws)

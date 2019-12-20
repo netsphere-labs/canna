@@ -225,11 +225,6 @@ char *insertUserSla pro((char *, int));
 int checkPermissionToRead pro((ClientPtr client,
       char *dirname, char *dicname));
 
-/* main.c */
-int process_request pro((
-      ClientPtr *clientp, ClientBuf *client_buf,
-      BYTE *data, size_t len));
-
 /* session.c */
 UserTable *UserTable_new pro((void));
 void UserTable_delete pro((UserTable *obj));
