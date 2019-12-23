@@ -1199,8 +1199,11 @@ int DMchmod pro((struct DM *, int));
 
 #define uslen WStrlen
 //int uslen pro((Wchar *));
+//#define ushortstrlen WStrlen
 
 #define usncopy WStrncpy
+
+//#define ushort2euc CNvW2E
 
 unsigned char *ustoeuc pro((const cannawc* src, int srclen,
                             unsigned char* dest, int destlen));

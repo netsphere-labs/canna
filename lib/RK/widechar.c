@@ -73,6 +73,8 @@ WStrcpy(cannawc* ws1, const cannawc* ws2)
 int
 ushortstrncpy(cannawc* wdest, const cannawc* wsrc, int n)
 {
+    assert(wsrc);
+
     int res = 0;
     while (res < n - 1 && (*wdest = *wsrc) != 0) {
         wdest++; wsrc++; res++;

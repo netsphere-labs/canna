@@ -14,12 +14,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -52,7 +52,7 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 
 /* LINTLIBRARY */
 
-#include "canna/sglobal.h" 
+#include "canna/sglobal.h"
 #include    "rkcw.h"
 #include    "canna/RK.h"
 #include    "rkc.h"
@@ -64,7 +64,7 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #include    <grp.h>
 #include    <signal.h>
 #include    <unistd.h>
-	
+
 /* CX:	コンテクストテーブル
  *	必要なレコードだけをmallocで作成する。
  *	^^^^^^^^^^^^^^^^^^
@@ -107,7 +107,7 @@ static char *ProtoVerTbl[] = {
     W_VERSION,/* サーバと同じメジャー番号の時は、サーバの
                                     バージョンのプロトコルを使っている。*/
     "2.1",    /* サーバよりメジャー番号が小さい時は、
-              小さい方のプロトコルを使う。(ここはマクロにした方がよいね)*/ 
+              小さい方のプロトコルを使う。(ここはマクロにした方がよいね)*/
 #ifdef USE_EUC_PROTOCOL
     E_VERSION,	/* ver1.2 */
     "1.0",
@@ -116,9 +116,9 @@ static char *ProtoVerTbl[] = {
 };
 
 static struct {
-  Ushort cbuf[CBUFSIZE];
-  char buffer[BUFSIZE];
-  cannawc wbuf[CBUFSIZE];
+    cannawc cbuf[CBUFSIZE];
+    char buffer[BUFSIZE];
+    cannawc wbuf[CBUFSIZE];
 } rkc; /* general buffer。ただし、RkwXXX のなかだけで使うことにしよう。*/
 
 /*
@@ -258,12 +258,12 @@ FindLogname()
     return uinfo->uname;
   else {
     char *username = NULL, *getenv(), *getlogin();
-  
+
     struct passwd *pass = getpwuid(getuid());
     if( pass )
     username = pass->pw_name;
     if (username == NULL){
-      if ( (username = getlogin()) == NULL ) {	
+      if ( (username = getlogin()) == NULL ) {
         if( (username = getenv( "LOGNAME" )) == NULL ) {
           username = getenv( "USER" );
         }
@@ -283,7 +283,7 @@ FindGroupname()
     struct group *gr = getgrgid(getgid()) ;
     if (gr && gr->gr_name) {
       return gr->gr_name;
-    } 
+    }
     else{
       return (char *)NULL;
     }
@@ -311,7 +311,7 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     char *username, *data ;
 
     if( rkc_call_flag == BUSY )
-		return( 0 );	
+		return( 0 );
 
     rkc_configure();
     if (config_error_handler)
@@ -387,7 +387,7 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     }
 
     /* サーバのマイナーバージョンを得る */
-    ProtocolMinor = 
+    ProtocolMinor =
       (short)((unsigned long)(server & 0xffff0000) >> (unsigned)0x10);
 
     /* サーバから取得したコンテクスト番号を入れる */
@@ -430,7 +430,7 @@ RkwFinalize()
 	if( RkcCX[ i ] ) {
 	    freeCC( i ) ;
 	}
-    }	
+    }
 
     (*RKCP->finalize)();
 
@@ -478,11 +478,11 @@ RkwCloseContext( int cxnum )
     freeCC( cxnum ) ;
     return( 0 );
 }
-/* 
- * KillServer 
+/*
+ * KillServer
  *
  * Version 3.3 以前のサーバには送らない 戻り値 OLDSRV = -110
- * Version 3.3 のサーバには送る 
+ * Version 3.3 のサーバには送る
  *
  */
 int
@@ -599,7 +599,7 @@ int max ;
     if( !cx )
 	return( -1 ) ;
 
-    if( max <= 0 ) 
+    if( max <= 0 )
 	return( 0 ) ;
     else if( !dicnames ) {
       return (*RKCP->dictionary_list)(cx, rkc.buffer, BUFSIZE);
@@ -637,12 +637,12 @@ Ushort *wordrec ;
  *  コンテクスト番号 or -1
  */
 int
-RkwDefineDic(int cxnum, char* dicname, cannawc* wordrec)
+RkwDefineDic(int cxnum, const char* dicname, const cannawc* wordrec)
 {
-    if( !dicname || !wordrec )
-	return( -1 ) ;
+    if ( !dicname || !wordrec )
+        return -1;
 
-    wchar2ushort(wordrec, wcharstrlen(wordrec), rkc.cbuf, CBUFSIZE);
+    WStrncpy(rkc.cbuf, wordrec, CBUFSIZE);
     return _RkwDefineDic(cxnum, dicname, rkc.cbuf);
 }
 
@@ -663,10 +663,11 @@ Ushort *wordrec ;
 int
 RkwDeleteDic(int cxnum, char* dicname, cannawc* wordrec)
 {
-  if( !dicname || !wordrec ) return -1;
+    if( !dicname || !wordrec )
+        return -1;
 
-  wchar2ushort(wordrec, wcharstrlen(wordrec), rkc.cbuf, CBUFSIZE);
-  return _RkwDeleteDic(cxnum, dicname, rkc.cbuf);
+    WStrncpy(rkc.cbuf, wordrec, CBUFSIZE);
+    return _RkwDeleteDic(cxnum, dicname, rkc.cbuf);
 }
 
 int
@@ -751,8 +752,8 @@ int bun_max ;
     register	RkcBun		*bun ;
     register	Ushort	*kouhobuf ;
 
-    /* カレント文節から最終文節までの候補を解放する */	
-    freeBUN( cx, cx->curbun ) ; 
+    /* カレント文節から最終文節までの候補を解放する */
+    freeBUN( cx, cx->curbun ) ;
 
     /* ここには、rkc_*(rkcConvert.c)で第一候補列が格納されている */
     kouhobuf = cx->Fkouho ;
@@ -774,15 +775,14 @@ int bun_max ;
     cx->maxbun = bun_max ;
 }
 
-/*
+/**
  *    連文節変換開始
+ * @param yomi NULL ありうる.
  */
-static int	
-_RkwBgnBun(cxnum, yomi, maxyomi, mode)
-int cxnum, maxyomi, mode ; 
-Ushort *yomi ;
+static int
+_RkwBgnBun(int cxnum, cannawc* yomi, int maxyomi, int mode)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
     int nbun, mask;					/* S002 */
 
     if( (maxyomi <= 0) || !cx )
@@ -809,12 +809,12 @@ Ushort *yomi ;
     /* これ以上の文節数は存在しないはず */
 
     cx->curbun = cx->maxbun = 0 ;
-    if( yomi != NULL ){
+    if ( yomi != NULL ) {
 	if( !(cx->bun = (RkcBun *)calloc( maxyomi, sizeof(RkcBun) )) )
 	    return( -1 ) ;
 	cx->lastyomi = (Ushort *)NULL;
 	nbun = (*RKCP->convert)(cx, yomi, maxyomi, mode);
-	if( nbun <= 0 ) {				
+	if( nbun <= 0 ) {
 	    RkcFree( (char *)cx->bun ) ;
 	    cx->bun = (RkcBun *)NULL ;
 	    return( -1 ) ;
@@ -830,7 +830,7 @@ Ushort *yomi ;
 	}
 
 	nbun = (*RKCP->autoconv)(cx, maxyomi, mode);
-	if( nbun < 0 ) {				
+	if( nbun < 0 ) {
 	    RkcFree( (char *)cx->bun ) ;
 	    cx->bun = (RkcBun *)NULL ;
 	    RkcFree( (char *)cx->lastyomi );
@@ -840,24 +840,21 @@ Ushort *yomi ;
 	*(cx->lastyomi) = ( Ushort )0;
     }
     cx->bgnflag = BUSY ;
-    return( nbun ) ;
+    return nbun;
 }
 
+
 int
-RkwBgnBun(cxnum, yomi, maxyomi, mode)
-int cxnum;
-cannawc *yomi;
-int maxyomi;
-int mode;
+RkwBgnBun(int cxnum, const cannawc* yomi, int maxyomi, int mode)
 {
     int len;
 
     if (yomi) {
-      len = wchar2ushort(yomi, maxyomi, rkc.cbuf, CBUFSIZE);
-      return _RkwBgnBun(cxnum, rkc.cbuf, len, mode);
+        len = ushortstrncpy(rkc.cbuf, yomi, min(maxyomi + 1, CBUFSIZE));
+        return _RkwBgnBun(cxnum, rkc.cbuf, len, mode);
     }
     else {  /* 自動変換開始 */
-      return _RkwBgnBun(cxnum, (Ushort *)NULL, maxyomi, mode);
+        return _RkwBgnBun(cxnum, NULL, maxyomi, mode);
     }
 }
 
@@ -929,7 +926,7 @@ int cxnum, knum ;
 	bun = &cx->bun[cx->curbun];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
-	if ( 0 <= knum && knum < bun->maxcand ) 
+	if ( 0 <= knum && knum < bun->maxcand )
 	    bun->curcand = knum;
 	return( bun->curcand );
     }
@@ -944,7 +941,7 @@ int cxnum ;
     register RkcBun	 *bun ;
 
     if( cx ) {
-	bun = &cx->bun[ cx->curbun ];	
+	bun = &cx->bun[ cx->curbun ];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
 	bun->curcand = bun->maxcand - 1; /* 読みは、最後にある(0オリジン) */
@@ -960,7 +957,7 @@ RkwNext(int cxnum)
     register RkcBun	 *bun ;
 
     if( cx ) {
-	bun = &cx->bun[ cx->curbun ];	
+	bun = &cx->bun[ cx->curbun ];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
 	if ( ++bun->curcand > bun->maxcand-1 )
@@ -1180,7 +1177,7 @@ int cxnum, len ;
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
     int ret;		/* 総文節数 */
 
-    if( cx ) {	
+    if( cx ) {
 	/* 文節長が変更できるかどうかチェックする */
 	register RkcBun *bun = &cx->bun[ cx->curbun ] ;
 
@@ -1230,7 +1227,7 @@ int cxnum, len ;
 		    return( cx->maxbun ) ;
 	    }
 	}
-	/* 〇文節から最終文節まで格納される */	
+	/* 〇文節から最終文節まで格納される */
 	if ((ret = (*RKCP->resize)(cx, len)) <= 0) {
 	    return( -1 ) ;
 	}
@@ -1301,21 +1298,17 @@ Ushort *yomi ;
 }
 
 int
-RkwStoreYomi(cxnum, yomi, maxyomi)
-int cxnum;
-cannawc *yomi;
-int maxyomi;
+RkwStoreYomi(int cxnum, const cannawc* yomi, int maxyomi)
 {
-  int len;
+    int len;
 
-  if (yomi && maxyomi >= 0) {
-    len = RKI_MIN(wcharstrlen(yomi),maxyomi); 
-    len = wchar2ushort(yomi, len, rkc.cbuf, CBUFSIZE) + 1;
-  } else {
-    rkc.cbuf[0] = 0;
-    len = 0;
-  }
-  return _RkwStoreYomi(cxnum, rkc.cbuf, len);
+    if (yomi && maxyomi >= 0)
+        len = WStrncpy(rkc.cbuf, yomi, min(maxyomi + 1, CBUFSIZE));
+    else {
+        rkc.cbuf[0] = 0;
+        len = 0;
+    }
+    return _RkwStoreYomi(cxnum, rkc.cbuf, len);
 }
 
 int								/* S003 */
@@ -1337,7 +1330,7 @@ Ushort	*yomi;
 #endif
 
     if( cx ){
-	bun = &cx->bun[ cx->curbun ] ;		
+	bun = &cx->bun[ cx->curbun ] ;
 	if( !PROTOCOL && (ProtocolMinor == 0) ) {
 	    /* Ver 1.0 では，取りあえず候補一覧を取ってくる */
 	    if( LoadKouho( cx ) < 0 )
@@ -1403,7 +1396,7 @@ RkLex *lex ;
 	  return 0;
 	}
 #endif
-	ret = (*RKCP->get_lex)(cx, 1024, buf); 
+	ret = (*RKCP->get_lex)(cx, 1024, buf);
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
 	GlobalFree((HGLOBAL)buf);
 #endif
@@ -1713,7 +1706,7 @@ Ushort	*yomi;
 {
     register RkcContext *cx = getCC( cxnum, CHECK );
     int len, curbun, nbun = -1, pbun, retval = -1;
-#ifndef USE_MALLOC_FOR_BIG_ARRAY
+#ifndef USE_MALLOC_FOR_BIG_ARRAY  ●●これはあかん
     Ushort cbuf[CBUFSIZE];
 #else
     Ushort *cbuf = GlobalAlloc(GMEM_FIXED, sizeof(Ushort) * CBUFSIZE);
@@ -1764,6 +1757,7 @@ Ushort	*yomi;
 #endif
     return retval;
 }
+
 
 int
 RkwSubstYomi( cxnum, ys, ye, yomi, nyomi )
@@ -2496,7 +2490,7 @@ int maxyomi;
   int len;
 
   if (yomi && maxyomi >= 0) {
-    len = RKI_MIN((int)strlen(yomi),maxyomi); 
+    len = RKI_MIN((int)strlen(yomi),maxyomi);
     len = euc2ushort(yomi, len, cbuf, CBUFSIZE) + 1;
   } else {
     cbuf[0] = 0;
@@ -2908,4 +2902,3 @@ int buffer_size;
     }
     return( -1 ) ;
 }							/* S000:end */
-

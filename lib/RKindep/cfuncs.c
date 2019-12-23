@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "config.h"
@@ -29,10 +29,7 @@ RCSID("$Id: cfuncs.c,v 1.2.2.1 2003/12/27 17:15:24 aida_s Exp $");
 
 #ifndef HAVE_STRLCPY
 size_t
-RkiAltStrlcpy(dst, src, size)
-char *dst;
-const char *src;
-size_t size;
+RkiAltStrlcpy(char* dst, const char* src, size_t size)
 {
   const char *sp = src;
   char *dp = dst;
@@ -50,10 +47,7 @@ last:
 }
 
 size_t
-RkiAltStrlcat(dst, src, size)
-char *dst;
-const char *src;
-size_t size;
+RkiAltStrlcat(char* dst, const char* src, size_t size)
 {
   const char *sp = src;
   char *dp = dst;

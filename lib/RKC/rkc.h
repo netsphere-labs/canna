@@ -24,12 +24,11 @@
 /* #ident	"@(#) NEC/V(386) R3.0B rkc.h 5.9 90/03/26 21:04:36" */
 /* $Id: rkc.h,v 1.5 2003/09/17 08:50:53 aida_s Exp $ */
 
-#if defined(ENGINE_SWITCH)
-#include "RKrename.h"
-#endif
-
 #include "canna/ccompat.h"
 #include "canna/rkcapi.h"
+
+// Internal APIs.
+#include "canna/sglobal.h"
 
 /* 文節情報レコード
  *
@@ -64,16 +63,15 @@ typedef struct _RkcContext {
     short	    maxyomi;
 } RkcContext ;
 
-#define ushort2euc CNvW2E
+//#define ushort2euc CNvW2E
 
 int
 euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen);
 
-#define wcharstrlen WStrlen
-#define ushortstrlen WStrlen
+//#define wcharstrlen WStrlen
+//#define ushortstrlen WStrlen
 
-extern ushort2wchar(), wchar2ushort(),
-      ushortstrcpy() ;
+extern ushortstrcpy() ;
 
 typedef long (*initialize_t) pro((char *));
 typedef int (*finalize_t) pro((void));

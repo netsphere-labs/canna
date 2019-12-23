@@ -368,17 +368,23 @@
 #define tourokureibun_mode                  G365_tourokureibun_mode
 #define trimYomi                            G366_trimYomi
 #define uiUtilIchiranTooSmall               G367_uiUtilIchiranTooSmall
-#define ushort2euc                          G368_ushort2euc
+//#define ushort2euc                          G368_ushort2euc
+#define ushort2euc  G008_CNvW2E
+
 #define ushort2eucsize                      G369_ushort2eucsize
 #define ushort2wchar                        G370_ushort2wchar
 #define ushortstrcpy                        G371_ushortstrcpy
-#define ushortstrlen                        G372_ushortstrlen
+//#define ushortstrlen                        G372_ushortstrlen
+#define ushortstrlen  G128_WStrlen
+
 #define ushortstrncpy                       G373_ushortstrncpy
 #define uuKigoGeneralExitCatch              G374_uuKigoGeneralExitCatch
 #define uuKigoMake                          G375_uuKigoMake
 #define uuTTangoQuitCatch                   G376_uuTTangoQuitCatch
 #define wchar2ushort                        G377_wchar2ushort
-#define wcharstrlen                         G378_wcharstrlen
+//#define wcharstrlen                         G378_wcharstrlen
+#define wcharstrlen G128_WStrlen
+
 #define wideproto                           G379_wideproto
 #define xString                             G380_xString
 #define yomiInfoLevel                       G381_yomiInfoLevel

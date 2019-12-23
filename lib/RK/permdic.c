@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -27,9 +27,7 @@ static char rcs_id[] = "$Id: permdic.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $";
 #include	"RKintern.h"
 
 
-#ifdef SVR4
-#include	<unistd.h>
-#endif
+#include <unistd.h>
 
 #ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
@@ -49,6 +47,7 @@ extern	Wchar		uniqAlnum();
 extern int fd_dic;      /* mmap */
 #endif
 
+// @return If failed, -1.
 static int
 openDF(df, dfnm, w, gramoff, gramsz)
      struct DF	*df;
@@ -65,9 +64,9 @@ openDF(df, dfnm, w, gramoff, gramsz)
   int		count = 0, err;
   int		fd;
   int errres = -1;
-    
+
   *w = 0;
-  if ((fd = open(dfnm, 0)) == -1) 
+  if ((fd = open(dfnm, 0)) == -1)
     return errres;
 #ifdef __CYGWIN32__
   setmode(fd, O_BINARY);
@@ -163,7 +162,7 @@ _Rkpopen(dm, dfnm, mode, gram)
   int fd;
   off_t		gramoff;
   size_t	gramsz;
-  
+
   if (!(df = dm->dm_file) || !(dd = df->df_direct))
     return -1;
   if (!df->df_rcount) {
@@ -181,7 +180,7 @@ _Rkpopen(dm, dfnm, mode, gram)
   df->df_rcount++;
   xdm = (struct ND *)dm->dm_xdm;
   fd = df->df_fdes;
-  
+
   if (!(xdm->buf = (unsigned char *)malloc((size_t)xdm->drsz))) {
     return(-1);
   }
@@ -242,7 +241,7 @@ _Rkpopen(dm, dfnm, mode, gram)
   return 0;
 }
 
-int	
+int
 _Rkpclose(dm, dfnm, gram)
      struct DM	*dm;
      char		*dfnm;
@@ -277,7 +276,7 @@ _Rkpclose(dm, dfnm, gram)
       (void)free((char *)xdm->pgs);
       xdm->pgs = (struct NP *)0;
     }
-    if (xdm->buf) { 
+    if (xdm->buf) {
       (void)free((char *) xdm->buf);
       xdm->buf = (unsigned char *)0;
     }
@@ -288,7 +287,7 @@ _Rkpclose(dm, dfnm, gram)
     struct DM	*dmh, *ddm;
 
     fd = df->df_fdes;
-    
+
     (void)close(fd);
     dmh = &df->df_members;
     for (ddm = dmh->dm_next; ddm != dmh; ddm = ddm->dm_next) {
@@ -521,7 +520,7 @@ SearchInDir(dm, xdm, pos, key, cur, ylen, nread, mc, nc, cf)
   return(nc);
 }
 
-int		
+int
 _Rkpsearch(cx, dm, key, n, nread, mc, cf)
      struct RkContext	*cx;
      struct DM		*dm;
@@ -543,7 +542,7 @@ _Rkpsearch(cx, dm, key, n, nread, mc, cf)
   return(0);
 }
 
-int	
+int
 _Rkpio(dm, cp, io)
      struct DM		*dm;
      struct ncache	*cp;
@@ -566,7 +565,7 @@ ch_perm(qm, offset, size, num)
 {
   unsigned char	tmp[8192];
   /* I leave this stack located array because of it is not used */
-  
+
   if (num > 0) {
     _RkCopyBits(tmp, 0, size, qm->dm_qbits, offset, num);
     _RkCopyBits(qm->dm_qbits, offset + 0, size,
@@ -579,7 +578,7 @@ ch_perm(qm, offset, size, num)
 #define PERM_WRECSIZE 2048
 #define PERM_NREADSIZE 128
 
-int	
+int
 _Rkpctl(dm, qm, what, arg, gram)
      struct DM	*dm;
      struct DM	*qm;
@@ -620,13 +619,13 @@ _Rkpctl(dm, qm, what, arg, gram)
   if ((qm->dm_flags & (DM_WRITABLE | DM_WRITEOK)) ==
       (DM_WRITABLE | DM_WRITEOK)) {
     /* (writable and write ok) */
-  
+
     if (RkParseOWrec(gram, arg, wrec, PERM_WRECSIZE, lucks)) {
       Wrec	    *p, *q, *kanji;
       Wchar         *wkey;
       int	    maxcache = PERM_NREADSIZE;
       int           ylen, klen, cnum, y_off = 2, k_off;
-      
+
 
       ylen = (wrec[0] >> 1) & 0x3f;
       if (wrec[0] & 0x80)
@@ -638,21 +637,21 @@ _Rkpctl(dm, qm, what, arg, gram)
 	p += 2;
       }
       *(key+ylen) = 0;
-      
+
       /* 品詞、漢字情報の取り出し */
       k_off = y_off + ylen * 2;
       klen = (wrec[k_off] >> 1) & 0x7f;
       cnum = ((wrec[k_off] & 0x01) << 8) | wrec[k_off+1];
       kanji = wrec + k_off + 2;
-      
+
       nc = -1;
       xdm = (struct ND *)dm->dm_xdm;
       if (xdm) {
 	if (xdm->buf)
-	  nc = SearchInDir(dm, xdm, xdm->buf, key, 0, ylen, nread, 
+	  nc = SearchInDir(dm, xdm, xdm->buf, key, 0, ylen, nread,
 			   maxcache, 0, &cf);
-      } 
-      
+      }
+
       if (nc > 0) {
 	struct nread	*thisRead;
 	struct ncache	*thisCache;
@@ -660,12 +659,12 @@ _Rkpctl(dm, qm, what, arg, gram)
 	int             nk, nl, pre;
 	unsigned long	offset;
 	int		bitSize, fnum = -1, nnum, i;
-	
+
 	for (i = 0 ; i < nc ; i++) {
 	  if (nread[i].nk == ylen) {
 	    break;
 	  }
-	} 
+	}
 	/* 使わない単語候補はあらかじめ _RkDerefCache する */
 	for (pre = 0 ; pre < nc ; pre++) {
 	  if (pre != i) {
@@ -673,28 +672,28 @@ _Rkpctl(dm, qm, what, arg, gram)
 	    thisCache = thisRead->cache;
 	    _RkDerefCache(thisCache);
 	  }
-	} 
+	}
 
 	if (i < nc) {
 	  thisRead = nread + i;
 	  thisCache = thisRead->cache;
 	  wp = thisCache->nc_word;
-	
+
 	  nk = _RkCandNumber(wp);
 	  nl = (*wp >> 1) & 0x3f;
 	  if (*wp & 0x80)
 	    wp += 2;
 	  wp += 2 + nl *2;
-	
+
 	/* ここの部分で辞書の何番目にでてくるか (fnum) を探す */
 	  for (i = 0; i < nk; i++) {
 	    unsigned char	*kp;
-	  
+
 	    nl = (*wp >> 1) & 0x7f;               /* 候補長 */
 	    nnum = ((*wp & 0x01) << 8) | *(wp+1); /* 品詞番号 */
 	    if (nl == klen && nnum == cnum) {
 	      int lc;
-	      
+
 	      for (lc = 0, kp = wp + 2; lc < klen*2; lc++) {
 		if (*(kanji+lc) != *(kp+lc))
 		  break;
@@ -706,12 +705,12 @@ _Rkpctl(dm, qm, what, arg, gram)
 	    }
 	    wp += 2 + nl*2;
 	  }
-	
+
 	  offset = thisRead->offset;
-	  if (fnum >= 0 && fnum < nk && 0 < thisRead->nk && 
+	  if (fnum >= 0 && fnum < nk && 0 < thisRead->nk &&
 	      thisRead->nk <= ylen && thisRead->nk <= RK_KEY_WMAX)  {
 	    int	   ecount, cval, i, dn = -1, ndel = 0;
-	  
+
 	    bitSize = _RkCalcLog2(nk + 1) + 1;
 	    _RkUnpackBits(permutation, qm->dm_qbits, offset, bitSize, nk);
 	    switch (what) {
@@ -741,7 +740,7 @@ _Rkpctl(dm, qm, what, arg, gram)
 		  dn = i;
 	      };
 	      break;
-	    }	  
+	    }
 	    if (ecount || cval < (nk-1)*(nk-2)) {
 	      for (i = 0; i < nk; i++)
 		permutation[i] = 2*i;
@@ -781,9 +780,9 @@ _Rkpctl(dm, qm, what, arg, gram)
   (void)free((char *)permutation);
 #endif
   return ret;
-}  
+}
 
-int	
+int
 _Rkpsync(cx, dm, qm)
      struct RkContext *cx;
      struct DM	*dm, *qm;
@@ -812,7 +811,7 @@ _Rkpsync(cx, dm, qm)
         for(j=0;j<dic->ttlpg;j++) {
           if (isLoadedPage(dic->pgs + j))
             if (_RkDoInvalidateCache(dic->pgs[j].buf, dic->pgsz) == 1) {
-	      if (((int) (dic->pgs[j].buf)) != -1) 
+	      if (((int) (dic->pgs[j].buf)) != -1)
 	        munmap((caddr_t)dic->pgs[j].buf, dic->pgsz);
               dic->pgs[j].buf = (unsigned char *)0;
               dic->pgs[j].lnksz = (unsigned) 0;

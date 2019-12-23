@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: file.h,v 1.5 2003/09/21 12:56:28 aida_s Exp $ */
@@ -73,12 +73,12 @@ typedef fd_set rki_fd_set;
 extern "C" {
 #endif
 
-extern int RkiConnect pro((int fd, struct sockaddr *addrp, size_t len, 
+extern int RkiConnect pro((int fd, struct sockaddr *addrp, size_t len,
       const struct timeval *timeout));
 extern char *RkiGetLine pro((FILE *src));
 extern void *RkiReadWholeFile pro((FILE *src, size_t *retsize));
 
-extern char *RkiBasename pro((const char *src));
+extern const char* RkiBasename pro((const char *src));
 #ifdef __cplusplus
 }
 #endif

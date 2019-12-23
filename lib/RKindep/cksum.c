@@ -1,26 +1,6 @@
-/* Copyright (c) 2003 Canna Project. All rights reserved.
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for any purpose is hereby granted without
- * fee, provided that the above copyright notice appear in all copies
- * and that both that copyright notice and this permission notice
- * appear in supporting documentation, and that the name of the
- * author and contributors not be used in advertising or publicity
- * pertaining to distribution of the software without specific, written
- * prior permission.  The author and contributors no representations
- * about the suitability of this software for any purpose.  It is
- * provided "as is" without express or implied warranty.
- *
- * THE AUTHOR AND CONTRIBUTORS DISCLAIMS ALL WARRANTIES WITH REGARD TO
- * THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS, IN NO EVENT SHALL THE AUTHOR AND CONTRIBUTORS BE LIABLE FOR
- * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
- * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
- */
-
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -35,11 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -56,30 +32,22 @@
  * SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "canna/ccompat.h"
-#include "RKindep/cksum.h"
+#ifndef lint
+#if 0
+static char sccsid[] = "@(#)crc.c	8.1 (Berkeley) 6/17/93";
+#endif
+#endif /* not lint */
+#include <sys/cdefs.h>
+__FBSDID("$FreeBSD$");
 
-RCSID("$Id: cksum.c,v 1.4 2003/09/25 14:37:24 aida_s Exp $");
+#include <sys/types.h>
 
-static void RkiCksumCRCAdd pro((RkiCksumCalc *cx,
-      const void *data, size_t len));
+#include <stdint.h>
+#include <unistd.h>
 
-int
-RkiCksumAdd(cx, data, len)
-RkiCksumCalc *cx;
-const void *data;
-size_t len;
-{
-  RkiCksumCRCAdd(cx, data, len);
-  return 0;
-}
+#include "extern.h"
 
-/*
- * POSIX 1003.2 cksum (==ISO/IEC 8802-3:1989 CRC)
- */
-
-static const canna_uint32_t crctab[] = {
+static const uint32_t crctab[] = {
 	0x0,
 	0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
 	0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6,
@@ -134,37 +102,44 @@ static const canna_uint32_t crctab[] = {
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
+/*
+ * Compute a POSIX 1003.2 checksum.  This routine has been broken out so that
+ * other programs can use it.  It takes a file descriptor to read from and
+ * locations to store the crc and the number of bytes read.  It returns 0 on
+ * success and 1 on failure.  Errno is set on failure.
+ */
+uint32_t crc_total = ~0;		/* The crc over a number of files. */
+
 int
-RkiCksumCRCInit(cx)
-RkiCksumCalc *cx;
+crc(int fd, uint32_t *cval, off_t *clen)
 {
-  cx->curr = 0;
-  cx->len = 0;
-  return 0;
+	uint32_t lcrc;
+	int nr;
+	off_t len;
+	u_char *p;
+	u_char buf[16 * 1024];
+
+#define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
+
+	lcrc = len = 0;
+	crc_total = ~crc_total;
+	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+		for (len += nr, p = buf; nr--; ++p) {
+			COMPUTE(lcrc, *p);
+			COMPUTE(crc_total, *p);
+		}
+	if (nr < 0)
+		return (1);
+
+	*clen = len;
+
+	/* Include the length of the file. */
+	for (; len != 0; len >>= 8) {
+		COMPUTE(lcrc, len & 0xff);
+		COMPUTE(crc_total, len & 0xff);
+	}
+
+	*cval = ~lcrc;
+	crc_total = ~crc_total;
+	return (0);
 }
-
-#define	CRC(varp, ch) (*(varp) = *(varp) << 8 ^ crctab[*(varp) >> 24 ^ (ch)])
-static void
-RkiCksumCRCAdd(cx, data, len)
-RkiCksumCalc *cx;
-const void *data;
-size_t len;
-{
-  const unsigned char *p = (const unsigned char *)data;
-  const unsigned char *endp = p + len;
-
-  for (; p < endp; ++p)
-    CRC(&cx->curr, *p);
-  cx->len += len;
-}
-
-canna_uint32_t
-RkiCksumCRCFinish(cx)
-RkiCksumCalc *cx;
-{
-  for (; cx->len != 0; cx->len >>= 8) /* LSB first, variable length */
-    CRC(&cx->curr, cx->len & 0xff);
-  return ~cx->curr;
-}
-
-/* vim: set sw=2: */
