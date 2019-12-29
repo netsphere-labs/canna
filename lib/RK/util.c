@@ -1,3 +1,5 @@
+﻿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -26,9 +28,7 @@ static char rcsid[]="@(#)$Id: util.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $ $Aut
 
 #include "RKintern.h"
 #include <stdio.h>
-#ifdef __STDC__
 #include <stdarg.h>
-#endif
 
 #define	isEndTag(s)	(s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 0)
 
@@ -60,7 +60,7 @@ static char rcsid[]="@(#)$Id: util.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $ $Aut
 #define HD_TAG_GRAM	"GRAM"
 #define HD_TAG_GRSZ	"GRSZ"
 
-static char	*Hdrtag[] = {
+static const char* Hdrtag[] = {
   HD_TAG_MAG,
   HD_TAG_SIZ,
   HD_TAG_HSZ,
@@ -88,11 +88,11 @@ static char	*Hdrtag[] = {
   HD_TAG_CRC,
   HD_TAG_GRAM,
   HD_TAG_GRSZ,
-  0,
+  NULL,
 };
 
 
-static FILE	*log = (FILE *)0;
+static FILE* log = NULL;
 
 void
 _Rkpanic( const char* fmt, ... )
@@ -115,18 +115,14 @@ _Rkpanic( const char* fmt, ... )
 }
 
 void
-RkAssertFail(file, line, expr)
-     const char *file;
-     int line;
-     const char *expr;
+RkAssertFail(const char* file, int line, const char* expr)
 {
   _Rkpanic("RK assertion failed: %s:%d %s", file, line, expr);
   /* NOTREACHED */
 }
 
 int
-_RkCalcUnlog2(x)
-     int	x;
+_RkCalcUnlog2( int x )
 {
   return((1 << x) - 1);
 }
@@ -143,16 +139,16 @@ _RkCalcLog2(n)
   return(lg2);
 }
 
-Wchar
-uniqAlnum(c)
-     Wchar c;
+// 全角数字・アルファベットのみを半角に変換する。それ以外はそのまま返す
+cannawc
+uniqAlnum(cannawc c)
 {
-  return((0xa3a0 < c && c < 0xa3ff) ? (Wchar)(c & 0x7f) : c);
+    return (c >= 0xa3b0 && c <= 0xa3b9 || c >= 0xa3c1 && c <= 0xa3da ||
+            c >= 0xa3e1 && c <= 0xa3fa) ? (c & 0x7f) : c;
 }
 
 void
-_RkClearHeader(hd)
-     struct HD	*hd;
+_RkClearHeader(struct HD* hd)
 {
   int	i;
 
@@ -166,11 +162,8 @@ _RkClearHeader(hd)
 }
 
 static int
-read_tags(hd, srctop, srcend, pass)
-     struct HD	*hd;
-     const unsigned char *srctop;
-     const unsigned char *srcend;
-     int	pass;
+read_tags(struct HD* hd, const unsigned char* srctop,
+          const unsigned char* srcend, int pass)
 {
   unsigned long	len, off;
   const unsigned char *src = srctop;
@@ -215,10 +208,7 @@ read_tags(hd, srctop, srcend, pass)
 }
 
 int
-_RkReadHeader(fd, hd, off_from_top)
-     int	fd;
-     struct HD	*hd;
-     off_t	off_from_top;
+_RkReadHeader(int fd, struct HD* hd, off_t off_from_top)
 {
   off_t tmpres;
   ssize_t pass1size;
@@ -296,9 +286,7 @@ _RkReadHeader(fd, hd, off_from_top)
 }
 
 unsigned char *
-_RkCreateHeader(hd, size)
-     struct HD	*hd;
-     size_t *size;
+_RkCreateHeader(struct HD* hd, size_t* size)
 {
   unsigned char	*tagdst, *datadst, *ptr;
   unsigned int i;
@@ -355,18 +343,14 @@ _RkCreateHeader(hd, size)
 }
 
 unsigned long
-_RkGetTick(mode)
-     int	mode;
+_RkGetTick(int mode)
 {
   static unsigned long time = 10000;
   return(mode ? time++ : time);
 }
 
 int
-set_hdr_var(hd, n, var)
-     struct HD		*hd;
-     int		n;
-     unsigned long	var;
+set_hdr_var(struct HD* hd, int n, unsigned long var)
 {
     if (!hd)
 	return -1;

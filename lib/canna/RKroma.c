@@ -101,28 +101,32 @@ int dicfd;
     return 0;
 }
 
+
+// @return If failed, NULL.
 struct RkRxDic *
-RkwOpenRoma(romaji)
-char *romaji;
+RkwOpenRoma(char* romaji)
 {
     struct RkRxDic	*rdic;
 #ifdef JAPANESE_SORT
     struct romaRec *tmp_rdic;
 #endif
 
-    rdic = (struct RkRxDic *)malloc(sizeof(struct RkRxDic));
-    if (rdic) {
-	int	dic;
-	unsigned char	*s;
-	int	i, sz, open_flags = O_RDONLY;
+    rdic = (struct RkRxDic*) malloc(sizeof(struct RkRxDic));
+    if (!rdic)
+        return NULL;
 
-#ifdef O_BINARY
-	open_flags |= O_BINARY;
+    int	dic;
+    unsigned char	*s;
+    int	i, sz;
+
+    int open_flags = O_RDONLY;
+#ifdef _WIN32
+    open_flags |= O_BINARY;
 #endif
-	if ( (dic = open((char *)romaji, open_flags)) < 0 ) {
-		free((char *)rdic);
-		return((struct RkRxDic *)0);
-	}
+    if ( (dic = open(romaji, open_flags)) < 0 ) {
+        free(rdic);
+        return NULL;
+    }
 	if ( readHeader(rdic, dic) ) {
 		(void)close(dic);
 		free((char *)rdic);
@@ -238,15 +242,16 @@ char *romaji;
 	}
 	free ((char *)tmp_rdic);
 #endif /* JAPANESE_SORT */
-    }
-    return((struct RkRxDic *)rdic);
+
+    return rdic;
 }
+
+
 /* RkCloseRoma
  *	romaji henkan table wo tojiru
  */
 void
-RkwCloseRoma(rdic)
-struct RkRxDic	*rdic;
+RkwCloseRoma(struct RkRxDic* rdic)
 {
     if ( rdic ) {
         if (rdic->nr_string) (void)free((char *)rdic->nr_string);
@@ -257,17 +262,15 @@ struct RkRxDic	*rdic;
 }
 
 struct RkRxDic *
-RkOpenRoma(romaji)
-char *romaji;
+RkOpenRoma(char* romaji)
 {
-  return RkwOpenRoma(romaji);
+    return RkwOpenRoma(romaji);
 }
 
 void
-RkCloseRoma(rdic)
-struct RkRxDic	*rdic;
+RkCloseRoma(struct RkRxDic* rdic)
 {
-  RkwCloseRoma(rdic);
+    RkwCloseRoma(rdic);
 }
 
 /* RkMapRoma

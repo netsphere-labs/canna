@@ -24,20 +24,16 @@
 static char rcs_id[] = "$Id: permdic.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $";
 #endif
 
-#include	"RKintern.h"
-
+#include "RKintern.h"
 
 #include <unistd.h>
-
-#ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
-#endif
 
 #define dm_xdm	dm_extdata.ptr
 #define df_fdes	df_extdata.var
 
 extern	unsigned	_RkCalcLVO();
-extern	Wchar		uniqAlnum();
+extern cannawc uniqAlnum(cannawc c);
 
 #ifdef MMAP
 /* If you compile with Visual C++, then please comment out the next 3 lines. */
@@ -47,14 +43,9 @@ extern	Wchar		uniqAlnum();
 extern int fd_dic;      /* mmap */
 #endif
 
-// @return If failed, -1.
+// @return If open(dfnm) failed, -1.
 static int
-openDF(df, dfnm, w, gramoff, gramsz)
-     struct DF	*df;
-     char	*dfnm;
-     int        *w;
-     off_t	*gramoff;
-     size_t	*gramsz;
+openDF(struct DF* df, const char* dfnm, int* w, off_t* gramoff, size_t* gramsz)
 {
   struct HD	hd;
   struct ND	nd, *xnd;
@@ -65,16 +56,15 @@ openDF(df, dfnm, w, gramoff, gramsz)
   int		fd;
   int errres = -1;
 
-  *w = 0;
-  if ((fd = open(dfnm, 0)) == -1)
-    return errres;
-#ifdef __CYGWIN32__
-  setmode(fd, O_BINARY);
+    *w = 0;
+    if ((fd = open(dfnm, O_RDONLY)) == -1)
+        return errres;
+#ifdef _WIN32
+    setmode(fd, O_BINARY);
 #endif
 
-  for (off = 0, err = 0; !err && _RkReadHeader(fd, &hd, off) >= 0;) {
-
-    if (hd.flag[HD_CODM] > 0) {
+    for (off = 0, err = 0; !err && _RkReadHeader(fd, &hd, off) >= 0;) {
+        if (hd.flag[HD_CODM] > 0) {
       _RkClearHeader(&hd);
       break;
     }
@@ -148,12 +138,9 @@ openDF(df, dfnm, w, gramoff, gramsz)
   return (df->df_fdes = fd);
 }
 
+
 int
-_Rkpopen(dm, dfnm, mode, gram)
-     struct DM	*dm;
-     char	*dfnm;
-     int	mode;
-     struct RkKxGram *gram; /* ARGSUSED */
+_Rkpopen(struct DM* dm, char* dfnm, int mode, struct RkKxGram* gram)
 {
   struct DF	*df;
   struct DD	*dd;
@@ -241,11 +228,9 @@ _Rkpopen(dm, dfnm, mode, gram)
   return 0;
 }
 
+
 int
-_Rkpclose(dm, dfnm, gram)
-     struct DM	*dm;
-     char		*dfnm;
-     struct RkKxGram *gram; /* ARGSUSED */
+_Rkpclose(struct DM* dm, char* dfnm, struct RkKxGram* gram)
 {
   struct DF	*df = dm->dm_file;
   struct ND	*xdm = (struct ND *)dm->dm_xdm;
@@ -301,11 +286,10 @@ _Rkpclose(dm, dfnm, gram)
   return 0;
 }
 
+
 static
 unsigned char *
-assurep(dic, id)
-     struct ND	*dic;
-     int	id;
+assurep(struct ND* dic, int id)
 {
   off_t	off = dic->doff + dic->drsz + dic->pgsz * id;
   unsigned	size = dic->pgsz;
@@ -348,15 +332,12 @@ assurep(dic, id)
 }
 
 int
-_RkEql(a, b, n)
-     Wchar		*a;
-     unsigned char	*b;
-     int		n;
+_RkEql(cannawc* a, unsigned char* b, int n)
 {
-  Wchar	c, d;
-  for (; n-- > 0; b += 2) {
-    c = uniqAlnum(*a++);
-    d = (*b << 8) | *(b+1);
+    cannawc c, d;
+    for (; n-- > 0; b += 2) {
+        c = uniqAlnum(*a++);
+        d = (*b << 8) | *(b+1);
     if (c != d)
       return(0);
   }
@@ -364,18 +345,9 @@ _RkEql(a, b, n)
 }
 
 static
-readThisCache(dm, xdm, pgno, val, key, cur, ylen, nread, mc, nc, cf)
-     struct DM		*dm;
-     struct ND		*xdm;
-     long		pgno;
-     unsigned long	val;
-     Wchar		*key;
-     int		cur;
-     int		ylen;
-     struct nread	*nread;
-     int		mc;
-     int		nc;
-     int		*cf;
+int readThisCache(struct DM* dm, struct ND* xdm, long pgno, unsigned long val,
+                  cannawc* key, int cur, int ylen, struct nread* nread, int mc,
+                  int nc, int* cf)
 {
   int		remlen;
   unsigned char	*wrec1, *wrec;
@@ -407,19 +379,9 @@ readThisCache(dm, xdm, pgno, val, key, cur, ylen, nread, mc, nc, cf)
 }
 
 static int
-SearchInPage(dm, xdm, pgno, buf, val, key, cur, ylen, nread, mc, nc, cf)
-     struct DM		*dm;
-     struct ND		*xdm;
-     unsigned char	*buf;
-     long		pgno;
-     unsigned long	val;
-     Wchar		*key;
-     int		cur;
-     int		ylen;
-     struct nread	*nread;
-     int		mc;
-     int		nc;
-     int		*cf;
+SearchInPage(struct DM* dm, struct ND* xdm, long pgno, unsigned char* buf,
+             unsigned long val, cannawc* key, int cur, int ylen,
+             struct nread* nread, int mc, int nc, int* cf)
 {
   Wchar		kv, wc;
   unsigned char	*pos = buf + val;
@@ -453,17 +415,8 @@ SearchInPage(dm, xdm, pgno, buf, val, key, cur, ylen, nread, mc, nc, cf)
 }
 
 static int
-SearchInDir(dm, xdm, pos, key, cur, ylen, nread, mc, nc, cf)
-     struct DM		*dm;
-     struct ND		*xdm;
-     unsigned char	*pos;
-     Wchar		*key;
-     int		cur;
-     int		ylen;
-     struct nread	*nread;
-     int		mc;
-     int		nc;
-     int		*cf;
+SearchInDir(struct DM* dm, struct ND* xdm, unsigned char* pos, cannawc* key,
+            int cur, int ylen, struct nread* nread, int mc, int nc, int* cf)
 {
   Wchar		kv, wc, nw;
   unsigned long	val;
@@ -521,15 +474,8 @@ SearchInDir(dm, xdm, pos, key, cur, ylen, nread, mc, nc, cf)
 }
 
 int
-_Rkpsearch(cx, dm, key, n, nread, mc, cf)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     Wchar		*key;
-     int		n;
-     struct nread	*nread;
-     int		mc;
-     int		*cf;
-/* ARGSUSED */
+_Rkpsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
+           struct nread* nread, int mc, int* cf)
 {
   struct ND	*xdm;
 
@@ -543,11 +489,7 @@ _Rkpsearch(cx, dm, key, n, nread, mc, cf)
 }
 
 int
-_Rkpio(dm, cp, io)
-     struct DM		*dm;
-     struct ncache	*cp;
-     int		io;
-/* ARGSUSED */
+_Rkpio(struct DM* dm, struct ncache* cp, int io)
 {
   if (io == 0) {
     cp->nc_word = (Wrec *)cp->nc_address;
@@ -579,12 +521,8 @@ ch_perm(qm, offset, size, num)
 #define PERM_NREADSIZE 128
 
 int
-_Rkpctl(dm, qm, what, arg, gram)
-     struct DM	*dm;
-     struct DM	*qm;
-     int	what;
-     Wchar	*arg;
-     struct RkKxGram *gram;
+_Rkpctl(struct DM* dm, struct DM* qm, int what, cannawc* arg,
+        struct RkKxGram* gram)
 {
   int		nc, cf = 0, ret = -1;
   struct ND	*xdm;
@@ -783,9 +721,7 @@ _Rkpctl(dm, qm, what, arg, gram)
 }
 
 int
-_Rkpsync(cx, dm, qm)
-     struct RkContext *cx;
-     struct DM	*dm, *qm;
+_Rkpsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
 {
   struct DF	*df;
   struct DD     *dd;

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -50,7 +50,7 @@ static char rcsid[]="$Id: dd.c,v 1.5 2003/09/17 08:50:52 aida_s Exp $";
 #define RK_WRITABLE 'w'
 
 /*
- * DD privates 
+ * DD privates
  */
 static struct DM	*_RkCreateDM();
 static void		_RkFreeDM();
@@ -73,7 +73,7 @@ allocStr(s)
 {
   char	*d = (char *)0;
   int	len;
-  
+
   if ((len = strlen(s)) && (d = malloc(len + 1))) {
     (void)strncpy(d, s, len);
     d[len] = (char)0;
@@ -93,7 +93,7 @@ _RkCreateDM(df, dicname, nickname, class)
      int		class;
 {
   struct DM	*dm;
-    
+
   dm = (struct DM *)Calloc(1, sizeof(struct DM));
   if (dm) {
     dm->dm_next = dm->dm_prev = dm;
@@ -169,15 +169,15 @@ _RkCreateDF(dd, lnk, type)
      int		type;
 {
   struct DF	*df;
-    
+
   df = (struct DF *)Calloc(1, sizeof(struct DF));
   if (df) {
     struct DM	*dm = &df->df_members;
-    
+
     df->df_next = df->df_prev = df;
     df->df_direct = dd;
     dm->dm_next = dm->dm_prev = dm;
-    
+
     if (!(df->df_link = allocStr((char *)lnk))) {
       (void)free(df);
       return(0);
@@ -198,7 +198,7 @@ _RkFreeDF(df)
 
   if (df) {
     struct DM	*mh = &df->df_members;
-    
+
     /* remove all members in this file */
     for (m = mh->dm_next; m != mh; m = n) {
       n = m->dm_next;
@@ -245,7 +245,7 @@ _RkRealizeDF(df)
   char		*pathname;
   unsigned long oldmask;
   int t;
-    
+
   _RkRealizeDD(dd);
   /* create path filename */
   pathname = _RkCreatePath(df->df_direct, df->df_link);
@@ -279,7 +279,7 @@ int *r_return, *w_return; /* アクセス権を返す所 */
   *dftype  = -1;
   *dmclass = -1;
   *r_return = *w_return = 0; /* 権利無し */
-  if (!isalpha(line[0])) 
+  if (!isalpha(line[0]))
     return -1;
 
   /* parse line %s.s(%s.%s)   -%s--%c%c- */
@@ -303,7 +303,7 @@ int *r_return, *w_return; /* アクセス権を返す所 */
   if (count++ < RK_LINK_BMAX) {
     *d = 0;
   }
-  if (!*s++) 
+  if (!*s++)
     return -1;
   if (count > RK_LINK_BMAX)
     return -1;
@@ -315,9 +315,9 @@ int *r_return, *w_return; /* アクセス権を返す所 */
     *dftype = DF_TEMPDIC;
   else if (!STRCMP(t, ".fq") || !STRCMP(t, ".cld"))
     *dftype = DF_FREQDIC;
-  else if (!STRCMP(t, ".ruc"))  
+  else if (!STRCMP(t, ".ruc"))
     *dftype = DF_RUCDIC;
-  else		
+  else
     return -1;
   /* member name */
   for (d = member, count = 0; *s && *s != ')'; count++) {
@@ -337,13 +337,13 @@ int *r_return, *w_return; /* アクセス権を返す所 */
     return -1;
   if (!(t = (char *)strrchr(member, '.')))
     return -1;
-  if (!STRCMP(t, ".mwd"))   
+  if (!STRCMP(t, ".mwd"))
     *dmclass = ND_MWD;
-  else if (!STRCMP(t, ".swd"))   
+  else if (!STRCMP(t, ".swd"))
     *dmclass = ND_SWD;
-  else if (!STRCMP(t, ".pre"))   
+  else if (!STRCMP(t, ".pre"))
     *dmclass = ND_PRE;
-  else if (!STRCMP(t, ".suc"))   
+  else if (!STRCMP(t, ".suc"))
     *dmclass = ND_SUC;
   else
     return -1;
@@ -404,7 +404,7 @@ _RkCreateDD(path, name)
      unsigned char	*path, *name;
 {
   struct DD	*dd;
-    
+
   dd = (struct DD *)Calloc(1, sizeof(struct DD));
   if (dd) {
     dd->dd_next = dd->dd_prev = dd;
@@ -412,7 +412,7 @@ _RkCreateDD(path, name)
     if (dd->dd_path) {
       dd->dd_name = allocStr((char *)name);
       if (dd->dd_name) {
-	dd->dd_rcount = 0;	
+	dd->dd_rcount = 0;
 	dd->dd_files.df_next = dd->dd_files.df_prev = &dd->dd_files;
 	dd->dd_flags = 0;
 	dd->dd_text.ddt_next = dd->dd_text.ddt_prev = &dd->dd_text;
@@ -425,7 +425,7 @@ _RkCreateDD(path, name)
   return (struct DD *)0;
 }
 
-static 
+static
 void
 _RkFreeDD(dd)
      struct DD	*dd;
@@ -521,7 +521,7 @@ _RkReadDD(name)
     return dd;
   }
 #endif
-   
+
   /* create dd even if there is no directory or dics.dir file */
   (void)strcpy(path, sx->ddhome);
   (void)strcat(path, "/");
@@ -658,14 +658,14 @@ _RkOpenDD(name)
   return dd;
 }
 
+
+// @return 生成した文字列. 呼び出し側で free() すること。
 char *
-_RkCreatePath(dd, name)
-     struct DD	*dd;
-     char	*name;
+_RkCreatePath(struct DD* dd, const char* name)
 {
-  unsigned 	sz;
-  char        *ddname;
-    
+    unsigned 	sz;
+    char        *ddname;
+
   if (!dd || !dd->dd_path || !name)
     return (char *)0;
   sz = strlen(dd->dd_path) + strlen(name) + 2;
@@ -685,7 +685,7 @@ _RkCreateUniquePath(dd, proto)
 {
   static char	newLinkName[RK_LINK_BMAX];
   unsigned 	i;
-    
+
   /* now checking ... */
   if (!dd || !dd->dd_path || !proto)
     return (char *)0;
@@ -699,7 +699,7 @@ _RkCreateUniquePath(dd, proto)
     struct DF		*fh = &dd->dd_files;
     unsigned long       oldmask;
     char		*filename;
-    
+
     count = 0;
     sprintf(newLinkName, proto, i);
     for (f = fh->df_next; f != fh; f = f->df_next)
@@ -710,7 +710,7 @@ _RkCreateUniquePath(dd, proto)
     filename = _RkCreatePath(dd, newLinkName);
     if (filename) {
       oldmask = umask(2);
-      
+
       if (close(creat(filename, CREAT_MODE)) < 0)
 	count++;
       (void)free(filename);
@@ -733,8 +733,7 @@ _RkMakePath(df)
 }
 
 int
-_RkRealizeDD(dd)
-     struct DD	*dd;
+_RkRealizeDD( struct DD* dd)
 {
   struct DDT		*ddLines;
   struct DDT		*ddt;
@@ -796,7 +795,7 @@ _RkRealizeDD(dd)
 #endif /* !HAVE_RENAME */
   };
   /* create dics.dir */
-    
+
   if ((fdes = creat(dicsdir, CREAT_MODE)) < 0) {
     if (backup[0]) {
 #ifdef HAVE_RENAME
@@ -813,7 +812,7 @@ _RkRealizeDD(dd)
     }
     goto return_ret;
   };
-#ifdef __CYGWIN32__
+#ifdef _WIN32
   setmode(fdes, O_BINARY);
 #endif
 /* header */
@@ -857,7 +856,7 @@ _RkRealizeDD(dd)
       if (tmpres > 0) {
 	tmpres--; /* for \n */
       }
-	
+
       ddt->ddt_spec[n] = '\0';
 
       if (tmpres != n) {
@@ -904,7 +903,7 @@ int
 _RkIsInDDP(ddp, dd)
      struct DD	**ddp, *dd;
 {
-  while (*ddp) 
+  while (*ddp)
     if (*ddp++ == dd)
       return 1;
   return 0;
@@ -934,7 +933,7 @@ _RkCopyDDP(ddp)
 
     new = (struct DD **)Calloc(count + 1, (unsigned)sizeof(struct DD *));
     if (new)
-      for (i = 0; (dd = new[i] = ddp[i]) != (struct DD *)0 ; i++) 
+      for (i = 0; (dd = new[i] = ddp[i]) != (struct DD *)0 ; i++)
 	dd->dd_rcount++;
   };
   return new;
@@ -978,7 +977,7 @@ _RkCreateDDP(ddpath)
     return ddp;
   }
 #endif
-  
+
   for (s = ddpath; *s; ) {
     int		count;
 
@@ -987,7 +986,7 @@ _RkCreateDDP(ddpath)
     }
     if (!*s)
       break;
-    for (d = dir, count = 0; *s; count++) 
+    for (d = dir, count = 0; *s; count++)
       if (*s == ':') {
 	s++;
 	break;
@@ -998,7 +997,7 @@ _RkCreateDDP(ddpath)
       };
     *d = 0;
     dd = _RkOpenDD(dir);
-    if (dd) 
+    if (dd)
       ddp = _RkAppendDDP(ddp, dd);
   };
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -1013,7 +1012,7 @@ _RkFreeDDP(ddp)
 {
   struct DD	*dd;
   int		i;
-  
+
   if (ddp) {
     for (i = 0; (dd = ddp[i]) != (struct DD *)0 ; i++)
       if (--dd->dd_rcount == 0) {
@@ -1024,7 +1023,7 @@ _RkFreeDDP(ddp)
 }
 
 /* _RkSearchDDP/Q
- *	search dictionary file by nickname 
+ *	search dictionary file by nickname
  */
 struct DM	*
 _RkSearchDDP(ddp, name)
@@ -1088,7 +1087,7 @@ _RkSearchDDQ(ddp, name, type)
 	if (f->df_type == (unsigned)type) {
 	  mh = &f->df_members;
 	  for (m = mh->dm_next; m != mh; m = m->dm_next) {
-	    if (!STRCMP(m->dm_nickname, name)) 
+	    if (!STRCMP(m->dm_nickname, name))
 	      return(m);
 	  };
 	};
@@ -1097,7 +1096,7 @@ _RkSearchDDQ(ddp, name, type)
   return((struct DM *)0);
 }
 
-/* 
+/*
  _RkSearchUDDP()
   最初に見付かるのがシステム辞書にあるやつかどうかを判断しながら返す
  */
@@ -1108,7 +1107,7 @@ _RkSearchUDDP(ddp, name)
      unsigned char	*name;
 {
   struct DM	*dm = _RkSearchDDP(ddp, (char *)name);
-    
+
   if (dm && STRCMP(dm->dm_file->df_direct->dd_name, SYSTEM_DDHOME_NAME)) {
     return dm;
   }
@@ -1234,7 +1233,7 @@ char *name;
 }
 
 /* DMcreate
- *	create a new member under dd 
+ *	create a new member under dd
  *	DMcreate does not create an actual dictionary file.
  */
 struct DM	*
@@ -1327,7 +1326,7 @@ DMremove(dm)
   _RkFreeDM(dm);
   if (df) {
     struct DM	*mh = &df->df_members;
-    
+
     if (mh == mh->dm_next)
       _RkFreeDF(df);
   };
@@ -1375,7 +1374,7 @@ DMrename(dm, nickname)
     (void)strcpy(member, ".suc");
     break;
   };
-  (void)sprintf(spec, "%s(%s) -%s--%s%s-", df->df_link, 
+  (void)sprintf(spec, "%s(%s) -%s--%s%s-", df->df_link,
 		dicname ? dicname : member, nickname,
 		(dm->dm_flags & DM_READOK) ? "r" : "",
 		(dm->dm_flags & DM_WRITEOK) ? "w" : "");
@@ -1579,7 +1578,7 @@ _RkMountMD(cx, dm, qm, mode, firsttime)
   md->md_freq = qm;
   md->md_flags = mode&MD_WRITE;
   /* wait for the translation to finish */
-  if (IS_XFERCTX(cx)) 
+  if (IS_XFERCTX(cx))
     md->md_flags |= MD_MPEND;
   return 0;
 }
@@ -1594,7 +1593,7 @@ _RkUmountMD(cx, md)
   struct DF	*df;
   struct DD	*dd;
   char		*file;
-  
+
   cx->dmprev = (struct DM *)0;
   cx->qmprev = (struct DM *)0;
   if (IS_XFERCTX(cx))

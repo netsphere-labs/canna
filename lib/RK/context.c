@@ -243,7 +243,7 @@ RkwFinalize()
 
 /* RkGetSystem: System heno pointer wo motomeru
  */
-struct RkParam	*
+struct RkParam *
 RkGetSystem()
 {
   return(&SX);
@@ -251,7 +251,7 @@ RkGetSystem()
 
 /* RkGetSystemDD: System heno pointer wo motomeru
  */
-struct DD	*
+struct DD *
 RkGetSystemDD()
 {
   struct RkParam	*sx;
@@ -262,15 +262,13 @@ RkGetSystemDD()
  *	-> RKintern.h
  */
 struct RkContext *
-RkGetContext(cx_num)
-     int	cx_num;
+RkGetContext( int cx_num )
 {
   return(IsLiveCxNum(cx_num) ? &CX[cx_num] : (struct RkContext *)0);
 }
 
 struct RkContext *
-RkGetXContext(cx_num)
-     int	cx_num;
+RkGetXContext( int cx_num )
 {
   struct RkContext	*cx;
 
@@ -580,11 +578,10 @@ RkwMountDic(cx_num, name, mode)
   }
   return(-1);
 }
+
 /* RkUnmountDic: removes the specified dictionary from the mount list */
 int
-RkwUnmountDic(cx_num, name)
-     int	cx_num;
-     char	*name;
+RkwUnmountDic( int cx_num, char* name)
 {
   struct RkContext	*cx;
   int			i;
@@ -615,10 +612,10 @@ RkwUnmountDic(cx_num, name)
 
 /* RkRemountDic: relocate the specified dictionary among the mount list */
 int
-RkwRemountDic(cx_num, name, mode)
-     int	cx_num;		/* context specified */
-     char	*name;		/* the name of dictonary */
-     int	mode;		/* mount mode */
+RkwRemountDic(
+    int cx_num,    /* context specified */
+    char* name,    /* the name of dictonary */
+    int mode)      /* mount mode */
 {
   struct RkContext	*cx;
   int			i, isfound = 0;
@@ -666,10 +663,7 @@ RkwRemountDic(cx_num, name, mode)
 
 /* RkGetDicList: collects the names of the mounted dictionaies */
 int
-RkwGetMountList(cx_num, mdname, maxmdname)
-     int	cx_num;
-     char	*mdname;
-     int	maxmdname;
+RkwGetMountList( int cx_num, char* mdname, int maxmdname)
 {
   struct RkContext	*cx;
   struct MD		*mh, *md;
@@ -712,11 +706,9 @@ struct dics {
   int dictype;
 };
 
-static int diccmp pro((const struct dics *, const struct dics *));
 
 static int
-diccmp(a, b)
-const struct dics *a, *b;
+diccmp(const struct dics* a, const struct dics* b)
 {
   int res;
 
@@ -748,10 +740,7 @@ const struct dics *a, *b;
 }
 
 int
-RkwGetDicList(cx_num, mdname, maxmdname)
-     int	cx_num;
-     char	*mdname;
-     int	maxmdname;
+RkwGetDicList( int cx_num, char* mdname, int maxmdname)
 {
   struct RkContext	*cx;
   struct DD   		**ddp, *dd;
@@ -824,10 +813,7 @@ RkwGetDicList(cx_num, mdname, maxmdname)
 
 /* RkGetDirList: collects the names of directories */
 int
-RkwGetDirList(cx_num, ddname, maxddname)
-     int	cx_num;
-     char	*ddname;
-     int	maxddname;
+RkwGetDirList( int cx_num, char* ddname, int maxddname)
 {
   struct RkContext	*cx;
   struct DD   		**ddp, *dd;

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -72,7 +72,7 @@ int mode;
     else {
       return ACCES;
     }
-  } else  
+  } else
   if (mode & RK_GRP_DIC) {
     if (ddpath[1] && ddpath[2]) {
       /* グループ辞書とシステム辞書がちゃんとあれば */
@@ -97,7 +97,7 @@ int mode;
  *         int            cx_num    コンテクストナンバー
  *	   unsigned char  *dicname  辞書へのポインタ
  *	   int            mode      辞書の種類と強制モードのOR
- *             辞書の種類 
+ *             辞書の種類
  *                 #define	Rk_MWD		0x80
  *                 #define	Rk_SWD		0x40
  *                 #define	Rk_PRE		0x20
@@ -133,7 +133,7 @@ char *dicname;
 int     mode;
 {
   struct RkParam	*sx = RkGetSystem();
-						  
+
   struct RkContext	*cx = RkGetContext(cx_num);
   struct DM             *sm, *um, *tm;
   int			type;
@@ -148,7 +148,7 @@ int     mode;
     return NOTALC;
   }
 #endif
-  
+
   if(!dicname || !dicname[0]) {
     ret = ACCES;
     goto return_ret;
@@ -205,7 +205,7 @@ int     mode;
     }
     if (!um) {
       struct DM	*dm;
-      
+
       if (!(filename = _RkCreateUniquePath(userDDP[0], FREQ_TEMPLATE))) {
 	ret = ACCES;
 	goto return_ret;
@@ -320,9 +320,8 @@ int     mode;
   return ret;
 }
 
-copyFile(src, dst)
-struct DM	*src;
-struct DM	*dst;
+
+int copyFile(struct DM* src, struct DM* dst)
 {
   struct DF	*srcF = src->dm_file;
   struct DD	*srcD = srcF->df_direct;
@@ -336,7 +335,7 @@ struct DM	*dst;
   srcN = _RkCreatePath(srcD, srcF->df_link);
   if (srcN) {
     srcFd = open(srcN, 0);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
     setmode(srcFd, O_BINARY);
 #endif
     (void)free(srcN);
@@ -344,7 +343,7 @@ struct DM	*dst;
       dstN = _RkCreatePath(dstD, dstF->df_link);
       if (dstN) {
 	dstFd = creat(dstN, 0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
 	setmode(dstFd, O_BINARY);
 #endif
 	(void)free(dstN);
@@ -380,7 +379,7 @@ struct DM	*dst;
  * unsigned char *buf;      辞書リストが返ってくるバッファ
  * int  size;               バッファのサイズ
  *
- * リターン値               
+ * リターン値
  *             成功した場合                      辞書の数
  *             コンテクストナンバーが負の場合          BADCONT
  *             RkwCreateContextに失敗した場合           BADCONT
@@ -456,7 +455,7 @@ int mode;
   if (!dm || ((mode & PL_DIC) && dm->dm_file->df_type != DF_FREQDIC)) {
     return NOENT;
   }
-  if ( dm->dm_rcount > 0 ) 
+  if ( dm->dm_rcount > 0 )
 	return TXTBSY;
   if ( !dm->dm_file ) /* ? */
 	return BADCONT;
@@ -467,7 +466,7 @@ int mode;
   if (!(path = _RkMakePath(dm->dm_file)))
 	return NOTALC;
   res = unlink(path);
-  (void)free(path);  
+  (void)free(path);
   if(res)
     return ACCES;
   dum_direct = dm->dm_file->df_direct;
@@ -513,7 +512,7 @@ RkwRenameDic(cx_num, old, new, mode)
   char            	spec[RK_LINE_BMAX];
   /* I leave this array on the stack because this will not glow so big.
    1996.6.5 kon */
-  
+
   if(!old || !*old)
     return NOENT;
   if(!new || !*new)
@@ -540,10 +539,10 @@ RkwRenameDic(cx_num, old, new, mode)
 
   dm2 = _RkSearchDDP(userDDP, (char *)new);
 
-  if (dm1->dm_rcount > 0) 
+  if (dm1->dm_rcount > 0)
     return TXTBSY;
   if (dm2) { /* 新しい名前が、既に辞書として存在すれば */
-    if (dm2->dm_rcount > 0) 
+    if (dm2->dm_rcount > 0)
       return TXTBSY;
     if (!(mode & KYOUSEI))
       return EXIST;
@@ -612,7 +611,7 @@ int mode;
   char			*path, *perm = DEFAULT_PERMISSION;
   char *myddname;
   int res, v, con;
-  
+
   if (!dir || !*dir) {
     return BADF;
   }
@@ -892,7 +891,7 @@ GetLine(cx, gram, tdp, line, size)
   struct TD	*vtd;
   struct TN	*vtn;
   struct _rec	*gwt = (struct _rec *)cx->cx_gwt;
-  
+
   if (tdp) {
     if (gwt->tdn)
       freeTdn(cx);
@@ -955,7 +954,7 @@ RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
   unsigned char *buff = 0;
   struct _rec	*gwt;
 
-  if (!dicname || !dirname || !info || !(cx = RkGetContext(cx_num)) || 
+  if (!dicname || !dirname || !info || !(cx = RkGetContext(cx_num)) ||
       !(gwt = (struct _rec *)cx->cx_gwt))
     return BADCONT;
 
@@ -998,7 +997,7 @@ RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
       RkwCloseContext(gwt->gwt_cx);
       gwt->gwt_cx = -1;
     }
-    
+
     if(!STRCMP(dirname, SYSTEM_DDHOME_NAME)) {
       if (!(dm = _RkSearchDDP(new_cx->ddpath, (char *)dicname))) {
 	if (dirname[0] != '\0') {

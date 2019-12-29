@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -47,8 +47,7 @@ static char rcsid[]="$Id: tempdic.c,v 1.4 2003/09/17 08:50:52 aida_s Exp $";
 #define	dm_td	dm_extdata.ptr
 
 static void
-freeTD(td)
-     struct TD	*td;
+freeTD(struct TD* td)
 {
   int	i;
   for (i = 0; i < (int)td->td_n; i++) {
@@ -66,22 +65,27 @@ freeTD(td)
   }
 }
 
-/* newTD: allocates a fresh node */
+/**
+ * newTD: allocates a fresh node
+ * @return If failed, NULL.
+ */
 static TD *
 newTD()
 {
-  struct TD	*td;
+    struct TD* td;
 
-  td = (struct TD *)malloc(sizeof(struct TD));
-  if (td) {
+    td = (struct TD*) malloc(sizeof(struct TD));
+    if (!td)
+        return NULL;
+
     td->td_n = 0;
     td->td_max = 1;
     if (!(td->td_node = (struct TN *)calloc(td->td_max, sizeof(struct TN)))) {
       freeTD(td);
       return((struct TD *)0);
     }
-  }
-  return(td);
+
+    return td;
 }
 
 /*
@@ -96,7 +100,7 @@ extendTD(tdic, key, tw)
   int		i, j;
   struct TN	*tp;
   struct TW	*ntw;
-    
+
   if (!(ntw = RkCopyWrec(tw)))
     return (struct TN *)0;
   tp = tdic->td_node;
@@ -251,7 +255,7 @@ enterTD(dm, td, gram, word)
   }
   else if (RkParseOWrec(gram, word, wrec, RK_LINE_BMAX * 10, tw.lucks)) {
     struct TN *tn;
-    
+
     tw.word = wrec;
     tn = defineTD(dm, td, 0, &tw, RK_LINE_BMAX * 10);
     if (tn) {
@@ -280,7 +284,7 @@ shrinkTD(td, key)
 {
   int		i;
   struct TN	*tn = td->td_node;
-    
+
   for (i = 0; i < (int)td->td_n; i++) {
     if (key == tn[i].tn_key) {
       while (++i < (int)td->td_n) tn[i - 1] = tn[i];
@@ -309,19 +313,19 @@ deleteTD(dm, tab, n, newW)
   struct TD	*td = *tab;
   int		i;
   Wchar		key;
-    
+
   key = nthKey(newW, n); n ++;
   for (i = 0; i < (int)td->td_n; i++) {
     struct TN	*tn = &td->td_node[i];
-    
+
     if (key == tn->tn_key ) {
       if (IsWordNode(tn)) {
 	struct TW	*oldTW = tn->tn_word;
 	Wrec		*oldW = oldTW->word;
-	
+
 	if (!key || yomi_equal(newW, oldW, n)) {
 	  struct ncache	*cache = _RkFindCache(dm, (long)oldTW);
-	  
+
 	  if (!cache || cache->nc_count <= 0) {
 	    struct TW	*subW, newTW;
 
@@ -389,7 +393,7 @@ _Rktopen(dm, file, mode, gram)
     return ret;
   }
 #endif
-    
+
   if (!df->df_rcount) {
     if (close(open(file, 0)))
       goto return_ret;
@@ -426,7 +430,7 @@ _Rktopen(dm, file, mode, gram)
     (void)fclose(f);
     dm->dm_offset = 0L;
     df->df_size = offset;
-    if (ecount) {		
+    if (ecount) {
       freeTD((struct TD *)xdm);
       dm->dm_td = (pointer)0;
       dm->dm_flags &= ~DM_EXIST;
@@ -468,7 +472,7 @@ writeTD(td, gram, fdes)
       unsigned char	*line;
       Wchar		*wc;
       int		sz;
-    
+
       if (IsWordNode(tn)) {
         wc = _RkUparseWrec(gram, tn->tn_word->word, wcline,
                           RK_LINE_BMAX * sizeof(Wchar), tn->tn_word->lucks, 1);
@@ -480,7 +484,7 @@ writeTD(td, gram, fdes)
             ecount++;
           else {
 	    line = (unsigned char *)malloc( RK_LINE_BMAX*3 );
-	    if(line) { 
+	    if(line) {
               sz = RkCvtNarrow((char *)line, RK_LINE_BMAX,
                                 wcline, (int)(wc - wcline));
 #ifdef USE_SJIS_TEXT_DIC
@@ -506,17 +510,15 @@ writeTD(td, gram, fdes)
   return 0;
 }
 
-int	
-_Rktclose(dm, file, gram)
-     struct DM	*dm;
-     char	*file;
-     struct RkKxGram	*gram;
+
+int
+_Rktclose(struct DM* dm, char* file, struct RkKxGram* gram)
 {
-  struct DF	*df = dm->dm_file;
-  struct TD	*xdm = (struct TD *)dm->dm_td;
+    struct DF	*df = dm->dm_file;
+    struct TD	*xdm = (struct TD *)dm->dm_td;
   int		ecount;
   int		fdes;
-  
+
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char	backup[RK_PATH_BMAX];
   char	header[RK_LINE_BMAX];
@@ -533,20 +535,20 @@ _Rktclose(dm, file, gram)
     return 0;
   }
 #endif
-    
+
   _RkKillCache(dm);
   if (dm->dm_flags & DM_UPDATED) {
     char	*p = rindex(file, '/');
-    
+
     if (p) {
       strcpy(backup, file);
       p++;
       backup[(int)(p - file)] = '#';
       strcpy(&backup[(int)(p-file) + 1], p);
     };
-    
+
     fdes = creat(backup, (unsigned)0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
     setmode(fdes, O_BINARY);
 #endif
     ecount = 0;
@@ -602,26 +604,21 @@ _Rktclose(dm, file, gram)
   return 0;
 }
 
+extern cannawc uniqAlnum(cannawc c);
+
 int
-_Rktsearch(cx, dm, key, n, nread, maxcache, cf)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     Wchar		*key;
-     int		n;
-     struct nread	*nread;
-     int		maxcache;
-     int		*cf;
+_Rktsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
+           struct nread nread, int maxcache, int* cf)
 {
-  Wchar		uniqAlnum();
-  struct TD	*xdm = (struct TD *)dm->dm_td;
-  int		nc = 0;
-  int		i, j;
-    
-  *cf = 0;
-  for (j = 0; j < n;) {
-    Wchar	k = uniqAlnum(key[j++]);
-    struct TN	*tn;
-    
+    struct TD	*xdm = (struct TD *)dm->dm_td;
+    int		nc = 0;
+    int		i, j;
+
+    *cf = 0;
+    for (j = 0; j < n;) {
+        cannawc k = uniqAlnum(key[j++]);
+        struct TN	*tn;
+
     tn = xdm->td_node;
     for (i = 0; i < (int)xdm->td_n && tn->tn_key <= k; i++, tn++) {
       if (k == tn->tn_key) {
@@ -646,14 +643,14 @@ _Rktsearch(cx, dm, key, n, nread, maxcache, cf)
 		nc++;
 	      } else
 		(*cf)++;
-	    } else 
+	    } else
 	      (*cf)++;
 	  }
 	  return nc;
 	} else {
 	  struct TD	*ct = tn->tn_tree;
 	  struct TN	*n0 = &ct->td_node[0];
-	  
+
 	  if (ct->td_n && !n0->tn_key) {
 	    unsigned char	*w;
 	    int			l;
@@ -696,7 +693,7 @@ _Rktsearch(cx, dm, key, n, nread, maxcache, cf)
  * IO
  */
 /*ARGSUSED*/
-int	
+int
 _Rktio(dm, cp, io)
      struct DM		*dm;
      struct ncache	*cp;
@@ -714,7 +711,7 @@ _Rktio(dm, cp, io)
 /*
  * CTL
  */
-int	
+int
 _Rktctl(dm, qm, what, arg, gram)
      struct DM	*dm;
      struct DM	*qm; /* no use : dummy*/
@@ -735,7 +732,7 @@ _Rktctl(dm, qm, what, arg, gram)
     return status;
   }
 #endif
-  
+
   switch(what) {
   case DST_DoDefine:
     if ((dm->dm_flags & (DM_WRITABLE | DM_WRITEOK)) !=
@@ -806,7 +803,7 @@ _Rktsync(cx, dm, qm)
   if (file) {
     if (dm->dm_flags & DM_UPDATED) {
       char	*p = rindex(file, '/');
-      
+
       if (p) {
 	strcpy(backup, file);
 	p++;
@@ -815,14 +812,14 @@ _Rktsync(cx, dm, qm)
       };
 
       fdes = creat(backup, (unsigned)0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
       setmode(fdes, O_BINARY);
 #endif
       ecount = 0;
       if (fdes >= 0) {
 	int	n;
 	TIME_T	tloc;
-	
+
 	tloc = time(0);
 	strcpy(whattime, ctime(&tloc));
 	whattime[strlen(whattime)-1] = 0;
@@ -837,14 +834,14 @@ _Rktsync(cx, dm, qm)
 	(void)strcat(header, "\n");
 #endif
 	n = strlen(header);
-	if (write(fdes, header, n) != n) { 
+	if (write(fdes, header, n) != n) {
 	  ecount++;
 	}
 	ecount += writeTD(xdm, gram, fdes);
 	(void)close(fdes);
       } else
 	ecount++;
-      
+
       if (!ecount) {
 #ifdef HAVE_RENAME
 #ifdef __EMX__
@@ -866,7 +863,7 @@ _Rktsync(cx, dm, qm)
     };
     (void)free(file);
     ret = 0;
-  } 
+  }
  return_ret:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free(backup);

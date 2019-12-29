@@ -38,14 +38,14 @@ static char sccsid[] = "@(#)crc.c	8.1 (Berkeley) 6/17/93";
 #endif
 #endif /* not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
+//__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 
 #include <stdint.h>
 #include <unistd.h>
 
-#include "extern.h"
+//#include "extern.h"
 
 static const uint32_t crctab[] = {
 	0x0,

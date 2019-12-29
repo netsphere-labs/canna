@@ -115,8 +115,8 @@ typedef unsigned char   Wrec;
 #define us_iscodeG2(wc)	(((wc) & 0x8080) == 0x0080)
 #define us_iscodeG3(wc)	(((wc) & 0x8080) == 0x8000)
 
-#define RK_SS2 (unsigned char)0x8e
-#define RK_SS3 (unsigned char)0x8f
+#define RK_SS2 ((unsigned char)0x8e)
+#define RK_SS3 ((unsigned char)0x8f)
 
 #define RK_ESC_CHAR ((Wchar)'\\')
 
@@ -221,9 +221,9 @@ typedef union _rkunion {
 
 #define RkNumber(ary) (sizeof(ary)/sizeof(ary[0]))
 
-#define rk_isdigit(c) (!((c) & ~0xff) ? isdigit((int)(c)) : 0)
-#define rk_isascii(c) (!((c) & ~0xff) ? isascii((int)(c)) : 0)
-#define rk_isspace(c) (!((c) & ~0xff) ? isspace((int)(c)) : 0)
+#define rk_isdigit  isdigit
+#define rk_isascii  isascii
+#define rk_isspace  isspace
 
 /* WARNING: これを並べ変えるときはHdrtagに注意すること! */
 enum {
@@ -970,24 +970,25 @@ extern struct RkDST	_RkDST[];
 
 
 /* Internal Functions */
-struct RkParam		*RkGetSystem();
-struct DD		*RkGetSystemDD();
+struct RkParam* RkGetSystem();
+struct DD* RkGetSystemDD();
 struct DD		*RkGetUserDD();
-struct RkContext	*RkGetContext();
-struct RkContext	*RkGetXContext();
+struct RkContext* RkGetContext( int cx_num );
+struct RkContext* RkGetXContext( int cx_num );
 struct RkKxGram		*RkReadGram pro((int, size_t));
 struct RkKxGram		*RkOpenGram();
 struct RkKxGram		*RkDuplicateGram();
-void			RkCloseGram();
+void
+RkCloseGram(struct RkKxGram* gram);
 
-int			_RkInitializeCache();
-void			_RkFinalizeCache();
-struct ncache		*_RkFindCache();
-struct ncache		*_RkReadCache();
+int _RkInitializeCache( int size );
+void _RkFinalizeCache();
+struct ncache* _RkFindCache( struct DM* dm, long addr );
+struct ncache* _RkReadCache( struct DM* dm, long addr );
 void			_RkFreeCache();
-void		 	_RkKillCache();
+void _RkKillCache(struct DM* dm);
 void		 	_RkPurgeCache();
-void			_RkDerefCache();
+void _RkDerefCache(struct ncache* cache);
 
 int			_RkRenbun2();
 void			_RkLearnBun();
@@ -997,12 +998,21 @@ int			RkUniqWcand();
 int			RkUnionWcand();
 int			RkSubtractWcand();
 
-unsigned char		*RkGetGramName();
-int			RkGetGramNum();
-Wchar			*RkUparseWrec();
-Wchar			*_RkUparseWrec();
-Wrec			*RkParseWrec();
-Wrec			*RkParseOWrec();
+unsigned char* RkGetGramName(struct RkKxGram* gram, int row);
+int RkGetGramNum(struct RkKxGram* gram, const char* name);
+
+cannawc* RkUparseWrec(struct RkKxGram* gram, Wrec* src, cannawc* dst,
+                      int maxdst, unsigned long* lucks);
+cannawc* _RkUparseWrec(struct RkKxGram* gram, Wrec* src, cannawc* dst,
+                       int maxdst, unsigned long* lucks, int add);
+Wrec* RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
+                  unsigned char* dst, unsigned maxdst);
+
+// ngram.c
+Wrec*
+RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
+             unsigned maxdst, unsigned long* lucks);
+
 Wchar			*RkUparseGramNum();
 Wchar			*RkParseGramNum();
 
@@ -1011,10 +1021,12 @@ char			*allocStr();
 void			_RkEndBun();
 void			freeDF();
 
-int			_RkCandNumber();
-int			_RkWordLength();
-int			_RkCalcLog2 pro((int));
-int			_RkCalcUnlog2();
+int _RkCandNumber(unsigned char* wrec);
+int _RkWordLength(unsigned char* wrec);
+
+// util.c
+int _RkCalcLog2 pro((int));
+int _RkCalcUnlog2( int x );
 
 /* etc. */
 
@@ -1061,14 +1073,15 @@ int			DMrename();
 int			_RkMountMD();
 void			_RkUmountMD();
 
-char			*_RkCreatePath();
+// dd.c
+char* _RkCreatePath(struct DD* dd, const char* name);
 char			*_RkCreateUniquePath();
 char			*_RkMakePath();
 
 unsigned char		*_RkCreateHeader pro((struct HD *, size_t *size));
 int			_RkReadHeader pro((int, struct HD *, off_t));
 void			_RkClearHeader pro((struct HD *));
-void			_RkRehashCache();
+void _RkRehashCache( struct ncache* cache, long addr );
 
 /*
  * limits

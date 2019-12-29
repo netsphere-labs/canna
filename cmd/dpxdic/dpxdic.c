@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -57,7 +57,7 @@ show_a_cand(gram, wrec, or)
   unsigned	j, clen, row;
   char		*ptr, rowname[128];
   Wchar		*dst, wbuf[1024];
-    
+
   clen = (*wrec >> 1) & 0x7f;
   row = _RkRowNumber(wrec);
   wrec += NW_PREFIX;
@@ -106,7 +106,7 @@ show_a_icand(gram, wrec)
   unsigned	j, clen, row;
   char		*ptr, rowname[128];
   Wchar		*dst, wbuf[1024];
-    
+
   clen = (*wrec >> 1) & 0x7f;
   row = _RkRowNumber(wrec);
   wrec += NW_PREFIX;
@@ -139,7 +139,7 @@ show_a_wrec(gram, wrec, yomi, n)
 {
   unsigned	i, left, nc, or;
   Wchar		*src, *dst, syomi[1024], wch;
-  
+
   left = (*wrec >> 1) & 0x3f;
   nc = _RkCandNumber(wrec);
   if (*wrec & 0x80)
@@ -188,10 +188,10 @@ loadDic(dic)
   unsigned	size = dic->drsz;
   int		fd = dic->fd;
   int		i;
-  
+
   if (!dic->pgs) {
     unsigned   tblsz = dic->ttlpg * sizeof(struct NP);
-    
+
     if (!(dic->pgs = (struct NP *)malloc(tblsz)))
       return(-1);
     for (i = 0; i < dic->ttlpg; i++) {
@@ -238,7 +238,7 @@ loadPage(dic, id)
       fprintf(stderr, "malloc failed.\n");
       return(-1);
     }
-    
+
     (void)lseek(fd, off, 0);
     if (read(fd, (char *)buf, size) != size) {
       (void)fprintf(stderr, "cannot read page %d (%d)\n", id, size);
@@ -305,7 +305,7 @@ show_nip(gram, dic, yomi, n, p, pg)
   unsigned	val;
   int		iw;
   int		il = 0;
-    
+
   while (!il) {
     w = bst2_to_s(p); p += 2;
     iw = *p & WORD_NODE;
@@ -360,11 +360,11 @@ show_nid(gram, dic, yomi, n, ptr)
 
   p = ptr;
   wc = bst2_to_s(p); p += 5;
-  qsort((char *)p, (unsigned)wc, 5, 
+  qsort((char *)p, (unsigned)wc, 5,
         (int (*) pro((const void *, const void *)))compit);
   for (i = 0; i < wc; i++) {
     Wchar	w;
-    
+
     w = bst2_to_s(p); p += 2;
     val = bst3_to_l(p); p += 3;
     if (w == (Wchar) 0xffff)
@@ -397,24 +397,22 @@ show_nid(gram, dic, yomi, n, ptr)
   return(0);
 }
 
+
 int
-getdic(dic, filenm, dmnm)
-     struct ND	*dic;
-     char	*filenm;
-     char	*dmnm;
+getdic(struct ND* dic, char* filenm, char* dmnm)
 {
   struct HD	hd;
   int		fd, lk;
   off_t	off, doff;
   unsigned err;
-  unsigned char	ll[4];	
+  unsigned char	ll[4];
 
-  if (!filenm)
-    return(-1);
-  if ((fd = open(filenm, O_RDONLY)) < 0)
-    return(-1);
-#ifdef __CYGWIN32__
-  setmode(fd, O_BINARY);
+    if (!filenm)
+        return -1;
+    if ((fd = open(filenm, O_RDONLY)) < 0)
+        return -1;
+#ifdef _WIN32
+    setmode(fd, O_BINARY);
 #endif
   for (off = 0, lk = 1, doff = 0, err = 0;
        !err && lk && _RkReadHeader(fd, &hd, off) >= 0;
@@ -453,7 +451,7 @@ getdic(dic, filenm, dmnm)
   dic->fd = fd;
   dic->buf = (unsigned char *)0;
   dic->pgs = (struct NP *)0;
-    
+
   return(loadDic(dic));
 }
 

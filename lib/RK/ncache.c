@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -52,12 +52,12 @@ Ncfree.nc_aprev->nc_anext = (p); Ncfree.nc_aprev = (p); \
 (p)->nc_hprev->nc_hnext = (p)->nc_hnext; (p)->nc_hnext = (p)->nc_hprev = (p);\
 }
 
-int	
-_RkInitializeCache(size)
-     int	size;
+
+int
+_RkInitializeCache( int size)
 {
-  register struct RkParam	*sx = &SX;
-  int				i;
+    struct RkParam	*sx = &SX;
+    int				i;
 
   sx->maxcache = size;
   if (!(sx->cache = (struct ncache *)calloc((unsigned)size, sizeof(struct ncache))))
@@ -72,26 +72,24 @@ _RkInitializeCache(size)
   sx->cache[sx->maxcache - 1].nc_anext = &Ncfree;
   Ncfree.nc_aprev = &sx->cache[sx->maxcache - 1];
   sx->cache[0].nc_aprev = &Ncfree;
-  for (i = 0; i < NCHASH; i++) 
+  for (i = 0; i < NCHASH; i++)
     Nchash[i].nc_hnext = Nchash[i].nc_hprev = &Nchash[i];
   return 0;
 }
+
 
 void
 _RkFinalizeCache()
 {
   register struct RkParam	*sx = &SX;
-  
-  if (sx->cache) 
+
+  if (sx->cache)
     (void)free((char *)sx->cache);
   sx->cache = (struct ncache *)0;
 }
 
-static
-int
-flushCache(dm, cache)
-     struct DM		*dm;
-     struct ncache	*cache;
+static int
+flushCache(struct DM* dm, struct ncache* cache)
 {
   if (cache->nc_word) {
     if (dm && (cache->nc_flags & NC_DIRTY)) {
@@ -104,9 +102,7 @@ flushCache(dm, cache)
 }
 
 static
-struct ncache	*newCache(ndm, address)
-     register struct DM		*ndm;
-     register long		address;
+struct ncache* newCache(struct DM* ndm, long address)
 {
   register struct ncache	*new;
 
@@ -156,8 +152,7 @@ _RkEnrefCache(cache)
 */
 
 void
-_RkDerefCache(cache)
-     struct ncache *cache;
+_RkDerefCache(struct ncache* cache)
 {
   struct DM	*dm = cache->nc_dic;
 /*
@@ -180,18 +175,16 @@ _RkDerefCache(cache)
   return;
 }
 
-void	
-_RkPurgeCache(cache)
-     struct ncache	*cache;
+void
+_RkPurgeCache(struct ncache* cache)
 {
   hremove(cache);
   aremove(cache);
   ainserttop(cache);
 }
 
-void	
-_RkKillCache(dm)
-     struct DM	*dm;
+void
+_RkKillCache(struct DM* dm)
 {
   struct ncache		*cache;
   int			i;
@@ -248,24 +241,21 @@ _RkDoInvalidateCache(addr, size)
 }
 #endif
 
-struct ncache	*
-_RkFindCache(dm, addr)
-     struct DM	*dm;
-     long	addr;
+struct ncache*
+_RkFindCache(struct DM* dm, long addr)
 {
   register struct ncache	*head, *cache;
 
   head = &Nchash[hash(addr)];
-  for (cache = head->nc_hnext; cache != head; cache = cache->nc_hnext)  
-    if (cache->nc_dic == dm && cache->nc_address == addr) 
+  for (cache = head->nc_hnext; cache != head; cache = cache->nc_hnext)
+    if (cache->nc_dic == dm && cache->nc_address == addr)
       return cache;
   return (struct ncache *)0;
 }
 
+
 void
-_RkRehashCache(cache, addr)
-     struct ncache	*cache;
-     long		addr;
+_RkRehashCache(struct ncache* cache, long addr)
 {
   struct ncache	*head;
 
@@ -279,12 +269,11 @@ _RkRehashCache(cache, addr)
   cache->nc_address = addr;
 }
 
-struct ncache	*
-_RkReadCache(dm, addr)
-     struct DM	*dm;
-     long	addr;
+
+struct ncache*
+_RkReadCache(struct DM* dm, long addr)
 {
-  register struct ncache	*head, *cache;
+    struct ncache	*head, *cache;
 
   head = &Nchash[hash(addr)];
   for (cache = head->nc_hnext; cache != head; cache = cache->nc_hnext) {

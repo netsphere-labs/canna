@@ -1,3 +1,5 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +14,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -60,11 +62,10 @@ struct RkKxGram {
 };
 #define is_row_num(g, n)	((0 <= (n)) && ((n) < ((g)->ng_rowcol)))
 
-extern unsigned char *ustoeuc();
+extern unsigned char *ustoeuc(); ‚óè„Éó„É≠„Éà„Çø„Ç§„ÉóÂÆ£Ë®Ä‰øÆÊ≠£
 
 void
-RkCloseGram(gram)
-     struct RkKxGram	*gram;
+RkCloseGram(struct RkKxGram* gram)
 {
   if (gram->ng_conj)
     (void)free((char *)gram->ng_conj);
@@ -88,7 +89,7 @@ gram_to_tab(gram)
 {
   char	**top, *str;
   int	i;
-  
+
   if (!(top = (char **) calloc(gram->ng_rowcol + 1, sizeof(char *)))) {
     RkSetErrno(RK_ERRNO_ENOMEM);
     return 0;
@@ -111,12 +112,12 @@ gram_fill_conjcells(gram)
   size_t lastbits = (gram->ng_rowcol % 8) ? (gram->ng_rowcol % 8) : 8;
   size_t ncells;
   conjcell *dst;
-  
+
   ncells = 0;
   src = gram->ng_conj;
   for (row = 0; row < gram->ng_rowcol; ++row) {
     unsigned char mask;
-    for (colbyte = 0; colbyte < gram->ng_rowbyte; ++colbyte) {	
+    for (colbyte = 0; colbyte < gram->ng_rowbyte; ++colbyte) {
       size_t nbits = (colbyte < gram->ng_rowbyte - 1) ? 8 : lastbits;
       size_t bit;
       for (bit = 0, mask = 0x80; bit < nbits; ++bit, mask >>= 1) {
@@ -138,7 +139,7 @@ gram_fill_conjcells(gram)
   for (row = 0; row < gram->ng_rowcol; ++row) {
     unsigned char mask;
     gram->ng_conjrows[row] = dst;
-    for (colbyte = 0; colbyte < gram->ng_rowbyte; ++colbyte) {	
+    for (colbyte = 0; colbyte < gram->ng_rowbyte; ++colbyte) {
       size_t nbits = (colbyte < gram->ng_rowbyte - 1) ? 8 : lastbits;
       size_t bit;
       for (bit = 0, mask = 0x80; bit < nbits; ++bit, mask >>= 1) {
@@ -165,7 +166,7 @@ nomem:
 }
 
 #ifdef unused
-/* RkGetGramSize -- gram_conj §À∆˛§Ï§∆§§§Î•·•‚•Í§Œ¬Á§≠§µ§Ú ÷§π */
+/* RkGetGramSize -- gram_conj „Å´ÂÖ•„Çå„Å¶„ÅÑ„Çã„É°„É¢„É™„ÅÆÂ§ß„Åç„Åï„ÇíËøî„Åô */
 static int
 RkGetGramSize(gram)
 struct RkKxGram *gram;
@@ -191,7 +192,7 @@ size_t gramsz;
   unsigned long		sz = 0xdeadbeefUL, rc = 0xdeadbeefUL;
   int errorres;
   unsigned long size;
-    
+
   if (!gramsz)
     return NULL;
   RkSetErrno(RK_ERRNO_EACCES);
@@ -258,22 +259,21 @@ cellsfail:;
   return (struct RkKxGram *)0;
 }
 
-struct RkKxGram	*
-RkOpenGram(mydic)
-     char	*mydic;
+struct RkKxGram*
+RkOpenGram(char* mydic)
 {
-  struct RkKxGram	*gram;
-  struct HD		hd;
+    struct RkKxGram	*gram;
+    struct HD		hd;
   off_t			off;
   size_t		gramsz = (size_t)-1;
   int			lk;
   int tmpres;
   int			fd;
- 
-  if ((fd = open(mydic, 0)) < 0)
-    return (struct RkKxGram *)0;
-#ifdef __CYGWIN32__
-  setmode(fd, O_BINARY);
+
+    if ( (fd = open(mydic, O_RDONLY)) < 0 )
+        return NULL;
+#ifdef _WIN32
+    setmode(fd, O_BINARY);
 #endif
 
   for (off = 0, lk = 1; lk && _RkReadHeader(fd, &hd, off) >= 0;) {
@@ -316,7 +316,7 @@ RkDuplicateGram(ogram)
 struct RkKxGram *ogram;
 {
   struct RkKxGram *gram = (struct RkKxGram *)0;
-    
+
   gram = (struct RkKxGram *)calloc(1, sizeof(struct RkKxGram));
   if (gram) {
     int siz = RkGetGramSize(ogram);
@@ -358,11 +358,10 @@ cellsfail:
 #endif /* unused */
 
 int
-_RkWordLength(wrec)
-     unsigned char	*wrec;
+_RkWordLength(unsigned char* wrec)
 {
   int	wl;
-    
+
   wl = ((wrec[0] << 5) & 0x20) | ((wrec[1] >> 3) & 0x1f);
   if (wrec[0] & 0x80)
     wl |= ((wrec[2] << 5) & 0x1fc0);
@@ -370,50 +369,52 @@ _RkWordLength(wrec)
 }
 
 int
-_RkCandNumber(wrec)
-     unsigned char	*wrec;
+_RkCandNumber(unsigned char* wrec)
 {
   int	nc;
-  
+
   nc = (wrec)[1] & 0x07;
   if (wrec[0] & 0x80)
     nc |= ((wrec[3] << 3) & 0x0ff8);
   return(nc);
 }
 
+// @return If not found, -1.
 int
-RkGetGramNum(gram, name)
-     struct RkKxGram	*gram;
-     char			*name;
+RkGetGramNum(struct RkKxGram* gram, const char* name)
 {
-  int	row;
-  int	max = gram->ng_rowcol;
-    
-  if (gram->ng_strtab) {
-    for (row = 0; row < max; row++) {
-      if (!strcmp(gram->ng_strtab[row], (char *)name))
-	return(row);
+    assert(gram);
+
+    int	row;
+    int	max = gram->ng_rowcol;
+
+    if (gram->ng_strtab) {
+        for (row = 0; row < max; row++) {
+            if ( !strcmp(gram->ng_strtab[row], name) )
+                return row;
+        }
     }
-  }
-  return(-1);
+    return -1;
 }
 
-static Wchar *
-skip_space(src)
-     Wchar	*src;
+static cannawc*
+skip_space(cannawc* src)
 {
-  while (*src) {
-    if (!rk_isspace(*src))
-      break;
-    src++;
-  }
-  return(src);
+    assert(src);
+
+    while (*src) {
+        if (!rk_isspace(*src))
+            break;
+        src++;
+    }
+    return src;
 }
 
 static
-skip_until_space(src, next)
-Wchar	*src, **next;
+skip_until_space(cannawc* src, cannawc** next)
 {
+    assert(src);
+
   int len = 0;
 
   while (*src) {
@@ -433,19 +434,14 @@ Wchar	*src, **next;
 }
 
 static int
-wstowrec(gram, src, dst, maxdst, yomilen, wlen, lucks)
-     struct RkKxGram	*gram;
-     Wchar		*src;
-     Wrec		*dst;
-     unsigned		maxdst;
-     unsigned		*yomilen, *wlen;
-     unsigned long	*lucks;
+wstowrec(struct RkKxGram* gram, cannawc* src, Wrec* dst, unsigned maxdst,
+         unsigned* yomilen, unsigned* wlen, unsigned long* lucks)
 {
-  Wrec		*odst = dst;
-  Wchar		*yomi, *kanji;
+    Wrec		*odst = dst;
+    cannawc *yomi, *kanji;
   int		klen, ylen, ncand, row = 0, step = 0, spec = 0;
   unsigned	frq;
-    
+
   lucks[0] = lucks[1] = 0L;
   ncand = 0;
   *yomilen = *wlen = 0;
@@ -504,17 +500,16 @@ wstowrec(gram, src, dst, maxdst, yomilen, wlen, lucks)
   return ncand;
 }
 
+extern cannawc uniqAlnum(cannawc c);
+
 static Wrec *
-fil_wc2wrec_flag(wrec, wreclen, ncand, yomi, ylen, left)
-     Wrec	*wrec;
-     Wchar	*yomi;
-     unsigned	*wreclen, ylen, ncand, left;
+fil_wc2wrec_flag(Wrec* wrec, unsigned* wreclen, unsigned ncand, cannawc* yomi,
+                 unsigned ylen, unsigned left)
 {
-  extern Wchar	uniqAlnum();
   Wrec		*owrec = wrec;
   Wchar		tmp;
   int		wlen = *wreclen, i;
-  
+
   if ((ncand > 7) || (wlen > 0x3f)) {
     wlen += 2;
     *wrec = 0x80;
@@ -528,7 +523,7 @@ fil_wc2wrec_flag(wrec, wreclen, ncand, yomi, ylen, left)
     *wrec++ = (Wrec)((ncand >> 3) & 0xff);
   }
   if (left) {
-    int offset = ylen - left; /* •«•£•Ï•Ø•»•Í…Ù§À∆˛§√§∆§§§Î∆…§ﬂ§Œƒπ§µ */
+    int offset = ylen - left; /* „Éá„Ç£„É¨„ÇØ„Éà„É™ÈÉ®„Å´ÂÖ•„Å£„Å¶„ÅÑ„ÇãË™≠„Åø„ÅÆÈï∑„Åï */
     RK_ASSERT(offset >= 0);
     for (i = 0 ; i < offset ; i++) {
       if (*yomi == RK_ESC_CHAR) {
@@ -559,7 +554,7 @@ fil_wrec_flag(wrec, wreclen, ncand, yomi, ylen, left)
   Wrec		*owrec = wrec;
   Wchar		tmp;
   int		wlen = *wreclen, i;
-  
+
   if ((ncand > 7) || (wlen > 0x3f)) {
     wlen += 2;
     *wrec = 0x80;
@@ -585,13 +580,10 @@ fil_wrec_flag(wrec, wreclen, ncand, yomi, ylen, left)
   return wrec;
 }
 
+
 Wrec *
-RkParseWrec(gram, src, left, dst, maxdst)
-     struct RkKxGram	*gram;
-     Wchar		*src;
-     unsigned		left;
-     unsigned char	*dst;
-     unsigned		maxdst;
+RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
+            unsigned char* dst, unsigned maxdst)
 {
   unsigned	wreclen, wlen, ylen, nc;
   unsigned long	lucks[2];
@@ -629,13 +621,10 @@ RkParseWrec(gram, src, left, dst, maxdst)
   return ret;
 }
 
-Wrec *
-RkParseOWrec(gram, src, dst, maxdst, lucks)
-     struct RkKxGram	*gram;
-     Wchar		*src;
-     unsigned char	*dst;
-     unsigned		maxdst;
-     unsigned long	*lucks;
+
+Wrec*
+RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
+             unsigned maxdst, unsigned long* lucks)
 {
   unsigned	wreclen, wlen, ylen, nc;
   unsigned char *ret = (unsigned char *)0;
@@ -686,7 +675,7 @@ RkParseGramNum(gram, src, row)
     return src;
   }
 #endif
-    
+
   code[0] = 0;
   *row = -1;
   if (*src++ != (Wchar)'#') {
@@ -723,10 +712,9 @@ RkParseGramNum(gram, src, row)
   return src;
 }
 
+
 unsigned char *
-RkGetGramName(gram, row)
-     struct RkKxGram	*gram;
-     int		row;
+RkGetGramName(struct RkKxGram* gram, int row)
 {
   if (gram && gram->ng_strtab)
     if (is_row_num(gram, row))
@@ -742,7 +730,7 @@ RkUparseGramNum(gram, row, dst, maxdst)
      int		maxdst;
 {
   unsigned char	*name, *p;
-    
+
   name = (unsigned char *)RkGetGramName(gram, row);
   if (name) {
     int len = strlen((char *)name);
@@ -758,7 +746,7 @@ RkUparseGramNum(gram, row, dst, maxdst)
     return (Wchar *)0;
   } else {
     int keta, uni, temp = row;
-    
+
     for (keta = 1, uni = 1; temp > 9; keta++) {
       temp /= 10;
       uni *= 10;
@@ -783,27 +771,23 @@ _RkRowNumber(wrec)
      unsigned char	*wrec;
 {
   int	row;
-  
+
   row = (int)wrec[1];
   if (wrec[0] & 0x01)
     row += 256;
   return row;
 }
 
-Wchar	*
-_RkUparseWrec(gram, src, dst, maxdst, lucks, add)
-     struct RkKxGram	*gram;
-     Wrec		*src;
-     Wchar		*dst;
-     int		maxdst;
-     unsigned long     	*lucks;
-     int		add;
+
+cannawc*
+_RkUparseWrec(struct RkKxGram* gram, Wrec* src, cannawc* dst, int maxdst,
+              unsigned long* lucks, int add)
 {
   unsigned long luck = _RkGetTick(0), val;
   unsigned char	*wrec = src;
   int 		num, ncnd, ylen, row, oldrow, i, l, oh = 0;
   Wchar		*endp = dst + maxdst, *endt, luckw[5], wch;
-    
+
   endt = (Wchar *)0;
   ylen = (*wrec >> 1) & 0x3f;
   ncnd = _RkCandNumber(wrec);
@@ -823,7 +807,7 @@ _RkUparseWrec(gram, src, dst, maxdst, lucks, add)
   oldrow = -1;
   for (i = 0; i < ncnd; i++, oh = 0) {
     unsigned	clen;
-    
+
     clen = (*wrec >> 1) & 0x7f;
     row = _RkRowNumber(wrec);
     wrec += NW_PREFIX;
@@ -839,7 +823,7 @@ _RkUparseWrec(gram, src, dst, maxdst, lucks, add)
     if (add && i < 2 && lucks[i]) {
       if (!oh) {
 	*dst++ = (Wchar)' ';
-	if (!(dst = RkUparseGramNum(gram, (int)row, dst, (int)(endp - dst)))) 
+	if (!(dst = RkUparseGramNum(gram, (int)row, dst, (int)(endp - dst))))
 	  break;
 	oh++;
       }
@@ -892,15 +876,11 @@ _RkUparseWrec(gram, src, dst, maxdst, lucks, add)
   return((Wchar *)0);
 }
 
-Wchar	*
-RkUparseWrec(gram, src, dst, maxdst, lucks)
-     struct RkKxGram	*gram;
-     Wrec		*src;
-     Wchar		*dst;
-     int		maxdst;
-     unsigned long	*lucks;
+cannawc*
+RkUparseWrec(struct RkKxGram* gram, Wrec* src, cannawc* dst, int maxdst,
+             unsigned long* lucks)
 {
-  return(_RkUparseWrec(gram, src, dst, maxdst, lucks, 0));
+    return(_RkUparseWrec(gram, src, dst, maxdst, lucks, 0));
 }
 
 struct TW *
@@ -909,7 +889,7 @@ RkCopyWrec(src)
 {
   struct TW	*dst = NULL;
   unsigned int	sz;
-  
+
   sz = _RkWordLength(src->word);
   if (sz) {
     dst = (struct TW *)malloc(sizeof(struct TW));
@@ -944,7 +924,7 @@ RkScanWcand(wrec, word, maxword)
   for (i = 0; i < nc; i++) {
     int		rcnum;
     int		klen;
-	
+
     klen = (*wrec >> 1) & 0x7f;
     rcnum = _RkRowNumber(wrec);
     if (i < maxword) {
@@ -967,16 +947,16 @@ RkUniqWcand(wc, nwc)
   int		i, j, nu;
   Wrec		*a;
   unsigned 	k, r;
-    
+
   for (nu = 0, j = 0; j < nwc; j++) {
     k = wc[j].klen;
     r = wc[j].rcnum;
     a = wc[j].addr + NW_PREFIX;
     for (i = 0; i < nu; i++)
-      if (wc[i].klen == k && wc[i].rcnum == (short)r && 
+      if (wc[i].klen == k && wc[i].rcnum == (short)r &&
 	  !memcmp(wc[i].addr + NW_PREFIX, a, 2 * k))
 	break;
-    if (nu <= i) 
+    if (nu <= i)
       wc[nu++] = wc[j];
   }
   return(nu);
@@ -1037,7 +1017,7 @@ RkWcand2Wrec(key, wc, nc, lucks)
 			    | ((wc[i].rcnum >> 8) & 0x01));
 	    *dst++ = (Wrec)(wc[i].rcnum & 0xff);
 	    a = wc[i].addr + NW_PREFIX;
-	    for (j = wc[i].klen * 2; j--;) 
+	    for (j = wc[i].klen * 2; j--;)
 	      *dst++ = *a++;
 	  }
 	  tw->lucks[0] = lucks[0];
@@ -1076,7 +1056,7 @@ RkUnionWcand(wc1, nc1, wlen1, wc2, nc2)
 	  !memcmp(wc1[i].addr + NW_PREFIX, a, 2 * k))
 	break;
     }
-    if (nu <= i) 
+    if (nu <= i)
       wc1[nu++] = wc2[j];
   }
   return(nu);
@@ -1128,7 +1108,7 @@ RkSubtractWrec(tw1, tw2)
   struct RkWcand	*wc1, *wc2;
   int			nc1, nc2, nc, ylen;
   Wrec			*a, *b, *wrec1 = tw1->word, *wrec2 = tw2->word;
-  
+
   wc1 = (struct RkWcand *) malloc(sizeof(struct RkWcand) * RK_CAND_NMAX);
   if (!wc1) return((struct TW *)0);
   wc2 = (struct RkWcand *) malloc(sizeof(struct RkWcand) * RK_CAND_NMAX);
@@ -1211,7 +1191,7 @@ RkTestGram(gram, row, col)
 {
   const conjcell *start = gram->ng_conjrows[row];
   const conjcell *end = gram->ng_conjrows[row + 1];
-  
+
   switch (end - start) {
   case 0:
     return 0;
@@ -1234,11 +1214,11 @@ RkTestGram(gram, row, col)
 }
 
 #ifdef LOGIC_HACK
-/* RkCheckNegGram -- ¬«§¡æ√§π¿‹¬≥§Ú∏°∫∫§π§Î
- * return value: 
- *    0: ¥ÿ∑∏§ §∑
- *    1: ¬«§¡æ√§π
- *    2: Õ•¿Ë≈Ÿ§Ú≤º§≤§Î
+/* RkCheckNegGram -- Êâì„Å°Ê∂à„ÅôÊé•Á∂ö„ÇíÊ§úÊüª„Åô„Çã
+ * return value:
+ *    0: Èñ¢‰øÇ„Å™„Åó
+ *    1: Êâì„Å°Ê∂à„Åô
+ *    2: ÂÑ™ÂÖàÂ∫¶„Çí‰∏ã„Åí„Çã
  */
 int
 RkCheckNegGram(gram, rc1, rc2, rc3)
