@@ -207,12 +207,12 @@ WIsG3(cannawc wc)
  */
 // 定義されているのはここだけ。RK/tempdic.c で使われている.
 int
-RkCvtWide(cannawc* dest, int destlen, const unsigned char* src, int srclen)
+RkCvtWide(cannawc* dest, int destlen, const char* src, int srclen)
 {
     assert( src );
 
     cannawc* d = dest;
-    const unsigned char* s = src;
+    const unsigned char* s = (unsigned char*) src;
     const unsigned char* const S = src + srclen;
     int count = 0;
     unsigned long code;
@@ -277,8 +277,11 @@ CANNA_mbstowcs(cannawc* dest, const unsigned char* src, size_t destlen)
 }
 
 
-// cannawc -> EUC-JP.
-// 引数の順序が違う.
+/**
+ * cannawc -> EUC-JP.
+ * 引数の順序が違う.
+ * @param dest NULL の場合, 大きさを数えるのみ.
+ */
 size_t
 CNvW2E(const cannawc* src, int srclen, unsigned char* dest, size_t destlen)
 {
@@ -337,7 +340,8 @@ CNvW2E(const cannawc* src, int srclen, unsigned char* dest, size_t destlen)
 
 
 /* RkCvtNarrow
- *
+ * @param dest NULL の場合、必要な大きさを数えるのみ. この場合, maxdst は無視さ
+ *             れる.
  */
 int
 RkCvtNarrow(unsigned char* dest, int maxdst, const cannawc* src, int maxsrc)

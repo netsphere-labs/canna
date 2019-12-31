@@ -987,7 +987,7 @@ struct ncache* _RkFindCache( struct DM* dm, long addr );
 struct ncache* _RkReadCache( struct DM* dm, long addr );
 void			_RkFreeCache();
 void _RkKillCache(struct DM* dm);
-void		 	_RkPurgeCache();
+void _RkPurgeCache(struct ncache* cache);
 void _RkDerefCache(struct ncache* cache);
 
 int			_RkRenbun2();
@@ -1013,8 +1013,11 @@ Wrec*
 RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
              unsigned maxdst, unsigned long* lucks);
 
-Wchar			*RkUparseGramNum();
-Wchar			*RkParseGramNum();
+cannawc*
+RkUparseGramNum(struct RkKxGram* gram, int row, cannawc* dst, int maxdst);
+
+cannawc*
+RkParseGramNum(struct RkKxGram* gram, cannawc* src, int* row);
 
 /* Context */
 char			*allocStr();
@@ -1171,7 +1174,7 @@ void freeTdn pro((struct RkContext *));
 void _RkFreeBunq pro((struct nstore *));
 int _RkRealizeDD pro((struct DD *));
 
-int RkCvtWide pro((cannawc* dest, int, const unsigned char* src, int));
+int RkCvtWide(cannawc* dest, int destlen, const char* src, int);
 cannawc* euctous(const unsigned char* src, int srclen, cannawc* dest, int destlen);
 
 int RkCvtNarrow pro((unsigned char* dest, int, const cannawc* src, int));
