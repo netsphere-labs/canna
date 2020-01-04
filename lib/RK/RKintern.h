@@ -573,8 +573,7 @@ struct nread {
   int		nk;
 };
 
-/* nword
- *	bunsetsu kaiseki kekka
+/* nword - 文節解析結果
  * 	jisho kara no tango yomidasi kekka
  * nword ha, jisho kara search sareta tango record wo kirokusi,
  * bunsetsu kaiseki ni yori sakusei sareru bunsetsu tree wo hyougen suru.
@@ -590,8 +589,17 @@ struct nword {
     unsigned long	nw_prio;	        /* kouzou ni yoru priority */  /* True ? by tamano */
     unsigned long   nw_csn;
     unsigned char	nw_count;	/* setsuzoku suu */
-    struct nword	*nw_left;	/* hidari ni tunagaru word */
-    struct nword	*nw_next;	/* onaji nw_len wo motu list */
+
+    /* 左に繋がる (?) word.
+       nw_next それぞれについて, さらにリストになっている. 終端は NULL.
+       See util.c: showWord(). */
+    struct nword	*nw_left;
+
+    /* 同じ nw_len (?) を持つリスト. 終端は NULL.
+       こちらが外側のリスト構造。このなかで、さらに, nw_left がリスト構造になっ
+       ている*/
+    struct nword	*nw_next;
+
     unsigned char	*nw_kanji;	/* kanji kouho ichi/douteki na kouho */
 /* nw_klen ha fuyou ni naru kanousei ari */
     struct DM		*nw_freq;	/* pointer to frequncy file */
@@ -976,10 +984,10 @@ struct DD		*RkGetUserDD();
 struct RkContext* RkGetContext( int cx_num );
 struct RkContext* RkGetXContext( int cx_num );
 struct RkKxGram		*RkReadGram pro((int, size_t));
-struct RkKxGram		*RkOpenGram();
+struct RkKxGram* RkOpenGram( const char* mydic );
 struct RkKxGram		*RkDuplicateGram();
-void
-RkCloseGram(struct RkKxGram* gram);
+
+void RkCloseGram(struct RkKxGram* gram);
 
 int _RkInitializeCache( int size );
 void _RkFinalizeCache();
@@ -990,8 +998,13 @@ void _RkKillCache(struct DM* dm);
 void _RkPurgeCache(struct ncache* cache);
 void _RkDerefCache(struct ncache* cache);
 
-int			_RkRenbun2();
-void			_RkLearnBun();
+// nword.c
+int _RkRenbun2(struct RkContext* cx,
+               int firstlen); /* bunsetsu chou sitei(ow 0) */
+
+void _RkLearnBun(struct RkContext* cx, int cur, int mode);
+
+cannawc* _RkGetKanji(struct nword* cw, cannawc* key, unsigned long mode);
 
 int			RkScanWcand();
 int			RkUniqWcand();
@@ -1009,19 +1022,18 @@ Wrec* RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
                   unsigned char* dst, unsigned maxdst);
 
 // ngram.c
-Wrec*
-RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
+Wrec* RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
              unsigned maxdst, unsigned long* lucks);
 
-cannawc*
-RkUparseGramNum(struct RkKxGram* gram, int row, cannawc* dst, int maxdst);
+cannawc* RkUparseGramNum(struct RkKxGram* gram, int row, cannawc* dst,
+                         int maxdst);
 
-cannawc*
-RkParseGramNum(struct RkKxGram* gram, cannawc* src, int* row);
+cannawc* RkParseGramNum(struct RkKxGram* gram, cannawc* src, int* row);
 
-/* Context */
-char			*allocStr();
-void			_RkEndBun();
+#define allocStr  strdup
+
+// context.c
+void _RkEndBun( struct RkContext* cx);
 void			freeDF();
 
 int _RkCandNumber(unsigned char* wrec);
@@ -1060,21 +1072,29 @@ int _RkCalcUnlog2( int x );
 	int		_RkRealizeDF();
 
 	struct DM	*_RkSearchDDQ();
-	struct DM	*_RkSearchDDP();
-	struct DM	*_RkSearchUDDP();
+
+// dd.c
+struct DM* _RkSearchDDP(struct DD** ddp, char* name);
+struct DM* _RkSearchUDDP(struct DD** ddp, char* name);
+
 	struct DM	*_RkSearchDDMEM();
 
 	int		_RkIsinDDP();
-struct DD		**_RkCopyDDP();
-struct DD		**_RkCreateDDP();
-void			_RkFreeDDP();
+
+struct DD** _RkCopyDDP(struct DD** ddp);
+
+struct DD** _RkCreateDDP( const char* ddpath );
+
+void _RkFreeDDP( struct DD** ddp );
 
 struct DM		*DMcreate();
 int			DMremove();
 int			DMrename();
 
-int			_RkMountMD();
-void			_RkUmountMD();
+int _RkMountMD(struct RkContext* cx, struct DM* dm, struct DM* qm, int mode,
+               int firsttime);
+
+void _RkUmountMD( struct RkContext* cx, struct MD* md );
 
 // dd.c
 char* _RkCreatePath(struct DD* dd, const char* name);
@@ -1159,11 +1179,9 @@ void _RkRehashCache( struct ncache* cache, long addr );
 #define	_RK_INTERN_FUNCTIONS_DEF_
 
 struct DM *_RkSearchDicWithFreq pro((struct DD **, char *, struct DM **));
-#ifdef __STDC__
+
 void _Rkpanic pro((const char *, ...));
-#else
-void _Rkpanic();
-#endif
+
 void RkAssertFail pro((const char *, int, const char *));
 unsigned long _RkGetTick pro((int));
 struct TW *RkCopyWrec pro((struct TW *));
@@ -1213,10 +1231,12 @@ int copyFile pro((struct DM *, struct DM *));
 int DDchmod pro((struct DD *, int));
 int DMchmod pro((struct DM *, int));
 
+extern size_t WStrlen pro((const cannawc* s));
 #define uslen WStrlen
 //int uslen pro((Wchar *));
 //#define ushortstrlen WStrlen
 
+extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, int n));
 #define usncopy WStrncpy
 
 //#define ushort2euc CNvW2E
@@ -1226,8 +1246,7 @@ unsigned char *ustoeuc pro((const cannawc* src, int srclen,
 int _RkSubstYomi pro((struct RkContext *, int, int, Wchar *, int));
 int HowManyChars pro((const cannawc*, int));
 
-int
-ushort2eucsize(const cannawc* yomi, int len);
+int ushort2eucsize(const cannawc* yomi, int len);
 #define HowManyBytes ushort2eucsize
 
 int _RkFlushYomi pro((struct RkContext *));

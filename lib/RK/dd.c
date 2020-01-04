@@ -52,8 +52,6 @@ static char rcsid[]="$Id: dd.c,v 1.5 2003/09/17 08:50:52 aida_s Exp $";
 /*
  * DD privates
  */
-static struct DM	*_RkCreateDM();
-static void		_RkFreeDM();
 static struct DM	*_RkAllocDM();
 static struct DF	*_RkCreateDF();
 static void		_RkFreeDF();
@@ -67,30 +65,13 @@ static struct DD	*_RkOpenDD();
 static int		_RkCountDDP();
 static struct DD	**_RkAppendDDP();
 
-char *
-allocStr(s)
-     char	*s;
-{
-  char	*d = (char *)0;
-  int	len;
-
-  if ((len = strlen(s)) && (d = malloc(len + 1))) {
-    (void)strncpy(d, s, len);
-    d[len] = (char)0;
-  }
-  return(d);
-}
 
 /*
  * DM
  */
-static
-struct DM	*
-_RkCreateDM(df, dicname, nickname, class)
-     struct DF		*df;
-     unsigned char	*dicname;
-     unsigned char	*nickname;
-     int		class;
+static struct DM*
+_RkCreateDM(struct DF* df, unsigned char* dicname, unsigned char* nickname,
+            int klass)
 {
   struct DM	*dm;
 
@@ -102,7 +83,7 @@ _RkCreateDM(df, dicname, nickname, class)
     if (dm->dm_dicname) {
       dm->dm_nickname = allocStr((char *)nickname);
       if (dm->dm_nickname) {
-	dm->dm_class = class;
+	dm->dm_class = klass;
 	dm->dm_flags = dm->dm_packbyte = dm->dm_rcount = 0;
 	dm->dm_gram = (struct RkGram *)0;
 	dm->dm_extdata.ptr = (pointer)0;
@@ -117,10 +98,9 @@ _RkCreateDM(df, dicname, nickname, class)
   return 0;
 }
 
-static
-void
-_RkFreeDM(dm)
-     struct DM	*dm;
+
+static void
+_RkFreeDM(struct DM* dm)
 {
     if (dm) {
 	dm->dm_next->dm_prev = dm->dm_prev;
@@ -135,11 +115,10 @@ _RkFreeDM(dm)
 
 static
 struct DM *
-_RkAllocDM(df, dicname, nickname, class)
+_RkAllocDM(df, dicname, nickname, int klass)
      struct DF		*df;
      unsigned char	*dicname;
      unsigned char	*nickname;
-     int		class;
 {
   struct DM	*m, *mh = &df->df_members;
 
@@ -148,7 +127,7 @@ _RkAllocDM(df, dicname, nickname, class)
       return m;
     }
   }
-  m = _RkCreateDM(df, dicname, nickname, class);
+  m = _RkCreateDM(df, dicname, nickname, klass);
   if (m) {
     m->dm_next = mh;
     m->dm_prev = mh->dm_prev;
@@ -920,9 +899,10 @@ _RkCountDDP(ddp)
     while (ddp[count])  count++;
   return count;
 }
-struct DD	**
-_RkCopyDDP(ddp)
-     struct DD	**ddp;
+
+
+struct DD**
+_RkCopyDDP(struct DD** ddp)
 {
   struct DD	**new = (struct DD **)0;
   int		i;
@@ -962,21 +942,17 @@ _RkAppendDDP(ddp, dd)
   return new;
 }
 
-struct DD	**
-_RkCreateDDP(ddpath)
-     char		*ddpath;
+struct DD**
+_RkCreateDDP( const char* ddpath )
 {
-  char		*d, *s;
-  struct DD 	*dd;
-  struct DD	**ddp  = (struct DD **)0;
-#ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char dir[RK_PATH_BMAX + 1];
-#else
-  char *dir = malloc(RK_PATH_BMAX + 1);
-  if (!dir) {
-    return ddp;
-  }
-#endif
+    char* d;
+    const char* s;
+    struct DD 	*dd;
+    struct DD	**ddp  = NULL;
+
+    char *dir = malloc(RK_PATH_BMAX + 1);
+    if (!dir)
+        return NULL;
 
   for (s = ddpath; *s; ) {
     int		count;
@@ -1000,15 +976,13 @@ _RkCreateDDP(ddpath)
     if (dd)
       ddp = _RkAppendDDP(ddp, dd);
   };
-#ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free(dir);
-#endif
-  return ddp;
+
+    free(dir);
+    return ddp;
 }
 
 void
-_RkFreeDDP(ddp)
-     struct DD	**ddp;
+_RkFreeDDP( struct DD** ddp)
 {
   struct DD	*dd;
   int		i;
@@ -1025,10 +999,8 @@ _RkFreeDDP(ddp)
 /* _RkSearchDDP/Q
  *	search dictionary file by nickname
  */
-struct DM	*
-_RkSearchDDP(ddp, name)
-     struct DD	**ddp;
-     char	*name;
+struct DM*
+_RkSearchDDP(struct DD** ddp, char* name)
 {
   struct DD	*dd;
   struct DF	*f, *fh;
@@ -1065,15 +1037,12 @@ _RkSearchDDP(ddp, name)
   return (struct DM *)0;
 }
 
+
 /* _RkSearchDDQ
    あるタイプの辞書だけ探して返す
  */
-
 struct DM	*
-_RkSearchDDQ(ddp, name, type)
-     struct DD	**ddp;
-     char	*name;
-     int	type;
+_RkSearchDDQ(struct DD** ddp, char* name, int type)
 {
   struct DD	*dd;
   struct DF	*f, *fh;
@@ -1096,17 +1065,15 @@ _RkSearchDDQ(ddp, name, type)
   return((struct DM *)0);
 }
 
+
 /*
  _RkSearchUDDP()
   最初に見付かるのがシステム辞書にあるやつかどうかを判断しながら返す
  */
-
 struct DM	*
-_RkSearchUDDP(ddp, name)
-     struct DD		**ddp;
-     unsigned char	*name;
+_RkSearchUDDP(struct DD** ddp, char* name)
 {
-  struct DM	*dm = _RkSearchDDP(ddp, (char *)name);
+    struct DM	*dm = _RkSearchDDP(ddp, name);
 
   if (dm && STRCMP(dm->dm_file->df_direct->dd_name, SYSTEM_DDHOME_NAME)) {
     return dm;
@@ -1511,13 +1478,10 @@ int mode;
 	  ((newflags & DD_READOK) ? RK_ENABLE_READ : RK_DISABLE_READ));
 }
 
+
 int
-_RkMountMD(cx, dm, qm, mode, firsttime)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     struct DM		*qm;
-     int		mode;
-     int		firsttime;
+_RkMountMD(struct RkContext* cx, struct DM* dm, struct DM* qm, int mode,
+           int firsttime)
 {
   struct MD	*md, *head;
   struct DF	*df;
@@ -1584,9 +1548,7 @@ _RkMountMD(cx, dm, qm, mode, firsttime)
 }
 
 void
-_RkUmountMD(cx, md)
-     struct RkContext	*cx;
-     struct MD		*md;
+_RkUmountMD( struct RkContext* cx, struct MD* md )
 {
   struct DM	*dm = md->md_dic;
   struct DM	*qm = md->md_freq;

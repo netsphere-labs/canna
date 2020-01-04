@@ -104,18 +104,18 @@ flushCache(struct DM* dm, struct ncache* cache)
 static
 struct ncache* newCache(struct DM* ndm, long address)
 {
-  register struct ncache	*new;
+    struct ncache* new_;
 
-  if ((new = Ncfree.nc_anext) != &Ncfree) {
-    (void)flushCache(new->nc_dic, new);
-    aremove(new);
-    hremove(new);
-    new->nc_dic = ndm;
-    new->nc_word = (unsigned char *)0;
-    new->nc_flags  = 0;
-    new->nc_address = address;
-    new->nc_count = 0;
-    return(new);
+  if ((new_ = Ncfree.nc_anext) != &Ncfree) {
+    (void)flushCache(new_->nc_dic, new_);
+    aremove(new_);
+    hremove(new_);
+    new_->nc_dic = ndm;
+    new_->nc_word = (unsigned char *)0;
+    new_->nc_flags  = 0;
+    new_->nc_address = address;
+    new_->nc_count = 0;
+    return(new_);
   };
   return (struct ncache *)0;
 }
@@ -123,18 +123,18 @@ struct ncache* newCache(struct DM* ndm, long address)
 int
 _RkRelease()
 {
-  register struct ncache	*new;
+  register struct ncache	*new_;
 
-  for (new = Ncfree.nc_anext; new != &Ncfree; new = new->nc_anext) {
-    if (!new->nc_word || (new->nc_flags & NC_NHEAP))
+  for (new_ = Ncfree.nc_anext; new_ != &Ncfree; new_ = new_->nc_anext) {
+    if (!new_->nc_word || (new_->nc_flags & NC_NHEAP))
       continue;
-    (void)flushCache(new->nc_dic, new);
-    hremove(new);
-    new->nc_dic = (struct DM *)0;
-    new->nc_flags  = (unsigned short)0;
-    new->nc_word = (unsigned char *)0;
-    new->nc_address = (long)0;
-    new->nc_count = (unsigned long)0;
+    (void)flushCache(new_->nc_dic, new_);
+    hremove(new_);
+    new_->nc_dic = (struct DM *)0;
+    new_->nc_flags  = (unsigned short)0;
+    new_->nc_word = (unsigned char *)0;
+    new_->nc_address = (long)0;
+    new_->nc_count = (unsigned long)0;
     return 1;
   };
   return 0;
@@ -199,11 +199,9 @@ _RkKillCache(struct DM* dm)
 
 #if defined(MMAP)
 int
-_RkDoInvalidateCache(addr, size)
-     long	addr;
-     unsigned long	size;
+_RkDoInvalidateCache( long addr, unsigned long size)
 {
-  register struct ncache	*head, *cache, *tmp;
+    struct ncache	*head, *cache, *tmp;
   int i;
   int found = 0;
 

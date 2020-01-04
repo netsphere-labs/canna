@@ -120,9 +120,7 @@ deleteCT(ruc, csn)
 }
 
 unsigned long
-searchRut(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+searchRut(struct RUT* ruc, unsigned long csn)
 {
   unsigned long whn;
   struct CTdata *wd;
@@ -153,9 +151,7 @@ searchCTadd(ruc, csn)
 }
 
 int
-entryRut(ruc, csn, tick)
-     struct RUT *ruc;
-     unsigned long csn, tick;
+entryRut(struct RUT* ruc, unsigned long csn, unsigned long tick)
 {
   struct CTdata *wpadd;
   int retval;

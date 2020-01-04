@@ -252,7 +252,7 @@ cellsfail:;
 }
 
 struct RkKxGram*
-RkOpenGram(char* mydic)
+RkOpenGram( const char* mydic )
 {
     struct RkKxGram	*gram;
     struct HD		hd;

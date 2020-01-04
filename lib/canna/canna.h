@@ -868,11 +868,17 @@ extern void makeGLineMessage pro((uiContext, cannawc *, int));
 extern void makeGLineMessageFromStrings pro((uiContext, char *));
 extern newmode *findExtraKanjiMode pro((int));
 extern setWStrings pro((cannawc **, char **, int));
-extern WStrlen pro((cannawc *));
-extern cannawc *WStrcat pro((cannawc *, cannawc *));
-extern cannawc *WStrcpy pro((cannawc *, cannawc *));
-extern cannawc *WStrncpy pro((cannawc *, cannawc *, int));
-extern WStrncmp pro((cannawc *, cannawc *, int));
+
+extern size_t WStrlen pro((const cannawc* s));
+
+extern cannawc* WStrcat pro((cannawc* dest, const cannawc* src));
+
+extern cannawc* WStrcpy pro((cannawc* dest, const cannawc* src));
+
+extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, int n));
+
+extern int WStrncmp pro((const cannawc* s1, const cannawc* s2, int n));
+
 extern cannawc *WString pro((char *));
 #ifndef NO_EXTEND_MENU
 extern prevMenuIfExist pro((uiContext));

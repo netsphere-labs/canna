@@ -36,12 +36,12 @@ static unsigned long now_context = 0L;
 
 #define	Calloc		calloc
 #define cx_gwt		cx_extdata.ptr
-#define	STRCMP(d, s)	strcmp((char *)(d), (char *)(s))
+#define STRCMP(d, s)	strcmp((d), (s))
 
 struct RkGram SG;
 struct RkParam SX;
 
-/* RkInitialize: Renbunsetsu Henkan shokika
+/* RkInitialize: 連文節変換初期化
  *	subeteno Renbunsetsu henkan kannsuu wo siyou suru maeni
  *      itido dake call suru koto.
  * returns: -1/0
@@ -67,11 +67,11 @@ int fd_dic = -1;        /* mmap */
 static int
 _RkInitialize(const char* ddhome, int numCache)
 {
-  int			i = strlen(ddhome);
-  struct RkParam	*sx = &SX;
-  struct DD		*dd = &sx->dd;
-  char			*gramdic, *path;
-  int con;
+    int			i = strlen(ddhome);
+    struct RkParam	*sx = &SX;
+    struct DD		*dd = &sx->dd;
+    char			*gramdic, *path;
+    int con;
 #ifdef __EMX__
   struct stat		statbuf;
 #endif
@@ -280,8 +280,7 @@ RkGetXContext( int cx_num )
 }
 
 void
-_RkEndBun(cx)
-struct RkContext	*cx;
+_RkEndBun( struct RkContext* cx)
 {
     struct DD	**ddp = cx->ddpath;
     int		c;
@@ -311,37 +310,31 @@ struct RkContext	*cx;
 }
 
 /* RkSetDicPath
- *
+ * @return 成功 0, 失敗 -1
  */
-
 int
-RkwSetDicPath(cx_num, path)
-     int	cx_num;
-     char	*path;
+RkwSetDicPath( int cx_num, const char* path )
 {
-  struct RkContext	*cx = RkGetContext(cx_num);
-  struct DD		**new;
+    struct RkContext	*cx = RkGetContext(cx_num);
+    struct DD** new_;
 
-  new = _RkCreateDDP(path);
-  if (new) {
-    _RkFreeDDP(cx->ddpath);
-    cx->ddpath = new;
-    return(0);
-  };
-  return(-1);
+    new_ = _RkCreateDDP(path);
+    if (new_) {
+        _RkFreeDDP(cx->ddpath);
+        cx->ddpath = new_;
+        return(0);
+    }
+    return -1;
 }
 
-/*
+
+/**
   fillContext -- コンテクスト構造体の決まったところに値を埋めてやる。
 
-  return value:
-    0 OK
-   -1 ダメ
+ * @return 0 OK, -1 ダメ
  */
-
 static int
-fillContext(cx_num)
-int cx_num;
+fillContext( int cx_num )
 {
   struct RkContext *cx = &CX[cx_num];
   int i;
@@ -534,18 +527,21 @@ RkwDuplicateContext( int cx_num )
   return(dup);
 }
 
-/* RkMountDic: append the specified dictionary at the end of the mount list */
-int
-RkwMountDic(cx_num, name, mode)
-     int	cx_num;		/* context specified */
-     char	*name;		/* the name of dictonary */
-     int	mode;		/* mount mode */
-{
-  struct RkContext	*cx;
-  int firsttime;
 
-  if (!name)
-    return(-1);
+/* RkMountDic: append the specified dictionary at the end of the mount list
+ * @return If failed, -1.
+ */
+int
+RkwMountDic(
+    int cx_num,  /* context specified */
+    char* name,  /* the name of dictonary */
+    int mode)    /* mount mode */
+{
+    struct RkContext	*cx;
+    int firsttime;
+
+    if (!name)
+        return -1;
   cx = RkGetContext(cx_num);
   if (cx) {
     struct DM *dm, *qm;
@@ -661,7 +657,7 @@ RkwRemountDic(
   return(-1);
 }
 
-/* RkGetDicList: collects the names of the mounted dictionaies */
+/* Collects the names of the mounted dictionaies */
 int
 RkwGetMountList( int cx_num, char* mdname, int maxmdname)
 {
@@ -699,7 +695,6 @@ RkwGetMountList( int cx_num, char* mdname, int maxmdname)
   return(count);
 }
 
-/* RkGetDicList: collects the names of dictionary */
 
 struct dics {
   char *nickname, *dicname;
@@ -841,7 +836,7 @@ RkwGetDirList( int cx_num, char* ddname, int maxddname)
  *	mount the dictionary onto the specified context.
  */
 int
-RkwDefineDic(int cx_num, const char* name, const cannawc* word)
+RkwDefineDic(int cx_num, const char* name, cannawc* word)
 {
   struct RkContext	*cx;
   int			i;

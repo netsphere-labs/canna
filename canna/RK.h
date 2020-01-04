@@ -193,7 +193,7 @@ canna_export(int) RkwInitialize pro((const char *));
 canna_export(int) RkwCreateContext pro((void));
 canna_export(int) RkwCloseContext pro((int));
 canna_export(int) RkwDuplicateContext pro((int));
-canna_export(int) RkwSetDicPath pro((int, char *));
+canna_export(int) RkwSetDicPath pro((int, const char *));
 canna_export(int) RkwGetDirList pro((int, char *,int));
 canna_export(int) RkwGetDicList pro((int, char *,int));
 canna_export(int) RkwMountDic pro((int, char *, int));
@@ -202,7 +202,7 @@ canna_export(int) RkwRemountDic pro((int, char *, int));
 canna_export(int) RkwSync pro((int, char *));
 canna_export(int) RkwGetMountList pro((int, char *, int));
 canna_export(int) RkwDefineDic pro((int, const char* dicname,
-                                    const cannawc* wordrec));
+                                    cannawc* wordrec));
 canna_export(int) RkwDeleteDic pro((int, char *, cannawc *));
 canna_export(int) RkwBgnBun pro((int, const cannawc* yomi, int, int));
 canna_export(int) RkwEndBun pro((int, int));

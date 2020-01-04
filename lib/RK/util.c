@@ -416,16 +416,18 @@ _RkGetOffset(dic, pos)
 }
 
 
-#ifdef TEST
+#ifndef NDEBUG
 
-printWord(w)
-struct nword *w;
+static void
+printWord(const struct nword* w)
 {
-  printf("[0x%x] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
+    assert(w);
+
+    printf("[0x%x] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
 	 w, w->nw_ylen, w->nw_klen, w->nw_class, w->nw_flags,
 	 w->nw_lit, w->nw_prio);
-  if (w->nw_kanji) {
-    int i, klen = w->nw_left ? w->nw_klen - w->nw_left->nw_klen : w->nw_klen;
+    if (w->nw_kanji) {
+        int i, klen = w->nw_left ? w->nw_klen - w->nw_left->nw_klen : w->nw_klen;
     char *p = w->nw_kanji + 2;
 
     for (i = 0 ; i < klen ; i++) {
@@ -436,20 +438,17 @@ struct nword *w;
   printf("\n");
 }
 
-showWord(w)
-struct nword *w;
+void showWord(const struct nword* w)
 {
-  struct nword *p, *q;
+    const struct nword *p, *q;
 
-  printf("next:\n");
-  for (p = w ; p ; p = p->nw_next) {
-    printWord(p);
-    for (q = p->nw_left ; q ; q = q->nw_left) {
-      printWord(q);
+    printf("next:\n");
+    for (p = w ; p ; p = p->nw_next) {
+        printWord(p);
+        for (q = p->nw_left ; q ; q = q->nw_left)
+            printWord(q);
+        printf("\n");
     }
-    printf("\n");
-  }
 }
 
-#endif /* TEST */
-/* vim: set sw=2: */
+#endif /* !NDEBUG */
