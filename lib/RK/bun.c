@@ -270,7 +270,7 @@ allocBunStorage(unsigned len)
     return s;
 }
 
-struct nstore	*
+struct nstore*
 _RkReallocBunStorage(struct nstore* src, unsigned len)
 {
     struct nstore	*dst = allocBunStorage(len);

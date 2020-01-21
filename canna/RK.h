@@ -196,7 +196,7 @@ canna_export(int) RkwDuplicateContext pro((int));
 canna_export(int) RkwSetDicPath pro((int, const char *));
 canna_export(int) RkwGetDirList pro((int, char *,int));
 canna_export(int) RkwGetDicList pro((int, char *,int));
-canna_export(int) RkwMountDic pro((int, char *, int));
+canna_export(int) RkwMountDic pro((int, const char* name, int));
 canna_export(int) RkwUnmountDic pro((int, char *));
 canna_export(int) RkwRemountDic pro((int, char *, int));
 canna_export(int) RkwSync pro((int, char *));
@@ -245,7 +245,7 @@ canna_export(int) RkwRemoveDic pro((int, char *, int));
 canna_export(int) RkwRenameDic pro((int, char *, char *, int));
 canna_export(int) RkwChmodDic pro((int, char *, int));
 canna_export(int) RkwGetWordTextDic pro((int, unsigned char *,
-					 unsigned char *, cannawc *, int));
+					 const char* dicname, cannawc *, int));
 canna_export(int) RkwGetSimpleKanji pro((int, char *, cannawc *, int,
 					 cannawc *, int, cannawc *, int));
 canna_export(int) RkwStoreRange pro((int, cannawc *, int));

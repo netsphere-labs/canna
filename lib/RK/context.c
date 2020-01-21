@@ -534,7 +534,7 @@ RkwDuplicateContext( int cx_num )
 int
 RkwMountDic(
     int cx_num,  /* context specified */
-    char* name,  /* the name of dictonary */
+    const char* name,  /* the name of dictonary */
     int mode)    /* mount mode */
 {
     struct RkContext	*cx;

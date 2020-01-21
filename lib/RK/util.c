@@ -29,6 +29,7 @@ static char rcsid[]="@(#)$Id: util.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $ $Aut
 #include "RKintern.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #define	isEndTag(s)	(s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 0)
 
@@ -127,11 +128,11 @@ _RkCalcUnlog2( int x )
   return((1 << x) - 1);
 }
 
+
 int
-_RkCalcLog2(n)
-     int n;
+_RkCalcLog2(int n)
 {
-  int	lg2;
+    int	lg2;
 
   n--;
   for (lg2 = 0; n > 0; lg2++)
@@ -252,7 +253,7 @@ _RkReadHeader(int fd, struct HD* hd, off_t off_from_top)
   hdrsiz = (size_t)hd->data[HD_HSZ].var;
 
   /* Pass 2 */
-  pass2buf = malloc(hdrsiz);
+  pass2buf = (unsigned char*) malloc(hdrsiz);
   if (!pass2buf)
     goto read_err;
   if (pass1size < hdrsiz) {
@@ -312,7 +313,7 @@ _RkCreateHeader(struct HD* hd, size_t* size)
       datasz += hd->flag[i];
   }
 
-  if (!(ptr = malloc(tagsz + HD_TAGSIZ + datasz)))
+  if (!(ptr = (unsigned char*) malloc(tagsz + HD_TAGSIZ + datasz)))
     return NULL;
 
   tagdst = ptr;
@@ -359,16 +360,14 @@ set_hdr_var(struct HD* hd, int n, unsigned long var)
     return 0;
 }
 
-_RkGetLink(dic, pgno, off, lvo, csn)
-     struct ND	*dic;
-     long	pgno;
-     unsigned long	off;
-     unsigned long	*lvo;
-     unsigned long	*csn;
+
+int
+_RkGetLink(struct ND* dic, long pgno, unsigned long off, unsigned long* lvo,
+           unsigned long* csn)
 {
-  struct NP	*pg = dic->pgs + pgno;
-  unsigned char	*p;
-  unsigned	i;
+    struct NP	*pg = dic->pgs + pgno;
+    unsigned char	*p;
+    unsigned	i;
 
   for (i = 0, p = pg->buf + 14 + 4 * pg->ndsz; i < pg->lnksz; i++, p += 5) {
     if (thisPWO(p) == off) {
@@ -381,9 +380,7 @@ _RkGetLink(dic, pgno, off, lvo, csn)
 }
 
 unsigned long
-_RkGetOffset(dic, pos)
-     struct ND		*dic;
-     unsigned char	*pos;
+_RkGetOffset(struct ND* dic, unsigned char* pos)
 {
   struct NP	*pg;
   unsigned char	*p;
@@ -423,12 +420,12 @@ printWord(const struct nword* w)
 {
     assert(w);
 
-    printf("[0x%x] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
+    printf("[0x%p] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
 	 w, w->nw_ylen, w->nw_klen, w->nw_class, w->nw_flags,
 	 w->nw_lit, w->nw_prio);
     if (w->nw_kanji) {
         int i, klen = w->nw_left ? w->nw_klen - w->nw_left->nw_klen : w->nw_klen;
-    char *p = w->nw_kanji + 2;
+        unsigned char *p = w->nw_kanji + 2;
 
     for (i = 0 ; i < klen ; i++) {
       printf("%c%c", p[0], p[1]);

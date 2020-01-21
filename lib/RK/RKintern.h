@@ -998,6 +998,9 @@ void _RkKillCache(struct DM* dm);
 void _RkPurgeCache(struct ncache* cache);
 void _RkDerefCache(struct ncache* cache);
 
+// bun.c
+struct nstore* _RkReallocBunStorage(struct nstore* src, unsigned len);
+
 // nword.c
 int _RkRenbun2(struct RkContext* cx,
                int firstlen); /* bunsetsu chou sitei(ow 0) */
@@ -1043,6 +1046,8 @@ int _RkWordLength(unsigned char* wrec);
 int _RkCalcLog2 pro((int));
 int _RkCalcUnlog2( int x );
 
+unsigned long _RkGetOffset(struct ND* dic, unsigned char* pos);
+
 /* etc. */
 
 #ifdef OPTIMIZE
@@ -1069,13 +1074,12 @@ int _RkCalcUnlog2( int x );
 /* space も候補として使いたいが今の所は space */
 #define IS_DIC_PUNCT(euc)	isspace(euc)
 
-	int		_RkRealizeDF();
-
-	struct DM	*_RkSearchDDQ();
-
 // dd.c
-struct DM* _RkSearchDDP(struct DD** ddp, char* name);
-struct DM* _RkSearchUDDP(struct DD** ddp, char* name);
+int _RkRealizeDF(struct DF* df);
+
+struct DM* _RkSearchDDQ(struct DD** ddp, const char* name, int type);
+struct DM* _RkSearchDDP(struct DD** ddp, const char* name);
+struct DM* _RkSearchUDDP(struct DD** ddp, const char* name);
 
 	struct DM	*_RkSearchDDMEM();
 
@@ -1087,9 +1091,11 @@ struct DD** _RkCreateDDP( const char* ddpath );
 
 void _RkFreeDDP( struct DD** ddp );
 
-struct DM		*DMcreate();
-int			DMremove();
-int			DMrename();
+// dd.c
+struct DM* DMcreate(struct DD* dd, char* spec);
+
+int DMremove(struct DM* dm);
+int DMrename(struct DM* dm, const char* nickname);
 
 int _RkMountMD(struct RkContext* cx, struct DM* dm, struct DM* qm, int mode,
                int firsttime);
@@ -1098,8 +1104,8 @@ void _RkUmountMD( struct RkContext* cx, struct MD* md );
 
 // dd.c
 char* _RkCreatePath(struct DD* dd, const char* name);
-char			*_RkCreateUniquePath();
-char			*_RkMakePath();
+char* _RkCreateUniquePath(struct DD* dd, const char* proto);
+char* _RkMakePath(struct DF* df);
 
 unsigned char		*_RkCreateHeader pro((struct HD *, size_t *size));
 int			_RkReadHeader pro((int, struct HD *, off_t));
@@ -1178,7 +1184,7 @@ void _RkRehashCache( struct ncache* cache, long addr );
 #ifndef	_RK_INTERN_FUNCTIONS_DEF_
 #define	_RK_INTERN_FUNCTIONS_DEF_
 
-struct DM *_RkSearchDicWithFreq pro((struct DD **, char *, struct DM **));
+struct DM *_RkSearchDicWithFreq pro((struct DD **, const char* name, struct DM **));
 
 void _Rkpanic pro((const char *, ...));
 

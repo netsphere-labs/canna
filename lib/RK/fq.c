@@ -29,6 +29,7 @@ static char rcsid[]="$Id: fq.c,v 1.6 2003/09/17 08:50:52 aida_s Exp $";
 #ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
 #endif
+#include <assert.h>
 
 #define dm_xdm	dm_extdata.ptr
 
@@ -38,10 +39,9 @@ struct xqm {
 };
 
 struct RUT *
-allocRUT(hn)
-     unsigned long hn;
+allocRUT(unsigned long hn)
 {
-  struct RUT	*tempo;
+    struct RUT	*tempo;
 
   if (!(tempo = (struct RUT *)calloc(1, sizeof(struct RUT))))
     return((struct RUT *) 0);
@@ -53,12 +53,10 @@ allocRUT(hn)
 }
 
 static int
-WrToRut(ruc, csn, tick)
-     struct RUT *ruc;
-     unsigned long csn, tick;
+WrToRut(struct RUT* ruc, unsigned long csn, unsigned long tick)
 {
-  unsigned long whn;
-  struct CTdata *wd, **pwd;
+    unsigned long whn;
+    struct CTdata *wd, **pwd;
 
   whn = HashFunc(csn);
   for (pwd = ruc->dp+whn, wd = *pwd ; wd; pwd = &wd->next, wd = *pwd) {
@@ -76,11 +74,10 @@ WrToRut(ruc, csn, tick)
 
 static
 unsigned long
-UpdateFrst(ruc)
-     struct RUT *ruc;
+UpdateFrst(struct RUT* ruc)
 {
-  unsigned long wmin, wtick, frst, lc;
-  struct CTdata *wd;
+    unsigned long wmin, wtick, frst, lc;
+    struct CTdata *wd;
 
   wmin = 0xffffffffL;
   frst = 0xfffffL;
@@ -99,12 +96,10 @@ UpdateFrst(ruc)
 }
 
 static int
-deleteCT(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+deleteCT(struct RUT* ruc, unsigned long csn)
 {
-  unsigned long whn;
-  struct CTdata *wd, **pre;
+    unsigned long whn;
+    struct CTdata *wd, **pre;
 
   whn = HashFunc(csn);
 
@@ -133,14 +128,12 @@ searchRut(struct RUT* ruc, unsigned long csn)
   return (unsigned long) 0L;
 }
 
-static
-struct CTdata *
-searchCTadd(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+
+static struct CTdata *
+searchCTadd(struct RUT* ruc, unsigned long csn)
 {
-  unsigned long whn;
-  struct CTdata *wd;
+    unsigned long whn;
+    struct CTdata *wd;
 
   whn = HashFunc(csn);
   for (wd = *(ruc->dp+whn) ; wd; wd = wd->next) {
@@ -190,12 +183,11 @@ entryRut(struct RUT* ruc, unsigned long csn, unsigned long tick)
   return retval;
 }
 
-static
-struct WRT *
-allocWRT(size)
-     unsigned long size;
+
+static struct WRT *
+allocWRT(unsigned long size)
 {
-  struct WRT *tempo;
+    struct WRT *tempo;
 
   if (!(tempo = (struct WRT *)calloc(1, sizeof(struct WRT))))
     return((struct WRT *) 0);
@@ -209,8 +201,7 @@ allocWRT(size)
 
 static
 struct WRT *
-readWRT(fr)
-     int fr;
+readWRT(int fr)
 {
   unsigned	long wsz, wcs, wfrst, wtm;
   unsigned char	ll[4];
@@ -243,12 +234,9 @@ readWRT(fr)
   return wrt;
 }
 
-static int writeToWRT pro((int, struct WRT *));
 
 static int
-writeToWRT(fr, wrt)
-     int	fr;
-     struct WRT	*wrt;
+writeToWRT(int fr, struct WRT* wrt)
 {
   unsigned char ll[4];
 
@@ -273,12 +261,10 @@ writeToWRT(fr, wrt)
 
 static
 void
-abolishNV(nv)
-     struct NV	*nv;
-
+abolishNV(struct NV* nv)
 {
-  struct NVE	*p, **q, *r;
-  unsigned i;
+    struct NVE	*p, **q, *r;
+    unsigned i;
 
   if (nv && nv->tsz && nv->buf) {
     for (i = 0, q = nv->buf + i; i < nv->tsz; i++, q = nv->buf + i) {
@@ -295,14 +281,14 @@ abolishNV(nv)
   return;
 }
 
+
 static
 struct NV *
-readNV(fd)
-     int	fd;
+readNV(int fd)
 {
-  struct NV	*vn;
-  unsigned char	ll[4], *buf, *p;
-  long		i, cnt;
+    struct NV	*vn;
+    unsigned char	ll[4], *buf, *p;
+    long		i, cnt;
 
   vn = (struct NV *)malloc(sizeof(struct NV));
   if (vn) {
@@ -353,15 +339,14 @@ readNV(fd)
   return(vn);
 }
 
+
 static int
-writeNV(fd, nv)
-     int	fd;
-     struct NV	*nv;
+writeNV(int fd, struct NV* nv)
 {
-  unsigned char	ll[4];
-  unsigned char	*buf = (unsigned char *)0, *r;
-  struct NVE	*p, **q;
-  unsigned long i;
+    unsigned char	ll[4];
+    unsigned char	*buf = (unsigned char *)0, *r;
+    struct NVE	*p, **q;
+    unsigned long i;
 
   if (!nv)
     return(-1);
@@ -405,12 +390,12 @@ writeNV(fd, nv)
   return(0);
 }
 
+
 static void
-freeRUT(ruc)
-struct RUT *ruc;
+freeRUT(struct RUT* ruc)
 {
-  struct CTdata *wd, *nex;
-  unsigned long lc;
+    struct CTdata *wd, *nex;
+    unsigned long lc;
 
   for (lc = 0; lc < HN; lc++) {
     for (wd = *(ruc->dp+lc); wd; wd = nex) {
@@ -422,13 +407,13 @@ struct RUT *ruc;
   free(ruc);
 }
 
+
 struct RUT *
-LoadRUC(fr)
-int fr;
+LoadRUC(int fr)
 {
-  struct WRT *wruc;
-  struct RUT *ruc;
-  unsigned long lc, csn, tick;
+    struct WRT *wruc;
+    struct RUT *ruc;
+    unsigned long lc, csn, tick;
 
   if (!(wruc = readWRT(fr)))
     return (struct RUT *) 0;
@@ -456,17 +441,14 @@ int fr;
   return ruc;
 }
 
-static int SaveRUC pro((int, struct RUT *));
 
 static int
-SaveRUC(fr, ruc)
-int fr;
-struct RUT *ruc;
+SaveRUC(int fr, struct RUT* ruc)
 {
-  struct WRT	*wruc;
-  struct CTdata	*wdp;
-  unsigned	long lc, count;
-  int		retval;
+    struct WRT	*wruc;
+    struct CTdata	*wdp;
+    unsigned	long lc, count;
+    int		retval;
 
   if (!ruc)
     return (int) 0;
@@ -495,6 +477,7 @@ struct RUT *ruc;
   freeWRT(wruc);
   return retval;
 }
+
 
 // @return If open(file) failed, -1.
 static int
@@ -583,18 +566,15 @@ FQscan(struct DF* df, struct DM* codm, const char* file, int* w)
   return fd;
 }
 
+
 int
-FQopen(dm, qm, file, mode)
-     struct DM	*dm;
-     struct DM	*qm;
-     char	*file;
-     int	mode;
+FQopen(struct DM* dm, struct DM* qm, char* file, int mode)
 {
-  struct DF	*df;
-  struct DD	*dd;
-  struct xqm 	*xqm;
-  int		writable;
-  int		fd;
+    struct DF	*df;
+    struct DD	*dd;
+    struct xqm 	*xqm;
+    int		writable;
+    int		fd;
 
   /* missing file info ? */
     if (!(df = qm->dm_file) || !(dd = df->df_direct))
@@ -639,20 +619,17 @@ FQopen(dm, qm, file, mode)
     return 0;
 }
 
+
 /*
  * CLOSE
  */
 /*ARGSUSED*/
 void
-FQclose(cx, dm, qm, file)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     struct DM		*qm;
-     char		*file;
+FQclose(struct RkContext* cx, struct DM* dm, struct DM* qm, char* file)
 {
-  struct DF		*df = qm->dm_file;
-  struct xqm		*xqm;
-  int			fd = (int)df->df_extdata.var;
+    struct DF		*df = qm->dm_file;
+    struct xqm		*xqm;
+    int			fd = (int)df->df_extdata.var;
 
   xqm = (struct xqm *)qm->dm_extdata.ptr;
   if (xqm) {
@@ -693,18 +670,14 @@ FQclose(cx, dm, qm, file)
   }
 }
 
+
 int
-FQsync(cx, dm, qm, file)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     struct DM		*qm;
-     char		*file;
-/* ARGSUSED */
+FQsync(struct RkContext* cx, struct DM* dm, struct DM* qm, char* file)
 {
-  struct DF		*df = qm->dm_file;
-  struct xqm		*xqm;
-  int rv;
-  int			fd = (int)df->df_extdata.var;
+    struct DF		*df = qm->dm_file;
+    struct xqm		*xqm;
+    int rv;
+    int			fd = (int)df->df_extdata.var;
 
   rv = 0;
   xqm = (struct xqm *)qm->dm_extdata.ptr;

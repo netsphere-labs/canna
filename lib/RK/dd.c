@@ -113,14 +113,12 @@ _RkFreeDM(struct DM* dm)
     };
 }
 
-static
-struct DM *
-_RkAllocDM(df, dicname, nickname, int klass)
-     struct DF		*df;
-     unsigned char	*dicname;
-     unsigned char	*nickname;
+
+static struct DM *
+_RkAllocDM(struct DF* df, unsigned char* dicname, unsigned char* nickname,
+           int klass)
 {
-  struct DM	*m, *mh = &df->df_members;
+    struct DM	*m, *mh = &df->df_members;
 
   for (m = mh->dm_next; m != mh; m = m->dm_next) {
     if (!STRCMP(m->dm_dicname,  dicname)) {
@@ -140,14 +138,10 @@ _RkAllocDM(df, dicname, nickname, int klass)
 /*
  * DF
  */
-static
-struct DF *
-_RkCreateDF(dd, lnk, type)
-     struct DD		*dd;
-     unsigned char	*lnk;
-     int		type;
+static struct DF *
+_RkCreateDF(struct DD* dd, unsigned char* lnk, int type)
 {
-  struct DF	*df;
+    struct DF	*df;
 
   df = (struct DF *)Calloc(1, sizeof(struct DF));
   if (df) {
@@ -168,12 +162,11 @@ _RkCreateDF(dd, lnk, type)
   return(df);
 }
 
-static
-void
-_RkFreeDF(df)
-     struct DF	*df;
+
+static void
+_RkFreeDF(struct DF* df)
 {
-  struct DM	*m, *n;
+    struct DM	*m, *n;
 
   if (df) {
     struct DM	*mh = &df->df_members;
@@ -192,14 +185,12 @@ _RkFreeDF(df)
   };
 }
 
-static
-struct DF	*
-_RkAllocDF(dd, lnk, type)
-     struct DD		*dd;
-     unsigned char	*lnk;
+
+static struct DF	*
+_RkAllocDF(struct DD* dd, unsigned char* lnk, int type)
 {
-  struct DF	*f;
-  struct DF	*fh = &dd->dd_files;
+    struct DF	*f;
+    struct DF	*fh = &dd->dd_files;
 
   for (f = fh->df_next; f != fh; f = f->df_next) {
     if (!STRCMP(f->df_link,  lnk)) {
@@ -216,11 +207,11 @@ _RkAllocDF(dd, lnk, type)
   return(f);
 }
 
+
 int
-_RkRealizeDF(df)
-     struct DF	*df;
+_RkRealizeDF(struct DF* df)
 {
-  struct DD	*dd = df->df_direct;
+    struct DD	*dd = df->df_direct;
   char		*pathname;
   unsigned long oldmask;
   int t;
@@ -241,18 +232,13 @@ _RkRealizeDF(df)
   return -1;
 }
 
+
 static int
-_RkParseDicsDir(line, lnk, member, nickname, dftype, dmclass,
-		r_return, w_return)
-char	*line;
-char	*lnk;
-char	*member;
-char	*nickname;
-int	*dftype;
-int	*dmclass;
-int *r_return, *w_return; /* アクセス権を返す所 */
+_RkParseDicsDir(char* line, char* lnk, char* member, char* nickname,
+                int* dftype, int* dmclass,
+                int* r_return, int* w_return) /* アクセス権を返す所 */
 {
-  char	*s, *d, *t, par, ch;
+    char	*s, *d, *t, par, ch;
   int	count;
 
   *dftype  = -1;
@@ -374,45 +360,44 @@ int *r_return, *w_return; /* アクセス権を返す所 */
   return 0;
 }
 
+
 /*
  * DD - dictonary directory record
+ * @return 新しく生成された DD.
  */
-static
-struct DD	*
-_RkCreateDD(path, name)
-     unsigned char	*path, *name;
+static struct DD	*
+_RkCreateDD( const char* path, const char* name)
 {
-  struct DD	*dd;
+    struct DD* dd = (struct DD*) Calloc(1, sizeof(struct DD));
+    if (!dd)
+        return NULL;
 
-  dd = (struct DD *)Calloc(1, sizeof(struct DD));
-  if (dd) {
     dd->dd_next = dd->dd_prev = dd;
-    dd->dd_path = allocStr((char *)path);
+    dd->dd_path = allocStr( path );
     if (dd->dd_path) {
-      dd->dd_name = allocStr((char *)name);
-      if (dd->dd_name) {
-	dd->dd_rcount = 0;
-	dd->dd_files.df_next = dd->dd_files.df_prev = &dd->dd_files;
-	dd->dd_flags = 0;
-	dd->dd_text.ddt_next = dd->dd_text.ddt_prev = &dd->dd_text;
-	return dd;
-      }
-      free((char *)dd->dd_path);
+        dd->dd_name = allocStr( name );
+        if (dd->dd_name) {
+            dd->dd_rcount = 0;
+            dd->dd_files.df_next = dd->dd_files.df_prev = &dd->dd_files;
+            dd->dd_flags = 0;
+            dd->dd_text.ddt_next = dd->dd_text.ddt_prev = &dd->dd_text;
+            return dd;
+        }
+        free( dd->dd_path );
     }
-    free((char *)dd);
-  }
-  return (struct DD *)0;
+    free( dd );
+
+    return NULL;
 }
 
 static
 void
-_RkFreeDD(dd)
-     struct DD	*dd;
+_RkFreeDD(struct DD* dd)
 {
-  struct DF	*f, *g;
-  struct DF	*fh = &dd->dd_files;
-  struct DDT	*ddLines;
-  struct DDT	*p, *q;
+    struct DF	*f, *g;
+    struct DF	*fh = &dd->dd_files;
+    struct DDT	*ddLines;
+    struct DDT	*p, *q;
 
   if (dd) {
     for (f = fh->df_next; f != fh; f = g) {
@@ -438,13 +423,12 @@ _RkFreeDD(dd)
     (void)free((char *)dd);
   };
 }
-static
-struct DD	*
-_RkLookupDD(dd, name)
-     struct DD	*dd;
-     unsigned char	*name;
+
+
+static struct DD	*
+_RkLookupDD(struct DD* dd, unsigned char* name)
 {
-  struct DD		*d;
+    struct DD		*d;
 
   for (d = dd->dd_next; d != dd; d = d->dd_next)
     if (!STRCMP(d->dd_name,  name))
@@ -452,60 +436,60 @@ _RkLookupDD(dd, name)
   return (struct DD *)0;
 }
 
+
 /* _RkReadDD
  *	read a DD directory using dics.dir file.
  */
-static
-struct DD	*
-_RkReadDD(name)
-     char	*name;
+static struct DD	*
+_RkReadDD(const char* name)
 {
-  char		*dics_dir = "/dics.dir";
-  struct DD *dd = (struct DD *)0;
-  struct DF		*df;
-  struct DM		*dm;
-  struct DDT		*ddLines;
-  struct DDT		*ddt;
-  struct RkParam	*sx = RkGetSystem();
-  int r, w;
-  int fdes;
-  FILE		*fp;
+    static const char* dics_dir = "/dics.dir";
+    struct DD *dd = (struct DD *)0;
+    struct DF		*df;
+    struct DM		*dm;
+    struct DDT		*ddLines;
+    struct DDT		*ddt;
+    struct RkParam	*sx = RkGetSystem();
+    int r, w;
+    int fdes;
+    FILE		*fp;
 
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char		direct[RK_PATH_BMAX];
   char		file[RK_PATH_BMAX];
   char		path[RK_PATH_BMAX];
-  unsigned char	line[RK_LINE_BMAX];
+    char line[RK_LINE_BMAX];
   unsigned char	lnk[RK_LINK_BMAX+1];
   unsigned char	member[RK_MEMBER_BMAX+1];
   unsigned char	nickname[RK_NICK_BMAX+1];
 #else
   char *direct, *file, *path;
-  unsigned char *line, *lnk, *member, *nickname;
+    char* line;
+  unsigned char *lnk, *member, *nickname;
   direct = malloc(RK_PATH_BMAX);
   file = malloc(RK_PATH_BMAX);
   path = malloc(RK_PATH_BMAX);
-  line = (unsigned char *)malloc(RK_LINE_BMAX);
+    line = (char*) malloc(RK_LINE_BMAX);
   lnk = (unsigned char *)malloc(RK_LINK_BMAX + 1);
   member = (unsigned char *)malloc(RK_MEMBER_BMAX + 1);
   nickname = (unsigned char *)malloc(RK_NICK_BMAX + 1);
-  if (!direct || !file || !path || !line || !lnk || !member || !nickname) {
-    if (direct) (void)free(direct);
-    if (file) (void)free(file);
-    if (path) (void)free(path);
-    if (line) (void)free((char *)line);
-    if (lnk) (void)free((char *)lnk);
-    if (member) (void)free((char *)member);
-    if (nickname) (void)free((char *)nickname);
-    return dd;
-  }
+    if (!direct || !file || !path || !line || !lnk || !member || !nickname) {
+        free(direct);
+        free(file);
+        free(path);
+        free(line);
+        free(lnk);
+        free(member);
+        free(nickname);
+        return NULL;
+    }
 #endif
 
-  /* create dd even if there is no directory or dics.dir file */
-  (void)strcpy(path, sx->ddhome);
-  (void)strcat(path, "/");
-  (void)strcat(path, name);
-  dd = _RkCreateDD((unsigned char *)path, (unsigned char *)name);
+    /* create dd even if there is no directory or dics.dir file */
+    strcpy(path, sx->ddhome);
+    strcat(path, "/");
+    strcat(path, name);
+    dd = _RkCreateDD( path, name);
   if (!dd) {
     goto return_dd;
   }
@@ -514,8 +498,8 @@ _RkReadDD(name)
     dd = (struct DD *)0;
     goto return_dd;
   }
-  (void)strcpy(direct, path);
-  (void)strcat(direct, dics_dir);
+    strcpy(direct, path);
+    strcat(direct, dics_dir);
 
   /* check for accessing right */
   if ((fdes = open(direct, 0)) < 0) { /* no file? */
@@ -535,14 +519,10 @@ _RkReadDD(name)
     }
   }
 
-#ifdef __EMX__
-  fp = fopen(direct, "rt");
-#else
-  fp = fopen(direct, "r");
-#endif
-  if (!fp) {
-    goto return_dd;
-  }
+    fp = fopen(direct, "rt");
+    if (!fp) {
+        goto return_dd;
+    }
   ddLines = &dd->dd_text;
   /* read dics_dir lines */
   while (fgets((char *)line, RK_LINE_BMAX, fp)) {
@@ -552,7 +532,7 @@ _RkReadDD(name)
     if (!ddt)
       continue;
 
-    ddt->ddt_spec = malloc(strlen((char *)line) + 2); /* 2 for \n\0 */
+    ddt->ddt_spec = (char*) malloc(strlen(line) + 2); /* 2 for \n\0 */
     if (!ddt->ddt_spec)
       {
 	free(ddt);
@@ -616,12 +596,11 @@ _RkReadDD(name)
 
 static
 struct DD	*
-_RkOpenDD(name)
-     char	*name;
+_RkOpenDD(char* name)
 {
-  struct RkParam	*sx = RkGetSystem();
-  struct DD		*dd;
-  struct DD		*knownDD = &sx->dd;
+    struct RkParam	*sx = RkGetSystem();
+    struct DD		*dd;
+    struct DD		*knownDD = &sx->dd;
 
   dd = _RkLookupDD(knownDD, (unsigned char *)name);
   if (dd)
@@ -645,25 +624,24 @@ _RkCreatePath(struct DD* dd, const char* name)
     unsigned 	sz;
     char        *ddname;
 
-  if (!dd || !dd->dd_path || !name)
-    return (char *)0;
-  sz = strlen(dd->dd_path) + strlen(name) + 2;
-  ddname = malloc(sz);
-  if (ddname)  {
-    (void)strcpy(ddname, dd->dd_path);
-    (void)strcat(ddname, "/");
-    (void)strcat(ddname, name);
-  };
-  return ddname;
+    if (!dd || !dd->dd_path || !name)
+        return NULL;
+    sz = strlen(dd->dd_path) + strlen(name) + 2;
+    ddname = (char*) malloc(sz);
+    if (ddname)  {
+        strcpy(ddname, dd->dd_path);
+        strcat(ddname, "/");
+        strcat(ddname, name);
+    }
+    return ddname;
 }
 
+
 char *
-_RkCreateUniquePath(dd, proto)
-     struct DD	*dd;
-     char	*proto;
+_RkCreateUniquePath(struct DD* dd, const char* proto)
 {
-  static char	newLinkName[RK_LINK_BMAX];
-  unsigned 	i;
+    static char newLinkName[RK_LINK_BMAX];
+    unsigned 	i;
 
   /* now checking ... */
   if (!dd || !dd->dd_path || !proto)
@@ -701,15 +679,17 @@ _RkCreateUniquePath(dd, proto)
   return (char *)0;
 }
 
+
+// @return df == NULL のとき, NULL.
 char	*
-_RkMakePath(df)
-     struct DF       *df;
+_RkMakePath(struct DF* df)
 {
-  if (df)
-    return _RkCreatePath(df->df_direct, df->df_link);
-  else
-    return (char *)0;
+    if (df)
+        return _RkCreatePath(df->df_direct, df->df_link);
+    else
+        return NULL;
 }
+
 
 int
 _RkRealizeDD( struct DD* dd)
@@ -875,12 +855,12 @@ _RkRealizeDD( struct DD* dd)
   return ret;
 }
 
+
 /*
  * DDP
  */
 int
-_RkIsInDDP(ddp, dd)
-     struct DD	**ddp, *dd;
+_RkIsInDDP(struct DD** ddp, struct DD* dd)
 {
   while (*ddp)
     if (*ddp++ == dd)
@@ -890,8 +870,7 @@ _RkIsInDDP(ddp, dd)
 
 static
 int
-_RkCountDDP(ddp)
-     struct DD	**ddp;
+_RkCountDDP(struct DD** ddp)
 {
   int	count = 0;
 
@@ -904,43 +883,43 @@ _RkCountDDP(ddp)
 struct DD**
 _RkCopyDDP(struct DD** ddp)
 {
-  struct DD	**new = (struct DD **)0;
-  int		i;
-  struct DD	*dd;
+    struct DD** new_ = (struct DD **)0;
+    int		i;
+    struct DD	*dd;
 
   if (ddp) {
     int	count = _RkCountDDP(ddp);
 
-    new = (struct DD **)Calloc(count + 1, (unsigned)sizeof(struct DD *));
-    if (new)
-      for (i = 0; (dd = new[i] = ddp[i]) != (struct DD *)0 ; i++)
+    new_ = (struct DD **)Calloc(count + 1, (unsigned)sizeof(struct DD *));
+    if (new_)
+      for (i = 0; (dd = new_[i] = ddp[i]) != (struct DD *)0 ; i++)
 	dd->dd_rcount++;
   };
-  return new;
+  return new_;
 }
-static
-struct DD	**
-_RkAppendDDP(ddp, dd)
-     struct DD	**ddp;
-     struct DD	*dd;
-{
-  struct DD	**new;
-  int		i;
-  int		count = _RkCountDDP(ddp);
 
-  new = (struct DD **)Calloc(count + 2, (unsigned)sizeof(struct DD *));
-  if (new) {
+
+static struct DD	**
+_RkAppendDDP(struct DD** ddp, struct DD* dd)
+{
+    struct DD** new_;
+    int		i;
+    int		count = _RkCountDDP(ddp);
+
+  new_ = (struct DD **)Calloc(count + 2, (unsigned)sizeof(struct DD *));
+  if (new_) {
     if (ddp) {
-      for (i = 0; i < count; i++) new[i] = ddp[i];
+      for (i = 0; i < count; i++) new_[i] = ddp[i];
       (void)free((char *)ddp);
     };
-    new[count++] = dd;
-    new[count] = (struct DD *)0;
+    new_[count++] = dd;
+    new_[count] = (struct DD *)0;
     dd->dd_rcount++;
   } else
-    new = ddp;
-  return new;
+    new_ = ddp;
+  return new_;
 }
+
 
 struct DD**
 _RkCreateDDP( const char* ddpath )
@@ -950,12 +929,12 @@ _RkCreateDDP( const char* ddpath )
     struct DD 	*dd;
     struct DD	**ddp  = NULL;
 
-    char *dir = malloc(RK_PATH_BMAX + 1);
+    char *dir = (char*) malloc(RK_PATH_BMAX + 1);
     if (!dir)
         return NULL;
 
-  for (s = ddpath; *s; ) {
-    int		count;
+    for (s = ddpath; *s; ) {
+        int		count;
 
     for (;*s && isspace(*s);) {
       s++;
@@ -1000,12 +979,12 @@ _RkFreeDDP( struct DD** ddp)
  *	search dictionary file by nickname
  */
 struct DM*
-_RkSearchDDP(struct DD** ddp, char* name)
+_RkSearchDDP(struct DD** ddp, const char* name)
 {
-  struct DD	*dd;
-  struct DF	*f, *fh;
-  struct DM	*m, *mh;
-  int		i;
+    struct DD	*dd;
+    struct DF	*f, *fh;
+    struct DM	*m, *mh;
+    int		i;
 
   if (ddp) {
     for (i = 0; (dd = ddp[i]) != (struct DD *)0 ; i++) {
@@ -1042,14 +1021,16 @@ _RkSearchDDP(struct DD** ddp, char* name)
    あるタイプの辞書だけ探して返す
  */
 struct DM	*
-_RkSearchDDQ(struct DD** ddp, char* name, int type)
+_RkSearchDDQ(struct DD** ddp, const char* name, int type)
 {
-  struct DD	*dd;
-  struct DF	*f, *fh;
-  struct DM	*m, *mh;
-  int		i;
+    struct DD	*dd;
+    struct DF	*f, *fh;
+    struct DM	*m, *mh;
+    int		i;
 
-  if (ddp) {
+    if (!ddp)
+        return NULL;
+
     for (i = 0; (dd = ddp[i]) != (struct DD *)0 ; i++) {
       fh = &dd->dd_files;
       for (f = fh->df_next; f && (f != fh); f = f->df_next)
@@ -1061,8 +1042,8 @@ _RkSearchDDQ(struct DD** ddp, char* name, int type)
 	  };
 	};
     };
-  };
-  return((struct DM *)0);
+
+    return NULL;
 }
 
 
@@ -1071,7 +1052,7 @@ _RkSearchDDQ(struct DD** ddp, char* name, int type)
   最初に見付かるのがシステム辞書にあるやつかどうかを判断しながら返す
  */
 struct DM	*
-_RkSearchUDDP(struct DD** ddp, char* name)
+_RkSearchUDDP(struct DD** ddp, const char* name)
 {
     struct DM	*dm = _RkSearchDDP(ddp, name);
 
@@ -1081,20 +1062,18 @@ _RkSearchUDDP(struct DD** ddp, char* name)
   return((struct DM *)0);
 }
 
+
 /* 辞書メンバ名で辞書を探す
 
   学習ファイルは除外して探す
  */
-
 struct DM	*
-_RkSearchDDMEM(ddp, name)
-     struct DD	**ddp;
-     char	*name;
+_RkSearchDDMEM(struct DD** ddp, char* name)
 {
-  struct DD	*dd;
-  struct DF	*f, *fh;
-  struct DM	*m, *mh;
-  int		i;
+    struct DD	*dd;
+    struct DF	*f, *fh;
+    struct DM	*m, *mh;
+    int		i;
 
   if (ddp) {
     for (i = 0; (dd = ddp[i]) != (struct DD *)0 ; i++) {
@@ -1114,23 +1093,19 @@ _RkSearchDDMEM(ddp, name)
   return (struct DM *)0;
 }
 
-/*
-  _RkSearchDicWithFreq -- 辞書(学習辞書を含む)を探し返す。
+
+/**
+ * 辞書(学習辞書を含む)を探し返す。
 
   ddpath の先頭から順に学習ファイルあるいは辞書をさがし、みつかったの
   を返す。学習ファイルがみつかった場合には学習ファイルの元辞書を探して
   それを dm に返し、学習ファイル自身は qmp の先に格納して返す。
-
  */
-
 struct DM *
-_RkSearchDicWithFreq(ddpath, name, qmp)
-struct DD **ddpath;
-char *name;
-struct DM **qmp;
+_RkSearchDicWithFreq(struct DD** ddpath, const char* name, struct DM** qmp)
 {
-  struct DD *udd[2];
-  struct DM *dm, *qm;
+    struct DD *udd[2];
+    struct DM *dm, *qm;
 
   udd[1] = (struct DD *)0;
 
@@ -1148,7 +1123,7 @@ struct DM **qmp;
     }
     ddpath++;
   }
-  return (struct DM *)0;
+    return NULL;
 }
 
 /* DMcheck
@@ -1159,13 +1134,10 @@ struct DM **qmp;
       1: OK
       0: bad
  */
-
-DMcheck(spec, name)
-char *spec;
-char *name;
+int DMcheck(char* spec, char* name)
 {
-  int dftype, dmclass;
-  int r, w, ret;
+    int dftype, dmclass;
+    int r, w, ret;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char lnk[RK_LINK_BMAX+1];
   char member[RK_MEMBER_BMAX+1];
@@ -1199,50 +1171,47 @@ char *name;
   return ret;
 }
 
+
 /* DMcreate
  *	create a new member under dd
  *	DMcreate does not create an actual dictionary file.
  */
-struct DM	*
-DMcreate(dd, spec)
-     struct DD		*dd;
-     char		*spec;
+struct DM* DMcreate(struct DD* dd, char* spec)
 {
-  int		dftype, dmclass;
-  struct DF	*df;
-  struct DM	*dm = (struct DM *)0;
-  struct DDT	*ddt;
-  struct DDT	*ddLines = &dd->dd_text;
-  int r, w;
+    int		dftype, dmclass;
+    struct DF	*df;
+    struct DM	*dm = (struct DM *)0;
+    struct DDT	*ddt;
+    struct DDT	*ddLines = &dd->dd_text;
+    int r, w;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char		lnk[RK_LINK_BMAX+1];
-  char		member[RK_MEMBER_BMAX+1];
-  char		nickname[RK_NICK_BMAX+1];
+    char		lnk[RK_LINK_BMAX+1];
+    char		member[RK_MEMBER_BMAX+1];
+    char		nickname[RK_NICK_BMAX+1];
 #else
-  char *lnk, *member, *nickname;
-  lnk = malloc(RK_LINK_BMAX + 1);
-  member = malloc(RK_MEMBER_BMAX + 1);
-  nickname = malloc(RK_NICK_BMAX + 1);
-  if (!lnk || !member || !nickname) {
-    if (lnk) (void)free(lnk);
-    if (member) (void)free(member);
-    if (nickname) (void)free(nickname);
-    return dm;
-  }
+    char *lnk, *member, *nickname;
+    lnk = malloc(RK_LINK_BMAX + 1);
+    member = malloc(RK_MEMBER_BMAX + 1);
+    nickname = malloc(RK_NICK_BMAX + 1);
+    if (!lnk || !member || !nickname) {
+        free(lnk);
+        free(member);
+        free(nickname);
+        return NULL;
+    }
 #endif
 
-  if (_RkParseDicsDir(spec, lnk, member, nickname, &dftype, &dmclass,
+    if (_RkParseDicsDir(spec, lnk, member, nickname, &dftype, &dmclass,
 		      &r, &w) >= 0) {
-    int len = strlen(spec);
-    if (spec[len - 1] == '\n') {
-      spec[len - 1] = '\0';
-    }
+        int len = strlen(spec);
+        if (spec[len - 1] == '\n')
+            spec[len - 1] = '\0';
 
-    ddt = (struct DDT *)malloc(sizeof(struct DDT));
-    if (ddt) {
-      ddt->ddt_spec = malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
-      if (ddt->ddt_spec) {
-	strcpy(ddt->ddt_spec, spec);
+        ddt = (struct DDT *)malloc(sizeof(struct DDT));
+        if (ddt) {
+            ddt->ddt_spec = (char*) malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
+            if (ddt->ddt_spec) {
+                strcpy(ddt->ddt_spec, spec);
 	df = _RkAllocDF(dd, (unsigned char *)lnk, dftype);
 	if (df) {
 	  dm = _RkAllocDM(df, (unsigned char *)member,
@@ -1264,22 +1233,21 @@ DMcreate(dd, spec)
       (void)free((char *)ddt);
     }
   }
- return_dm:
+return_dm:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free(lnk);
-  (void)free(member);
-  (void)free(nickname);
+    free(lnk);
+    free(member);
+    free(nickname);
 #endif
-  return(dm);
+    return(dm);
 }
 
-int
-DMremove(dm)
-     struct DM	*dm;
-{
-  struct DF	*df = dm->dm_file;
-  struct DDT	*ddt = dm->dm_line;
 
+int
+DMremove(struct DM* dm)
+{
+    struct DF	*df = dm->dm_file;
+    struct DDT	*ddt = dm->dm_line;
 
   /* free up dirs.dic line */
    if (ddt) {
@@ -1300,57 +1268,56 @@ DMremove(dm)
   return 0;
 }
 
+
 int
-DMrename(dm, nickname)
-     struct DM		*dm;
-     unsigned char	*nickname;
+DMrename(struct DM* dm, const char* nickname)
 {
-  struct DF	*df = dm->dm_file;
-  struct DDT	*ddt = dm->dm_line;
-  char		*new_spec;
-  char		*new_nick;
-  char		member[5];
-  char *dicname = (char *)0;
-  int ret = -1;
+    struct DF	*df = dm->dm_file;
+    struct DDT	*ddt = dm->dm_line;
+    char		*new_spec;
+    char		*new_nick;
+    char		member[5];
+    char *dicname = (char *)0;
+    int ret = -1;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char		spec[RK_LINE_BMAX];
+    char		spec[RK_LINE_BMAX];
 #else
-  char *spec = malloc(RK_LINE_BMAX);
-  if (!spec) {
-    return ret;
-  }
+    char *spec = (char*) malloc(RK_LINE_BMAX);
+    if (!spec)
+        return -1;
 #endif
 
-  if (!df || !df->df_link || !dm->dm_file || !ddt || !ddt->ddt_spec)
-    goto return_ret;
-  if (df->df_type == DF_FREQDIC) {
-    dicname = dm->dm_dicname;
-  }
-  switch (dm->dm_class) {
-  default:
-  case ND_MWD:
-    (void)strcpy(member, ".mwd");
-    break;
-  case ND_SWD:
-    (void)strcpy(member, ".swd");
-    break;
-  case ND_PRE:
-    (void)strcpy(member, ".pre");
-    break;
-  case ND_SUC:
-    (void)strcpy(member, ".suc");
-    break;
-  };
-  (void)sprintf(spec, "%s(%s) -%s--%s%s-", df->df_link,
+    if (!df || !df->df_link || !dm->dm_file || !ddt || !ddt->ddt_spec)
+        goto return_ret;
+    if (df->df_type == DF_FREQDIC) {
+        dicname = dm->dm_dicname;
+    }
+    switch (dm->dm_class)
+    {
+    default:
+    case ND_MWD:
+        strcpy(member, ".mwd");
+        break;
+    case ND_SWD:
+        strcpy(member, ".swd");
+        break;
+    case ND_PRE:
+        strcpy(member, ".pre");
+        break;
+    case ND_SUC:
+        strcpy(member, ".suc");
+        break;
+    }
+    sprintf(spec, "%s(%s) -%s--%s%s-", df->df_link,
 		dicname ? dicname : member, nickname,
 		(dm->dm_flags & DM_READOK) ? "r" : "",
 		(dm->dm_flags & DM_WRITEOK) ? "w" : "");
-  new_spec = malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
+    new_spec = (char*) malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
   if (!new_spec) {
     goto return_ret;
   }
   strcpy(new_spec, spec);
-  if (!(new_nick = allocStr((char *)nickname))) {
+  if (!(new_nick = allocStr(nickname))) {
     (void)free(new_spec);
     goto return_ret;
   };
@@ -1360,21 +1327,20 @@ DMrename(dm, nickname)
   dm->dm_nickname = new_nick;
   ret = 0;
 
- return_ret:
+return_ret:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free(spec);
+    free(spec);
 #endif
-  return ret;
+    return ret;
 }
 
+
 int
-DMchmod(dm, mode)
-struct DM *dm;
-int mode;
+DMchmod(struct DM* dm, int mode)
 {
-  struct DF	*df = dm->dm_file;
-  struct DDT	*ddt = dm->dm_line;
-  char		*new_spec;
+    struct DF	*df = dm->dm_file;
+    struct DDT	*ddt = dm->dm_line;
+    char		*new_spec;
   unsigned newflags = dm->dm_flags;
   int ret = -1;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
@@ -1412,7 +1378,7 @@ int mode;
 		    df->df_link, dm->dm_dicname, dm->dm_nickname,
 		    (dm->dm_flags & DM_READOK) ? "r" : "",
 		    (dm->dm_flags & DM_WRITEOK) ? "w" : "");
-      new_spec = malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
+      new_spec = (char*) malloc(strlen(spec) + 3); /* 3 for \r\n\0 */
       if (!new_spec) {
 	ret = NOTALC;
 	goto return_ret;
@@ -1433,20 +1399,18 @@ int mode;
 }
 
 int
-DDchmod(dd, mode)
-struct DD *dd;
-int mode;
+DDchmod(struct DD* dd, int mode)
 {
-  char *dicsdir;
-  unsigned newflags = dd->dd_flags;
+    char *dicsdir;
+    unsigned newflags = dd->dd_flags;
 
-  /* READ パーミッションの操作 */
-  if ((mode & (RK_ENABLE_READ | RK_DISABLE_READ)) == RK_ENABLE_READ) {
-    newflags |= DD_READOK;
-  }
-  else if ((mode & (RK_ENABLE_READ | RK_DISABLE_READ)) == RK_DISABLE_READ) {
-    newflags &= ~DD_READOK;
-  }
+    /* READ パーミッションの操作 */
+    if ((mode & (RK_ENABLE_READ | RK_DISABLE_READ)) == RK_ENABLE_READ) {
+        newflags |= DD_READOK;
+    }
+    else if ((mode & (RK_ENABLE_READ | RK_DISABLE_READ)) == RK_DISABLE_READ) {
+        newflags &= ~DD_READOK;
+    }
 
   /* WRITE パーミッションの操作 */
   if ((mode & (RK_ENABLE_WRITE | RK_DISABLE_WRITE)) == RK_ENABLE_WRITE) {
@@ -1457,7 +1421,7 @@ int mode;
   }
 
   if (newflags != dd->dd_flags) {
-    dicsdir = malloc(strlen(dd->dd_path) + strlen("/dics.dir") + 1);
+      dicsdir = (char*) malloc(strlen(dd->dd_path) + strlen("/dics.dir") + 1);
     if (dicsdir) {
       int filemode;
 
