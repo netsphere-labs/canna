@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 102.1 $Id: dicar.c,v 1.31 1996/11/27 08:20:23 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: dicar.c,v 1.4.2.2 2003/12/27 17:15:22 aida_s Exp $";
 #endif
 
 /*
@@ -40,6 +40,7 @@ static char rcsid[]="@(#) 102.1 $Id: dicar.c,v 1.31 1996/11/27 08:20:23 kon Exp 
 #include <time.h>		/* 時間をとってくるため */
 #include <fcntl.h>
 #include <sys/types.h>
+#include "RKindep/file.h"
 
 static char *program;
 
@@ -63,18 +64,6 @@ char *msg;
 char *name;
 {
   (void)printf("%s - %s\n", msg, name);
-}
-
-static char *
-basename(name)
-char *name;
-{
-  char *s = name + strlen(name);
-  if (*--s == '/') *s = (char)0;
-  while (s-- >= name) {
-    if (*s == '/') return ++s;
-  }
-  return name;
 }
 
 /* cfuncdef
@@ -110,7 +99,7 @@ struct HD *hd;
     date = ctime( &tloc );
     date[strlen(date)-1] = '\0';
 
-    (void)printf("%s.d [%s] = %d + %d\n",
+    (void)printf("%s.d [%s] = %lu + %lu\n",
 		 hd->data[HD_DMNM].ptr, date,
 		 hd->data[HD_CAN].uvar, hd->data[HD_REC].uvar);
   }
@@ -125,6 +114,9 @@ char *name;
   if ((newfd = open(name, O_RDONLY)) < 0) {
     (void)fprintf(stderr, "%s: %s cannot read.\n", program, name);
   }
+#ifdef __CYGWIN32__
+  setmode(newfd, O_BINARY);
+#endif
   return newfd;
 }
 
@@ -137,6 +129,9 @@ char *name;
   if ((newfd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0) {
     (void)fprintf(stderr, "%s: %s cannot create\n", program, name);
   }
+#ifdef __CYGWIN32__
+  setmode(newfd, O_BINARY);
+#endif
   return newfd;
 }
 
@@ -159,7 +154,7 @@ unsigned siz;
   char *buf;
 
   if (!(buf = (char *)malloc((unsigned)siz))) {
-    (void)fprintf(stderr, "%s: cannot malloc %ld siz.\n", program, siz);
+    (void)fprintf(stderr, "%s: cannot malloc %d siz.\n", program, siz);
   }
   else {
     (void)read(src, buf, siz);
@@ -428,7 +423,7 @@ char **args;
       xgetDic(fd, (char *)0);
     else {
       for (i = 3 ; i < argn ; i++) {
-	xgetDic(fd, basename(args[i]));
+	xgetDic(fd, RkiBasename(args[i]));
       }
     }
     (void)close(fd);
@@ -447,7 +442,7 @@ char **args;
     if ((src = openForRead(args[2])) >= 0) {
       if ((atm = openForRead(args[i])) >= 0) {
 	(void)strcpy(fname, "#");
-	(void)strcat(fname, basename(args[2]));
+	(void)strcat(fname, RkiBasename(args[2]));
 	if ((dst = openForWrite(fname)) >= 0) {
 	  remakeDic(src, atm, dst);
 	  closeForWrite(dst, fname);
@@ -469,7 +464,7 @@ char **args;
   char fname[ND_HDRSIZ];
 
   (void)strcpy(fname, "#");
-  (void)strcat(fname, basename(args[2]));
+  (void)strcat(fname, RkiBasename(args[2]));
   if ((dst = openForWrite(fname)) >= 0) {
     for (i = 3 ; i < argn ; i++) {
       if ((atm = openForRead(args[i])) >= 0) {
@@ -492,7 +487,7 @@ char **args;
   for (i = 3 ; i < argn ; i++) {
     if ((src = openForRead(args[2])) >= 0) {
       (void)strcpy(fname, "#");
-      (void)strcat(fname, basename(args[2]));
+      (void)strcat(fname, RkiBasename(args[2]));
       if ((dst = openForWrite(fname)) >= 0) {
 	deleteDic(src, dst, args[i]);
 	closeForWrite(dst, args[i]);
@@ -509,7 +504,7 @@ char	**args;
 {
   char *opchar;
 
-  program = basename(args[0]);
+  program = RkiBasename(args[0]);
 
   if (argn < 3) usage();
 

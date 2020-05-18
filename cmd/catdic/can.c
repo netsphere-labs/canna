@@ -21,12 +21,14 @@
  */
 
 #ifndef lint
-static char rcs[] = "@(#) 112.1 $Id: can.c,v 4.3 1996/11/27 07:05:47 kon Exp $";
+static char rcs[] = "@(#) 112.1 $Id: can.c,v 1.4 2003/02/01 19:34:20 aida_s Exp $";
 #endif
 
 #ifdef ENGINE_SWITCH
 #include "RKrename.h"
 #endif
+#include "cannaconf.h"
+#define CANNA_NEW_WCHAR_AWARE
 
 #include <stdio.h>
 #include <signal.h>
@@ -35,21 +37,9 @@ static char rcs[] = "@(#) 112.1 $Id: can.c,v 4.3 1996/11/27 07:05:47 kon Exp $";
 #include <pwd.h>
 #include <sys/types.h>
 #include <grp.h>
+#include "ccompat.h"
 #ifdef __EMX__
-#include <stdlib.h>
 #include <netdb.h>
-#endif
-
-#if defined(USG) || defined(SYSV) || defined(SVR4)
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-
-#ifdef __STDC__
-#define pro(x) x
-#else
-#define pro(x) ()
 #endif
 
 #if defined(__STDC__) || defined(SVR4)
@@ -76,15 +66,6 @@ extern  char *gettxt();
 #else
 #define SIGVAL void
 #endif
-
-#if defined(USG) || defined(SYSV) || defined(SVR4) 
-# ifndef index
-#define   index  strchr 
-# endif
-# ifndef rindex
-#define   rindex strrchr
-# endif
-#endif 
 
 #ifdef USE_VARARGS
 #ifdef __STDC__
@@ -1696,11 +1677,19 @@ char  **argv;
 		usage();
 	    }
 	}
+#ifdef USE_UNIX_SOCKET
 	(void)strcpy(init,"unix:");
+#else
+	(void)strcpy(init,"localhost:");
+#endif
 	(void)strcat(init,argv[1]);
     }
     else {
+#ifdef USE_UNIX_SOCKET
 	(void)strcpy(init,"unix");
+#else
+	(void)strcpy(init,"localhost");
+#endif
     }
 #else
     if ( argc > 1 ) {

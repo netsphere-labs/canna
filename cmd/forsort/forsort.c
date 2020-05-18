@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.13 1996/11/27 07:17:27 kon Exp $";
+static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.2 2003/02/01 19:34:21 aida_s Exp $";
 #endif
 /*
  * forsort.c	ソートを行なう時に8ビットコードを保護する
@@ -34,6 +34,7 @@ static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.13 1996/11/27 07:17:27 kon Ex
 #if defined(__STDC__) || defined(SVR4)
 #include        <locale.h>
 #endif
+#include "ccompat.h"
 
 #ifdef SVR4
 extern char *gettxt();

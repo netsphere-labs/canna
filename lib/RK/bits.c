@@ -21,15 +21,11 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id: bits.c,v 3.4 1996/11/27 08:20:57 kon Exp $";
+static char rcsid[]="$Id: bits.c,v 1.2 2003/09/17 08:50:52 aida_s Exp $";
 #endif
 /* LINTLIBRARY */
 
 #include "RKintern.h"
-
-#ifdef WIN
-#include "windows.h"
-#endif
 
 /*
  * PackBits

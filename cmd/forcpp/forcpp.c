@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 112.1 $Id: forcpp.c,v 1.19 1996/11/27 07:17:14 kon Exp $";
+static char rcsid[]="@(#) 112.1 $Id: forcpp.c,v 1.2 2003/02/01 19:34:21 aida_s Exp $";
 #endif
 /*
  * forcpp.c	/lib/cpp を通す時に8ビットコードを保護する
@@ -35,6 +35,7 @@ static char rcsid[]="@(#) 112.1 $Id: forcpp.c,v 1.19 1996/11/27 07:17:14 kon Exp
 #if defined(__STDC__) || defined(SVR4)
 #include        <locale.h>
 #endif
+#include "ccompat.h"
 
 #ifdef SVR4
 extern char *gettxt();

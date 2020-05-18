@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 7.32 1996/11/25 10:06:50 kon Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.10 2003/09/17 08:50:53 aida_s Exp $";
 #endif /* lint */
 
 #include "canna.h"
@@ -29,15 +29,11 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 7.32 1996/11/25 10:06:50 kon 
 #include <errno.h>
 #ifdef MEASURE_TIME
 #include <sys/types.h>
-#ifdef WIN
-#include <sys/timeb.h>
-#else
-/* If you compile with Visual C++ on WIN, then please comment out next line. */
 #include <sys/times.h>
 #endif
-#endif
 
-#ifdef WIN
+/* Now canna have only cbp files. */
+#if 1
 #define DEFAULT_ROMKANA_TABLE "/dic/default.cbp"
 #else
 #define DEFAULT_ROMKANA_TABLE "/dic/default.kp"
@@ -46,6 +42,14 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 7.32 1996/11/25 10:06:50 kon 
 #ifdef luna88k
 extern int errno;
 #endif
+
+/*********************************************************************
+ *                      wchar_t replace begin                        *
+ *********************************************************************/
+#ifdef wchar_t
+# error "wchar_t is already defined"
+#endif
+#define wchar_t cannawc
 
 int forceRomajiFlushYomi pro((uiContext));
 static int KanaYomiInsert pro((uiContext));
@@ -155,10 +159,6 @@ extern struct RkRxDic *englishdic;
  * kEndp             1
  */
 
-#ifdef WIN
-#define KANALIMIT 127 /* This is caused by the Canna IME coding */
-#endif
-
 #ifndef KANALIMIT
 #define KANALIMIT 255
 #endif
@@ -173,7 +173,6 @@ yomiContext x;
   char foo[1024];
   int len, i;
 
-#ifndef WIN
   if (iroha_debug) {
     len = WCstombs(foo, x->romaji_buffer, 1024);
     foo[len] = '\0';
@@ -204,7 +203,6 @@ yomiContext x;
     printf("↑\n");
 
   }
-#endif
 }
 #else /* !DEBUG */
 # define debug_yomi(x)
@@ -237,7 +235,7 @@ int where, insertlen, mask;
 wchar_t *insert;
 {
   yomiContext yc = (yomiContext)d->modec;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
   wchar_t buf[256];
 #else
   wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * 256);
@@ -252,7 +250,7 @@ wchar_t *insert;
   generalReplace(yc->kana_buffer, yc->kAttr, &yc->kRStartp, 
 		 &yc->kCurs, &yc->kEndp,
 		 where, insert, insertlen, mask);
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)buf);
 #endif
 }
@@ -336,7 +334,7 @@ char *table;
 {
   struct RkRxDic *retval = (struct RkRxDic *)0, *RkwOpenRoma();
   char *p, *getenv();
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
   char rdic[1024];
 #else
   char *rdic = malloc(1024);
@@ -350,9 +348,7 @@ char *table;
 
     if (ckverbose == CANNA_FULL_VERBOSE) {
       if (retval != (struct RkRxDic *)NULL) { /* 辞書がオープンできた */
-#ifndef WIN
         printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", table);
-#endif
       }
     }
 
@@ -381,9 +377,7 @@ char *table;
 
       if (ckverbose == CANNA_FULL_VERBOSE) {
 	if (retval != (struct RkRxDic *)NULL) {
-#ifndef WIN
           printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-#endif
 	}
       }
 
@@ -404,34 +398,78 @@ char *table;
 	if (ckverbose) {
 	  if (retval != (struct RkRxDic *)NULL) {
 	    if (ckverbose == CANNA_FULL_VERBOSE) {
-#ifndef WIN
               printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-#endif
 	    }
 	  }
 	}
+      }
 
-	if (retval == (struct RkRxDic *)NULL) { /* 全部オープンできない */
-	  sprintf(rdic, 
-#ifndef WIN
-		  "ローマ字かな変換テーブル(%s)がオープンできません。",
-#else
-	"\245\355\241\274\245\336\273\372\244\253\244\312"
-	"\312\321\264\271\245\306\241\274\245\326\245\353\50\45\163\51\244\254"
-	"\245\252\241\274\245\327\245\363\244\307\244\255\244\336\244\273"
-	"\244\363\241\243",
-#endif
-		  table);
-           /* ローマ字かな変換テーブル(%s)がオープンできません。 */
-	  addWarningMesg(rdic);
-	  retval = (struct RkRxDic *)0;
-	  goto return_ret;
+      if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
+        extern jrUserInfoStruct *uinfo;
+	
+        rdic[0] = '\0';
+        if (uinfo && uinfo->topdir) {
+	  strcpy(rdic, uinfo->topdir);
+        }
+        else {
+          strcpy(rdic, CANNALIBDIR);
+        }
+	strcat(rdic, "/");
+	strcat(rdic, table);
+	retval = RkwOpenRoma(rdic);
+	
+	if (ckverbose) {
+	  if (retval != (struct RkRxDic *)NULL) {
+	    if (ckverbose == CANNA_FULL_VERBOSE) {
+              printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
+	    }
+	  }
 	}
+      }
+      
+#if 0 /* currently CANNASHAREDDIR is not defined */
+      if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
+        extern jrUserInfoStruct *uinfo;
+	
+        rdic[0] = '\0';
+        if (uinfo && uinfo->topdir) {
+	  strcpy(rdic, uinfo->topdir);
+        }
+        else {
+          strcpy(rdic, CANNASHAREDIR);
+        }
+	strcat(rdic, "/");
+	strcat(rdic, table);
+	retval = RkwOpenRoma(rdic);
+	
+	if (ckverbose) {
+	  if (retval != (struct RkRxDic *)NULL) {
+	    if (ckverbose == CANNA_FULL_VERBOSE) {
+              printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
+	    }
+	  }
+	}
+      }
+#endif
+      
+      if (retval == (struct RkRxDic *)NULL) { /* 全部オープンできない */
+	sprintf(rdic, 
+#ifndef CODED_MESSAGE
+		"ローマ字かな変換テーブル(%s)がオープンできません。",
+#else
+		"\245\355\241\274\245\336\273\372\244\253\244\312"
+		"\312\321\264\271\245\306\241\274\245\326\245\353\50\45\163\51\244\254"
+		"\245\252\241\274\245\327\245\363\244\307\244\255\244\336\244\273"
+		"\244\363\241\243",
+#endif
+		table);
+	/* ローマ字かな変換テーブル(%s)がオープンできません。 */
+	addWarningMesg(rdic);
+	retval = (struct RkRxDic *)0;
       }
     }
   }
- return_ret:
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)rdic);
 #endif
   return retval;
@@ -460,7 +498,7 @@ RomkanaInit()
     romajidic = OpenRoma(RomkanaTable);
   }
   else {
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
     char buf[1024];
 #else
     char *buf = malloc(1024);
@@ -486,17 +524,13 @@ RomkanaInit()
 	strcpy(RomkanaTable, buf);
       }
       if (ckverbose == CANNA_FULL_VERBOSE) {
-#ifndef WIN
         printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", buf);
-#endif
       }
     }
     else { /* オープンできなかった */
       if (ckverbose) {
-#ifndef WIN
         printf("ローマ字かな変換テーブル \"%s\" がオープンできません。\n",
                buf);
-#endif
       }
       sprintf(buf, "\245\267\245\271\245\306\245\340\244\316\245\355\241\274"
 	"\245\336\273\372\244\253\244\312\312\321\264\271\245\306\241\274"
@@ -505,7 +539,7 @@ RomkanaInit()
          /* システムのローマ字かな変換テーブルがオープンできません。 */
       addWarningMesg(buf);
     }
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
     (void)free(buf);
 #endif
   }
@@ -1155,7 +1189,7 @@ int flag, english;
   int engflag = (english && englishdic);
   int engdone = 0;
   wchar_t *subp;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
   wchar_t kana_char[1024], sub_buf[1024];
 #else
   wchar_t *kana_char, *sub_buf;
@@ -1386,7 +1420,7 @@ int flag, english;
       }
     }
   }
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)kana_char);
   (void)free((char *)sub_buf);
 #endif
@@ -2254,6 +2288,13 @@ yomiContext yc;
 }
 
 
+typedef struct _autoDefRec {
+    struct _autoDefRec *next;
+    int ishira;
+    wchar_t yomibuf[ROMEBUFSIZE];
+    wchar_t kanabuf[ROMEBUFSIZE];
+} autoDefRec, *autoDef;
+
 /*
   doKakutei -- 確定処理をする。
 
@@ -2281,16 +2322,9 @@ yomiContext *yc_return;
   yomiContext yc;
   int len, res;
   wchar_t *ss = s;
-  int katakanadef = 0, hiraganadef = 0;
   extern int auto_define;
-#ifndef WIN
-  wchar_t ytmpbuf[256];
-#else
-  wchar_t *ytmpbuf = (wchar_t *)malloc(sizeof(wchar_t) * 256);
-  if (!ytmpbuf) {
-    return 0;
-  }
-#endif
+  autoDef autotop = NULL, autocur;
+  KanjiMode kmsv = d->current_mode;
 
   /* まず確定準備処理をする */
   for (tan = st ; tan != et ; tan = tan->right) {
@@ -2298,16 +2332,24 @@ yomiContext *yc_return;
       yc = (yomiContext)tan;
       d->modec = (mode_context)yc;
       if (yc->jishu_kEndp) {
-        if (auto_define) {
-          if (yc->jishu_kc == JISHU_ZEN_KATA)
-            katakanadef = 1;
+	autocur = NULL;
+        if (auto_define &&
+	    (yc->jishu_kc == JISHU_ZEN_KATA
 #ifdef HIRAGANAAUTO
-          if (yc->jishu_kc == JISHU_HIRA)
-            hiraganadef = 1;
+	     || yc->jishu_kc == JISHU_HIRA
 #endif
-          WStrcpy(ytmpbuf, yc->kana_buffer);
-        }
+	    ))
+	  autocur = (autoDef)malloc(sizeof(autoDefRec));
+	if (autocur) {
+	  WStrcpy(autocur->yomibuf, yc->kana_buffer);
+	  autocur->ishira = (yc->jishu_kc == JISHU_HIRA);
+	}
 	doJishuKakutei(d, yc);
+	if (autocur) {
+	  WStrcpy(autocur->kanabuf, yc->kana_buffer);
+	  autocur->next = autotop;
+	  autotop = autocur;
+	}
       }
       else if (!yc->bunlen && /* 文節伸ばし縮め中 */
 	       (!yc->nbunsetsu || /* 漢字がないか... */
@@ -2323,6 +2365,8 @@ yomiContext *yc_return;
       }
     }
   }
+  /* doJishuKakutei,doYomiKakuteiでempty_modeに入ることがある */
+  d->current_mode = kmsv;
 
   /* 次に確定文字を取り出す */
   for (tan = st ; tan != et ; tan = tan->right) {
@@ -2421,7 +2465,7 @@ yomiContext *yc_return;
   /* 壊れているかも知れないので使い間違わないように壊し尽くしておく */
 
   /* 字種変換で全角カタカナを確定したら、自動登録する */
-  if (katakanadef || hiraganadef) {
+  for (autocur = autotop; autocur; autocur = autocur->next) {
     wchar_t line[ROMEBUFSIZE];
     int cnt;
     extern int defaultContext;
@@ -2430,12 +2474,12 @@ yomiContext *yc_return;
     extern char *hiraautodic;
 #endif
 
-    WStraddbcpy(line, ytmpbuf, ROMEBUFSIZE);
+    WStraddbcpy(line, autocur->yomibuf, ROMEBUFSIZE);
     EWStrcat(line, " ");
     EWStrcat(line, "#T30");
     EWStrcat(line, " ");
     cnt = WStrlen(line);
-    WStraddbcpy(line + cnt, ss, ROMEBUFSIZE - cnt);
+    WStraddbcpy(line + cnt, autocur->kanabuf, ROMEBUFSIZE - cnt);
 
     if (defaultContext == -1) {
       if ((KanjiInit() < 0) || (defaultContext == -1)) {
@@ -2445,26 +2489,27 @@ yomiContext *yc_return;
       }
     }
 
-    if (katakanadef) {
+    if (!autocur->ishira) {
       if (RkwDefineDic(defaultContext, kataautodic, line) != 0) {
         jrKanjiError = "\274\253\306\260\305\320\317\277\244\307\244\255"
                        "\244\336\244\273\244\363\244\307\244\267\244\277";
                          /* 自動登録できませんでした */
         makeGLineMessageFromString(d, jrKanjiError);
+	goto return_res;
       }
       else {
         if (cannaconf.auto_sync) {
           (void)RkwSync(defaultContext, kataautodic);
         }
       }
-    }
-    if (hiraganadef) {
+    } else {
 #ifdef HIRAGANAAUTO
       if (RkwDefineDic(defaultContext, hiraautodic, line) != 0) {
         jrKanjiError = "\274\253\306\260\305\320\317\277\244\307\244\255"
                        "\244\336\244\273\244\363\244\307\244\267\244\277";
                          /* 自動登録できませんでした */
         makeGLineMessageFromString(d, jrKanjiError);
+	goto return_res;
       }
       else {
         if (cannaconf.auto_sync) {
@@ -2475,9 +2520,11 @@ yomiContext *yc_return;
     }
   }
  return_res:
-#ifdef WIN
-  (void)free((char *)ytmpbuf);
-#endif
+  while (autotop) {
+    autocur = autotop->next;
+    free(autotop);
+    autotop = autocur;
+  }
   return res;
 }
 
@@ -3429,9 +3476,7 @@ uiContext d;
     正しく１６進に変換できた場合は１そうでない時は０が返る。
 */
 
-#ifdef WIN
-static 
-#endif
+int
 cvtAsHex(d, buf, hexbuf, hexlen)
 uiContext d;     
 wchar_t *buf, *hexbuf;
@@ -4114,7 +4159,7 @@ uiContext d;
   int RkwCvtZen(), RkwCvtKana(), RkwCvtHira(), RkwCvtHan();
   long savedgf;
   wchar_t *buf, *p;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
   wchar_t xxxx[1024];
 #else
   wchar_t *xxxx = (wchar_t *)malloc(sizeof(wchar_t) * 1024);
@@ -4291,7 +4336,7 @@ uiContext d;
   yc->pmark = yc->cmark;
   yc->cmark = yc->kCurs;
   yc->jishu_kEndp = 0;
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)xxxx);
 #endif
   return 0;
@@ -4339,7 +4384,7 @@ chikujiEndBun(d)
 
   if ((yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE) && yc->nbunsetsu) {
     KanjiMode mdsv;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
     yomiContextRec ycsv;
 #else
     yomiContext ycsv;
@@ -4349,7 +4394,7 @@ chikujiEndBun(d)
 #endif
 
     /* 疑問が残る処理 */
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
     * /* This is a little bit tricky source code */
 #endif
     ycsv = *yc;
@@ -4358,12 +4403,12 @@ chikujiEndBun(d)
     ret = TanKakutei(d);
     d->current_mode = mdsv;
     *yc =
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
       * /* this is also a little bit trick source code */
 #endif
       ycsv;
   }
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
     (void)free((char *)ycsv);
   }
 #endif 
@@ -4419,7 +4464,7 @@ uiContext d;
 #endif
   yomiContext yc = (yomiContext)d->modec;
   
-#if defined(DEBUG) && !defined(WIN)
+#if defined(DEBUG)
   if (iroha_debug) {
     fprintf(stderr,"yc->kCurs=%d yc->cmark=%d\n", yc->kCurs,yc->cmark);
   }
@@ -4541,7 +4586,7 @@ int fnum;
     }
     if (fnum != CANNA_FN_FunctionalInsert && len > 0) {
       int n, m, t, flag, prevrule;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
       wchar_t kana[128], roma[128];
 #else
       wchar_t *kana, *roma;
@@ -4570,7 +4615,7 @@ int fnum;
 	/* RK_SOKON を付けるのは旧辞書用 */
 	fnum = CANNA_FN_FunctionalInsert;
       }
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
       (void)free((char *)kana);
       (void)free((char *)roma);
 #endif
@@ -4606,6 +4651,7 @@ int sy, ey, sr, er;
   kanaReplace   (-sy, (wchar_t *)NULL, 0, 0);
 }
 
+#if 0 /* unused */
 static int
 TbBubunKakutei(d)
 uiContext d;
@@ -4626,6 +4672,7 @@ uiContext d;
   (void)TanMuhenkan(d);
   return len;
 }
+#endif
 
 int doTanConvertTb pro((uiContext, yomiContext));
 
@@ -4672,7 +4719,7 @@ uiContext	d;
   yomiContext yc = (yomiContext)d->modec;
   tanContext tan;
   int i, j, n, l = 0, len, con, ret = 0;
-#ifndef WIN
+#ifndef USE_MALLOC_FOR_BIG_ARRAY
   wchar_t tmpbuf[ROMEBUFSIZE];
 #else
   wchar_t *tmpbuf = (wchar_t *)malloc(sizeof(wchar_t) * ROMEBUFSIZE);
@@ -4783,7 +4830,7 @@ uiContext	d;
   ret = d->nbytes;
 
  return_ret:
-#ifdef WIN
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)tmpbuf);
 #endif
   return ret;
@@ -4953,4 +5000,13 @@ uiContext d;
 
  */
 
+#ifndef wchar_t
+# error "wchar_t is already undefined"
+#endif
+#undef wchar_t
+/*********************************************************************
+ *                       wchar_t replace end                         *
+ *********************************************************************/
+
 #include "yomimap.h"
+/* vim: set sw=2: */

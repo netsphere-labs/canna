@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 4.31 1996/11/27 07:17:37 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 1.4.2.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
 
 #if defined(__STDC__) || defined(SVR4)
@@ -34,14 +34,11 @@ extern char *gettxt();
 #define	gettxt(x,y)  (y)
 #endif
 
-#ifdef __STDC__
-#include <stdlib.h>
-#define pro(x) x
-#else
-char *malloc();
-#define pro(x) ()
-#endif
+#include "ccompat.h"
 
+#ifdef __CYGWIN32__
+#include <fcntl.h> /* for O_BINARY */
+#endif
 
 #include	<stdio.h>
 #include	<ctype.h>
@@ -57,6 +54,7 @@ char *malloc();
 static char	fileName[256];
 static int	lineNum;
 static int	errCount;
+int chk_dflt pro((int c));
 
 	struct  def_tbl {
 	    int   used  ;
@@ -142,6 +140,19 @@ int		maxword;
 			c = 8*c + (*s++ - '0');
 		};
 		break;
+	    case 'x':
+		{
+		    unsigned char   xx[3];
+		    unsigned char   *xxp = xx;
+		    s++;
+		    if ( isxdigit(*s) )
+			*xxp++ = *s++;
+		    if ( isxdigit(*s) )
+			*xxp++ = *s++;
+		    *xxp = '\0';
+		    sscanf((char *)xx, "%x", &c);
+		}
+		break;
 	    default:
 		c = *s++;
 		break;
@@ -161,8 +172,12 @@ unsigned char	*s;
 {
     unsigned char	*d;
 
-    if ( d = (unsigned char *)malloc(strlen((char *)s) + 1) )
+    if ( (d = (unsigned char *)malloc(strlen((char *)s) + 1)) != NULL )
 	 strcpy((char *)d, (char *)s);
+    else {
+	fprintf(stderr, "Out of memory\n");
+	exit(1);
+    }
     return d;
 }
 
@@ -224,6 +239,9 @@ main(argc, argv)
 #endif
 #ifdef __EMX__
     _fsetmode(stdout, "b");
+#endif
+#ifdef __CYGWIN32__
+    setmode(fileno(stdout), O_BINARY);
 #endif
 
 /* option */
@@ -310,7 +328,7 @@ main(argc, argv)
 	    werr = 1;
 	  }
 	  else {
-	    p = chk_dflt((char)roman[nKey].roma[0]);
+	    p = chk_dflt((int)(unsigned char)roman[nKey].roma[0]);
 	    if (p--) {
 	      if (def[p].used == 0) { /* if not used */
 		if (nKey < maxkey) {
@@ -383,10 +401,10 @@ main(argc, argv)
   }
   else {
     l4[0] = LOMASK(size >> 24); l4[1] = LOMASK(size >> 16);
-    l4[2] = LOMASK(size >> 8); l4[1] = LOMASK(size);
+    l4[2] = LOMASK(size >> 8); l4[3] = LOMASK(size);
     putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
     l4[0] = LOMASK(nKey >> 24); l4[1] = LOMASK(nKey >> 16);
-    l4[2] = LOMASK(nKey >> 8); l4[1] = LOMASK(nKey);
+    l4[2] = LOMASK(nKey >> 8); l4[3] = LOMASK(nKey);
     putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
   }
 
@@ -417,11 +435,12 @@ main(argc, argv)
 
 /* sub */
 int
-chk_dflt(c) char c ; {
+chk_dflt(c) int c ; {
     int  i,n ; 
+    char cc = (char)c;
     n = sizeof(def) / sizeof(struct def_tbl) ; 
     for (i=0; i < n ; i++) {
-	if (c == def[i].intr[0]) {
+	if (cc == def[i].intr[0]) {
 	    return(i+1) ;
 	}
     }

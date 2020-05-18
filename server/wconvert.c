@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 7.9 1996/11/27 07:27:28 kon Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 1.11.2.2 2003/12/27 23:30:53 aida_s Exp $";
 #endif
 
 #define EXTPROTO 1
@@ -73,41 +73,30 @@ static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 7.9 1996/11/27 07:27:28 kon
 
 /* LINTLIBRARY */
 
-#include <stdio.h>
-#include <errno.h>
-#include <sys/types.h>
+#include "server.h"
+#include "RKindep/ecfuncs.h"
 #include <pwd.h>
 
 #include <patchlevel.h>
 
-#include "net.h"
-#include "IR.h"
-
-extern int  errno;
 
 typedef struct {
-#ifdef __STDC__
-  int (*func)(ClientPtr *), (*extdat)(BYTE *);
-#else
-  int (*func)(), (*extdat)();
-#endif
+  int (*func) pro((ClientPtr *));
+  int (*extdat) pro((BYTE *));
 } reqproc;
 
-extern char *WideProtoName[], *ExtensionRequest[];
-extern reqproc WideVector[];
+extern const char *WideProtoName[], *ExtensionRequest[];
+extern const reqproc WideVector[];
 #ifdef EXTENSION
-extern reqproc ExtensionWideVector[];
+extern const reqproc ExtensionWideVector[];
 #endif
 
-extern void DispDebug() ;
-extern int canna_server_hi ;
-extern int canna_server_lo ;
+static int RkThrough pro((int cx, int command, char *buf,
+      int content_size, int buffer_size));
+
 #ifdef DEBUG
-#ifdef pcux_r32
-static struct DicInfo * RkwQueryDic();
-#endif /* pcux_r32 */
-static char * conveuc();
-static char null[] = "NULL";
+static char *conveuc pro((Ushort *src));
+static const char null[] = "NULL";
 #endif /* DEBUG */
 static IRwReq	Request ;
 static BYTE local_buffer[ LOCAL_BUFSIZE ];
@@ -144,9 +133,6 @@ int n;
 #else /* !DEBUGPROTO */
 #define probe(a, b, c)
 #endif /* !DEBUGPROTO */
-
-/* VARARGS */
-int PrintMsg(), Dmsg();
 
 static
 GetFirstKouho(cxnum, start, end, val_return, buf, bufsize, bufp_return)
@@ -195,7 +181,20 @@ Ushort *buf, **bufp_return;
   return p - *bufp_return;
 }
 
-static int WriteClient();
+#ifdef DEBUG
+static int
+WriteClient(client, buf, size)
+ClientPtr client;
+const BYTE *buf;
+size_t size;
+{
+    ir_debug( Dmsg(10, "WriteClient:") );
+    ir_debug( DebugDump( 10, buf, size ) );
+    return ClientBuf_store_reply(client->client_buf, buf, size);
+}
+#else
+# define WriteClient(c, b, s) ClientBuf_store_reply((c)->client_buf, b, s)
+#endif
 
 static BYTE *
 copylenstr(name, p)
@@ -322,9 +321,10 @@ char **protonames;
       int clientinfolen;
       register ClientPtr awho = *who;
       BYTE *q = p;
+      int id = ClientBuf_getfd(awho->client_buf);
 
       p += SIZEOFSHORT;
-      LTOL4(awho->id, p);           p += SIZEOFLONG;
+      LTOL4(id, p);		    p += SIZEOFLONG;
       LTOL4(awho->usr_no, p);       p += SIZEOFLONG;
       LTOL4(awho->used_time, p);    p += SIZEOFLONG;
       LTOL4(awho->idle_date, p);    p += SIZEOFLONG;
@@ -352,7 +352,7 @@ char **protonames;
     }
   }
   
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -368,7 +368,7 @@ int majo, mino, stat;
   *p++ = (BYTE)0;    *p++ = (BYTE)1;
   *p = (BYTE)stat;
 
-  return WriteClient(client->id, buf, sizeof(buf));
+  return WriteClient(client, buf, sizeof(buf));
 }
 
 static
@@ -395,7 +395,7 @@ int *dat;
   for (i = 0 ; i < len ; i++) {
     LTOL4(*dat, p); dat++; p += SIZEOFLONG;
   }
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -429,7 +429,7 @@ int *dat;
   for (i = 0 ; i < len ; i++) {
     LTOL4(*dat, p); dat++; p += SIZEOFINT;
   }
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -445,7 +445,7 @@ int majo, mino, context;
   *p++ = (BYTE)0;    *p++ = (BYTE)SIZEOFSHORT;
   STOS2(context, p);
 
-  return WriteClient(client->id, buf, sizeof(buf));
+  return WriteClient(client, buf, sizeof(buf));
 }
 
 static
@@ -520,7 +520,7 @@ char *names;
   STOS2(size, p); p += SIZEOFSHORT;
   STOS2(n, p);    p += SIZEOFSHORT;
   bcopy(names, p, namelen);
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -548,7 +548,7 @@ Ushort *dat;
   for (i = 0 ; i < len ; i++) {
     STOS2(*dat, p); dat++; p += SIZEOFSHORT;
   }
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -576,7 +576,7 @@ int *dat;
   for (i = 0 ; i < len ; i++) {
     LTOL4(*dat, p); dat++; p += SIZEOFINT;
   }
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
@@ -612,11 +612,21 @@ int *dat;
   for (i = 0 ; i < len ; i++) {
     LTOL4(*dat, p); dat++; p += SIZEOFINT;
   }
-  retval = WriteClient(client->id, bufp, requiredsize);
+  retval = WriteClient(client, bufp, requiredsize);
   if (bufp != lbuf) free((char *)bufp);
   return retval;
 }
 #endif
+
+static const char *
+irwerrhdr(client, proto)
+ClientPtr client;
+int proto;
+{
+  static char buf[50];
+  sprintf(buf, "[%.25s](%.20s)", client->username, WideProtoName[proto - 1]);
+  return buf;
+}
 
 static
 irw_finalize( clientp )
@@ -629,29 +639,35 @@ ClientPtr *clientp ;
     }
 
     /* close処理＆後始末（コンテクストの開放等） */
-    CloseDownClient( client ) ;
-    *clientp = (ClientPtr)0;
+    close_session(clientp, 1);
     return( 0 ) ;
 }
 
-static
+static int
 irw_killserver(clientp)
-     ClientPtr *clientp;
+ClientPtr *clientp;
 {
   register ClientPtr client = *clientp;
   int stat = 0;
-#ifdef USE_UNIX_SOCKET
-  extern struct sockaddr_un unsock;
-#endif
-  char *susername = "root";
-  unsigned long ser_hostaddr, cli_hostaddr;
+  const char *susername = "root";
+  const Address *cli_hostaddrp;
+  AddrList *ser_hostaddrs = NULL, *local_hostaddrs = NULL;
+  int client_ok;
   static char   buf[ BUFSIZE ]; /* protodefs.h BUFSIZE 4096 */
-  struct hostent *ser;
   
   /* サーバ側のユーザ名の取得：取得できなかった場合は"root" */
+#ifdef __CYGWIN32__
+  char *logname = getlogin();
+  if (logname)
+      susername = logname;
+  else {
+#endif
   struct passwd *pass = getpwuid(getuid());
   if( pass )
   susername = pass->pw_name;
+#ifdef __CYGWIN32__
+  }
+#endif
   ir_debug( Dmsg(5, "サーバを起動したユーザ名:[%s]\n", susername);)
   
   /* ユーザ名の比較 */
@@ -667,35 +683,31 @@ irw_killserver(clientp)
     goto not_owner;
   }
   
+  cli_hostaddrp = &client->hostaddr;
+  if (client->hostaddr.family == AF_UNIX)
+    goto addr_ok;	/*  unixドメインの場合(0)、通過ok  */
   /* サーバ側のホストアドレスの取得  成功(0) */
-  if (gethostname(buf, sizeof(buf)) < 0){
-    goto not_addr;
-  }
-  ser = gethostbyname(buf);    
-  if (!ser){
-    goto not_addr;
-  }
-  ser_hostaddr = *(unsigned long *)(ser->h_addr);
-  cli_hostaddr = client->hostaddr;  
+  if (!gethostname(buf, sizeof(buf)))
+    ser_hostaddrs = GetAddrListFromName(buf);
+  local_hostaddrs = GetAddrListFromName("localhost");
+  if (!local_hostaddrs)
+    local_hostaddrs = GetAddrListFromName("127.0.0.1");
 
   /* アドレスの比較 */
-  if (cli_hostaddr) /*  unixドメインの場合(0)、通過ok  */
-  if (cli_hostaddr != ser_hostaddr){
-    not_addr:
+  client_ok = SearchAddrList(ser_hostaddrs, &client->hostaddr)
+    || SearchAddrList(local_hostaddrs, &client->hostaddr);
+  FreeAddrList(ser_hostaddrs);
+  FreeAddrList(local_hostaddrs);
+  if (!client_ok) {
     stat = NOTUXSRV;
     return SendType2Reply(client, wKillServer, !EXTPROTO, stat);
   }
   
+addr_ok:
   /* 終了処理 */
-  RkwFinalize();
-  SendType2Reply(client, wKillServer, !EXTPROTO, 0);
-  AllCloseDownClients();
   PrintMsg("irw_killserver:cannaserver end\n");
-#ifdef USE_UNIX_SOCKET
-  PrintMsg("remove [%s]\n" ,unsock.sun_path);
-  unlink(unsock.sun_path);   /* UNIXドメインで作ったファイルを消す。*/
-#endif
-  exit(0);  
+  EventMgr_quit_later(global_event_mgr, 0);
+  return SendType2Reply(client, wKillServer, !EXTPROTO, 0);
 }
 
 static	
@@ -712,8 +724,8 @@ ClientPtr *clientp ;
     else {
       RkwCloseContext(cxnum);
       cxnum =  -1;
-      PrintMsg("[%s](%s) Can't set dictionary home\n",
-	       client->username, WideProtoName[wCreateContext - 1]);
+      PrintMsg("%s Can't set dictionary home\n",
+	      irwerrhdr(client, wCreateContext));
     }
 
     return SendType5Reply(client, wCreateContext, !EXTPROTO, cxnum);
@@ -735,8 +747,7 @@ ClientPtr client;
   if (chk_cxt(client, cxnum)) {
     return 1;
   }
-  PrintMsg("[%s](%s) Context Err[%d]\n", client->username,
-	   WideProtoName[proto - 1], cxnum) ;
+  PrintMsg("%s Context Err[%d]\n", irwerrhdr(client, proto), cxnum);
   return 0;
 }
 
@@ -765,7 +776,6 @@ static
 irw_close_context( clientp )
 ClientPtr *clientp ;
 {
-    extern void off_cxt();
     ClientPtr client = *clientp ;
     int cxnum = Request.type2.context, stat = -1;
 
@@ -817,8 +827,7 @@ ClientPtr *clientp ;
 		size = (stat + 1);
 	    }
 	  } else {
-	    PrintMsg("[%s](%s) bunsetu move failed\n",
-		     client->username, WideProtoName[wGetYomi - 1]);
+	    PrintMsg("%s bunsetu move failed\n", irwerrhdr(client, wGetYomi));
 	  }
 	}
     }
@@ -992,8 +1001,8 @@ ClientPtr *clientp ;
                                  sizeof(local_buffer) / sizeof(Ushort),
                                  &bufp);
 	} else {
-	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
-		     client->username, WideProtoName[wBeginConvert - 1]);
+	    PrintMsg( "%s kana-kanji convert failed\n",
+		    irwerrhdr(client, wBeginConvert));
 	}
     }	
     retval =
@@ -1017,8 +1026,8 @@ ClientPtr *clientp ;
 	if (len) {
 	    if( RkwGoTo( cxnum, 0 ) != 0 ) {	
 
-		PrintMsg("[%s](%s) ir_convert_end: RkwGoTo failed\n",
-			 client->username, WideProtoName[wEndConvert - 1]);
+		PrintMsg("%s ir_convert_end: RkwGoTo failed\n",
+			irwerrhdr(client, wEndConvert));
 	    }
 	    ir_debug( Dmsg(5, "学習させる候補\n") );
 
@@ -1027,15 +1036,15 @@ ClientPtr *clientp ;
 	    for( i = 0; i < len; i++ ){ 
 		if( req->kouho[ i ] != RkwXfer( cxnum, req->kouho [ i ] ) ) {
 
-		    PrintMsg("[%s](%s) irw_convert_end: RkwXfer failed\n",
-			     client->username, WideProtoName[wEndConvert - 1]);
+		    PrintMsg("%s irw_convert_end: RkwXfer failed\n",
+			    irwerrhdr(client, wEndConvert));
 		}
 		ir_debug( DebugDispKanji( cxnum, i ) );
 
 		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) { 	
 
-		    PrintMsg("[%s](%s) irw_convert_end: RkwRight failed\n",
-			     client->username, WideProtoName[wEndConvert - 1]);
+		    PrintMsg("%s irw_convert_end: RkwRight failed\n",
+			    irwerrhdr(client, wEndConvert));
 		}
 	    }
 	    ir_debug( Dmsg(5, "\n") );
@@ -1064,8 +1073,8 @@ ClientPtr *clientp ;
 	  if( RkwGoTo(cxnum, bunsetuno) == bunsetuno ) {
 	    stat = RkwGetKanjiList(cxnum, kouho, maxkanji);
 	  } else {
-	    PrintMsg("[%s](%s) bunsetu move failed\n",
-		     client->username, WideProtoName[wGetCandidacyList - 1]);
+	    PrintMsg("%s bunsetu move failed\n",
+		    irwerrhdr(client, wGetCandidacyList));
 	  }
 	}
     }
@@ -1134,7 +1143,7 @@ ClientPtr *clientp ;
 	ir_debug( Dmsg(5, "読み = %s\n",
 		       (req->yomi)?conveuc(req->yomi):null));
 
-	len = ((int)req->datalen - SIZEOFSHORT * 2) / SIZEOFSHORT;
+	len = req->yomi ? ushortstrlen(req->yomi) : 0;
 	ret = RkwStoreYomi(cxnum, req->yomi, len);
 	if( ret >= 0 ){
 	  if (len == 0 && ret && bunsetu >= ret)
@@ -1144,8 +1153,8 @@ ClientPtr *clientp ;
                                sizeof(local_buffer) / sizeof(Ushort), &bufp);
 	  RkwGoTo(cxnum, bunsetu);
 	} else {
-	    PrintMsg("[%s](%s) RkwStoreYomi faild\n",
-		     client->username, WideProtoName[wStoreYomi - 1]);
+	    PrintMsg("%s RkwStoreYomi faild\n",
+		    irwerrhdr(client, wStoreYomi));
 	    stat = -1 ;
 	}
     }
@@ -1161,17 +1170,30 @@ ClientPtr *clientp ;
     wReq17 *req = &Request.type17 ;
     ClientPtr client = *clientp ;
     char *reqname;
-    int i, stat = 0 ;
+    int i, stat = -1 ;
 
-    reqname = req->dicname;
-    for( i = 0; *reqname; i++ ){
-	if (strcmp(ExtensionRequest[i], reqname)) {
+    reqname = req->extensions;
+    /* まずは頭出し */
+    for( i = 0; *ExtensionRequest[i]; i++) {
+	if (!strcmp(ExtensionRequest[i], reqname))
+	    goto matchfirst;
+    }
+    goto last;	/* not found */
+matchfirst:
+    /* 全部合うかな */
+    stat = i;
+    for (;;) {
+	reqname += strlen(reqname) + 1;
+	i++;
+	if (!*reqname)
+	    break;	/* 全部OK */
+	if (!*ExtensionRequest[i]
+		|| strcmp(ExtensionRequest[i], reqname)) {
 	    stat = -1;
 	    break;
 	}
-	reqname += strlen(reqname) + 1;
     }
-
+last:
     return SendType2Reply(client, wQueryExtensions, !EXTPROTO, stat);
 }
 
@@ -1192,7 +1214,7 @@ checkPermissionToRead(client, dirname, dicname)
 ClientPtr client;
 char *dirname, *dicname;
 {
-  int check = 0, len;
+  int check = 0, len = (int)0xdeadbeef;
   char *dp;
 
   if (*dirname) {
@@ -1263,8 +1285,6 @@ char *dirname, *dicname;
   return check ? -1 : 0;
 }
 
-#ifdef EXTENSION
-
 /*
   insertUserSla
 
@@ -1312,6 +1332,8 @@ int dirlen;
 }
 
 
+#ifdef EXTENSION
+
 static
 irw_list_dictionary( clientp )
 ClientPtr *clientp ;
@@ -1322,7 +1344,10 @@ ClientPtr *clientp ;
     char *dirname, *dirnamelong = (char *)0;
     int cxnum = Request.type18.context, stat = -1;
     int requestsize = Request.type18.size, retval;
+    size_t datasize = Request.type18.datalen - SIZEOFSHORT * 2;
 
+    if (datasize == 0 || req->data[datasize - 1] != 0)
+      goto protoerr;
     if (validcontext(cxnum, client, wListDictionary)) {
       if (requestsize <= sizeof(local_buffer) ||
 	  (dicnames = malloc(requestsize))) {
@@ -1359,6 +1384,7 @@ ClientPtr *clientp ;
       }
     }	
 
+protoerr:
     retval = SendType6Reply(client, wListDictionary, EXTPROTO, stat,
 			    dicnames, namesize(dicnames, stat));
     if (dicnames != (char *)local_buffer) free(dicnames);
@@ -1470,10 +1496,15 @@ ClientPtr *clientp ;
     char *dicname, *dirname, *dirnamelong = (char *)0;
     int cxnum = Request.type18.context, stat = BADCONT;
     int dirlen, requestsize = Request.type18.size, retval;
+    size_t datasize = Request.type18.datalen - SIZEOFSHORT * 2;
 
+    if (datasize == 0 || req->data[datasize - 1] != 0)
+      goto protoerr;
     if (validcontext(cxnum, client, wGetWordTextDictionary)) {
 	dirname = req->data ;
 	dirlen = strlen(dirname) + 1 ;
+	if (dirlen == datasize)
+	  goto protoerr;
 	dicname = &(req->data[dirlen]) ;
 	if (dirlen > 1) {
 	  if (!dirname || dirname[0] != ':' ||
@@ -1515,6 +1546,7 @@ ClientPtr *clientp ;
 	  free(dirnamelong);
 	}
     }
+protoerr:
     retval = SendType7Reply(client, wGetWordTextDictionary, EXTPROTO,
 			    stat, stat > 0 ? stat + 1 : 0, infobuf);
     if (infobuf != (Ushort *)local_buffer) free((char *)infobuf);
@@ -1526,24 +1558,17 @@ irw_server_stat( clientp )
 ClientPtr *clientp ;
 {
     ClientPtr client = *clientp, who, *OutPut;
-    int i, j, count, stat = 0, max_cx, majorv, minorv, curtime, retval, n;
+    int i, j, stat = 0, max_cx, majorv, minorv, curtime, retval, n;
+    size_t count;
 
-    OutPut = (ClientPtr *)malloc(connow_socks * sizeof(ClientPtr));
+    OutPut = get_all_other_clients(client, &count);
 
     /* サーババージョン */
     majorv = CANNA_MAJOR_MINOR / 1000;
     minorv = CANNA_MAJOR_MINOR % 1000;
 
     /* 現在時刻 */
-    curtime = time((long *)0);
-
-    /* 接続しているクライアント数 */
-    if (OutPut) {
-      count = ConnectClientCount(client, OutPut, connow_socks) ;
-    }
-    else {
-      count = 0;
-    }
+    curtime = time(NULL);
 
     /* コンテクスト数(一番大きいコンテキストを調べる) */
     max_cx = 0;
@@ -1571,9 +1596,6 @@ ClientPtr *clientp ;
     }
     return retval;
 }
-
-extern NumberAccessControlList();
-extern ACLPtr ACLHead;
 
 static
 irw_host_ctl( clientp )
@@ -1619,7 +1641,7 @@ ClientPtr *clientp ;
     }
     /* CloseDownClient( client ) ; */
     /* *clientp = (ClientPtr)0; */
-    return( 1 ) ;
+    return( 0 ) ;
 }
 
 static
@@ -1701,8 +1723,8 @@ ClientPtr *clientp ;
 	if( (stat = RkwBgnBun( cxnum, (Ushort *)NULL,
 			      (int)req->size, req->mode )) < 0 ) {
 
-	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
-		     client->username, WideProtoName[wAutoConvert - 1]);
+	    PrintMsg( "%s kana-kanji convert failed\n",
+		    irwerrhdr(client, wAutoConvert));
 	}
     }	
     return SendType2Reply(client, wAutoConvert, !EXTPROTO, stat);
@@ -1724,8 +1746,8 @@ ClientPtr *clientp ;
 	if( (ret = RkwSubstYomi(cxnum, (int)req->begin, (int)req->end,
 				req->yomi, (int)req->yomilen)) < 0) {
 
-	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
-		     client->username, WideProtoName[wSubstYomi - 1]);
+	    PrintMsg( "%s kana-kanji convert failed\n",
+		    irwerrhdr(client, wSubstYomi));
 	    stat = ret ;
 	} else {
 	    /* 最優先候補リストを取得する */
@@ -1761,15 +1783,15 @@ ClientPtr *clientp ;
 	    /* クライアントが選んだ候補をRKに知らせる */		
 	    for( i = 0; i < len; i++ ){ 
 		if ((int)req->kouho[i] != RkwXfer(cxnum, (int)req->kouho[i])) {
-		    PrintMsg("[%s](%s) irw_flush_yomi: RkwXfer failed\n",
-			     client->username, WideProtoName[wFlushYomi - 1]);
+		    PrintMsg("%s irw_flush_yomi: RkwXfer failed\n",
+			    irwerrhdr(client, wFlushYomi));
 		}
 		ir_debug( DebugDispKanji( cxnum, i ) );
 
 		if( RkwRight( cxnum ) == 0 && i != (len - 1) ) { 	
 
-		    PrintMsg("[%s](%s) irw_flush_yomi: RkwRight failed\n",
-			     client->username, WideProtoName[wFlushYomi - 1]);
+		    PrintMsg("%s irw_flush_yomi: RkwRight failed\n",
+			    irwerrhdr(client, wFlushYomi));
 		}
 	    }
 	    ir_debug( Dmsg(5, "\n") );
@@ -1777,8 +1799,8 @@ ClientPtr *clientp ;
 	}
 	if( (ret = RkwFlushYomi( cxnum )) < 0 ) {
 
-	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
-		     client->username, WideProtoName[wFlushYomi - 1]);
+	    PrintMsg( "%s kana-kanji convert failed\n",
+		    irwerrhdr(client, wFlushYomi));
 	    stat = ret ;
 	} else {
 	    /* 最優先候補リストを取得する */
@@ -1807,8 +1829,8 @@ ClientPtr *clientp ;
 
 	if( (stat = RkwGetLastYomi( cxnum, (Ushort *)yomi, maxyomi )) < 0 ) {
 
-	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
-		     client->username, WideProtoName[wGetLastYomi - 1]);
+	    PrintMsg( "%s kana-kanji convert failed\n",
+		    irwerrhdr(client, wGetLastYomi));
 	} else {
 	    /* 未決定文節の読みを取得する */
 	    ir_debug(Dmsg(5, "未決文節=%s\n",
@@ -1841,8 +1863,8 @@ ClientPtr *clientp ;
       for( i = 0; !i || (curbun != maxbun); i++ ){ 
 	curkouho = req->kouho[curbun];
 	if( curkouho != RkwXfer( cxnum, curkouho ) ) {
-	  PrintMsg("[%s](%s) irw_remove_yomi: RkwXfer failed\n",
-		   client->username, WideProtoName[wRemoveYomi - 1]);
+	  PrintMsg("%s irw_remove_yomi: RkwXfer failed\n",
+		  irwerrhdr(client, wRemoveYomi));
 	}
 	ir_debug( DebugDispKanji( cxnum, curbun ) );
 
@@ -1872,7 +1894,7 @@ ClientPtr *clientp;
 	  (kanjis = (Ushort *)malloc(requiredsize * sizeof(Ushort)))) {
 	ir_debug( Dmsg(5, "maxyomi [%d]\n", requiredsize) );
 
-	maxyomi = MIN( req->yomilen, ushortstrlen( req->yomi ) ) ;
+	maxyomi = RKI_MIN( req->yomilen, ushortstrlen( req->yomi ) ) ;
 	stat = RkwGetSimpleKanji(cxnum, req->dicname, req->yomi, maxyomi,
 				kanjis, (int)Request.type13.kouhosize,
 				kanjis + (int)Request.type13.kouhosize,
@@ -1975,8 +1997,8 @@ ClientPtr *clientp ;
 
 	RkwGoTo(cxnum, (int)req->curbun);
 	if ((int)req->curkouho != RkwXfer(cxnum, (int)req->curkouho)) {
-	    PrintMsg("[%s](%s) irw_get_hinshi: RkwXfer failed\n",
-		     client->username, WideProtoName[wGetHinshi - 1]);
+	    PrintMsg("%s irw_get_hinshi: RkwXfer failed\n",
+		    irwerrhdr(client, wGetHinshi));
 	}
 
 	stat = RkwGetHinshi(cxnum, dst, requiredsize);
@@ -2004,7 +2026,7 @@ ClientPtr *clientp ;
 	curbun = (int)req->curbun;
 	RkwGoTo(cxnum, curbun);
 
-	maxyomi = ushortstrlen( req->yomi );
+	maxyomi = req->yomi ? ushortstrlen( req->yomi ) : 0;
 	if ((ret = RkwStoreRange(cxnum, req->yomi, maxyomi)) < 0) { 
 	    PrintMsg( "[%s](%s) kana-kanji convert failed\n",
 		     client->username, WideProtoName[wStoreRange - 1]);
@@ -2029,7 +2051,11 @@ ClientPtr *clientp ;
     int cxnum = Request.type15.context, stat = -1 ;
 
     if (validcontext(cxnum, client, wSetLocale)) {
+#if 0
 	stat = RkwSetLocale(cxnum, (unsigned char *)req->dicname);
+#else
+	stat = 0;
+#endif
     }
     return SendType2Reply(client, wSetLocale, !EXTPROTO, stat);
 }
@@ -2079,8 +2105,8 @@ ClientPtr *clientp;
 
     if (SetDicHome(client, cxnum) <= 0) {
       stat = -1;
-      PrintMsg("[%s](%s) Can't set dictionary home\n",
-	       client->username, WideProtoName[wCreateContext - 1]);
+      PrintMsg("%s Can't set dictionary home\n",
+	      irwerrhdr(client, wCreateContext));
     }
   }
   return SendType2Reply(client, wNoticeGroupName, !EXTPROTO, stat);
@@ -2109,47 +2135,6 @@ ClientPtr *clientp;
   return retval;
 }							/* S000:end */
 
-static
-WriteClient( ClientFD, buf, size )
-int ClientFD;
-BYTE *buf;
-int size;
-{
-    register int write_stat;
-    register char *bufindex = (char *)buf;
-    register int todo = size;
-
-    ir_debug( Dmsg(10, "WriteClient:") );
-    ir_debug( DebugDump( 10, (char *)buf, size ) );
-    ir_debug(probe("Write: %d\n", size, buf));
-
-    while ( size > 0 ) {
-	errno = 0;
-	write_stat = write( ClientFD, bufindex, todo );
-	if (write_stat >= 0) {
-	    size -= write_stat;
-	    todo = size;
-	    bufindex += write_stat;
-	    continue;
-	} else if (errno == EWOULDBLOCK) {   /* pc98 */
-	    continue;
-#ifdef EMSGSIZE
-	} else if (errno == EMSGSIZE) {
-	    if (todo > 1)
-		todo >>= 1;
-	    else
-		continue;
-#endif
-	} else {
-	    /* errno set by write system call. */
-	    PrintMsg( "Write Error[ %d ]\n", errno );
-	    return -1;
-	}
-    }
-
-    return 0;
-}
-
 /*
  * もともとio.cに入れいていたものをここから下に置く
  */
@@ -2160,133 +2145,91 @@ int size;
 #define TRY_COUNT   10
 #define DATALEN_TOP (sizeof( char ) * 2)
 
-static BYTE ReadRequestBuffer[ READ_SIZE ] ;	/* デフォルトバッファ */
-
-static int  ReadSize = READ_SIZE ;     /* バッファサイズ */
-
-static BYTE *readbufptr = ReadRequestBuffer ;	/* デフォルトバッファ */
-
-int (* CallFunc)() ;
-
-ReadWideRequestFromClient(who, status )
-ClientPtr who;
-int *status;	      /* read at least n from client */
+int
+parse_wide_request(request, data, len, username, hostname)
+int *request;
+BYTE *data;
+size_t len;
+const char *username;
+const char *hostname;
 {
-    extern void ClientStat();
     int (* ReqCallFunc)() ;
-#ifdef DEBUG
-    extern char *DebugProcWide[][2] ;
-#endif
-    BYTE *bufptr = ReadRequestBuffer, *p;
+    BYTE *p = data;
     register wReq1 *req = &Request.type1 ;
-    int client = who->id;
-    int     readsize ;		    /* 一回に読み込んだサイズ */
-    int     bufsize = ReadSize ;   /* バッファサイズ */
-    int     bufcnt = 0 ;	    /* 読み込んだ累積サイズ */
-    int     empty_count = 0 ;
-    int requiredsize = HEADER_SIZE, rest = requiredsize;
+    const char *username0 = username ? username : null;
+    const char *hostname0 = hostname ? hostname : null;
+    int nwant;
 
-    if( readbufptr != ReadRequestBuffer ) {	   /* 前回バッファを大きく */
-	ir_debug( Dmsg(8, "free readbufptr.\n") ); /* した場合は，デフォルト*/
+    ir_debug(Dmsg(5, "ワイドプロトコルのリクエストを解析, 長さ=%d\n", len));
+    if (len < HEADER_SIZE)
+	return HEADER_SIZE - len;
+    req->type = *p++;
+    req->none = *p++;
+    req->datalen = S2TOS(p);
 
-	free((char *)readbufptr);		   /* に戻す */
-	readbufptr = ReadRequestBuffer ;
-	ReadSize = READ_SIZE ;
-    }
+    nwant = HEADER_SIZE + req->datalen - len;
+    if (nwant > 0)
+	return nwant;
 
-    while (empty_count < TRY_COUNT && rest > 0) {
-	if ((readsize = read(client, (char *)bufptr, rest)) < 0) {
-	  break;
-	} else if ( !readsize ) {	
-	    empty_count ++ ;
-	    continue ;
-	}
-	ir_debug( Dmsg(10, "NewReadRequest:") );
-	ir_debug( DebugDump( 10, (char *)bufptr, readsize ) );
-
-	empty_count = 0;
-	bufcnt += readsize;
-	bufptr += readsize;
-	rest -= readsize;
-	
-	if (requiredsize == HEADER_SIZE && HEADER_SIZE == bufcnt) {
-	  p = readbufptr;
-	  req->type = *p++;
-	  req->none = *p++;
-	  req->datalen = requiredsize = S2TOS(p);
-	  rest += requiredsize;
-	  requiredsize += HEADER_SIZE;
-	  if (requiredsize > bufsize) {
-	    readbufptr = (BYTE *)malloc(requiredsize);
-	    if (readbufptr) {
-	      bcopy(ReadRequestBuffer, readbufptr, bufcnt);
-	      rest = requiredsize - bufcnt;
-	      bufptr = readbufptr + bufcnt;
-	      bufsize = requiredsize;
-	    }
-	    else {
-	      break;
-	    }
-	  }
-        }
-    }
-    if (rest > 0) {
-      PrintMsg("[%s] Read request failed\n", who->username);
-      ir_debug(Dmsg(5, "ReadWideRequestFromClient: Read request failed\n"));
-      *status = -1;
-      return 0;
-    }
-
+    ir_debug( Dmsg(10, "NewReadRequest:") );
+    ir_debug( DebugDump( 10, (char *)data, len ) );
     ir_debug( Dmsg(5, "Client: <%s@%s> [0x%x:0x%x]\n",
-		   (who->username)?(who->username):null,
-		   (who->hostname)?(who->hostname):null,
-		   req->type, req->none) );
+		username0, hostname0, req->type, req->none));
 
     if( ((req->type > W_REALREQUEST) && !(req->none)) ||
-       ((req->type > W_MAXEXTREQUESTNO) && req->none) ) {
-      PrintMsg( "[%s] Request error[%d]\n", who->username, req->type ) ;
-      *status = -1 ;
-      return( 0 ) ;
+       (
+#ifdef EXTENSION
+	(req->type > W_MAXEXTREQUESTNO) &&
+#endif
+	req->none) ) {
+      PrintMsg( "[%s] Request error[%d]\n", username0, req->type ) ;
+      return -1;
     }
 	
     /* プロトコルのタイプ毎にデータを呼んでくる関数を呼ぶ */
+#ifdef EXTENSION
     if( req->none ) {
       ir_debug( Dmsg(8, "Now Call EXTENSION\n") );
 
-#ifdef EXTENSION
       ReqCallFunc = ExtensionWideVector[req->type].extdat;
       CallFunc = ExtensionWideVector[req->type].func;
-#else
-      PrintMsg( "[%s] Request error[%d]\n", who->username, req->type ) ;
-      SendType5Reply(client,
-		     (int)Request.type1.type, (int)Request.type1.none, -1);
-      *status = -1 ;
-      return( 0 ) ;
-#endif /* EXTENSION */
     }
-    else {
+    else
+#endif /* EXTENSION */
+    {
 	ir_debug( Dmsg(8, "Now Call %s\n", DebugProcWide[req->type][1]) );
 
 	ReqCallFunc = WideVector[req->type].extdat;
 	CallFunc = WideVector[req->type].func;
     }
-    if ((* ReqCallFunc)(readbufptr)  < 0) {
-      /* マイナスを返すことはない */
-      PrintMsg( "[%s] Read Data failed\n", who->username ) ;
-      *status = -1 ;
-      return( 0 ) ;	
+    if ((* ReqCallFunc)(data)  < 0) {
+      PrintMsg( "[%s] Read Data failed\n", username0 ) ;
+      return -1;
     }
 
-    /* プロトコルの種類毎に統計を取る */
-    if( req->type < (unsigned)W_MAXREQUESTNO ) {		/* S000 */
-	who->pcount[ req->type ] ++ ;
+  /* プロトコルの種類毎に統計を取る */
+#ifdef EXTENSION
+    if( req->type < (unsigned)W_MAXREQUESTNO )
+#endif
 	TotalWideRequestTypeCount[ req->type ] ++ ;
-    }
 
-    ClientStat(who, SETTIME, (int)req->type, 0);
+#ifdef DEBUG
+    if (req->none)
+	CallFuncName = ExtensionRequest[req->type - 1];
+    else
+	CallFuncName = DebugProcWide[req->type][0];
+#endif
+    *request = req->type;
+    return 0;
+}
 
-    *status = 1 ;
-    return (int)req->type;
+static int
+ProcWideReq0(buf)
+BYTE *buf ;
+/* ARGSUSED */
+{
+    ir_debug( Dmsg(10, "ProcWideReq0(error case) start!!\n") );
+    return( 0 ) ;
 }
 
 static
@@ -2295,6 +2238,9 @@ BYTE *buf ;
 /* ARGSUSED */
 {
     ir_debug( Dmsg(10, "ProcWideReq1 start!!\n") );
+
+    if (Request.type1.datalen != 0)
+	return( -1 );
 
     return( 0 ) ;
 }
@@ -2305,6 +2251,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq2 start!!\n") );
 
+    if (Request.type2.datalen != SIZEOFSHORT)
+	return( -1 );
     buf += HEADER_SIZE; Request.type2.context = S2TOS(buf);
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type2.context) );
 
@@ -2317,6 +2265,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq3 start!!\n") );
 
+    if (Request.type3.datalen != SIZEOFSHORT * 2)
+	return( -1 );
     buf += HEADER_SIZE; Request.type3.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type3.buflen = S2TOS(buf);
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type3.context) );
@@ -2334,12 +2284,18 @@ BYTE *buf ;
 
     ir_debug( Dmsg(10, "ProcWideReq4 start!!\n") );
 
+    if (Request.type4.datalen < SIZEOFSHORT * 4)
+	return( -1 );
     buf += HEADER_SIZE; Request.type4.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.begin = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.end = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type4.yomilen = S2TOS(buf);
     Request.type4.yomi = (Ushort *)(buf += SIZEOFSHORT) ;
-    len = Request.type4.datalen - SIZEOFSHORT * 4;
+    len = Request.type4.yomilen + 1;
+    if (Request.type4.datalen != SIZEOFSHORT * (4 + len)
+	    || len == 0
+	    || Request.type4.yomi[len - 1] != 0)
+	return( -1 );
     for (data = Request.type4.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs((unsigned short)*data); /* ちょっとやだなあ */
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type4.context) );
@@ -2359,6 +2315,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq5 start!!\n") );
 
+    if (Request.type5.datalen != SIZEOFSHORT * 2 + SIZEOFINT)
+	return( -1 );
     buf += HEADER_SIZE; Request.type5.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type5.size = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type5.mode = L4TOL(buf);
@@ -2375,6 +2333,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq6 start!!\n") );
 
+    if (Request.type6.datalen != SIZEOFSHORT * 3)
+	return( -1 );
     buf += HEADER_SIZE; Request.type6.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type6.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type6.buflen = S2TOS(buf);
@@ -2391,6 +2351,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq7 start!!\n") );
 
+    if (Request.type7.datalen != SIZEOFSHORT * 3)
+	return( -1 );
     buf += HEADER_SIZE; Request.type7.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type7.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type7.yomilen = (short)S2TOS(buf);
@@ -2407,6 +2369,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq8 start!!\n") );
 
+    if (Request.type8.datalen != SIZEOFSHORT * 4)
+	return( -1 );
     buf += HEADER_SIZE; Request.type8.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type8.curbun = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type8.curkouho = S2TOS(buf);
@@ -2425,6 +2389,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq9 start!!\n") );
 
+    if (Request.type9.datalen != SIZEOFSHORT * 4)
+	return( -1 );
     buf += HEADER_SIZE; Request.type9.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type9.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type9.kouho = S2TOS(buf);
@@ -2442,9 +2408,13 @@ ProcWideReq10(buf)
 BYTE *buf ;
 {
     register int i ;
+    int rest;
 
     ir_debug( Dmsg(10, "ProcWideReq10 start!!\n") );
 
+    rest = Request.type10.datalen - (SIZEOFSHORT * 2 + SIZEOFINT);
+    if (rest < 0)
+	return( -1 );
     buf += HEADER_SIZE; Request.type10.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type10.number = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type10.mode = L4TOL(buf);
@@ -2452,6 +2422,8 @@ BYTE *buf ;
     ir_debug( Dmsg(10, "req->number =%d\n", Request.type10.number) );
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type10.mode) );
 
+    if (rest != Request.type10.number * SIZEOFSHORT)
+	return( -1 );
     buf += SIZEOFINT; Request.type10.kouho = (short *)buf; /* short? */
     for (i = 0; i < Request.type10.number; i++) {
       Request.type10.kouho[i] = S2TOS(buf); buf += SIZEOFSHORT;
@@ -2468,14 +2440,28 @@ BYTE *buf ;
     register Ushort *data;
     int i, len ;
 
-    ir_debug( Dmsg(10, "ProcWideReq10 start!!\n") );
+    ir_debug( Dmsg(10, "ProcWideReq11 start!!\n") );
 
+    if (Request.type11.datalen < SIZEOFSHORT * 2
+	|| Request.type11.datalen % SIZEOFSHORT != 0 )
+	return( -1 );
     buf += HEADER_SIZE; Request.type11.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type11.curbun = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type11.yomi = (Ushort *)buf;
     len = ((int)Request.type11.datalen - SIZEOFSHORT * 2) / SIZEOFSHORT ;
-    for (data = Request.type11.yomi, i = 0; i < len; i++, data++)
-	*data = ntohs( *data ); /* なんかやだ */
+    /*
+     * XXX: 今のところ、RkwStoreYomiで空のデータが送られる以外で、この
+     * リクエストは発行されない。とりあえず、長さ0の場合は正当なリクエストと
+     * みなし、それ以外の場合はヌル終端を要求する。 2003.01.05 aida_s
+     */
+    if (len) {
+      if (Request.type11.yomi[len - 1] != 0)
+	  return( -1 );
+      for (data = Request.type11.yomi, i = 0; i < len; i++, data++)
+	  *data = ntohs( *data ); /* なんかやだ */
+    } else {
+      Request.type11.yomi = NULL;
+    }
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type11.context) );
     ir_debug( Dmsg(10, "req->curbun =%d\n", Request.type11.curbun) );
     ir_debug( Dmsg(10, "req->yomi =%s\n",
@@ -2490,16 +2476,26 @@ ProcWideReq12(buf)
 BYTE *buf ;
 {
     register Ushort *data;
-    int i, len ;
+    int i, len, rest;
 
     ir_debug( Dmsg(10, "ProcWideReq12 start!!\n") );
 
+    rest = Request.type12.datalen - SIZEOFSHORT;
+    if (rest < 0)
+	return( -1 );
     buf += HEADER_SIZE; Request.type12.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type12.datainfo = (Ushort *)buf;
+    if (!ushortmemchr((Ushort *)buf, 0, rest / SIZEOFSHORT))
+	return( -1 );
     len = ushortstrlen((Ushort *)buf) + 1;
+    rest -= len * SIZEOFSHORT;
+    if (rest <= 0)
+	return( -1 );
     for( data = Request.type12.datainfo, i = 0; i < len; i++, data++ )
 	*data = ntohs( *data ); /* なんかやだ */
     buf += len * SIZEOFSHORT;
+    if (buf[rest - 1] != '\0')
+	return( -1 );
     Request.type12.dicname = (char *)buf;
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type12.context) );
     ir_debug( Dmsg(10, "req->datainfo =%s\n",
@@ -2517,24 +2513,37 @@ ProcWideReq13(buf)
 BYTE *buf ;
 {
     register Ushort *data;
-    int i ,len ;
+    int i ,len, rest;
 
     ir_debug( Dmsg(10, "ProcWideReq13 start!!\n") );
 
+    rest = Request.type13.datalen - SIZEOFSHORT;
+    if (rest < 0)
+	return( -1 );
     buf += HEADER_SIZE; Request.type13.context = S2TOS(buf);
     len = SIZEOFSHORT ;
     buf += len;
     Request.type13.dicname = (char *)buf;
+    if (!memchr(buf, 0, rest))
+	return( -1 );
     len = strlen( (char *)buf ) + 1;
+    rest -= len;
+    if (rest % SIZEOFSHORT
+	    || rest < SIZEOFSHORT * 3)
+	return( -1 );
     buf += len;
     Request.type13.yomi = (Ushort *)buf;
     len = ((int)Request.type13.datalen - len - SIZEOFSHORT * 4) / SIZEOFSHORT;
+    if (ushortmemchr((Ushort *)buf, 0, len) != (Ushort *)buf + len - 1)
+	return( -1 );
     for( data = Request.type13.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs( *data );
-    buf += (ushortstrlen((Ushort *)buf) + 1) * SIZEOFSHORT;
+    buf += len * SIZEOFSHORT;
     Request.type13.yomilen = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type13.kouhosize = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type13.hinshisize = S2TOS(buf);
+    if (Request.type13.yomilen != len - 1)
+	return( -1 );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type13.context) );
     ir_debug( Dmsg(10, "req->dicname =%s\n", Request.type13.dicname) );
     ir_debug( Dmsg(10, "req->yomi =%s\n",
@@ -2556,11 +2565,16 @@ BYTE *buf ;
 
     ir_debug( Dmsg(10, "ProcWideReq14 start!!\n") );
 
+    if (Request.type14.datalen <= SIZEOFINT + SIZEOFSHORT
+	    || Request.type14.datalen % SIZEOFSHORT)
+	return( -1 );
     buf += HEADER_SIZE; Request.type14.mode = L4TOL(buf);
     buf += SIZEOFINT;   Request.type14.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type14.yomi = (Ushort *)buf;
     len = ((int)Request.type14.datalen - SIZEOFSHORT - SIZEOFINT)
       / SIZEOFSHORT;
+    if (Request.type14.yomi[len - 1] != 0)
+	return( -1 );
     for (data = Request.type14.yomi, i = 0; i < len; i++, data++)
 	*data = ntohs( *data ); /* なんかやだ */
 
@@ -2577,11 +2591,17 @@ static
 ProcWideReq15(buf)
 BYTE *buf ;
 {
+    int rest;
     ir_debug( Dmsg(10, "ProcWideReq15 start!!\n") );
 
+    rest = Request.type15.datalen - (SIZEOFINT + SIZEOFSHORT);
+    if (rest <= 0)
+	return( -1 );
     buf += HEADER_SIZE; Request.type15.mode = L4TOL(buf);
     buf += SIZEOFINT;   Request.type15.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type15.dicname = (char *)buf;
+    if (buf[rest - 1] != 0)
+	return( -1 );
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type15.mode) );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type15.context) );
     ir_debug( Dmsg(10, "req->dicname =%s\n",
@@ -2594,14 +2614,29 @@ static
 ProcWideReq17(buf)
 BYTE *buf ;
 {
+    char *p;
+    size_t len;
     ir_debug( Dmsg(10, "ProcWideReq17 start!!\n") );
 
     buf += HEADER_SIZE;
-    Request.type17.dicname = (char *)buf;
-    Request.type17.mode = (char)*(buf + Request.type17.datalen - SIZEOFCHAR) ;
-    ir_debug( Dmsg(10, "req->dicname =%s\n",
-		   (Request.type17.dicname)?Request.type17.dicname:null) );
-    ir_debug( Dmsg(10, "req->mode =%d\n", Request.type17.mode) );
+    p = Request.type17.extensions = (char *)buf;
+    if (Request.type17.datalen < SIZEOFCHAR * 3
+	    || Request.type17.extensions[Request.type17.datalen - 2] != 0
+	    || Request.type17.extensions[Request.type17.datalen - 3] != 0)
+	return( -1 );
+    while ((len = strlen(p)) != 0)
+	p += len + 1;
+    if (p != Request.type17.extensions + Request.type17.datalen - 2)
+	return( -1 );
+    /*
+     * 最後の1バイトは使われていない。以前のクライアントが送る値は
+     * 不定である(不正な静的領域を読んでいる)。現在は0になっている。
+     */
+    Request.type17.ch = Request.type17.extensions[Request.type17.datalen - 1];
+    ir_debug( Dmsg(10, "req->extensions =%s...\n",
+		   (Request.type17.datalen)?Request.type17.extensions:null) );
+    ir_debug( Dmsg(10, "req->ch =%c\n",
+		   Request.type17.ch) );
 
     return( 0 ) ;
 }
@@ -2613,6 +2648,8 @@ BYTE *buf ;
 {
     ir_debug( Dmsg(10, "ProcWideReq18 start!!\n") );
 
+    if (Request.type18.datalen < SIZEOFSHORT * 2)
+	return( -1 );
     buf += HEADER_SIZE; Request.type18.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type18.data = (char *)buf;
     buf += Request.type18.datalen - SIZEOFSHORT * 2;
@@ -2630,12 +2667,18 @@ static
 ProcWideReq19(buf)
 BYTE *buf ;
 {
+    int rest;
     ir_debug( Dmsg(10, "ProcWideReq19 start!!\n") );
 
+    rest = Request.type20.datalen - (SIZEOFSHORT + SIZEOFINT * 2);
+    if (rest < 0)
+	return( -1 );
     buf += HEADER_SIZE; Request.type20.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type20.command = L4TOL(buf);
     buf += SIZEOFINT;   Request.type20.bufsize = L4TOL(buf);
     buf += SIZEOFINT;   Request.type20.buf = (char *)buf;
+    if (Request.type20.bufsize != rest)
+	return( -1 );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type20.context) );
     ir_debug( Dmsg(10, "req->command =%d\n", Request.type20.command) );
     ir_debug( Dmsg(10, "req->bufsize =%d\n", Request.type20.bufsize) );
@@ -2647,15 +2690,25 @@ static
 ProcWideReq20(buf)
 BYTE *buf ;
 {
+    BYTE *bufend;
     ir_debug( Dmsg(10, "ProcWideReq20 start!!\n") );
 
+    if (Request.type21.datalen < SIZEOFINT + SIZEOFSHORT)
+	return( -1 );
     buf += HEADER_SIZE; Request.type21.mode = L4TOL(buf);
+    bufend = buf + Request.type21.datalen;
     buf += SIZEOFINT;   Request.type21.context = S2TOS(buf);
     buf += SIZEOFSHORT; Request.type21.dirname = (char *)buf;
+    if (!memchr(buf, 0, bufend - buf))
+	return( -1 );
     buf += strlen((char *)buf) + 1;
     Request.type21.srcdic = (char *)buf;
+    if (!memchr(buf, 0, bufend - buf))
+	return( -1 );
     buf += strlen((char *)buf) + 1;
     Request.type21.dstdic = (char *)buf;
+    if (*(bufend - 1) != 0)
+	return( -1 );
 
     ir_debug( Dmsg(10, "req->mode =%d\n", Request.type21.mode) );
     ir_debug( Dmsg(10, "req->context =%d\n", Request.type21.context) );
@@ -2700,16 +2753,19 @@ int cxnum, mode;
     return( 0 );
 }
 
+#if 0
 RkwSetLocale( cxnum, locale )
 int cxnum;
 char *locale;
 {
     return( 0 );
 }
+#endif
 
 static unsigned char kouho[] = "テスト候補";
 static unsigned char hinshi[] = "#T35 テスト品詞";
 
+int
 RkwGetSimpleKanji( cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis, hinshis, maxhinshis )
 int cxnum, maxyomi, maxkanjis, maxhinshis;
 char *dicname;
@@ -2723,6 +2779,11 @@ Ushort *yomi, *kanjis, *hinshis;
     return( 1 ) ;
 }
 
+/*
+ * この関数は何だ？まともに動かないようだが、本来の意図は？
+ *   2003.09.21 aida_s
+ */
+#if 0
 #ifdef pcux_r32
 struct DicInfo *
 #endif /* pcux_r32 */
@@ -2735,7 +2796,9 @@ struct DicInfo *status;
 
     return( status ) ;
 }
+#endif
 
+int
 RkwGetHinshi( cxnum, dst, maxdst )
 int cxnum, maxdst;
 Ushort *dst;
@@ -2746,6 +2809,7 @@ Ushort *dst;
     return( 0 ) ;
 }
 
+int
 RkwStoreRange( cxnum, yomi, maxyomi )
 int cxnum, maxyomi;
 Ushort *yomi;
@@ -2758,18 +2822,18 @@ Ushort *yomi;
 #endif /* WIDE_PROTO */
 
 #ifdef DEBUG
-char dest[CBUFSIZE];
-
 static char *
 conveuc(src)
 Ushort *src;
 {
+    static char dest[CBUFSIZE];
     ushort2euc(src, ushortstrlen(src), dest, CBUFSIZE);
     return(dest);
 }
 #endif /* DEBUG */
 							/* S000:begin */
 /* #ifdef DEBUG_TOOL */
+static int
 RkThrough( cx, command, buf, content_size, buffer_size )
 int cx, command, content_size, buffer_size;
 char *buf;
@@ -2783,12 +2847,10 @@ char *buf;
 }
 /* #endif *//* DEBUG_TOOL */					/* S000:end */
 
-extern int ir_error(), ir_initialize(), ProcReq0();
-
-reqproc WideVector[] =
+const reqproc WideVector[] =
 {
-/* 0x00 */	{ ir_error,		   ProcReq0 },
-/* 0x01 */	{ ir_initialize,	   ProcReq0 },
+/* 0x00 */	{ ir_error,		   ProcWideReq0 },
+/* 0x01 */	{ ir_error /* hack */,	   ProcWideReq0 },
 /* 0x02 */	{ irw_finalize,		   ProcWideReq1 },
 /* 0x03 */	{ irw_create_context,	   ProcWideReq1 },
 /* 0x04 */	{ irw_duplicate_context,   ProcWideReq2 },
@@ -2826,9 +2888,13 @@ reqproc WideVector[] =
 /* 0x24 */	{ irw_killserver,	   ProcWideReq1 },
 } ;
 
-char *ExtensionRequest[] = {
+const char *ExtensionRequest[] = {
     /* Request Name */
 #ifdef EXTENSION
+    /*
+     * GetServerInfoからCopyDictioinaryまでは、従来のクライアントや
+     * コマンド類がこの順番を仮定しているので、変えてはいけない。
+     */
     "GetServerInfo",		/* 0x01 */
     "GetAccessControlList",	/* 0x02 */
     "CreateDictioinary",	/* 0x03 */
@@ -2844,9 +2910,9 @@ char *ExtensionRequest[] = {
 } ;
 
 #ifdef EXTENSION
-reqproc ExtensionWideVector[] =
+const reqproc ExtensionWideVector[] =
 {
-/* 0x00 */	{ ir_error,		   ProcReq0 },
+/* 0x00 */	{ ir_error,		   ProcWideReq0 },
 /* 0x01 */	{ irw_server_stat,	   ProcWideReq1 },		
 /* 0x02 */	{ irw_host_ctl,		   ProcWideReq1 },
 /* 0x03 */	{ irw_create_dictionary,   ProcWideReq15 },
@@ -2861,7 +2927,7 @@ reqproc ExtensionWideVector[] =
 #endif /* EXTENSION */
 
 
-char *WideProtoName[] = {
+const char *WideProtoName[] = {
     "Initialize",
     "Finalize",
     "CreateContext",
@@ -2901,7 +2967,7 @@ char *WideProtoName[] = {
 } ;			
 
 #ifdef DEBUG
-char *DebugProcWide[][2] = {
+const char *DebugProcWide[][2] = {
     { "ir_null",		"ProcReq0" } ,
     { "ir_initialize",		"ProcReq0" },
     { "irw_finalize",		"ProcReq1" },

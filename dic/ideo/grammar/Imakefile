@@ -1,4 +1,4 @@
-/* $Id: Imakefile,v 1.13 1996/11/27 07:14:45 kon Exp $ */
+/* $Id: Imakefile,v 1.6 2003/09/27 06:18:38 aida_s Exp $ */
 #include "../../../Canna.conf"
 
 #ifdef __EMX__
@@ -37,13 +37,16 @@
 
          ALLDIC = $(DICOBJS)
 #ifdef USE_OBSOLETE_STYLE_FILENAME
-        DICOBJS = fuzokugo.d fuzokugo.fq
+        DICOBJS = fuzokugo.d
 #else
-        DICOBJS = fuzokugo.cbd fuzokugo.cld
+        DICOBJS = fuzokugo.cbd
 #endif
            OBJS = cpp.gram cnj.swd cnj.bits cnj.h cnj.mac fuzokugo.swd
 
         DEFINES = -USX /* for SX3 */
+#ifdef DIC_3_6_COMPAT
+     COMPATFLAG = -c 3.0
+#endif
 
 AllTarget($(ALLDIC))
 
@@ -62,18 +65,10 @@ fuzokugo.swd: cnj.swd
 		$(MERGE) > fuzokugo.swd
 
 fuzokugo.d: fuzokugo.swd cnj.bits
-	$(CRXDIC) -s -o fuzokugo.d -D cnj.bits -n fuzokugo fuzokugo.swd
-	cat cnj.bits >> fuzokugo.d
+	$(CRXDIC) $(COMPATFLAG) -g -s -o fuzokugo.d -D cnj.bits -n fuzokugo fuzokugo.swd
 
 fuzokugo.cbd: fuzokugo.swd cnj.bits
-	$(CRXDIC) -s -o fuzokugo.cbd -D cnj.bits -n fuzokugo fuzokugo.swd
-	cat cnj.bits >> fuzokugo.cbd
-
-fuzokugo.cld: fuzokugo.cbd
-	$(CRFREQ) -o fuzokugo.cld fuzokugo.cbd fuzokugo.swd
-
-fuzokugo.fq: fuzokugo.d
-	$(CRFREQ) -o fuzokugo.fq fuzokugo.d fuzokugo.swd
+	$(CRXDIC) $(COMPATFLAG) -g -s -o fuzokugo.cbd -D cnj.bits -n fuzokugo fuzokugo.swd
 
 clean::
 	$(RM) $(DICOBJS) $(OBJS)
@@ -85,6 +80,6 @@ MakeDirectories(install,$(CANNADICDIR))
 InstallMultipleFlags($(ALLDIC),$(CANNADICDIR),-m 0664 $(cannaOwnerGroup))
 
 install::
-	$(CHGRP) $(cannaGroup) $(CANNADICDIR)
-	$(CHOWN) $(cannaOwner) $(CANNADICDIR)
-	$(CHMOD) ug+w $(CANNADICDIR)
+	$(CHGRP) $(cannaGroup) $(DESTDIR)$(CANNADICDIR)
+	$(CHOWN) $(cannaOwner) $(DESTDIR)$(CANNADICDIR)
+	$(CHMOD) ug+w $(DESTDIR)$(CANNADICDIR)

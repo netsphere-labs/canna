@@ -21,7 +21,7 @@
 #  OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
 #  PERFORMANCE OF THIS SOFTWARE. 
 #
-# $Id: newjis.kpdef,v 1.4 1994/09/22 04:53:32 kuma Exp $ 
+# $Id: newjis.kpdef,v 1.2 2003/03/04 19:23:53 aida_s Exp $ 
 # */
 
 b	あ
@@ -51,7 +51,7 @@ f	\0	と
 #ifndef ASCII
 :	な
 #else /* ASCII */
-\'	な
+\x27	な
 #endif /* ASCII */
 c	に
 P	ぬ
@@ -96,7 +96,7 @@ n	っ
 *	」
 #else /* ASCII */
 {	「
-\"	」
+\x22	」
 #endif /* ASCII */
 ,	、
 .	。

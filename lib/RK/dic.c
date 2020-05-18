@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#) 102.1 $Id: dic.c,v 3.15 1996/11/27 08:21:02 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: dic.c,v 1.4 2003/09/17 08:50:52 aida_s Exp $";
 #endif
 /*LINTLIBRARY*/
 
@@ -29,20 +29,8 @@ static char rcsid[]="@(#) 102.1 $Id: dic.c,v 3.15 1996/11/27 08:21:02 kon Exp $"
 
 #include <stdio.h> /* for sprintf */
 
-#if defined(USG) || defined(SYSV) || defined(SVR4) || defined(WIN)
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-
-#ifdef WIN
-#define unlink(x) (DeleteFile(x) ? 0 : -1)
-#define sprintf wsprintf
-/* The definitions below assumes that TCHAR == char in Windows environment */
-#define strcpy(x, y) lstrcpy((x), (y))
-#define strlen(x) lstrlen(x)
-#define strcat(x, y) lstrcat((x), (y))
-#define strcmp(x, y) lstrcmp((x), (y))
+#ifdef __CYGWIN32__
+#include <fcntl.h> /* for O_BINARY */
 #endif
 
 #define dm_td		dm_extdata.ptr
@@ -341,91 +329,45 @@ struct DM	*dst;
   struct DF	*dstF = dst->dm_file;
   struct DD	*dstD = dstF->df_direct;
   char		*srcN, *dstN;
-#ifndef WIN
   int		srcFd, dstFd;
   int		n;
-#else
-  HANDLE srcFd, dstFd;
-  DWORD n, nextn;
-#endif
   int		ecount = 0;
 
   srcN = _RkCreatePath(srcD, srcF->df_link);
   if (srcN) {
-#ifdef WIN
-    srcFd = CreateFile(srcN, GENERIC_READ,
-		       FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-		       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-#else
     srcFd = open(srcN, 0);
+#ifdef __CYGWIN32__
+    setmode(srcFd, O_BINARY);
 #endif
     (void)free(srcN);
-    if
-#ifdef WIN
-      (srcFd != INVALID_HANDLE_VALUE)
-#else
-      (srcFd >= 0)
-#endif
-    {
+    if (srcFd >= 0) {
       dstN = _RkCreatePath(dstD, dstF->df_link);
       if (dstN) {
-#ifdef WIN
-	dstFd = CreateFile(dstN, GENERIC_WRITE,
-			   FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-			   CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-#else
 	dstFd = creat(dstN, 0666);
+#ifdef __CYGWIN32__
+	setmode(dstFd, O_BINARY);
 #endif
 	(void)free(dstN);
 
-	if
-#ifdef WIN
-	  (dstFd != INVALID_HANDLE_VALUE)
-#else
-	  (dstFd >= 0)
-#endif
-	{
+	if (dstFd >= 0) {
 	  char b[RK_BUFFER_SIZE];
 	  /* I will leave this array on the stack because it may be a rare
 	     case to use this function. 1996.6.5 kon */
 
 	  _RkRealizeDD(dstD);
 
-	  while 
-#ifdef WIN
-	    (ReadFile(srcFd, b, RK_BUFFER_SIZE, &n, NULL) && n > 0)
-#else
-	    ((n = read(srcFd, b, RK_BUFFER_SIZE)) > 0)
-#endif
-	  { /* do copy */
-	    if
-#ifdef WIN
-	      (!WriteFile(dstFd, b, n, &nextn, NULL) || nextn != n)
-#else
-	      ( write(dstFd, b, n) != n )
-#endif
-	    {
+	  while ((n = read(srcFd, b, RK_BUFFER_SIZE)) > 0) { /* do copy */
+	    if ( write(dstFd, b, n) != n ) {
 	      ecount++;
 	      break;
 	    }
 	  }
-	  if (
-#ifdef WIN
-	    !CloseHandle(dstFd)
-#else
-	    close(dstFd) < 0
-#endif
-	      || n < 0)
-	  {
+	  if ( close(dstFd) < 0 || n < 0) {
 	    ecount++;
 	  }
 	}
       }
-#ifdef WIN
-      CloseHandle(srcFd);
-#else
       close(srcFd);
-#endif
     }
   }
   return ecount ? -1 : 0;

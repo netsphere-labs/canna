@@ -48,66 +48,28 @@ SOFTWARE.
 ******************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: wconvert.c,v 8.16 1996/11/27 07:22:30 kon Exp $";
+static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Exp $";
 #endif
 
 /* LINTLIBRARY */
 
 #include <stdio.h>
 
-#include "rkcw.h"
-#ifndef WIN
 #include "sglobal.h"
-#endif
+#include "rkcw.h"
 #include "canna/RK.h"
+#include "RKindep/file.h"
 #include "rkc.h"
+#include "conf.h"
 
-#include <errno.h>
 #include <sys/types.h>
 #include <signal.h>
 
-#if defined(__STDC__) || defined(WIN)
-#include <string.h>
-#else
-#if defined(USG) || defined(SYSV) || defined(SVR4) || defined(WIN)
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-extern char *strtok();
-#endif
-
-#ifndef WIN
 #include "net.h"
-#endif
-
-#ifdef __STDC__
-#include <stdlib.h>
-#elif !defined(WIN32)
-extern char  *malloc() ;
-extern void  free() ;
-#endif
-
-#ifndef WIN
-extern FILE  *fopen();
-extern char  *getenv();
-#endif
-
-#ifdef WIN
-extern unsigned long PASCAL FAR inet_addr();
-#else
-extern unsigned long  inet_addr() ;		
-#endif
-
-#ifdef luna88k
-extern int   errno;
-#endif
 
 #ifndef CANNAHOSTFILE
 #define CANNAHOSTFILE	    "/usr/lib/canna/cannahost"
 #endif
-
-#define RkcFree( p )	{ if( (p) ) (void)free( (char *)(p) ) ; }
 
 #define ReqType0    0
 #define ReqType1    1
@@ -132,19 +94,11 @@ extern int   errno;
 #define ReqType20   20
 #define ReqType21   21
 
-#ifndef WIN
 #define SENDBUFSIZE 1024
 #define RECVBUFSIZE 1024
-#else
-#define SENDBUFSIZE 320
-#define RECVBUFSIZE 320
-#endif
 
-#ifdef WIN
-SOCKET ServerFD;
-#else
 int ServerFD ;
-#endif
+unsigned int ServerTimeout;
 
 static
 #ifndef SIGNALRETURNSINT
@@ -155,13 +109,25 @@ int sig;
 /* ARGSUSED */
 {
     errno = EPIPE;
-#ifndef WIN
     signal(SIGPIPE, DoSomething);
-#endif
+}
+
+static int
+try_connect( fd, addrp, len )
+int fd ;
+struct sockaddr *addrp ;
+size_t len ;
+{
+    struct timeval timeout;
+    if( !ServerTimeout )
+	return connect( fd, addrp, len );
+    timeout.tv_sec = ServerTimeout / 1000;
+    timeout.tv_usec = (ServerTimeout % 1000) * 1000;
+    return RkiConnect( fd, addrp, len, &timeout );
 }
 
 #ifdef UNIXCONN
-#if !defined(WIN) && !defined(__EMX__)
+#if !defined(__EMX__)
 /* UNIXドメインでお話する */
 static int
 connect_unix( number )
@@ -169,7 +135,6 @@ int number ;
 {
     struct sockaddr_un unaddr;	    /* UNIX socket address. */
     struct sockaddr *addr;	    /* address to connect to */
-    int addrlen ;		 
     
     /* いろはサーバと、ＵＮＩＸドメインで接続 */
     unaddr.sun_family = AF_UNIX;
@@ -179,12 +144,11 @@ int number ;
 	strcpy( unaddr.sun_path, IR_UNIX_PATH ) ;
 
     addr = (struct sockaddr *)&unaddr;
-    addrlen = strlen( (char *)unaddr.sun_path ) + 2;
     /*
      * Open the network connection.
      */
     if ((ServerFD = socket((int) addr->sa_family, SOCK_STREAM, 0)) >= 0){
-	if( connect( ServerFD, addr, addrlen ) < 0 ) {
+	if( try_connect( ServerFD, addr, sizeof unaddr ) < 0 ) {
 	    close( ServerFD ) ;
 	    return( -1 ) ;
 	}
@@ -252,124 +216,54 @@ int number ;
 }
 #endif /* STREAMCONN */
 
-#ifdef WIN
+#ifdef INET6
 static int
 connect_inet( hostname, number )
 int number ;
 char *hostname ;
 {
-    SOCKADDR_IN  inaddr;            /* INET socket address. */
-    unsigned long hostinetaddr;     /* result of inet_addr of arpa addr */
-    struct hostent FAR *host_ptr;
-    struct hostent workhostbuf ;
-    struct servent FAR *sp = (struct servent FAR *) NULL;
-    int addrlen ;
-    char FAR *h_addr_ptr;
-    char tmpbuf[100];
+    struct addrinfo hints, *infolist, *info;
+    struct servent *sp ;
+    char portbuf[10];
+    canna_uint16_t port;
 
-    /* インターネットドメインで接続する。 */
+    sp = getservbyname( IR_SERVICE_NAME, "tcp" );
+    port = ( sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT ) + number;
+    sprintf( portbuf, "%u", (unsigned int)port );
 
-    _fmemcpy(tmpbuf, hostname, strlen(hostname));
-    tmpbuf[strlen(hostname)] = '\0';
+    bzero( &hints, sizeof(hints) );
+    hints.ai_flags = 0;
+    hints.ai_family = PF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = 0;
 
-    if (isascii(hostname[0]) && isdigit(hostname[0]))
-      hostinetaddr = inet_addr(hostname);
-    else
-      hostinetaddr = INADDR_NONE;
-
-    if (hostinetaddr == INADDR_NONE) {
-
-      if ((host_ptr = gethostbyname( (char FAR *)tmpbuf ))
-                                       == (struct hostent FAR *)NULL) {
-        return(-1); 
-      }
-      else {
-         /* アドレスタイプをチェックする */
-
-        if (host_ptr->h_addrtype != AF_INET) {
-#ifndef WIN32
-            /* Not an Internet host! */
-            errno = EPROTOTYPE;
-#endif
-            return( -1 );
-        }
-      }
-    }
-    else if( !(host_ptr = gethostbyaddr( (char FAR *)&hostinetaddr,
-                               sizeof( hostinetaddr ), AF_INET )) ) {
-      workhostbuf.h_addrtype = AF_INET ;
-      workhostbuf.h_addr_list = (char FAR * FAR *)&h_addr_ptr;
-      workhostbuf.h_addr = (char FAR *)&hostinetaddr ;
-      workhostbuf.h_length = sizeof( hostinetaddr ) ;
-      host_ptr = (struct hostent FAR *)&workhostbuf ;
-    } 
-
-    /* /etc/servicesからポート番号を取得する */
-#ifdef notdef  /* WinSock bug ? */ 
-    sp = getservbyname( (char FAR *) IR_SERVICE_NAME, (char FAR *) "tcp");
-#endif
-        /* データセット */
-    inaddr.sin_family = host_ptr->h_addrtype;
-    inaddr.sin_port = (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + number;
-    inaddr.sin_port = htons(inaddr.sin_port);
-    bcopy( host_ptr->h_addr, &inaddr.sin_addr, sizeof(inaddr.sin_addr) ) ;
-    addrlen = sizeof( struct sockaddr_in ) ;
-    errno = 0 ;
-
-    if( (ServerFD = socket( AF_INET, SOCK_STREAM, 0 )) == INVALID_SOCKET)
-        return( -1 ) ;
-                                                      
-    {long arg = 1;  /* set non-blocking io */
-     int ierr;
-
-        ierr = ioctlsocket(ServerFD, FIONBIO, (long FAR *) &arg);
-	if (ierr == SOCKET_ERROR)
-	{
-	    closesocket(ServerFD);
-	    return(-1);
-	}
+    if( getaddrinfo( hostname, portbuf, &hints, &infolist ) ) {
+	errno = EINVAL;
+	return( -1 );
     }
 
-    if (connect(ServerFD, (struct sockaddr FAR *)&inaddr, addrlen ) < 0 ) 
-    {int err = WSAGetLastError();
-     fd_set fds;
-     struct timeval timeout;
-
-        timeout.tv_sec = 5;
-        timeout.tv_usec = 0;
-
-	FD_ZERO(&fds);
-	FD_SET(ServerFD, &fds);
-
-        if (err == WSAEWOULDBLOCK) 
-	{int serr;
-
-	    serr = select (0,  (fd_set FAR *) NULL, (fd_set FAR *) &fds, 
-		    (fd_set FAR *) NULL, (struct timeval FAR *) &timeout);
-	    if (serr == SOCKET_ERROR || serr == 0)
-	    {
-		closesocket(ServerFD);
-		return(-1);
+    for( info = infolist; info; info = info->ai_next ) {
+	ServerFD = socket( info->ai_family,
+		info->ai_socktype, info->ai_protocol );
+	if( ServerFD != -1 ) {
+	    if ( !try_connect( ServerFD, info->ai_addr, info->ai_addrlen ) ) {
+		freeaddrinfo( infolist );
+		return( ServerFD );
 	    }
-	}
-	else
-	{
-	    closesocket(ServerFD);
-	    return(-1);
+	    close( ServerFD );
 	}
     }
-
-    return( ServerFD ) ;
+    freeaddrinfo( infolist );
+    return( -1 );
 }
-
-#else
+#else /* !INET6 */
 static int
 connect_inet( hostname, number )
 int number ;
 char *hostname ;
 {
     struct sockaddr_in inaddr;	    /* INET socket address. */
-    unsigned long hostinetaddr;     /* result of inet_addr of arpa addr */
+    canna_in_addr_t hostinetaddr;   /* result of inet_addr of arpa addr */
     struct hostent *host_ptr, workhostbuf ;
     struct servent *sp ;
     int addrlen ;		 
@@ -379,7 +273,7 @@ char *hostname ;
     if( (host_ptr = gethostbyname( hostname ) )
 	                                 == (struct hostent *)NULL) {
 	hostinetaddr = inet_addr( hostname );
-	if( hostinetaddr == (unsigned long)-1 ) {
+	if( hostinetaddr == (canna_in_addr_t)-1 ) {
 	    /* インターネットアドレス表記が間違っている */
 	    errno = EINVAL;
 	    return( -1 );
@@ -389,11 +283,11 @@ char *hostname ;
 				 sizeof( hostinetaddr ), AF_INET )) ) {
 	    host_ptr = &workhostbuf ;
 	    host_ptr->h_addrtype = AF_INET ;
-#ifdef SVR4
-	    /* SVR4では hostent構造体が変更されている． */
+# ifdef HAVE_STRUCT_HOSTENT_H_ADDR_LIST
 	    host_ptr->h_addr_list = &h_addr_ptr;
-#endif /* SVR4 */
+#else
 	    host_ptr->h_addr = (char *)&hostinetaddr ;
+# endif
 	    host_ptr->h_length = sizeof( hostinetaddr ) ;
 	}
     } else { 
@@ -418,7 +312,7 @@ char *hostname ;
     bcopy( host_ptr->h_addr, &inaddr.sin_addr, sizeof(inaddr.sin_addr) ) ;
     addrlen = sizeof( struct sockaddr_in ) ;
     errno = 0 ; 
-    if ( connect( ServerFD, (struct sockaddr *)&inaddr, addrlen ) < 0 ) {
+    if ( try_connect( ServerFD, (struct sockaddr *)&inaddr, addrlen ) < 0 ) {
 #ifdef nodef
 	perror("connect") ;
 #endif
@@ -427,13 +321,9 @@ char *hostname ;
     }
     return( ServerFD ) ;
 }
-#endif
+#endif /* !INET6 */
 
-#ifndef WIN
 #define MAX_LIST	128
-#else
-#define MAX_LIST	 32
-#endif
 
 static int
 increment_counter( flush )
@@ -457,7 +347,8 @@ static void
 rkc_build_cannaserver_list( list )
 char **list ;
 {
-    char work[ MAX_HOSTNAME ], *hostp ;
+    char work[ MAX_HOSTNAME ];
+    const char *hostp ;
     char **listp = list, *getenv();
     exp(char *) RkwGetServerName();
     FILE *hostfp ;
@@ -466,8 +357,10 @@ char **list ;
 
     /* First, check if the server name is specified by API.
        Then make the list of servers from environment variable. */
-    if ((hostp = RkwGetServerName()) != (char *)NULL ||
-	(hostp = getenv( "CANNAHOST" )) != (char *)NULL) {
+    if ((hostp = RkwGetServerName()) != NULL ||
+	*(hostp = RkcConfMgr_get_string(
+		&rkc_config, CONF_CANNAHOST, NULL)) ||
+	(hostp = getenv( "CANNAHOST" )) != NULL) {
 	char *wp, buf[ MAX_HOSTNAME ] ;
 
 	strncpy( buf, hostp, MAX_HOSTNAME ) ;
@@ -493,14 +386,9 @@ char **list ;
 #else
     if( (hostfp = fopen( CANNAHOSTFILE, "r" )) != (FILE *)NULL ) {
 #endif
-      while( (hostp = fgets( work, MAX_HOSTNAME, hostfp) )
-	    != (char *)NULL ) {
+      while( (hostp = fgets( work, MAX_HOSTNAME, hostfp) ) != NULL ) {
 	/* 改行文字をとる */
-#ifdef WIN      /* bug ? */
-	work[strlen(hostp)] = '\0';
-#else
 	work[ strlen( hostp )-1 ] = '\0' ;
-#endif
 	/* リストに格納する */
 	*listp = (char *)malloc(strlen(work) + 1);
 	if (*listp) {
@@ -523,14 +411,19 @@ char *hostname ;
     char *serverlist[ MAX_LIST ], **listp ;
     int num ;
     char *number ;
+#ifdef UNIXCONN
+    char *localhost = "unix";
+#else
+    char *localhost = "localhost";
+#endif
 
     listp = serverlist ;
     if( hostname[ 0 ] == '\0' ) {
 	rkc_build_cannaserver_list( listp ) ;
 	if( !*listp ) {
-	    *listp = (char *)malloc(strlen("unix") + 1);
+	    *listp = (char *)malloc(strlen(localhost) + 1);
 	    if (*listp) {
-	      strcpy(*listp, "unix");
+	      strcpy(*listp, localhost);
 	    }
 	    listp++ ;
 	    *listp = (char *)NULL ;
@@ -546,7 +439,42 @@ char *hostname ;
     }
     
     for( listp = serverlist; *listp; listp++ ) {
+	ServerTimeout = RkcConfMgr_get_number(
+		&rkc_config, CONF_SERVER_TIMEOUT, *listp );
 	/* サーバ起動番号を取得する */
+#ifdef INET6
+	if( **listp == '[' ) {
+	    char *p, *q;
+	    p = *listp + 1;
+	    q = strchr(p, ']');
+	    if( q ) {
+		size_t bodylen;
+		*( q++ ) = '\0';
+		/* ここでの形式チェックは厳密でなくてよい */
+		bodylen = strspn( p, "0123456789ABCDEFabcdef:." );
+		if( bodylen
+			&& ( p[bodylen] == '\0' || p[bodylen] == '%' )
+			&& strchr( p, ':' )
+			&& ( *q == ':' || *q == '\0' ) ) {
+		    if( *q == ':' ) {
+			*( q++ ) = '\0';
+			num = atoi( q );
+			sprintf( hostname,"[%s]:%d", p, num ) ;
+		    } else {
+			num = 0;
+			strcpy( hostname, p );
+		    }
+		    ServerFD = connect_inet( p, num );
+		    if( ServerFD >= 0 )
+			break;
+		    continue;
+		}
+	    }
+	    ServerFD = -1;
+	    errno = EINVAL;
+	    continue;
+	}
+#endif /* INET6 */
 	strtok( *listp, ":" ) ;
 	number = (char *)strtok( NULL, ":" ) ;
 	num = number ? atoi( number ) : 0 ;
@@ -557,12 +485,10 @@ char *hostname ;
 #if defined(UNIXCONN) || defined(STREAMCONN)
 	if ( (strcmp( "unix", *listp ) == 0) ) {
 #ifdef UNIXCONN
-#ifndef WIN
 #ifdef __EMX__
 	    ServerFD = -1;
 #else
 	    ServerFD = connect_unix( num ) ;
-#endif
 #endif
 	}
 	else { 
@@ -626,7 +552,7 @@ BYTE *data, *dest;
     for (i = 0 ; i < len ; i++) {
       *wp = S2TOS(data); data += SIZEOFSHORT; wp++;
     }
-    RkcFree((char *)cx->Fkouho);
+    free((char *)cx->Fkouho);
     cx->Fkouho = return_kouho ;
     return 0;
 }
@@ -652,14 +578,13 @@ BYTE *data, *dest;
     for (i = 0 ; i < len ; i++) {
 	*wp = S2TOS(data); data += SIZEOFSHORT; wp++;
     }
-    RkcFree((char *)cx->Fkouho);
+    free((char *)cx->Fkouho);
     cx->Fkouho = return_kouho ;
     return 0;
 }
 
 #define PROTOBUF (16 * 8)
 
-#define READ_BUF_SIZE	    (ACK_BUFSIZE + sizeof( int )*2 )
 #define TRY_COUNT	    10
 
 
@@ -667,39 +592,23 @@ BYTE *data, *dest;
   buf は 4 Byte 以上あり、bufsize >= 4 であることを仮定している
  */
 
-#ifdef WIN
 #define READIT(ServerFD, requiredsize, p, bufcnt, rest) /* SUPPRESS622 */\
   do {                                                               \
     int empty_count = 0;                                             \
     while (empty_count < TRY_COUNT && bufcnt < requiredsize) {       \
-      readlen = recv(ServerFD, p, rest, 0);                          \
-      if (readlen < 0) {                                             \
-        if ((errno = WSAGetLastError()) == WSAEWOULDBLOCK)           \
-          continue;                                                  \
-        else if (errno == WSAEINTR) {                                \
-          continue;                                                  \
-        }                                                            \
-        else {                                                       \
-          break;                                                     \
-        }                                                            \
+      struct timeval timeout2 = timeout;                             \
+      rki_fd_set rmask2 = rmask;                                     \
+      if (ServerTimeout) {                                           \
+	int r = select(ServerFD + 1, &rmask2, NULL, NULL, &timeout2); \
+	if (r == 0) {                                                \
+	  break;                                                     \
+	} else if (r == -1) {                                        \
+	  if (errno == EINTR)                                        \
+	    continue;                                                \
+	  else                                                       \
+	    break;                                                   \
+	}                                                            \
       }                                                              \
-      else if ( readlen == 0 ) {                                     \
-        empty_count++;                                               \
-      }                                                              \
-      else {                                                         \
-        empty_count = 0;                                             \
-        bufcnt += readlen;                                           \
-        p += readlen;                                                \
-        rest -= readlen;                                             \
-      }                                                              \
-    }                                                                \
-  } while (0)
-
-#else
-#define READIT(ServerFD, requiredsize, p, bufcnt, rest) /* SUPPRESS622 */\
-  do {                                                               \
-    int empty_count = 0;                                             \
-    while (empty_count < TRY_COUNT && bufcnt < requiredsize) {       \
       readlen = read(ServerFD, p, rest);                             \
       if (readlen < 0) {                                             \
 	if (errno == EINTR) {                                        \
@@ -720,7 +629,6 @@ BYTE *data, *dest;
       }                                                              \
     }                                                                \
   } while (0)
-#endif
 
 #ifdef DEBUGPROTO
 static void
@@ -754,29 +662,30 @@ int n;
 
 /*
 
-  ReadServer()
+  RkcRecvWReply()
 
    0: Succeed;
   -1: Error;
 
-  ReadServer はサーバからの reply を read する。とりあえず、ReadServer
-  へはバッファとバッファサイズを渡すが、ReadServer はバッファが足りな
-  いと判断すると自分で malloc してそのバッファを使う。ReadServer がバッ
-  ファを malloc した場合には allocptr にそのバッファへのポインタを返す。
-  allocptr に 0 が渡された場合には ReadServer がバッファサイズが足りな
-  いと判断した場合は、上記 malloc が行われず ReadServer はエラーリター
-  ンする。
+  RkcRecvWReply はサーバからの reply を read する。とりあえず、RkcRecvWReply
+  へはバッファとバッファサイズを渡すが、RkcRecvWReply はバッファが足りないと
+  判断すると自分で malloc してそのバッファを使う。RkcRecvWReply がバッファを
+  malloc した場合には allocptr にそのバッファへのポインタを返す。
+  allocptr に 0 が渡された場合には RkcRecvWReply がバッファサイズが足りないと
+  判断した場合は、上記 malloc が行われず RkcRecvWReply はエラーリターンする。
 
-  ReadServer がエラーリターンした場合は malloc は行われていないと判断
+  RkcRecvWReply がエラーリターンした場合は malloc は行われていないと判断
   して良い。
 
-  allocptr: バッファが足りなかった場合、ReadServer が alloc したバッファ
-  len_return: 読んだデータの長さ。0 を与えれば 格納しない。
+  allocptr: バッファが足りなかった場合、RkcRecvWReply が alloc したバッファ
+  len_return: 読んだデータの長さ。NULL を与えれば 格納しない。
 
  */
 
-static
-ReadServer(buf, bufsize, len_return, allocptr)
+#define ReadServer RkcRecvWReply
+
+int
+RkcRecvWReply(buf, bufsize, len_return, allocptr)
 BYTE *buf, **allocptr;
 int bufsize, *len_return;
 {
@@ -784,17 +693,20 @@ int bufsize, *len_return;
   int bufcnt = 0, rest = bufsize, readlen;
   int requiredsize = HEADER_SIZE;
   unsigned short len = (unsigned short)0;
+  struct timeval timeout;
+  rki_fd_set rmask;
+
+  timeout.tv_sec = ServerTimeout / 1000;
+  timeout.tv_usec = (ServerTimeout % 1000) * 1000;
+  RKI_FD_ZERO(&rmask);
+  RKI_FD_SET(ServerFD, &rmask);
 
   errno = 0;
 
   READIT(ServerFD, requiredsize, p, bufcnt, rest);
   if (bufcnt < requiredsize) {
     errno = EPIPE;
-#ifdef WIN
-    closesocket(ServerFD);
-#else
     close(ServerFD);
-#endif
     if (allocptr && bufptr != buf) free(bufptr);
     return -1;
   }
@@ -818,11 +730,7 @@ int bufsize, *len_return;
   }
   if (bufcnt < requiredsize) {
     errno = EPIPE;
-#ifdef WIN
-    closesocket(ServerFD);
-#else
     close(ServerFD);
-#endif
     if (allocptr && bufptr != buf) free(bufptr);
     return -1;
   }
@@ -833,55 +741,61 @@ int bufsize, *len_return;
   }
 }
 
-static int
-WriteServer( Buffer, size )
-BYTE *Buffer ;
+#define WriteServer RkcSendWRequest
+
+int
+RkcSendWRequest( Buffer, size )
+const BYTE *Buffer ;
 int size ;
 {
     register int todo, retval = 0;
     register int write_stat;
-    register BYTE *bufindex;
+    register const BYTE *bufindex;
 #ifdef SIGNALRETURNSINT
     static int (*Sig) pro((int));
 #else /* !SIGNALRETURNSINT */
     static void (*Sig) pro((int));
 #endif /* !SIGNALRETURNSINT */
+    struct timeval timeout, timeout2;
+    rki_fd_set wfds, wfds2;
+
+    timeout.tv_sec = ServerTimeout / 1000;
+    timeout.tv_usec = (ServerTimeout % 1000) * 1000;
+    RKI_FD_ZERO(&wfds);
+    RKI_FD_SET(ServerFD, &wfds);
 
     errno = 0 ;
     bufindex = Buffer ;
     todo = size ;
-#ifndef WIN
     Sig = signal(SIGPIPE, DoSomething);
-#endif
     while (size) {
+	timeout2 = timeout;
+	wfds2 = wfds;
 	errno = 0;
 	probe("Write: %d\n", todo, (char *)bufindex);
-#ifdef WIN
-        write_stat = send(ServerFD, (char *)bufindex, (int) todo, 0);
-#else
+	if (ServerTimeout) {
+	  int r = select(ServerFD + 1, NULL, &wfds, NULL, &timeout2);
+	  if (r == 0) {
+	    goto fail;
+	  } else if (r == -1) {
+	    if (errno == EINTR)
+	      continue;
+	    else
+	      goto fail;
+	  }
+	}
 	write_stat = write(ServerFD, (char *)bufindex, (int) todo);
-#endif
 
 	if (write_stat >= 0) {
 	    size -= write_stat;
 	    todo = size;
 	    bufindex += write_stat;
-#ifdef WIN
-	} else if ((errno = WSAGetLastError()) == WSAEWOULDBLOCK) {   /* pc98 */
-	    continue ;
-	}
-	else if (errno == WSAEINTR) {
-	    continue;
-	}
-#
-#else
 	} else if (errno == EWOULDBLOCK) {   /* pc98 */
 	    continue ;
 	}
 	else if (errno == EINTR) {
 	    continue;
 	}
-#endif
 #ifdef EMSGSIZE
 	else if (errno == EMSGSIZE) {
 	    if (todo > 1)
@@ -891,20 +805,16 @@ int size ;
         }
 #endif
 	else {
-	    /* errno set by write system call. */
-#ifdef WIN
-            closesocket(ServerFD);
-#else
-	    close( ServerFD ) ;
-#endif
-	    retval = -1;
-	    errno = EPIPE ;
-	    break;
+	    goto fail;
 	}
     }
-#ifndef WIN
+    goto last;
+fail:
+    close( ServerFD ) ;
+    retval = -1;
+    errno = EPIPE ;
+last:
     signal(SIGPIPE, Sig);
-#endif
     return retval;
 }
 
@@ -1121,7 +1031,14 @@ Ushort *wstr;
       for (wp = wstr, i = 0 ; i < wlen ; wp++, i++) {
 	STOS2(*wp, p); p += SIZEOFSHORT;
       }
-      p[0] = p[1] = (BYTE)0;
+      /*
+       * このリクエストは実装されて以来、実際には空のwstrを渡すStoreYomi
+       * でしか使われていない。また、3.6p1までのサーバにはバグがあり、
+       * 3.6まではwstrの領域は空でなくてはならず(ヌル文字も不可)、
+       * 3.6p1の場合は常に失敗してしまう。そのため、このリクエストに
+       * ついては当面、呼び出し側がヌル終端かwlen=0を保証するものとする。
+       * 2003.01.05 aida_s
+       */
 
       retval = WriteServer(bufp, sz);
       if (bufp != lbuf) free((char *)bufp);
@@ -1438,7 +1355,7 @@ char *dirstr, *ostr, *nstr;
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int dirlen = strlen(dirstr) + 1; 
   int oslen = strlen(ostr) + 1, nslen = strlen(nstr) + 1;
-  int sz = HEADER_SIZE + SIZEOFLONG + SIZEOFLONG + SIZEOFSHORT 
+  int sz = HEADER_SIZE + SIZEOFLONG + SIZEOFSHORT 
                                                 +dirlen + oslen + nslen;
   int len, res;
   long mode = mod;
@@ -1726,11 +1643,7 @@ char *username ;
   if (SendType0Request((long) wInitialize, len, username) == 0 &&
       RecvType0Reply(&reply) == 0) {
     if (reply < 0) {
-#ifdef WIN
-      closesocket(ServerFD);
-#else
       close(ServerFD);
-#endif
     }
     return reply;
   }
@@ -1746,11 +1659,7 @@ rkcw_finalize()
 
   if (SendType1Request(wFinalize, 0) == 0 &&
       RecvType2Reply(&reply) == 0) {
-#ifdef WIN
-    closesocket(ServerFD);
-#else
     (void)close( ServerFD ) ;
-#endif
     return reply;
   }
   return -1;
@@ -1765,11 +1674,7 @@ rkcw_killserver()
 
   if (SendType1Request(wKillServer, 0) == 0 &&
       RecvType2Reply(&reply) == 0) {
-#ifdef WIN
-    closesocket(ServerFD);
-#else
     (void)close( ServerFD );
-#endif
     return reply;
   }
   return -1;
@@ -2155,22 +2060,22 @@ int maxyomi;
 }
 
 static
-char *ExtensionRequest = {
+char *BasicExtension = {
 #ifdef EXTENSION
     /* Request Name */
     "GetServerInfo\0GetAccessControlList\0CreateDictioinary\0\
 DeleteDictioinary\0RenameDictioinary\0GetWordTextDictioinary\0\
-ListDictioinary\0"
+ListDictioinary\0\0"
 #else
-    ""
+    "\0"
 #endif /* EXTENSION */
 } ;
 
-static
-Query_Extension()
+static int
+Query_Extension_Ex(reqnames)
+char *reqnames;
 {
     int datalen = 0, reply;
-    char *reqnames = ExtensionRequest;
 
     while( *(reqnames + datalen) ){
       datalen += strlen(reqnames + datalen) + 1;
@@ -2179,11 +2084,18 @@ Query_Extension()
 
     /* Request Names は '\0' を含む文字列であるためパケットに載せるべき
        大きさが判りにくいので全体の大きさを datalen に指定する． */
+    /* 最後に余計な1バイトが付く。とりあえずこのバイトは0にしておく。 */
     if (SendType17Request(wQueryExtensions, 0, reqnames, datalen + 1) == 0 &&
 	RecvType2Reply(&reply) == 0) {
       return reply;
     }
     return -1;
+}
+
+static int
+Query_Extension()
+{
+    return Query_Extension_Ex(BasicExtension);
 }
 
 #ifdef EXTENSION
@@ -2203,7 +2115,8 @@ int size ;
     if( extension_base < 0 )
 	return( -1 ) ;
 
-    if (SendType18Request(wListDictionary, 1, (int)cx->server, 
+    if (SendType18Request(extension_base + wListDictionary,
+			  1, (int)cx->server, 
 			  (char *)dirname, slen, (char *)0, 0, size)
 	== 0 &&
         RecvType6Reply((BYTE *)dicnames_return, size, &n) == 0) {
@@ -2224,7 +2137,7 @@ int mode ;
 
     if( extension_base < 0 )
 	return( -1 ) ;
-    return mount_dictionary(wCreateDictionary, 1,
+    return mount_dictionary(extension_base + wCreateDictionary, 1,
 			    (int)cx->server, dicname, mode);
 }
 
@@ -2240,7 +2153,8 @@ int mode;
 
     if( extension_base < 0 )
 	return( -1 ) ;
-    return mount_dictionary(wDeleteDictionary, 1, (int)cx->server,
+    return mount_dictionary(extension_base + wDeleteDictionary,
+			    1, (int)cx->server,
 			    dicname, mode);
 }
 
@@ -2253,8 +2167,13 @@ char *dic, *newdic;
 int mode;
 {
   int reply;
+  int extension_base = Query_Extension() ;
 
-  if (SendType16Request(wRenameDictionary, 1, mode, (int)cx->server, dic,
+  if( extension_base < 0 )
+      return( -1 ) ;
+
+  if (SendType16Request(extension_base + wRenameDictionary,
+			1, mode, (int)cx->server, dic,
 			newdic) == 0 &&
       RecvType2Reply(&reply) == 0){
     return reply;
@@ -2278,8 +2197,12 @@ char *dir, *dic, *newdic;
 int mode;
 {
   int reply;
+  int extension_base = Query_Extension() ;
 
-  if (SendType21Request(wCopyDictionary, 1, mode, 
+  if( extension_base < 0 )
+      return( -1 ) ;
+
+  if (SendType21Request(extension_base + wCopyDictionary, 1, mode, 
                 (int)cx->server, dir, dic, newdic) == 0 &&
                                 RecvType2Reply(&reply) == 0){
     return reply;
@@ -2307,7 +2230,8 @@ int infolen ;
     if( extension_base < 0 )
 	return( -1 ) ;
 
-    if (SendType18Request(wGetWordTextDictionary, 1, (int)cx->server,
+    if (SendType18Request(extension_base + wGetWordTextDictionary,
+			  1, (int)cx->server,
 			  dirname, dirlen, dicname, diclen,
 			  infolen) == 0&&
 	RecvType7Reply(&n, yomiStore, (BYTE *)info) == 0) {
@@ -2321,8 +2245,12 @@ rkcw_get_server_info( majorp, minorp )
 int *majorp, *minorp;
 {
   int reply, vmajp, vminp;
+  int extension_base = Query_Extension() ;
 
-  if (SendType1Request(wGetServerInfo, 1) == 0 &&
+  if( extension_base < 0 )
+      return( -1 ) ;
+
+  if (SendType1Request(extension_base + wGetServerInfo, 1) == 0 &&
       RecvType1Reply(&reply, &vmajp, &vminp) == 0) {
     *majorp = vmajp;
     *minorp = vminp;
@@ -2521,7 +2449,7 @@ int mode ;
 	    return( -1 );
   
 	bcopy( first_kouho, return_kouho, len * SIZEOFSHORT );
-	RkcFree( (char *)cx->Fkouho );
+	free( (char *)cx->Fkouho );
 	cx->Fkouho = return_kouho;
     }
     return( stat );

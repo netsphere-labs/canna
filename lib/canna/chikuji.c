@@ -21,20 +21,23 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: chikuji.c,v 4.7 1996/11/06 01:51:46 kon Exp $";
+static char rcs_id[] = "$Id: chikuji.c,v 1.3 2003/09/17 08:50:53 aida_s Exp $";
 #endif
 
 #include	"canna.h"
 
 #ifdef MEASURE_TIME
 #include	<sys/types.h>
-#ifdef WIN
-#include	<sys/timeb.h>
-#else
-/* If you compile with Visual C++, then please comment out the next line. */
 #include <sys/times.h>
-#endif
 #endif /* MEASURE_TIME */
+
+/*********************************************************************
+ *                      wchar_t replace begin                        *
+ *********************************************************************/
+#ifdef wchar_t
+# error "wchar_t is already defined"
+#endif
+#define wchar_t cannawc
 
 extern int yomiInfoLevel, nKouhoBunsetsu, KeepCursorPosition;
 extern int defaultContext;
@@ -795,5 +798,13 @@ uiContext d;
   makeKanjiStatusReturn(d, yc);
   return 0;
 }
+
+#ifndef wchar_t
+# error "wchar_t is already undefined"
+#endif
+#undef wchar_t
+/*********************************************************************
+ *                       wchar_t replace end                         *
+ *********************************************************************/
 
 #include "chikujimap.h"

@@ -24,7 +24,7 @@
  * rutil.c
  */
 #ifndef lint
-static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 3.2 1996/11/07 01:22:58 kon Exp $";
+static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 1.3.2.2 2003/12/27 17:15:21 aida_s Exp $";
 #endif
 
 #ifdef ENGINE_SWITCH
@@ -32,6 +32,7 @@ static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 3.2 1996/11/07 01:22:58 kon Exp $
 #endif
 
 #include <stdio.h>
+#define CANNA_NEW_WCHAR_AWARE
 #include <canna/RK.h>
 
 #ifdef USE_VARARGS
@@ -42,12 +43,7 @@ static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 3.2 1996/11/07 01:22:58 kon Exp $
 #endif
 #endif
 
-#ifdef __STDC__
-#include <stdlib.h>
-#else
-extern char *malloc(), *realloc(), *calloc();
-extern void free();
-#endif
+#include "ccompat.h"
 
 #if defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -282,8 +278,7 @@ unsigned char  *dicname;
 	 "Specified dictionary \"%s\" is binary dictionary.\n"),dicname);
     break;
   case BADDR :
-    (void)fprintf(stderr, gettxt("cannacmd:197", "dics.dir is abnormal.\n"),
-		  dicname);
+    (void)fprintf(stderr, gettxt("cannacmd:197", "dics.dir is abnormal.\n"));
     break;
   case NOMOUNT :
     (void)fprintf(stderr, gettxt("cannacmd:198", 

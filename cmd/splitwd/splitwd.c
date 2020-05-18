@@ -21,11 +21,12 @@
  */
 
 #ifndef	lint
-static char rcsid[] = "@(#) 112.1 $Id: splitwd.c,v 2.6 1996/11/30 06:32:18 kon Exp $";
+static char rcsid[] = "@(#) 112.1 $Id: splitwd.c,v 1.2.4.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
     
 #include	<stdio.h>
 #include	<signal.h>
+#include	"ccompat.h"
 
 #if defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -79,22 +80,23 @@ uchar   *hinshi;
 {
     struct tango   *tp;
     uchar   *p;
-    extern char *malloc();
 	
     if( !(tp = (struct tango *)malloc(sizeof(struct tango))) )
 	fprintf(stderr, gettxt("cannacmd:41", 
-	       "cannnot malloc %d\n"), sizeof(struct tango) );
+	       "cannnot malloc %lu\n"), (unsigned long)sizeof(struct tango) );
 
     if( !(p = (uchar *)malloc(strlen((char *)tsuduri) + 1)) )
 	fprintf(stderr, gettxt("cannacmd:42",
-	       "cannnot malloc %d\n"), strlen((char *)tsuduri)+1 );
+	       "cannnot malloc %lu\n"),
+		(unsigned long)strlen((char *)tsuduri)+1 );
     
     tp->tsuduri = p;
     strcpy((char *)p,(char *)tsuduri);
 
     if( !(p = (uchar *)malloc(strlen((char *)hinshi) + 1)) )
 	fprintf(stderr, gettxt("cannacmd:43",
-	       "cannnot malloc %d\n"), strlen((char *)hinshi)+1 );
+	       "cannnot malloc %lu\n"),
+		(unsigned long)strlen((char *)hinshi)+1 );
     tp->hinshi = p;
     strcpy((char *)p, (char *)hinshi);
     

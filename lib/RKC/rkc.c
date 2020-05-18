@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: rkc.c,v 7.20 1996/11/27 07:21:11 kon Exp $";
+static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #endif
 
 /*
@@ -50,50 +50,35 @@ static char rcs_id[] = "$Id: rkc.c,v 7.20 1996/11/27 07:21:11 kon Exp $";
 
 /* LINTLIBRARY */
 
+#include    "sglobal.h" 
 #include    "rkcw.h"
 #include    "canna/RK.h"
 #include    "rkc.h"
-#ifndef WIN
-#include    "sglobal.h" 
-#endif
+#include "conf.h"
+#include "RKindep/ecfuncs.h"
 
 #include    <sys/types.h>
-#include    <errno.h>
-#ifndef WIN
 #include    <pwd.h>
 #include    <grp.h>
-#endif
 #include    <signal.h>
+#include    <unistd.h>
 	
-#if defined(USG) || defined(SYSV) || defined(SVR4) || defined(WIN)
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-
-#ifdef __STDC__
-#include <stdlib.h>
-#elif !defined(WIN32)
-extern char *malloc();
-#endif
-
 /* CX:	コンテクストテーブル
  *	必要なレコードだけをmallocで作成する。
  *	^^^^^^^^^^^^^^^^^^
  */
 
-#ifdef luna88k
-extern int  errno;
+/*********************************************************************
+ *                      wchar_t replace begin                        *
+ *********************************************************************/
+#ifdef wchar_t
+# error "wchar_t is already defined"
 #endif
+#define wchar_t cannawc
 
 static RkcContext *RkcCX[MAX_CX] ;
 
-#define RkcFree( p )	{ if( (p) ) (void)free( (char *)(p) ) ; }
-
-#ifndef MIN
-#define MIN( n, m )	( ( (n) > (m) ) ? (m) : (n) )
-#endif
-
+#define RkcFree free
 #define BUSY	1
 
 #define AUTO_YOMI_SIZE	512
@@ -118,6 +103,7 @@ static short PROTOCOL = 0 ;
 
 static char ConnectIrohaServerName[ MAX_HOSTNAME + 1 ];
 static char *ServerNameSpecified;
+static RkcConfigErrorProc config_error_handler;
 
 /*
  * サポートするプロトコルのリスト
@@ -253,7 +239,7 @@ int	clientcx, type ;
 
 int RkwSetUserInfo pro((char *, char *, char *));
 
-RkUserInfo *uinfo;
+static RkUserInfo *uinfo;
 
 int
 RkwSetUserInfo(user, group, topdir)
@@ -274,11 +260,8 @@ char *user, *group, *topdir;
 static char *
 FindLogname()
 {
-  extern RkUserInfo *uinfo;
-
   if (uinfo)
     return uinfo->uname;
-#ifndef WIN
   else {
     char *username = NULL, *getenv(), *getlogin();
   
@@ -294,18 +277,14 @@ FindLogname()
     }
     return( username );
   }
-#endif
   return (char *)NULL;
 }
 
 static char *
 FindGroupname()
 {
-  extern RkUserInfo *uinfo;
-
   if (uinfo)
     return uinfo->gname;
-#ifndef WIN
   else {
     struct group *gr = getgrgid(getgid()) ;
     if (gr && gr->gr_name) {
@@ -315,7 +294,6 @@ FindGroupname()
       return (char *)NULL;
     }
   }
-#endif
   return (char *)NULL;
 }
 /*
@@ -341,29 +319,19 @@ char *hostname ;
     if( rkc_call_flag == BUSY )
 		return( 0 );	
 
-    /* どのタイプのワイドキャラを使用しているかを調べる */
-    rkcWCinit();
-
-#ifdef WIN
-#define DESIRED_WINSOCK_VERSION         0x0101
-    {int serr;
-     WSADATA wsadata;
-
-        serr = WSAStartup(DESIRED_WINSOCK_VERSION, &wsadata);
-        if( serr != 0 )
-            return -1;
-    }
-#endif
-
+    rkc_configure();
+    if (config_error_handler)
+	(*config_error_handler)(RkcErrorBuf_get(&rkc_errors));
     if (ServerNameSpecified) {
         free(ServerNameSpecified);
 	ServerNameSpecified = (char *)0;
     }
     ConnectIrohaServerName[0] = '\0';
+    if( hostname && (unsigned)strlen(hostname) > 0 &&
 #ifdef __EMX__
-    if( hostname && (unsigned)strlen(hostname) > 0 && !_fnisabs( hostname ) &&
+	    !_fnisabs( hostname ) &&
 #else
-    if( hostname && (unsigned)strlen(hostname) > 0 && hostname[0] != '/' &&
+	    hostname[0] != '/' &&
 #endif
        (ServerNameSpecified = malloc(strlen(hostname) + 1))) {
         strcpy(ServerNameSpecified, hostname);
@@ -420,11 +388,7 @@ char *hostname ;
     if (!*ProtoVerTbl[i]) {
       freeCC(cx->client);
       errno = EPIPE;
-#ifdef WIN
-      closesocket(ServerFD);
-#else
       (void)close(ServerFD);
-#endif
       goto init_err;
     }
 
@@ -446,10 +410,7 @@ char *hostname ;
     }
     return( cx->client ) ;
  init_err:
-#ifdef WIN
-    if (rkc_call_flag != BUSY)
-      WSACleanup();
-#endif
+    rkc_config_fin();
     return -1;
 }
 
@@ -464,7 +425,6 @@ void
 RkwFinalize()
 {
     register int i ;
-    extern RkUserInfo *uinfo;
 
     if( rkc_call_flag != BUSY )
 		return;
@@ -492,9 +452,7 @@ RkwFinalize()
     if (uinfo) {
       free((char *)uinfo);
     }
-#ifdef WIN
-    WSACleanup();
-#endif
+    rkc_config_fin();
 }
 
 /*
@@ -1373,7 +1331,7 @@ int maxyomi;
   int len;
 
   if (yomi && maxyomi >= 0) {
-    len = MIN(wcharstrlen(yomi),maxyomi); 
+    len = RKI_MIN(wcharstrlen(yomi),maxyomi); 
     len = wchar2ushort(yomi, len, rkc.cbuf, CBUFSIZE) + 1;
   } else {
     rkc.cbuf[0] = 0;
@@ -1511,8 +1469,6 @@ RkStat *stat ;
     return( ret ) ;
 }
 
-char *RkwGetServerName pro((void));
-
 char *
 RkwGetServerName()
 {
@@ -1524,8 +1480,7 @@ RkwGetServerName()
   }
 }
 
-int RkwGetProtocolVersion pro((int *, int *));
-
+int
 RkwGetProtocolVersion(majorp, minorp)
 int *majorp, *minorp;
 {
@@ -1551,12 +1506,40 @@ RkcGetServerFD()
     return( ServerFD );
 }
 
+int
+G070_RkcGetServerFD()
+{
+    return( ServerFD );
+}
+
+int
 RkcConnectIrohaServer( servername )
 char* servername;
 {
+    /* XXX:
+     * RkcDisconnectIrohaServerに相当するインターフェースが無いので、
+     * これはメモリリークを引き起こす。今のところこのAPIは古いcannastatが
+     * ver 1.xのサーバと通信する場合にだけ使うので、この問題は無視する
+     * ことにする。
+     */
+    rkc_configure();
     return( rkc_Connect_Iroha_Server( servername ) );
 }
 							/* end:S004 */
+int
+G069_RkcConnectIrohaServer( servername )
+char* servername;
+{
+    return RkcConnectIrohaServer(servername);
+}
+
+void
+RkcListenConfigErrors( handler )
+RkcConfigErrorProc handler;
+{
+    config_error_handler = handler;
+}
+
 #ifdef EXTENSION
 static
 CheckRemoteToolProtoVersion(mode)
@@ -1768,7 +1751,7 @@ Ushort	*yomi;
 	  goto done;
 	}
 
-	nyomi = MIN( ushortstrlen( yomi ), nyomi);
+	nyomi = RKI_MIN( ushortstrlen( yomi ), nyomi);
 	curbun = cx->curbun;
 	cx->curbun = 0;
 	if ((nbun = (*RKCP->subst_yomi)(cx, cx->maxbun, ys, ye, yomi, nyomi))
@@ -1965,8 +1948,8 @@ Ushort *yomi, *kanjis, *hinshis;
 int
 RkwGetSimpleKanji( cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis, hinshis, maxhinshis )
 int cxnum, maxyomi, maxkanjis, maxhinshis ;
-wchar_t *yomi, *kanjis;
-char *dicname, *hinshis; /* wchar_t *？？ */
+wchar_t *yomi, *kanjis, *hinshis;
+char *dicname;
 {
   Ushort cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
   int nkanji, len, i, j = 0, k = 0, l = 0, m = 0;
@@ -2191,7 +2174,7 @@ int  mode;
   }
   return -1;
 }
-							/* S003:begin */
+
 /* EUC functions */
 
 #ifndef OMIT_EUC_FUNCS
@@ -2535,7 +2518,7 @@ int maxyomi;
   int len;
 
   if (yomi && maxyomi >= 0) {
-    len = MIN((int)strlen(yomi),maxyomi); 
+    len = RKI_MIN((int)strlen(yomi),maxyomi); 
     len = euc2ushort(yomi, len, cbuf, CBUFSIZE) + 1;
   } else {
     cbuf[0] = 0;
@@ -2947,3 +2930,11 @@ int buffer_size;
     }
     return( -1 ) ;
 }							/* S000:end */
+
+#ifndef wchar_t
+# error "wchar_t is already undefined"
+#endif
+#undef wchar_t
+/*********************************************************************
+ *                       wchar_t replace end                         *
+ *********************************************************************/

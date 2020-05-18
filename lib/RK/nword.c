@@ -21,13 +21,14 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id: nword.c,v 3.9 1996/11/09 02:17:04 kon Exp $";
+static char rcsid[]="$Id: nword.c,v 1.5 2003/07/31 19:03:51 aida_s Exp $";
 #endif
 
 /* LINTLIBRARY */
 #include	"RKintern.h"
 
-#if defined(DEBUG_NWORD) || defined(RK_DEBUG)
+#if defined(DEBUG_NWORD) || defined(RK_DEBUG) || defined(TEST)
+#include <stdio.h>
 /* 
  * debug aids
  */
@@ -62,6 +63,7 @@ clearWord(w, bb)			/* make word empty */
     w->nw_flags = 0;
     w->nw_lit = 0;
     w->nw_prio = 0L;
+    w->nw_count = 0;
     w->nw_left = w->nw_next = (struct nword *)0;
     w->nw_kanji = (Wrec *)0;
   }
@@ -185,30 +187,40 @@ extern int	entryRut();
 
 static
 struct nword	*
-concWord(st, p, q, loc, bb) 		/* create the concatinated word p+q */
-  struct nstore		*st;
+concWord(cx, p, q, loc, bb) 		/* create the concatinated word p+q */
+  struct RkContext	*cx;
   struct nword		*p, *q;	/* prefix word list, and right word */
   int			loc;
   int			bb;
 {
     struct nword	conc;
     struct nword	*pq;
-    struct nword	*t;
-    int			count;
 
-/* check limit conditions */
-    count = 0;
-    for (t = p; t; t = t->nw_left)
-	count++;
-    if (((unsigned long)(p->nw_klen + q->nw_klen) > RK_LEN_WMAX) ||
-         ((unsigned long)(p->nw_ylen + q->nw_ylen) > RK_LEN_WMAX) ||
-	 (count >= RK_CONC_NMAX))
-	return (struct nword *)0;
 /* create a concatinated word temoprally */
     conc = *q;
     conc.nw_klen  += p->nw_klen;
     conc.nw_ylen  += p->nw_ylen;
-    conc.nw_flags = p->nw_flags&(NW_PRE|NW_SUC|NW_SWD);
+    conc.nw_flags = p->nw_flags&(NW_PRE|NW_SUC|NW_SWD|NW_LOWPRI);
+    conc.nw_count = p->nw_count + 1;
+/* check limit conditions */
+    if (conc.nw_klen > RK_LEN_WMAX ||
+	conc.nw_ylen > RK_LEN_WMAX ||
+	conc.nw_count >= RK_CONC_NMAX)
+	return (struct nword *)0;
+#ifdef LOGIC_HACK
+    if (conc.nw_count >= 3) {
+      switch (RkCheckNegGram(cx->gram->gramdic,
+	    p->nw_left->nw_rowcol, p->nw_rowcol, q->nw_rowcol))
+      {
+      case 1:
+	return (struct nword *)0;
+      case 2:
+	conc.nw_flags |= NW_LOWPRI;
+      }
+    }
+#endif /* LOGIC_HACK */
+    if (p->nw_ylen == 1 && q->nw_rowcol == cx->gram->P_Ftte)
+      conc.nw_flags |= NW_LOWPRI; /* FIXME: replace to something better */
     conc.nw_prio = p->nw_prio;
     conc.nw_next = (struct nword *)0;
     conc.nw_left = p;
@@ -237,6 +249,7 @@ concWord(st, p, q, loc, bb) 		/* create the concatinated word p+q */
 	break;
     case	ND_MWD:
 	conc.nw_flags |= NW_MWD;
+	conc.nw_flags |= (q->nw_flags & NW_LOWPRI);
 	conc.nw_prio = q->nw_prio;
 	break;
     case	ND_SWD:
@@ -251,7 +264,7 @@ concWord(st, p, q, loc, bb) 		/* create the concatinated word p+q */
 	break;
     };
 /* cache no sanshoudo wo kousinn suru */
-    pq = allocWord(st, bb);
+    pq = allocWord(cx->store, bb);
     if (pq) {
 	*pq = conc;
         p->nw_flags |= NW_FOLLOW;
@@ -699,10 +712,12 @@ makeWord(cx, yy, ys, ye, class, word, maxword, doflush, douniq)
 	  break;
 	};
 	switch (*k) {
+#ifndef LOGIC_HACK
 	case 0xa4a1: case 0xa4a3: case 0xa4a5:
 	case 0xa4a7: case 0xa4a9:
 	case 0xa4e3: case 0xa4e5: case 0xa4e7:
 	case 0xa4c3: case 0xa4f3:
+#endif
 	case 0xa1ab: case 0xa1ac: case 0xa1b3:
 	case 0xa1b4: case 0xa1b5: case 0xa1b6:
 	case 0xa1bc:
@@ -971,21 +986,22 @@ parseWord(cx, yy, ys, ye, class, xqh, maxclen, doflush, douniq)
       r = makeWord(cx, yy + clen, ys1, ye1, class,
 		   r, RIGHTSIZE -1 - (int)(r - right), doflush, douniq);
     for (t = 0; t < sameLen; t++) {
-      unsigned char	*cj;
       p = tail[t];
-      cj = (unsigned char *)(gram ? GetGramRow(gram, p->nw_rowcol) : 0);
       for (q = right; q < r; q++)  
 	if (Is_Word_Connect(cx) &&
-	    (q->nw_class >= ND_OPN || !cj || TestGram(cj, q->nw_rowcol)))  {
-	  struct nword	*pq = concWord(cx->store, p, q, clen, cx->gram->P_BB);
+	    (q->nw_class >= ND_OPN ||
+	     RkTestGram(gram, p->nw_rowcol, q->nw_rowcol)))  {
+	  struct nword	*pq = concWord(cx, p, q, clen, cx->gram->P_BB);
 	  if (pq) {
 	    struct nword	*s;
 	    if (gram && !IsShuutan(gram, pq->nw_rowcol)) {
 #ifdef BUNMATU
 	      /* 文章末にしかならない */
 	      if (IsBunmatu(gram, pq->nw_rowcol)) {
-		/* 句読点その他の場合には文章末検査は不要 */
-		if (q->nw_class >= ND_OPN)
+		/* 句読点などの場合と、読みを尽くしている場合には
+		   文章末検査は不要 */
+		if (q->nw_class >= ND_OPN ||
+		    (doflush && yy + pq->nw_ylen == cx->store->nyomi))
 		  pq->nw_flags &= ~NW_BUNMATU;
 		else
 		  pq->nw_flags |= NW_BUNMATU;
@@ -1208,8 +1224,12 @@ int
 compword(x, y)
 const struct compRec *x, *y;
 {
+  int lowdiff = (int)((unsigned char)y->word->nw_flags & NW_LOWPRI)
+    - (int)((unsigned char)x->word->nw_flags & NW_LOWPRI);
   long	d =  ((long) y->word->nw_prio) - ((long) (x->word->nw_prio));
 
+  if (lowdiff > 0) return(-1);
+  else if (lowdiff < 0) return(1);
   if (d > 0) return(1);
   else if(d < 0) return(-1);
   else {
@@ -1350,6 +1370,23 @@ parseBun(cx, yy, ys, ye, doflush, douniq, maxclen)
   }
 }
 
+#ifdef BUNMATU
+static
+struct nword	*
+modifyPrio(cx, words)
+    struct RkContext	*cx;
+    struct nword	*words;
+{
+  struct RkKxGram	*gram = cx->gram->gramdic;
+  struct nword		*w;
+
+  for (w = words; w; w = w->nw_next)
+    if (w->nw_prio > 0 && !IsBunmatu(gram, w->nw_rowcol))
+	w->nw_prio += 0x2000 << 4;
+  return words;
+}
+#endif
+
 static 
 void
 storeBun(cx, yy, ys, ye, bun)
@@ -1361,7 +1398,11 @@ storeBun(cx, yy, ys, ye, bun)
   struct nword	*w;
   int		maxclen;
   
+#ifdef BUNMATU
+  full = sortWord(modifyPrio(cx, parseBun(cx, yy, ys, ye, 1, 0, &maxclen)));
+#else
   full = sortWord(parseBun(cx, yy, ys, ye, 1, 0, &maxclen));
+#endif
   bun->nb_cand = full;
   bun->nb_yoff = yy;
 /* kouho wo unique ni suru */
@@ -1382,9 +1423,43 @@ struct splitParm {
   int		l2;
 };
 
+#ifdef LOGIC_HACK
 static
 void
-evalSplit(suc, ul)
+evalSplit(cx, suc, ul)
+     struct RkContext	*cx;
+     struct nword	*suc;
+     struct splitParm	*ul;
+{
+  struct nword	*p;
+  unsigned	l2;
+  unsigned long	u2;
+  
+  l2 = 0;
+  u2 = 0L;
+  for (p = suc; p; p = p->nw_next)  
+  {
+    if (!CanSplitWord(p) || /* 文節にならない */
+	OnlyBunmatu(p) || /* リテラルの直前でしか文節になれない */
+	(p->nw_rowcol == cx->gram->P_KJ) || /* 単漢字 */
+	(p->nw_flags & NW_LOWPRI) || /* 優先度の低い文節 */
+	(p->nw_flags & NW_SUC))
+      continue;
+    if (l2 <= p->nw_ylen) {
+      l2 = p->nw_ylen;
+      /* 読みが一文字の単語の優先度は考慮しない */
+      if (u2 < p->nw_prio && p->nw_ylen > 1)
+        u2 = p->nw_prio;
+    }
+  }
+  ul->l2 = l2;
+  ul->u2 = u2;
+}
+#else /* LOGIC_HACK */
+static
+void
+evalSplit(cx, suc, ul)
+     struct RkContext	*cx;
      struct nword	*suc;
      struct splitParm	*ul;
 {
@@ -1406,6 +1481,7 @@ evalSplit(suc, ul)
   ul->l2 = l2;
   ul->u2 = u2;
 }
+#endif /* LOGIC_HACK */
 
 #define PARMSIZE 256
 
@@ -1419,8 +1495,13 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
      int		maxclen;
      int		flush;
 {
+#ifdef LOGIC_HACK
+  int			L, L1 = 0, L2;
+  unsigned long		U;
+#else
   unsigned		L, L1 = 0, L2;
   unsigned		U2;
+#endif
   struct nword	*w;
   int			i;
   int			maxary = PARMSIZE - 1;
@@ -1448,27 +1529,41 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
   }
   if (L1 == 0) {
     L = (L1 = 1)+ (L2 = 0);
+#ifdef LOGIC_HACK
+    U = 0L;
+#else
     U2 = (unsigned)0;
+#endif
     if (maxary > maxclen)
       maxary = maxclen;
     for (i = 0; i <= maxary; i++)
       ul2[i].l2 = ul2[i].u2 = 0L;
     for (w = top; w; w = w->nw_next) {
-      int				l, l1;
+      int			l, l1;
+#ifdef LOGIC_HACK
+      unsigned long		u;
+#endif
       struct splitParm		ul;
-      /* ichido ni 2tu tukomono ha yameru */
+      /* 文節にならない */
       if (!CanSplitWord(w)) {
 	continue;
       }
+#ifdef LOGIC_HACK
+      /* 優先度の低い文節の後では切らない */
+      if (w->nw_flags & NW_LOWPRI) {
+	  DontSplitWord(w);
+	  continue;
+      }
+#endif
       if ((w->nw_flags & NW_PRE) && (w->nw_flags & NW_SUC)) {
 	continue;
       }
-      /* mijikasugiru/bunsetumatu ni narenai  monoha hazusu */
+      /* 読みを消費していない */
       l1 = w->nw_ylen;
       if (l1 <= 0) {
 	continue;
       }
-      /* shuujoushi ha bun no tochuu deha tukanai */
+      /* 一文節にするのが最長 */
       if (flush && (unsigned)yy + w->nw_ylen == cx->store->nyomi) {
 	L1 = l1;
 	break;
@@ -1480,17 +1575,36 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 	continue;
       }
 #endif
-      /* migi donari no bunsetsu wo kaiseki */
+#ifdef LOGIC_HACK
+      /* 単漢字は文の途中に登場しない */
+      if (w->nw_rowcol == cx->gram->P_KJ) {
+	  DontSplitWord(w);
+	  continue;
+      }
+#endif
+      /* 右隣の文節を解析 */
       if (l1 <= maxary) {
 	if (!ul2[l1].l2) 
-	  evalSplit(xq[l1].tree, &ul2[l1]);
+	  evalSplit(cx, xq[l1].tree, &ul2[l1]);
 	ul = ul2[l1];
       }
       else {
-	evalSplit(xq[l1].tree, &ul);
+	evalSplit(cx, xq[l1].tree, &ul);
       }
       /* hikaku */
       l = l1 + ul.l2;
+#ifdef LOGIC_HACK
+      u = w->nw_prio + ul.u2;
+      if ((L < l) || /* 二文節最長 */
+	  ((L == l) &&
+	   (U < u || /* 優先度の合計 */
+	    (U == u && (L2 < ul.l2))))) { /* 二文節目の長さ */
+	  L = l;
+	  U = u;
+	  L1 = l1;
+	  L2 = ul.l2;
+      }
+#else
       if ((((int)L < l)) ||
 	  (((int)L == l) &&  (U2 < ul.u2)) ||
 	  (((int)L == l) &&  (U2 == ul.u2) && ((int)L2 < ul.l2))
@@ -1500,6 +1614,7 @@ calcSplit(cx, yy, top, xq, maxclen, flush)
 	L2 = ul.l2;
 	U2 = ul.u2;
       }
+#endif
     }
   }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -2000,8 +2115,10 @@ doLearn(cx, thisW)
 	candidates[i] = wp;
 	wp += 2 * ((*wp >> 1) & 0x7f) + 2;
       };
+/*
       if (thisCache->nc_count)
 	continue;
+*/
       if (qm && qm->dm_qbits) {
 	int		bits;
 	
@@ -2113,3 +2230,4 @@ _RkLearnBun(cx, cur, mode)
   killWord(st, bun->nb_cand);
 }
 
+/* vim: set sw=2: */

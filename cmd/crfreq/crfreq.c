@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 102.1 $Id: crfreq.c,v 1.24 1996/10/25 04:07:01 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: crfreq.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $";
 #endif
 
 #include "RKintern.h"
@@ -51,7 +51,7 @@ CreateNL(fr, size1, size2)
      int	size1;
      int	size2;
 {
-  unsigned char ll[4], *buf;
+  unsigned char ll[4], *buf = (unsigned char *)0xdeadbeef; /* for gcc */
   
   size1 = size1 > 0 ? size1 : 0;
   size2 = size2 > 0 ? size2 : 0;
@@ -105,12 +105,11 @@ main(argc, argv)
 {
   struct HD	hd;
   off_t		off, doff; 
-  unsigned	sz;
+  size_t	sz;
   unsigned char	ll[4], *buf;
-  char		*flnm = (char *)0, *dmnm, freq[RK_MAX_HDRSIZ];
-  char		*frqf, *frqe, freqfile[RK_MAX_HDRSIZ];
+  char		*flnm = (char *)0, *dmnm, freq[RK_OLD_MAX_HDRSIZ];
+  char		*frqf, *frqe, freqfile[RK_OLD_MAX_HDRSIZ];
   int		bit_size, fd, fr, fqoffset, i, j, k, lk, nc, nw, vds = 0, err;
-  int		fnum;
   long		fqbytes;
 
   freq[0] = '\0';
@@ -147,23 +146,25 @@ main(argc, argv)
     }
     usage();
   }
+  if (!flnm)
+    usage();
 
-  if (strlen(flnm) >= RK_MAX_HDRSIZ || strlen(dmnm) >= RK_MAX_HDRSIZ ||
+  if (strlen(flnm) >= RK_OLD_MAX_HDRSIZ || strlen(dmnm) >= RK_OLD_MAX_HDRSIZ ||
       (fd = open(flnm, O_RDONLY)) < 0) {
     (void)fprintf(stderr, "%s: cannot open %s\n", program, flnm);
     exit(1);
   }
+#ifdef __CYGWIN32__
+  setmode(fd, O_BINARY);
+#endif
 
-  if ((fd = open(flnm, O_RDONLY)) < 0) {
-    (void)fprintf(stderr, "%s: cannot open %s\n.", program, flnm);
-    exit(1);
-  }
   for (off = 0, lk = 1, doff = 0, err = 0;
        !err && lk && _RkReadHeader(fd, &hd, off) >= 0;
        lk = strcmp(dmnm, (char *)hd.data[HD_DMNM].ptr)) {
     doff = off;
     off += hd.data[HD_SIZ].var;
-    if (!strncmp(".swd", (char *)(hd.data[HD_DMNM].ptr + strlen((char *)hd.data[HD_DMNM].ptr) - 4), 4)) {
+    if (HD_VERSION(&hd) < 0x300702L &&
+	!strncmp(".swd", (char *)(hd.data[HD_DMNM].ptr + strlen((char *)hd.data[HD_DMNM].ptr) - 4), 4)) {
       if (lseek(fd, off, 0) < 0 || read(fd, (char *)ll, 4) != 4) 
 	err = 1;
       off += bst4_to_l(ll) + 4;
@@ -201,7 +202,9 @@ main(argc, argv)
     (void)fprintf(stderr, "%s: cannot create freqency file %s\n", program, freqfile);
     exit(1);
   }
-
+#ifdef __CYGWIN32__
+  setmode(fr, O_BINARY);
+#endif
   hd.flag[HD_CODM] = hd.flag[HD_DMNM];
   hd.data[HD_CODM].ptr = hd.data[HD_DMNM].ptr;
   hd.data[HD_DMNM].ptr = (unsigned char *)STrdup(freq);
@@ -253,7 +256,7 @@ main(argc, argv)
     }
   }
   fqbytes = (fqoffset + 7)/8;
-  (void)fprintf(stderr, "size %d bits %d bytes\n", fqoffset, fqbytes);
+  (void)fprintf(stderr, "size %d bits %ld bytes\n", fqoffset, fqbytes);
   if (fqbytes >= sizeof(fqbits)) {
     (void)close(fd);
     (void)close(fr);

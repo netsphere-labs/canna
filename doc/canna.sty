@@ -19,7 +19,7 @@
 % OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
 % PERFORMANCE OF THIS SOFTWARE. 
 
-% $Id: canna.sty,v 1.6 1994/03/24 12:33:23 kuma Exp $
+% $Id: canna.sty,v 1.2 2003/09/09 10:33:00 takasan Exp $
 
 % enumerate 環境の再定義
 %
@@ -140,14 +140,14 @@
 %
 % ASCII 版 TeX と NTT 版の違いの吸収
 %
-\newif\ifASCII
-\ifx\gtfam\undefined
-\ASCIIfalse
-\else
-\ASCIItrue
-\fi
+%\newif\ifASCII
+%\ifx\gtfam\undefined
+%\ASCIIfalse
+%\else
+%\ASCIItrue
+%\fi
 
-\ifASCII 
-\def\dg{\gt}
-\def\dm{\mc}
-\fi
+%\ifASCII 
+\providecommand{\dg}{\gt}
+\providecommand{\dm}{\mc}
+%\fi

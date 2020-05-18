@@ -1,4 +1,4 @@
-/* $Id: Imakefile,v 1.4 1994/01/28 05:27:38 kon Exp $ */
+/* $Id: Imakefile,v 1.2 2003/09/17 01:22:01 aida_s Exp $ */
 #include "../Canna.conf"
 
          CANNAROOT = ..
@@ -7,7 +7,6 @@ all::
 
 LinkFileList(includes,canna.sty,man/guide/tex,../../..)
 LinkFileList(includes,canna.sty,lisp,..)
-LinkFileList(includes,canna.sty,misc,..)
 LinkFileList(includes,canna.sty,intern,..)
 
 depend::

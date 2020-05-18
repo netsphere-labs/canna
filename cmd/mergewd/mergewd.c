@@ -21,7 +21,7 @@
  */
 
 #ifndef lint
-static char rcsid[]="@(#) 112.1 $Id: mergewd.c,v 1.26 1996/11/27 07:17:46 kon Exp $";
+static char rcsid[]="@(#) 112.1 $Id: mergewd.c,v 1.1.1.1.4.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
 
 #include	"RKintern.h" 
@@ -147,7 +147,7 @@ char	*args[];
       *d = 0;
       while (*s && !RkwIsGraphicChar(*s)) s++;
       d = kanji;
-      while ( *d = *s++ )	d++;
+      while ( (*d = *s++) != 0 )	d++;
       
       euctous(yomi, strlen((char *)yomi), wyomi, sizeof(yomi)/sizeof(Wchar));
       euctous(kanji, strlen((char *)kanji), wkanji, sizeof(kanji)/sizeof(Wchar));

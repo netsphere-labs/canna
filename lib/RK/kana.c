@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#) 102.1 $Id: kana.c,v 3.8 1996/07/18 08:30:07 kon Exp $";
+static char rcsid[]="@(#) 102.1 $Id: kana.c,v 1.2 2003/09/17 08:50:52 aida_s Exp $";
 #endif
 
 /* LINTLIBRARY */
@@ -515,7 +515,7 @@ RkCvtNone(dst, maxdst, src, maxsrc)
 }
 
 #ifdef USE_SJIS_TEXT_DIC
-exp(int)
+canna_export(int)
 SJistowcs(wc_return, maxwc, sj, maxsj)
 Wchar *wc_return;
 int maxwc;

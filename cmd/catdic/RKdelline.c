@@ -20,20 +20,15 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-static	char	rcs_id[] = "@(#) 112.1 $Id: RKdelline.c,v 2.4 1996/11/07 01:22:30 kon Exp $";
+static	char	rcs_id[] = "@(#) 112.1 $Id: RKdelline.c,v 1.3 2003/10/02 07:40:30 aida_s Exp $";
 
 #ifdef ENGINE_SWITCH
 #include "RKrename.h"
 #endif
 
+#define CANNA_NEW_WCHAR_AWARE
 #include <canna/RK.h>
-
-#ifdef __STDC__
-#include <stdlib.h>
-#else
-extern char *malloc(), *realloc(), *calloc();
-extern void free();
-#endif
+#include "ccompat.h"
 
 RkDeleteLine(cx_num, name, line)
 int cx_num;
