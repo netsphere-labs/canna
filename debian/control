@@ -5,7 +5,7 @@ Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: debhelper (>> 7.0.50~), libx11-dev, xutils-dev, po-debconf,
  autoconf, texlive-lang-cjk, texlive-lang-japanese,
  texlive-latex-recommended, autotools-dev
-Standards-Version: 3.9.5
+Standards-Version: 4.5.0
 Homepage: http://canna.sourceforge.jp/
 Vcs-Git: git://anonscm.debian.org/collab-maint/canna.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/canna.git
