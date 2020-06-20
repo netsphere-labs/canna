@@ -2,9 +2,15 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper (>> 7.0.50~), libx11-dev, xutils-dev, po-debconf,
- autoconf, texlive-lang-cjk, texlive-lang-japanese,
- texlive-latex-recommended, autotools-dev
+Build-Depends: autoconf,
+               autotools-dev,
+               debhelper (>> 7.0.50~),
+               libx11-dev,
+               po-debconf,
+               texlive-lang-cjk,
+               texlive-lang-japanese,
+               texlive-latex-recommended,
+               xutils-dev
 Standards-Version: 4.5.0
 Homepage: http://canna.sourceforge.jp/
 Vcs-Browser: https://salsa.debian.org/debian/canna
@@ -12,7 +18,11 @@ Vcs-Git: https://salsa.debian.org/debian/canna.git
 
 Package: canna
 Architecture: any
-Depends: lsb-base, ${misc:Depends}, ${shlibs:Depends}, adduser (>= 3.34), canna-utils
+Depends: adduser (>= 3.34),
+         canna-utils,
+         lsb-base,
+         ${misc:Depends},
+         ${shlibs:Depends}
 Suggests: canna-shion
 Description: input system for Japanese - server and dictionary
  Canna provides a unified user interface for Japanese input. It is based
@@ -56,7 +66,7 @@ Description: input system for Japanese - runtime library
 Package: libcanna1g-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libcanna1g (= ${binary:Version})
+Depends: libcanna1g (= ${binary:Version}), ${misc:Depends}
 Description: input system for Japanese - development files
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.
