@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: autoconf,
                autotools-dev,
-               debhelper (>> 7.0.50~),
+               debhelper-compat (=12),
                libx11-dev,
                po-debconf,
                texlive-lang-cjk,
