@@ -7,3 +7,4 @@
 08_fix_ftbfs_on_hurd-i386.patch
 09_fix_format_security.patch
 10_fix_manpages_error.patch
+11_fix_configure.ac.patch
