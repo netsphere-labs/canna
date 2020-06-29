@@ -3,7 +3,6 @@ Section: utils
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: autoconf,
-               autotools-dev,
                debhelper-compat (=12),
                libx11-dev,
                po-debconf,
