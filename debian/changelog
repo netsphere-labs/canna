@@ -1,9 +1,27 @@
 canna (3.7p3-15) unstable; urgency=medium
 
   * QA upload.
-  * 
+  * Using new DH level format. Consequently:
+      - debian/compat: removed.
+      - debian/control: changed from 'debhelper' to 'debhelper-compat' in
+        Build-Depends field and bumped level to 12.
+  * debian/control:
+      - Added 'Rules-Requires-Root: binary-targets' to source stanza.
+      - Bumped Standards-Version to 4.5.0.
+      - Removed 'autotools-dev' from Build-Depends field.
+      - Updated VCS fields to use Salsa.
+      - wrap-and-sort.
+  * debian/copyright:
+      - Migrated to 1.0 format.
+      - Updated packaging copyright.
+  * debian/patches/11_fix_configure.ac.patch:
+      - Added to fix FTBFS caused after the DH level has bumped.
+  * debian/rules:
+      - Added DEB_BUILD_MAINT_OPTIONS to improve the GCC hardening.
+  * debian/salsa-ci.yml:
+      - Added to provide CI tests for Salsa.
 
- -- Francisco Vilmar Cardoso Ruviaro <francisco.ruviaro@riseup.net>  Mon, 18 May 2020 03:49:59 +0000
+ -- Francisco Vilmar Cardoso Ruviaro <francisco.ruviaro@riseup.net>  Tue, 30 Jun 2020 22:10:14 +0000
 
 canna (3.7p3-14) unstable; urgency=medium
 
@@ -63,7 +81,7 @@ canna (3.7p3-11) unstable; urgency=medium
 canna (3.7p3-10) unstable; urgency=low
 
   * QA upload.
-  * Fix bug in postrm scripts (Closes: #681756). 
+  * Fix bug in postrm scripts (Closes: #681756).
   * Fix a dangling symlink (/usr/bin/chmoddic -> catdic) on canna package.
 
  -- gustavo panizzo <gfa@zumbi.com.ar>  Sat, 28 Jul 2012 00:41:47 -0300
@@ -161,7 +179,7 @@ canna (3.7p3-6.3) unstable; urgency=low
 canna (3.7p3-6.2) unstable; urgency=low
 
   * Non-maintainer upload.
-  * Allow dpkg-reconfigure to work by using debconf settings even 
+  * Allow dpkg-reconfigure to work by using debconf settings even
     when /etc/canna/default.canna already exists. Closes: #208538
   * Bump debhelper compatibility level to 7
   * As a consequence, drop the use of "dh_clean -k", replaced by dh_prep
@@ -316,7 +334,7 @@ canna (3.7-4) unstable; urgency=low
 
 canna (3.7-3) unstable; urgency=low
 
-  * Fix build problems on hppa 
+  * Fix build problems on hppa
   - 05_hppabuild.dpatch: Do not try to use .sl for shared library extention on palinux.
   * dpatch maintenance:
   - 02_debiandefines: update, add /Imakefile, which was missing
@@ -326,7 +344,7 @@ canna (3.7-3) unstable; urgency=low
 
 canna (3.7-2) unstable; urgency=low
 
-  * dh_makeshlibs is called with -V so that libcanna1g is upgraded 
+  * dh_makeshlibs is called with -V so that libcanna1g is upgraded
     along with other packages.
   * Fix postinst so that it works on new installations.
     fuzokugo.cld is no longer distributed with canna binary.
@@ -344,7 +362,7 @@ canna (3.7-1) experimental; urgency=low
     01_mkrelease_autoconf213_debian: apply
     02_debiandefines: updated to work with 3.7
     03_debian_useshareddir: apply
-  * README.Debian: Remove reference to yc-el; yc-el now supports unix domain sockets, 
+  * README.Debian: Remove reference to yc-el; yc-el now supports unix domain sockets,
     and not a reason to make canna listen to TCP ports.
   * Install tex docs.
   * /usr/bin/chkconc is added to canna-utils
@@ -388,7 +406,7 @@ canna (3.6p1-8) unstable; urgency=low
     From: Geoffrey Lee  (closes: #190518)
     This is a temporal solution, should be fully fixed with autoconf'd canna.
   * The binary dictionary is provided as a template from
-    /usr/lib/canna/debian-template, and copied to 
+    /usr/lib/canna/debian-template, and copied to
     /var/lib/canna/dic/canna when no files already exist.
     Possible future enhancement: upgrade path for dictionary frequency data.
     Fixes "canna: learned dictionary is destroyed when upgrading"
@@ -400,7 +418,7 @@ canna (3.6p1-7) unstable; urgency=low
 
   * Fixes: canna: [wishlist] Please include updated Brazilian Portuguese (pt_BR) debconf template translations
     From: Andre Luis Lopes  (closes: #207952)
-  * Standards-Version: 3.6.1, I don't see much changes required for this 
+  * Standards-Version: 3.6.1, I don't see much changes required for this
     package.
   * call ldconfig in postrm if 'remove' option is set,
     and call ldconfig in postinst only when 'configure' option is set.
@@ -416,14 +434,14 @@ canna (3.6p1-6) unstable; urgency=low
 
 canna (3.6p1-5) unstable; urgency=low
 
-  * Add french translation. (closes: #206432) 
+  * Add french translation. (closes: #206432)
 
  -- Junichi Uekawa <dancer@debian.org>  Fri, 22 Aug 2003 19:01:15 +0900
 
 canna (3.6p1-4) unstable; urgency=low
 
   * section devel->libdevel.
-  * require debhelper 4.1.59, which supports installation of manpages with 
+  * require debhelper 4.1.59, which supports installation of manpages with
     .TH with quotes.
   * Install available manpages. TBD: Documentation needs a patch to build.
   * Update Brazilian Portuguese debconf template
@@ -436,7 +454,7 @@ canna (3.6p1-4) unstable; urgency=low
 
 canna (3.6p1-3) unstable; urgency=low
 
-  * New maintainer (closes: #178240) 
+  * New maintainer (closes: #178240)
   * Improve wordings of README.Debian, and debconf templates
     (closes: #203291, #117354)
   * debconf-gettextize
@@ -525,7 +543,7 @@ canna (3.5b2-43) unstable; urgency=low
 
 canna (3.5b2-42) unstable; urgency=low
 
-  * add Depends: adduser (>= 3.34), closes: #116239 
+  * add Depends: adduser (>= 3.34), closes: #116239
   * debconf template spelling fix, closes: #116345
 
  -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 21 Oct 2001 07:45:12 +0900
@@ -571,7 +589,7 @@ canna (3.5b2-36) unstable; urgency=low
 
 canna (3.5b2-35) unstable; urgency=low
 
-  * add debconf templates, config for selecting 
+  * add debconf templates, config for selecting
     default canna input style
   * add /usr/share/canna to roman-kana trans table serch path
 
@@ -590,7 +608,7 @@ canna (3.5b2-34) unstable; urgency=low
   * remove INSTALL and INSTALL.jp document from packages
   * roman-kana translation tables moves to /usr/share/canna
   * malloc() size problem in libRK fixed
-  
+
  -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Fri, 10 Aug 2001 06:19:50 +0900
 
 canna (3.5b2-32) unstable; urgency=low
@@ -634,7 +652,7 @@ canna (3.5b2-27) unstable; urgency=low
     diff.gz
   * apply Bugs#58667's patch, closes: #58667
   * add Build-Depends: in control
-  
+
  -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Mon, 16 Oct 2000 22:18:18 +0900
 
 canna (3.5b2-26) unstable; urgency=low
@@ -649,7 +667,7 @@ canna (3.5b2-25) frozen unstable; urgency=high
 
   * [SECURITY FIX] buffer overflow. If send IR_INIT command to cannaserver
     with very logn username and/or groupname, remote user can get root
-    facility. 
+    facility.
   * add /etc/hosts.canna file as conffile for security reason. Default
     setting is `clients can connect cannaserver only from localhost.'
     closes: Bug#63402
@@ -661,7 +679,7 @@ canna (3.5b2-23) unstable; urgency=low
   * move /usr/lib/lib*.so from canna.deb to libcanna1g-dev.deb
   * add Confilics: canna (<= 3.5b2-22) for libcanna1g and libcanna1g-dev.
     (Because some files from canna to libcanna1g and libcanna1g-dev)
-  
+
  -- ISHIKAWA Mutsumi <ishikawa@linux.or.jp>  Sun, 10 Oct 1999 03:11:15 +0900
 
 canna (3.5b2-22) unstable; urgency=low
@@ -721,7 +739,7 @@ canna (3.5b2-16.1) unstable; urgency=low
     on netwinder/arm.
 
  -- Tor Slettnes <tor@slett.net>  Mon, 23 Nov 1998 02:29:27 -0800
-	
+
 canna (3.5b2-16) unstable; urgency=low
 
   * Added that the libcanna1g-dev depends on libcanna1g. (#JP/551)
@@ -730,7 +748,7 @@ canna (3.5b2-16) unstable; urgency=low
 
 canna (3.5b2-15) unstable; urgency=low
 
-  * Changed install directory of Japanese manpages to /usr/man/ja. 
+  * Changed install directory of Japanese manpages to /usr/man/ja.
   * Remove "sudo" command in rules. (Bug#25782)
   * Fixed typo "dh=testdir" in rules.
   * Updated Standards-Version 2.4.1.3.
@@ -746,7 +764,7 @@ canna (3.5b2-14) frozen unstable; urgency=low
 
 canna (3.5b2-13) frozen unstable; urgency=low
 
-  * Bug Fix: can't unpack source package. (Bug#20156) 
+  * Bug Fix: can't unpack source package. (Bug#20156)
   * Bug Fix: libcanna1g-dev changed priority optional to extra. (Bug#19920)
 
  -- Yoshiaki Yanagihara <yochi@debian.or.jp>  Wed, 25 Mar 1998 10:16:08 +0900
@@ -763,7 +781,7 @@ canna (3.5b2-12) unstable; urgency=low
 
 canna (3.5b2-11) hamm-jp; urgency=low
 
-  * Fixed file modes. 
+  * Fixed file modes.
   * Fixed symbolic files.
   * Made conffiles for /etc/init.d/canna.
   * Fixed init (added restart and force-reload).
@@ -837,7 +855,7 @@ canna (3.5b2-3) bo-jp hamm-jp; urgency=low
   * Change ja_JP.EUC to ja_JP.ujis of manpage directory.
   * Change init.d filename from canna to canna-server.
   * Upgrading from canna_3.5b2-2:
-    	You must purge canna_3.5b2-2 package 
+    	You must purge canna_3.5b2-2 package
   	before install these packages.
   		dpkg --purge --force-depends canna
   * cannaserver don't run after install canna-server package.
@@ -900,5 +918,3 @@ canna (32p2+uf1+gp3-0) unstable; urgency=low
     but grammer-patch patch.228 doesn't apply to sources.
 
  -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Tue, 28 Aug 1996 01:30:00 +0900
-
-
