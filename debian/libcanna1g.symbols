@@ -1,4 +1,5 @@
 libRKC.so.1 libcanna1g #MINVER#
+* Build-Depends-Package: libcanna1g-dev
  G001_RkiAltStrlcpy@Base 3.7p3
  G001_RkiStrbuf_init@Base 3.7p3
  G002_RkiAltStrlcat@Base 3.7p3
