@@ -36,7 +36,8 @@ Description: input system for Japanese - server and dictionary
 
 Package: canna-utils
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
 Breaks: canna (<< 3.7p3-10)
 Replaces: canna (<< 3.7p3-10)
 Description: input system for Japanese - utilities
@@ -52,7 +53,8 @@ Description: input system for Japanese - utilities
 Package: libcanna1g
 Section: libs
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
 Description: input system for Japanese - runtime library
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.
@@ -66,7 +68,8 @@ Description: input system for Japanese - runtime library
 Package: libcanna1g-dev
 Section: libdevel
 Architecture: any
-Depends: libcanna1g (= ${binary:Version}), ${misc:Depends}
+Depends: libcanna1g (= ${binary:Version}),
+         ${misc:Depends}
 Description: input system for Japanese - development files
  Canna provides a unified user interface for Japanese input. It is based
  on a client-server model and supports automatic kana-to-kanji conversion.
