@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -848,7 +848,7 @@ int where ;
 {
   int reply, datalen = strlen(dicname) + 1;
 
-  if (SendTypeE6Request(IR_RMNT_DIC, cx->server, where, 
+  if (SendTypeE6Request(IR_RMNT_DIC, cx->server, where,
 			(BYTE *)dicname, datalen) &&
       RecvTypeE1Reply(&reply)) {
     return reply;
@@ -865,10 +865,8 @@ int max ;
   return Dic_Dir_List(cx->server, data, max, IR_MNT_LIST);
 }
 
-rkc_get_dir_list( cx, ddname, maxddname )
-RkcContext *cx ;
-char *ddname ;
-int maxddname ;
+
+int rkc_get_dir_list( RkcContext* cx, char* ddname, int maxddname )
 {
     return( Dic_Dir_List( cx->server, ddname, maxddname, IR_DIR_LIST ) ) ;
 }
@@ -1084,7 +1082,7 @@ Query_Extension()
     if( !RemoteDicUtilBaseProtoNumber ){
 	int datalen = strlen( REMOTE_DIC_UTIL ) + 1 ;
 
-        if (SendTypeE12Request(IR_QUERY_EXT, (BYTE *)REMOTE_DIC_UTIL, datalen, 
+        if (SendTypeE12Request(IR_QUERY_EXT, (BYTE *)REMOTE_DIC_UTIL, datalen,
 			       MAXEXTREQUESTNO + 1) &&
 	    RecvTypeE1Reply(&RemoteDicUtilBaseProtoNumber)) {
 	  return RemoteDicUtilBaseProtoNumber;
@@ -1173,7 +1171,7 @@ int mode ;
 
 /* ARGSUSED */
 static
-rkc_get_text_dictionary( cx, dirname, dicname, info, infolen )	
+rkc_get_text_dictionary( cx, dirname, dicname, info, infolen )
 register RkcContext *cx ;
 char *dirname, *dicname;
 Ushort *info ;
@@ -1197,7 +1195,7 @@ int infolen ;
     return -1;
 }
 
-			
+
 #endif /* EXTENSION */
 
 /* ARGSUSED */
@@ -1216,7 +1214,7 @@ RkStat *dest;
     src += SIZEOFLONG;
     dest->diccand = (int)L4TOL(src);	/* jisho ni aru kouho suu */
     src += SIZEOFLONG;
-    dest->ylen = (int)L4TOL(src);	/* yomigana no nagasa (in byte) */ 
+    dest->ylen = (int)L4TOL(src);	/* yomigana no nagasa (in byte) */
     src += SIZEOFLONG;
     dest->klen = (int)L4TOL(src);	/* kanji no nagasa (in byte) */
     src += SIZEOFLONG;
@@ -1237,7 +1235,7 @@ RkLex *dest;
   if (n > 0 && n > maxn) n = maxn;
 
   for (i = 0; i < n; i++, dest++) {
-    dest->ylen = (int)L4TOL(src);	/* yomigana no nagasa (in byte) */ 
+    dest->ylen = (int)L4TOL(src);	/* yomigana no nagasa (in byte) */
     src += SIZEOFLONG;
     dest->klen = (int)L4TOL(src);	/* kanji no nagasa (in byte) */
     src += SIZEOFLONG;
@@ -1299,7 +1297,7 @@ RkLex *info_return ;
 
     if (!SendTypeE5Request(IR_GET_LEX, cx->server, cx->curbun,
 			   cx->bun[cx->curbun].curcand, max) ||
-        !RecvTypeE4Reply(&ret, lexStore, (BYTE *)info_return, 
+        !RecvTypeE4Reply(&ret, lexStore, (BYTE *)info_return,
 			 max, sizeof(RkLex) / sizeof(int))) {
       ret = -1;
     }

@@ -30,13 +30,10 @@ static char rcsid[]="$Id: tempdic.c,v 1.4 2003/09/17 08:50:52 aida_s Exp $";
 #include <stdio.h>
 #include <fcntl.h> /* for O_BINARY */
 #include <sys/types.h>
+#include <assert.h>
 
-#if defined(__STDC__) || defined(SVR4)
 #include <time.h>
 #define TIME_T time_t
-#else
-#define TIME_T long
-#endif
 
 #define	dm_td	dm_extdata.ptr
 
@@ -337,6 +334,8 @@ deleteTD(struct DM* dm, struct TD** tab, int n, Wrec* newW)
 int
 _Rktopen(struct DM* dm, const char* file, int mode, struct RkKxGram* gram)
 {
+    assert(dm);
+
     struct DF	*df = dm->dm_file;
     struct DD	*dd = df->df_direct;
     struct TD	*xdm;
@@ -345,7 +344,7 @@ _Rktopen(struct DM* dm, const char* file, int mode, struct RkKxGram* gram)
     int		ecount = 0;
     int ret = -1;
 
-    char* line = (char*) malloc(RK_LINE_BMAX * 10);
+    unsigned char* line = (unsigned char*) malloc(RK_LINE_BMAX * 10);
     cannawc* wcline = (cannawc*) malloc(sizeof(cannawc) * RK_LINE_BMAX * 10);
     if (!line || !wcline) {
         free(line);
@@ -353,33 +352,29 @@ _Rktopen(struct DM* dm, const char* file, int mode, struct RkKxGram* gram)
         return -1;
     }
 
-  if (!df->df_rcount) {
-    if (close(open(file, 0)))
-      goto return_ret;
-    df->df_flags |= DF_EXIST;
-    dm->dm_flags |= DM_EXIST;
-    if (!close(open(file, 2)))
-      dm->dm_flags |= DM_WRITABLE;
-  }
-  if (!(dm->dm_flags & DM_EXIST))
-    ;
-#ifdef __EMX__
-  else if (!(f = fopen(file, "rt"))) {
-#else
-  else if (!(f = fopen(file, "r"))) {
-#endif
-    df->df_flags &= ~DF_EXIST;
-    dm->dm_flags &= ~DM_EXIST;
-  }
-  else if (!(xdm = newTD())) {
-    fclose(f);
-  }
-  else {
-    while (fgets((char *)line, RK_LINE_BMAX*10, f)) {
-      int		sz;
+    if (!df->df_rcount) {
+        if (close(open(file, 0)))
+            goto return_ret;
+        df->df_flags |= DF_EXIST;
+        dm->dm_flags |= DM_EXIST;
+        if (!close(open(file, 2)))
+            dm->dm_flags |= DM_WRITABLE;
+    }
+    if (!(dm->dm_flags & DM_EXIST))
+        ;
+    else if (!(f = fopen(file, "rt"))) {
+        df->df_flags &= ~DF_EXIST;
+        dm->dm_flags &= ~DM_EXIST;
+    }
+    else if (!(xdm = newTD())) {
+        fclose(f);
+    }
+    else {
+        while (fgets((char *)line, RK_LINE_BMAX*10, f)) {
+            int		sz;
 
-      offset += strlen(line);
-      sz = RkCvtWide(wcline, RK_LINE_BMAX*10, line, strlen(line));
+            offset += strlen((char*) line);
+            sz = RkCvtWide(wcline, RK_LINE_BMAX*10, line, strlen((char*) line));
       if (sz < RK_LINE_BMAX*10 - 1) {
 	if ( enterTD(dm, xdm, gram, wcline) < 0 )
 	  ecount++;

@@ -911,7 +911,7 @@ GetLine(struct RkContext* cx, struct RkKxGram* gram, struct TD* tdp,
  *          dics.dirに異常があった場合                 -10   BADDR
  */
 int
-RkwGetWordTextDic(int cx_num, unsigned char* dirname, const char* dicname,
+RkwGetWordTextDic(int cx_num, const char* dirname, const char* dicname,
                   cannawc* info, int infolen)
 {
     struct RkContext *new_cx, *cx;

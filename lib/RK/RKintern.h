@@ -1198,7 +1198,7 @@ void freeTdn pro((struct RkContext *));
 void _RkFreeBunq pro((struct nstore *));
 int _RkRealizeDD pro((struct DD *));
 
-int RkCvtWide(cannawc* dest, int destlen, const char* src, int);
+int RkCvtWide(cannawc* dest, int destlen, const unsigned char* src, int);
 cannawc* euctous(const unsigned char* src, int srclen, cannawc* dest, int destlen);
 
 int RkCvtNarrow pro((unsigned char* dest, int, const cannawc* src, int));

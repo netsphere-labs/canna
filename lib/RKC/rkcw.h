@@ -58,5 +58,8 @@ typedef uint16_t cannawc;
 extern int rkcWCinit pro((void));
 extern int rkcw_get_server_info pro((int *, int *));
 
+// widechar.c
 cannawc* WStrncpy(cannawc* ws1, const cannawc* ws2, size_t destsize);
 extern int ushortstrncpy pro((cannawc* wdest, const cannawc* wsrc, int n));
+
+size_t WStrlen(const cannawc* ws);

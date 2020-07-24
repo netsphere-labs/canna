@@ -369,7 +369,7 @@
 #define trimYomi                            G366_trimYomi
 #define uiUtilIchiranTooSmall               G367_uiUtilIchiranTooSmall
 //#define ushort2euc                          G368_ushort2euc
-#define ushort2euc  G008_CNvW2E
+#define ushort2euc  CNvW2E
 
 #define ushort2eucsize                      G369_ushort2eucsize
 #define ushort2wchar                        G370_ushort2wchar
@@ -381,7 +381,7 @@
 #define uuKigoGeneralExitCatch              G374_uuKigoGeneralExitCatch
 #define uuKigoMake                          G375_uuKigoMake
 #define uuTTangoQuitCatch                   G376_uuTTangoQuitCatch
-#define wchar2ushort                        G377_wchar2ushort
+//#define wchar2ushort                        G377_wchar2ushort
 //#define wcharstrlen                         G378_wcharstrlen
 #define wcharstrlen G128_WStrlen
 

@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -30,36 +32,36 @@
 // Internal APIs.
 #include "canna/sglobal.h"
 
-/* Ê¸Àá¾ğÊó¥ì¥³¡¼¥É
+/* æ–‡ç¯€æƒ…å ±ãƒ¬ã‚³ãƒ¼ãƒ‰
  *
  */
 
 #define MAX_HOSTNAME	256
 
 typedef struct _RkcBun {
-    unsigned short  *kanji  ;	/* Âè°ì¸õÊä¤Ş¤¿¤ÏÁ´¸õÊäÎó */
-    short	    curcand ;	/* ¥«¥ì¥ó¥È´Á»ú¸õÊäÈÖ¹æ */
-    short	    maxcand ;	/* ´Á»ú¸õÊäÁí¿ô */
-    short	    flags   ;	/* ¥Õ¥é¥° */
+    cannawc* kanji  ;	/* ç¬¬ä¸€å€™è£œã¾ãŸã¯å…¨å€™è£œåˆ— */
+    short	    curcand ;	/* ã‚«ãƒ¬ãƒ³ãƒˆæ¼¢å­—å€™è£œç•ªå· */
+    short	    maxcand ;	/* æ¼¢å­—å€™è£œç·æ•° */
+    short	    flags   ;	/* ãƒ•ãƒ©ã‚° */
 #define NOTHING_KOUHO	 0x00
-#define FIRST_KOUHO	0x01	   /* kanji¤ÏÀèÆ¬¸õÊä¤Î¤ß */
-#define NUMBER_KOUHO	0x02	   /* kanji¤Ï¸õÊä°ìÍ÷¤Î¥İ¥¤¥ó¥¿ */
-} RkcBun ;			   /* ¤³¤Î¾ì¹ç¡¢curcand¤Ï0,maxcand¤Ï1 */
+#define FIRST_KOUHO	0x01	   /* kanjiã¯å…ˆé ­å€™è£œã®ã¿ */
+#define NUMBER_KOUHO	0x02	   /* kanjiã¯å€™è£œä¸€è¦§ã®ãƒã‚¤ãƒ³ã‚¿ */
+} RkcBun ;			   /* ã“ã®å ´åˆã€curcandã¯0,maxcandã¯1 */
 
 
 /*
- *  ¥¯¥é¥¤¥¢¥ó¥È¥³¥ó¥Æ¥¯¥¹¥È¥ì¥³¡İ¥É
+ *  ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆãƒ¬ã‚³âˆ’ãƒ‰
  *
  */
 typedef struct _RkcContext {
-    short	    server ;  /* ¥µ¡İ¥Ğ¡¦¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ */
-    short	    client ;  /* ¥¯¥é¥¤¥¢¥ó¥È¡¦¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ */
-    RkcBun	    *bun   ;  /* Ê¸Àá¾ğÊó¥ì¥³¡¼¥ÉÇÛÎó¤Ø¤Î¥İ¥¤¥ó¥¿ */
-    unsigned short *Fkouho ; /* Âè°ì¸õÊäÎó¤Ø¤Î¥İ¥¤¥ó¥¿ */
-    short	    curbun ;  /* ¥«¥ì¥ó¥ÈÊ¸ÀáÈÖ¹æ */
-    short	    maxbun ;  /* Ê¸ÀáÁí¿ô */
-    short	    bgnflag ; /* RkBgnBun¤Î¥Õ¥é¥° */
-    unsigned short *lastyomi;
+    short	    server ;  /* ã‚µâˆ’ãƒãƒ»ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· */
+    short	    client ;  /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒ»ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· */
+    RkcBun	    *bun   ;  /* æ–‡ç¯€æƒ…å ±ãƒ¬ã‚³ãƒ¼ãƒ‰é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+    cannawc* Fkouho ; /* ç¬¬ä¸€å€™è£œåˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+    short	    curbun ;  /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ç•ªå· */
+    short	    maxbun ;  /* æ–‡ç¯€ç·æ•° */
+    short	    bgnflag ; /* RkBgnBunã®ãƒ•ãƒ©ã‚° */
+    cannawc* lastyomi;
     short	    maxyomi;
 } RkcContext ;
 
@@ -71,7 +73,7 @@ euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen);
 //#define wcharstrlen WStrlen
 //#define ushortstrlen WStrlen
 
-extern ushortstrcpy() ;
+extern int ushortstrcpy(cannawc* wdest, const cannawc* wsrc) ;
 
 typedef long (*initialize_t) pro((char *));
 typedef int (*finalize_t) pro((void));
@@ -79,31 +81,31 @@ typedef int (*close_context_t) pro((RkcContext *));
 typedef int (*create_context_t) pro((void));
 typedef int (*duplicate_context_t) pro((RkcContext *));
 typedef int (*dictionary_list_t) pro((RkcContext *, char *, int));
-typedef int (*define_dic_t) pro((RkcContext *, char *, Ushort *));
-typedef int (*delete_dic_t) pro((RkcContext *, char *, Ushort *));
+typedef int (*define_dic_t) pro((RkcContext *, const char *, cannawc* wordrec));
+typedef int (*delete_dic_t) pro((RkcContext *, char *, cannawc* wordrec));
 typedef int (*mount_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*remount_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*umount_dictionary_t) pro((RkcContext *, char *));
 typedef int (*mount_list_t) pro((RkcContext *, char *, int));
-typedef int (*convert_t) pro((RkcContext *, Ushort *, int, int));
+typedef int (*convert_t) pro((RkcContext *, cannawc*, int, int));
 typedef int (*convert_end_t) pro((RkcContext *, int));
 typedef int (*get_kanji_list_t) pro((RkcContext *));
 typedef int (*get_stat_t) pro((RkcContext *, RkStat *));
 typedef int (*resize_t) pro((RkcContext *, int));
-typedef int (*store_yomi_t) pro((RkcContext *, Ushort *, int));
-typedef int (*get_yomi_t) pro((RkcContext *, Ushort *));
+typedef int (*store_yomi_t) pro((RkcContext *, cannawc*, int));
+typedef int (*get_yomi_t) pro((RkcContext *, cannawc*));
 typedef int (*get_lex_t) pro((RkcContext *, int, RkLex *));
 typedef int (*autoconv_t) pro((RkcContext *, int, int));
-typedef int (*subst_yomi_t) pro((RkcContext *, int, int, int, Ushort *, int));
+typedef int (*subst_yomi_t) pro((RkcContext *, int, int, int, cannawc*, int));
 typedef int (*flush_yomi_t) pro((RkcContext *));
-typedef int (*get_last_yomi_t) pro((RkcContext *, Ushort *, int));
+typedef int (*get_last_yomi_t) pro((RkcContext *, cannawc*, int));
 typedef int (*remove_bun_t) pro((RkcContext *, int));
 typedef int (*get_simple_kanji_t)
-    pro((RkcContext *, char *, Ushort *, int, Ushort *, int, Ushort *, int));
+    pro((RkcContext *, char *, cannawc*, int, cannawc*, int, cannawc*, int));
 typedef int (*query_dic_t)
     pro((RkcContext *, char *, char *, struct DicInfo *));
-typedef int (*get_hinshi_t) pro((RkcContext *, Ushort *, int));
-typedef int (*store_range_t) pro((RkcContext *, Ushort *, int));
+typedef int (*get_hinshi_t) pro((RkcContext *, cannawc*, int));
+typedef int (*store_range_t) pro((RkcContext *, cannawc*, int));
 typedef int (*set_locale_t) pro((RkcContext *, char *));
 typedef int (*set_app_name_t) pro((RkcContext *, char *));
 typedef int (*notice_group_name_t) pro((RkcContext *, char *));
@@ -115,8 +117,8 @@ typedef int (*create_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*remove_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*rename_dictionary_t) pro((RkcContext *, char *, char *, int));
 typedef int (*get_text_dictionary_t)
-     pro((RkcContext *, char *, char *, Ushort *, int));
-typedef int (*sync_t) pro((RkcContext *, char *));
+                pro((RkcContext *, const char *, const char *, cannawc*, int));
+typedef int (*sync_t) pro((RkcContext *, const char *));
 typedef int (*chmod_dic_t) pro((RkcContext *, char *, int));
 typedef int (*copy_dictionary_t)
      pro((RkcContext *, char *, char *, char *, int));
@@ -187,7 +189,7 @@ struct rkcproto {
 	(s2)[0] = LOMASK((s)>> 8); (s2)[1] = LOMASK((s));\
 }
 
-#define RK_LINE_BMAX 1024 /* ¤³¤ì¤Ï RKintern.h ¤Î¤ÈÆ±¤¸ÃÍ¤Ç¤Ê¤±¤ì¤Ğ¤Ê¤é¤Ê¤¤ */
+#define RK_LINE_BMAX 1024 /* ã“ã‚Œã¯ RKintern.h ã®ã¨åŒã˜å€¤ã§ãªã‘ã‚Œã°ãªã‚‰ãªã„ */
 
 #if 0
 #define I16toI32(x) (((x) & 0x8000) ? ((x) | 0xffff8000) : (x))
@@ -216,4 +218,4 @@ typedef struct {
 
 /* function prototypes .. */
 
-extern rkc_Connect_Iroha_Server pro((char *));
+extern int rkc_Connect_Iroha_Server pro((char *));

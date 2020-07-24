@@ -244,7 +244,7 @@ canna_export(int) RkwCopyDic pro((int, char *, char *, char *, int));
 canna_export(int) RkwRemoveDic pro((int, char *, int));
 canna_export(int) RkwRenameDic pro((int, char *, char *, int));
 canna_export(int) RkwChmodDic pro((int, char *, int));
-canna_export(int) RkwGetWordTextDic pro((int, unsigned char *,
+canna_export(int) RkwGetWordTextDic pro((int, const char* dirname,
 					 const char* dicname, cannawc *, int));
 canna_export(int) RkwGetSimpleKanji pro((int, char *, cannawc *, int,
 					 cannawc *, int, cannawc *, int));

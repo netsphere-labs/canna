@@ -3,6 +3,9 @@
 #include <assert.h>
 #include "canna/sglobal.h"
 
+static int min(int a, int b) { return a <= b ? a : b; }
+
+
 size_t
 WStrlen(const cannawc* ws)
 {
@@ -68,47 +71,49 @@ WStrcpy(cannawc* ws1, const cannawc* ws2)
     return ws1;
 }
 
-// @param n wdest の大きさ.
-// @return 書き込んだワイド文字数. ナル終端を含まない.
+// @param destsize wdest の大きさ.
+// @return min(wstrlen(wsrc), n - 1). ナル終端を含まない要素数.
 int
-ushortstrncpy(cannawc* wdest, const cannawc* wsrc, int n)
+ushortstrncpy(cannawc* wdest, const cannawc* wsrc, int destsize)
 {
     assert(wsrc);
+    assert(wdest);
+    assert(destsize > 0);
 
-    int res = 0;
-    while (res < n - 1 && (*wdest = *wsrc) != 0) {
-        wdest++; wsrc++; res++;
+    int res;
+
+    if (wsrc == wdest) {
+        wdest[destsize - 1] = 0;
+        res = WStrlen(wdest);
     }
-    *wdest = 0;
+    else if ( wsrc < wdest ) {
+        int len = min(WStrlen(wsrc), destsize - 1);
+        res = len;
+        wdest[len] = 0;
+        while (len > 0) {
+            len--;
+            wdest[len] = wsrc[len];
+        }
+    }
+    else { // wdest < wsrc
+        res = 0;
+        while ( res++ < destsize - 1 && *wsrc)
+            *wdest++ = *wsrc++;
+        *wdest = 0;
+    }
+
     return res;
 }
 
 
+// @return ws1
 cannawc*
 WStrncpy(cannawc* ws1, const cannawc* ws2, size_t destsize)
 {
     assert(ws1);
     assert(ws2);
 
-    cannawc* ws;
-
-    if (ws1 == ws2)
-        ws1[destsize - 1] = 0;
-    else if ( ws2 < ws1 ) {
-        int len = WStrlen(ws2);
-        if (destsize - 1 < len) len = destsize - 1;
-        ws1[len] = 0;
-        while (len--)
-            ws1[len] = ws2[len];
-    }
-    else if (ws1 < ws2) {
-        int i = 0;
-        ws = ws1;
-        while ( i++ < destsize - 1 && *ws2)
-            *ws++ = *ws2++;
-        *ws = 0;
-    }
-
+    ushortstrncpy(ws1, ws2, destsize);
     return ws1;
 }
 
@@ -207,7 +212,7 @@ WIsG3(cannawc wc)
  */
 // 定義されているのはここだけ。RK/tempdic.c で使われている.
 int
-RkCvtWide(cannawc* dest, int destlen, const char* src, int srclen)
+RkCvtWide(cannawc* dest, int destlen, const unsigned char* src, int srclen)
 {
     assert( src );
 
@@ -267,13 +272,16 @@ int euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen)
     return RkCvtWide(dest, destlen, src, srclen);
 }
 
-// @param dest  If dest is NULL, destlen is ignored.
-// @return 変換された wide-character の数. ナル終端は含まない.
-//         Invalid なシーケンスだった場合は, -1.
+
+/**
+ * @param dest  If dest is NULL, destlen is ignored.
+ * @return 変換された wide-character の数. ナル終端は含まない.
+ *         Invalid なシーケンスだった場合は, -1.
+ */
 size_t
 CANNA_mbstowcs(cannawc* dest, const unsigned char* src, size_t destlen)
 {
-    return RkCvtWide(dest, destlen, src, strlen(src));
+    return RkCvtWide(dest, destlen, src, strlen((char*) src));
 }
 
 
