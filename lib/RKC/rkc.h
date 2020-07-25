@@ -83,7 +83,7 @@ typedef int (*duplicate_context_t) pro((RkcContext *));
 typedef int (*dictionary_list_t) pro((RkcContext *, char *, int));
 typedef int (*define_dic_t) pro((RkcContext *, const char *, cannawc* wordrec));
 typedef int (*delete_dic_t) pro((RkcContext *, char *, cannawc* wordrec));
-typedef int (*mount_dictionary_t) pro((RkcContext *, char *, int));
+typedef int (*mount_dictionary_t) pro((RkcContext *, const char *, int));
 typedef int (*remount_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*umount_dictionary_t) pro((RkcContext *, char *));
 typedef int (*mount_list_t) pro((RkcContext *, char *, int));
@@ -103,7 +103,7 @@ typedef int (*remove_bun_t) pro((RkcContext *, int));
 typedef int (*get_simple_kanji_t)
     pro((RkcContext *, char *, cannawc*, int, cannawc*, int, cannawc*, int));
 typedef int (*query_dic_t)
-    pro((RkcContext *, char *, char *, struct DicInfo *));
+    pro((RkcContext *, const char *, char *, struct DicInfo *));
 typedef int (*get_hinshi_t) pro((RkcContext *, cannawc*, int));
 typedef int (*store_range_t) pro((RkcContext *, cannawc*, int));
 typedef int (*set_locale_t) pro((RkcContext *, char *));
@@ -178,7 +178,8 @@ struct rkcproto {
  *		unsigned long	wxyz
  */
 #define LOMASK(x)	((x)&255)
-#define	LTOL4(l, l4)	{\
+
+#define	LTOL4(l, l4)	{                               \
 	(l4)[0] = LOMASK((l)>>24); (l4)[1] = LOMASK((l)>>16);\
 	(l4)[2] = LOMASK((l)>> 8); (l4)[3] = LOMASK((l));\
 }

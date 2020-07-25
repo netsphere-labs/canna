@@ -521,7 +521,7 @@ ch_perm(qm, offset, size, num)
 #define PERM_NREADSIZE 128
 
 int
-_Rkpctl(struct DM* dm, struct DM* qm, int what, cannawc* arg,
+_Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
         struct RkKxGram* gram)
 {
   int		nc, cf = 0, ret = -1;

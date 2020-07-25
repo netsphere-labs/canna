@@ -28,13 +28,17 @@ static char rcsid[]="@(#) 102.1 $Id: RKroma.c,v 1.4.2.1 2004/04/26 22:49:21 aida
 #include "canna.h"
 
 #include <fcntl.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#define euccharlen eucchars
 
 #define S2TOS(s2)	(((unsigned short)(s2)[0]<<8)|(s2)[1])
 #define L4TOL(l4)\
-        ((((((((unsigned long) ((unsigned char)(l4)[0])) << 8) | \
-                ((unsigned long) ((unsigned char)(l4)[1])))  << 8)  | \
-                ((unsigned long) ((unsigned char)(l4)[2])))  << 8)      | \
-                ((unsigned long) ((unsigned char)(l4)[3])))
+        ((((((((uint32_t) ((unsigned char)(l4)[0])) << 8) | \
+                ((uint32_t) ((unsigned char)(l4)[1])))  << 8)  | \
+                ((uint32_t) ((unsigned char)(l4)[2])))  << 8)      | \
+                ((uint32_t) ((unsigned char)(l4)[3])))
 
 #ifdef JAPANESE_SORT
 
@@ -43,13 +47,9 @@ struct romaRec {
   unsigned char bang;
 };
 
-#if !defined(__STDC__)
-extern void qsort();
-#endif
 
 int
-compar(p, q)
-struct romaRec	*p, *q;
+compar(struct romaRec* p, struct romaRec* q)
 {
   unsigned char	*s = p->roma;
   unsigned char	*t = q->roma;

@@ -836,7 +836,7 @@ RkwGetDirList( int cx_num, char* ddname, int maxddname)
  *	mount the dictionary onto the specified context.
  */
 int
-RkwDefineDic(int cx_num, const char* name, cannawc* word)
+RkwDefineDic(int cx_num, const char* name, const cannawc* word)
 {
   struct RkContext	*cx;
   int			i;

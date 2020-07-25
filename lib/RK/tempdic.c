@@ -661,7 +661,7 @@ int
 _Rktctl(struct DM* dm,
         struct DM* qm, /* no use : dummy*/
         int what,
-        cannawc* arg,
+        const cannawc* arg,
         struct RkKxGram* gram)
 {
   struct TD	*xdm = (struct TD *)dm->dm_td;

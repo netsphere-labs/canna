@@ -1478,7 +1478,7 @@ RkwQueryDic(
 
 
 int
-_RkwSync(struct RkContext* cx, char* dicname)
+_RkwSync(struct RkContext* cx, const char* dicname)
 {
     struct DM	*dm, *qm;
 
@@ -1492,7 +1492,7 @@ _RkwSync(struct RkContext* cx, char* dicname)
 
 
 int
-RkwSync(int cx_num, char* dicname)
+RkwSync(int cx_num, const char* dicname)
 {
   struct RkContext	*cx;
   int ret = -1;
@@ -1541,7 +1541,7 @@ RkwSync(int cx_num, char* dicname)
 
 int
 RkwGetSimpleKanji(int cxnum, char* dicname, cannawc* yomi, int maxyomi,
-                  cannawc* kanjis, int maxkanjis, cannawc* hinshis,
+                  cannawc* kanjis, int maxkanjis, unsigned char* hinshis,
                   int maxhinshis)
 {
     return -1;

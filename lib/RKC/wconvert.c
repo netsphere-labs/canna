@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +14,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 /*
   This program contains a part of the X library.  The communication part
@@ -29,13 +31,13 @@ and the Massachusetts Institute of Technology, Cambridge, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the names of Digital or MIT not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -104,19 +106,15 @@ static
 #ifndef SIGNALRETURNSINT
 void
 #endif
-DoSomething(sig)
-int sig;
-/* ARGSUSED */
+DoSomething( int sig)
 {
     errno = EPIPE;
     signal(SIGPIPE, DoSomething);
 }
 
+
 static int
-try_connect( fd, addrp, len )
-int fd ;
-struct sockaddr *addrp ;
-size_t len ;
+try_connect( int fd, struct sockaddr* addrp, size_t len )
 {
     struct timeval timeout;
     if( !ServerTimeout )
@@ -128,15 +126,14 @@ size_t len ;
 
 #ifdef UNIXCONN
 #if !defined(__EMX__)
-/* UNIX¥É¥á¥¤¥ó¤Ç¤ªÏÃ¤¹¤ë */
+/* UNIXãƒ‰ãƒ¡ã‚¤ãƒ³ã§ãŠè©±ã™ã‚‹ */
 static int
-connect_unix( number )
-int number ;    
+connect_unix( int number )
 {
     struct sockaddr_un unaddr;	    /* UNIX socket address. */
     struct sockaddr *addr;	    /* address to connect to */
-    
-    /* ¤¤¤í¤Ï¥µ¡¼¥Ğ¤È¡¢£Õ£Î£É£Ø¥É¥á¥¤¥ó¤ÇÀÜÂ³ */
+
+    /* ã„ã‚ã¯ã‚µãƒ¼ãƒã¨ã€ï¼µï¼®ï¼©ï¼¸ãƒ‰ãƒ¡ã‚¤ãƒ³ã§æ¥ç¶š */
     unaddr.sun_family = AF_UNIX;
     if( number )
 	sprintf( unaddr.sun_path,"%s:%d", IR_UNIX_PATH, number ) ;
@@ -154,29 +151,28 @@ int number ;
 	}
     }
     return( ServerFD ) ;
-}    
+}
 #endif
 #endif /* UNIXCONN */
 
 #ifdef STREAMCONN
-/* ¥¹¥È¥ê¡¼¥à¥Ñ¥¤¥×¤Ç ¤¤¤í¤Ï¥µ¡¼¥Ğ¤È¤ªÏÃ¤¹¤ë */
+/* ã‚¹ãƒˆãƒªãƒ¼ãƒ ãƒ‘ã‚¤ãƒ—ã§ ã„ã‚ã¯ã‚µãƒ¼ãƒã¨ãŠè©±ã™ã‚‹ */
 static int
-connect_stream_pipe( number )
-int number ;
+connect_stream_pipe( int number )
 {
     char namebuf[(sizeof(IR_STREAM_PATH)) + 8];
-    char buf[ sizeof(struct file *) ] ; 
+    char buf[ sizeof(struct file *) ] ;
     struct strbuf ctrlbuf ;
     int retfd, flags, mfd ;
-        
+
     sprintf( namebuf, "%s%d%s", IR_STREAM_PATH, number, "R" ) ;
-    
+
     if( (mfd = open( namebuf, O_RDWR )) < 0 )
 	return( -1 ) ;
 
     if( (retfd = open( IROHA_STREAM, O_RDWR )) < 0 ) {
 	int w = errno ;
-	
+
 	close ( mfd ) ;
 	errno = w ;
 	return( -1 ) ;
@@ -184,28 +180,28 @@ int number ;
 
     if( write (mfd, &mfd, 1) != 1 ) {
 	int w = errno ;
-	
+
 	close( retfd ) ;
 	close( mfd ) ;
 	errno = w ;
 	return( -1 ) ;
     }
-    
+
     ctrlbuf.maxlen = sizeof( buf ) ;
     ctrlbuf.buf = buf ;
     flags = 0 ;
     if ( getmsg(mfd, &ctrlbuf, (struct strbuf *)NULL, &flags) < 0 ) {
 	int w = errno ;
-	
+
 	close( retfd ) ;
 	close( mfd ) ;
 	errno = w ;
 	return( -1 ) ;
     }
-    
+
     if( putmsg(retfd, &ctrlbuf, (struct strbuf *) NULL, 0) < 0 ) {
 	int w = errno ;
-	
+
 	close( retfd ) ;
 	close( mfd ) ;
 	errno = w ;
@@ -216,11 +212,10 @@ int number ;
 }
 #endif /* STREAMCONN */
 
+
 #ifdef INET6
 static int
-connect_inet( hostname, number )
-int number ;
-char *hostname ;
+connect_inet( char* hostname, int number )
 {
     struct addrinfo hints, *infolist, *info;
     struct servent *sp ;
@@ -258,27 +253,25 @@ char *hostname ;
 }
 #else /* !INET6 */
 static int
-connect_inet( hostname, number )
-int number ;
-char *hostname ;
+connect_inet( char* hostname, int number )
 {
     struct sockaddr_in inaddr;	    /* INET socket address. */
     canna_in_addr_t hostinetaddr;   /* result of inet_addr of arpa addr */
     struct hostent *host_ptr, workhostbuf ;
     struct servent *sp ;
-    int addrlen ;		 
+    int addrlen ;
     char *h_addr_ptr;
 
-    /* ¥¤¥ó¥¿¡¼¥Í¥Ã¥È¥É¥á¥¤¥ó¤ÇÀÜÂ³¤¹¤ë¡£ */
+    /* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆãƒ‰ãƒ¡ã‚¤ãƒ³ã§æ¥ç¶šã™ã‚‹ã€‚ */
     if( (host_ptr = gethostbyname( hostname ) )
 	                                 == (struct hostent *)NULL) {
 	hostinetaddr = inet_addr( hostname );
 	if( hostinetaddr == (canna_in_addr_t)-1 ) {
-	    /* ¥¤¥ó¥¿¡¼¥Í¥Ã¥È¥¢¥É¥ì¥¹É½µ­¤¬´Ö°ã¤Ã¤Æ¤¤¤ë */
+	    /* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹è¡¨è¨˜ãŒé–“é•ã£ã¦ã„ã‚‹ */
 	    errno = EINVAL;
 	    return( -1 );
 	}
-	
+
 	if( !(host_ptr = gethostbyaddr( (char *)&hostinetaddr,
 				 sizeof( hostinetaddr ), AF_INET )) ) {
 	    host_ptr = &workhostbuf ;
@@ -290,8 +283,8 @@ char *hostname ;
 # endif
 	    host_ptr->h_length = sizeof( hostinetaddr ) ;
 	}
-    } else { 
-	/* ¥¢¥É¥ì¥¹¥¿¥¤¥×¤ò¥Á¥§¥Ã¥¯¤¹¤ë */
+    } else {
+	/* ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚¿ã‚¤ãƒ—ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 	if (host_ptr->h_addrtype != AF_INET) {
 	    /* Not an Internet host! */
 	    errno = EPROTOTYPE;
@@ -299,19 +292,19 @@ char *hostname ;
 	}
     }
 
-    if( (ServerFD = socket( AF_INET, SOCK_STREAM, 0 )) < 0 ) 
+    if( (ServerFD = socket( AF_INET, SOCK_STREAM, 0 )) < 0 )
 	return( -1 ) ;
-  
+
     errno = 0;
-    /* /etc/services¤«¤é¥İ¡¼¥ÈÈÖ¹æ¤ò¼èÆÀ¤¹¤ë */ 
+    /* /etc/servicesã‹ã‚‰ãƒãƒ¼ãƒˆç•ªå·ã‚’å–å¾—ã™ã‚‹ */
     sp = getservbyname( IR_SERVICE_NAME, "tcp");
-    /* ¥Ç¡¼¥¿¥»¥Ã¥È */
+    /* ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ */
     inaddr.sin_family = host_ptr->h_addrtype;
     inaddr.sin_port = (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + number;
     inaddr.sin_port = htons(inaddr.sin_port);
     bcopy( host_ptr->h_addr, &inaddr.sin_addr, sizeof(inaddr.sin_addr) ) ;
     addrlen = sizeof( struct sockaddr_in ) ;
-    errno = 0 ; 
+    errno = 0 ;
     if ( try_connect( ServerFD, (struct sockaddr *)&inaddr, addrlen ) < 0 ) {
 #ifdef nodef
 	perror("connect") ;
@@ -326,8 +319,7 @@ char *hostname ;
 #define MAX_LIST	128
 
 static int
-increment_counter( flush )
-int flush ;    
+increment_counter( int flush )
 {
     static int counter = 0 ;
 
@@ -338,21 +330,20 @@ int flush ;
 
     if( counter > MAX_LIST - 1 )
 	return( -1 ) ;
-    
+
     return( counter ) ;
 }
 
-/* °Ê²¼¤Î½ç½ø¤Ç¡¤»ØÄê¤·¤¿¥µ¡¼¥ĞÌ¾¤Î¥İ¥¤¥ó¥¿¥ê¥¹¥È¤òÊÖ¤¹ */
+/* ä»¥ä¸‹ã®é †åºã§ï¼ŒæŒ‡å®šã—ãŸã‚µãƒ¼ãƒåã®ãƒã‚¤ãƒ³ã‚¿ãƒªã‚¹ãƒˆã‚’è¿”ã™ */
 static void
-rkc_build_cannaserver_list( list )
-char **list ;
+rkc_build_cannaserver_list( char** list )
 {
     char work[ MAX_HOSTNAME ];
     const char *hostp ;
     char **listp = list, *getenv();
     exp(char *) RkwGetServerName();
     FILE *hostfp ;
-    
+
     increment_counter( 1 ) ;
 
     /* First, check if the server name is specified by API.
@@ -380,21 +371,21 @@ char **list ;
 	}							/* S004 */
     }
 
-    /* CANNAHOSTFILE ¥Õ¥¡¥¤¥ë¤«¤é¥ê¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* CANNAHOSTFILE ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒªã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
 #ifdef __EMX__
     if( (hostfp = fopen( CANNAHOSTFILE, "rt" )) != (FILE *)NULL ) {
 #else
     if( (hostfp = fopen( CANNAHOSTFILE, "r" )) != (FILE *)NULL ) {
 #endif
       while( (hostp = fgets( work, MAX_HOSTNAME, hostfp) ) != NULL ) {
-	/* ²ş¹ÔÊ¸»ú¤ò¤È¤ë */
+	/* æ”¹è¡Œæ–‡å­—ã‚’ã¨ã‚‹ */
 	work[ strlen( hostp )-1 ] = '\0' ;
-	/* ¥ê¥¹¥È¤Ë³ÊÇ¼¤¹¤ë */
+	/* ãƒªã‚¹ãƒˆã«æ ¼ç´ã™ã‚‹ */
 	*listp = (char *)malloc(strlen(work) + 1);
 	if (*listp) {
 	  strcpy(*listp, work);
 	}
-	if( !*listp || ( increment_counter( 0 ) < 0) ) 
+	if( !*listp || ( increment_counter( 0 ) < 0) )
 	  break ;
 	listp++ ;
       }
@@ -403,10 +394,10 @@ char **list ;
     *listp = (char *)NULL ;
 }
 
-/* °ú¿ô¤Ë NULL ¥İ¥¤¥ó¥¿¤òÅÏ¤·¤Æ¤Ï¤¤¤±¤Ş¤»¤ó¡£*/
-/* ¤½¤ì¤É¤³¤í¤«¡¢½½Ê¬¤ª¤ª¤­¤ÊÇÛÎó¤òÅÏ¤µ¤Ê¤±¤ì¤Ğ¤Ê¤é¤Ê¤¤¤Î¤À */
-rkc_Connect_Iroha_Server( hostname )
-char *hostname ; 
+
+/* å¼•æ•°ã« NULL ãƒã‚¤ãƒ³ã‚¿ã‚’æ¸¡ã—ã¦ã¯ã„ã‘ã¾ã›ã‚“ã€‚*/
+/* ãã‚Œã©ã“ã‚ã‹ã€ååˆ†ãŠãŠããªé…åˆ—ã‚’æ¸¡ã•ãªã‘ã‚Œã°ãªã‚‰ãªã„ã®ã  */
+rkc_Connect_Iroha_Server( char* hostname )
 {
     char *serverlist[ MAX_LIST ], **listp ;
     int num ;
@@ -427,7 +418,7 @@ char *hostname ;
 	    }
 	    listp++ ;
 	    *listp = (char *)NULL ;
-	}	
+	}
     }
     else {
 	*listp = (char *)malloc(strlen(hostname) + 1);
@@ -437,11 +428,11 @@ char *hostname ;
 	listp++ ;
 	*listp = (char *)NULL ;
     }
-    
+
     for( listp = serverlist; *listp; listp++ ) {
 	ServerTimeout = RkcConfMgr_get_number(
 		&rkc_config, CONF_SERVER_TIMEOUT, *listp );
-	/* ¥µ¡¼¥Ğµ¯Æ°ÈÖ¹æ¤ò¼èÆÀ¤¹¤ë */
+	/* ã‚µãƒ¼ãƒèµ·å‹•ç•ªå·ã‚’å–å¾—ã™ã‚‹ */
 #ifdef INET6
 	if( **listp == '[' ) {
 	    char *p, *q;
@@ -450,7 +441,7 @@ char *hostname ;
 	    if( q ) {
 		size_t bodylen;
 		*( q++ ) = '\0';
-		/* ¤³¤³¤Ç¤Î·Á¼°¥Á¥§¥Ã¥¯¤Ï¸·Ì©¤Ç¤Ê¤¯¤Æ¤è¤¤ */
+		/* ã“ã“ã§ã®å½¢å¼ãƒã‚§ãƒƒã‚¯ã¯å³å¯†ã§ãªãã¦ã‚ˆã„ */
 		bodylen = strspn( p, "0123456789ABCDEFabcdef:." );
 		if( bodylen
 			&& ( p[bodylen] == '\0' || p[bodylen] == '%' )
@@ -491,9 +482,9 @@ char *hostname ;
 	    ServerFD = connect_unix( num ) ;
 #endif
 	}
-	else { 
+	else {
 #else /* STREAMCONN */
-	    /* ¤¤¤í¤Ï¥µ¡¼¥Ğ¤È¥¹¥È¥ê¡¼¥à¥Ñ¥¤¥×¤ÇÀÜÂ³ */
+	    /* ã„ã‚ã¯ã‚µãƒ¼ãƒã¨ã‚¹ãƒˆãƒªãƒ¼ãƒ ãƒ‘ã‚¤ãƒ—ã§æ¥ç¶š */
 	    ServerFD = connect_stream_pipe( num ) ;
 	}
         else {
@@ -507,25 +498,23 @@ char *hostname ;
 	    break ;
     }
     listp = serverlist ;
-    
+
     while( *listp )
 	free( *listp++ ) ;
-	
+
     return( ServerFD ) ;
 }
 
 #define HEADER_SIZE ((sizeof(char)) + (sizeof(char)) + SIZEOFSHORT)
 
 /*
- * ¥µ¡¼¥Ğ¤«¤éÊÖ¤µ¤ì¤¿Âè°ì¸õÊäÎó¤ò¡¢Âè°ì¸õÊäÎó¥Ğ¥Ã¥Õ¥¡¤Ë³ÊÇ¼¤¹¤ë¡£
+ * ã‚µãƒ¼ãƒã‹ã‚‰è¿”ã•ã‚ŒãŸç¬¬ä¸€å€™è£œåˆ—ã‚’ã€ç¬¬ä¸€å€™è£œåˆ—ãƒãƒƒãƒ•ã‚¡ã«æ ¼ç´ã™ã‚‹ã€‚
  */
 
 static firstKouhoStore pro((int, BYTE *, int, BYTE *));
 
 static
-firstKouhoStore(n, data, len, dest)
-int n, len;
-BYTE *data, *dest;
+firstKouhoStore( int n, BYTE* data, int len, BYTE* dest)
 {
     RkcContext *cx = (RkcContext *)dest;
     register Ushort *return_kouho, *wp ;
@@ -535,16 +524,16 @@ BYTE *data, *dest;
 
     if (n < 0) return n;
 
-    /* ¥³¥Ô¡¼¤¹¤Ù¤­¥Ğ¥Ã¥Õ¥¡¤ÎÂç¤­¤µ¤òÄ´¤Ù¤ë */
+    /* ã‚³ãƒ”ãƒ¼ã™ã¹ããƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã‚’èª¿ã¹ã‚‹ */
      for( save_len = i = 0; i < cx->curbun; i++ ) {
  	length = ushortstrlen( first_kouho )+1 ;
  	first_kouho += length ;
  	save_len += length ;
      }
- 
+
     if (!(return_kouho = (Ushort *)malloc(save_len * SIZEOFSHORT + len)))
       return( -1 ) ;
- 
+
     wp = return_kouho;
     bcopy(cx->Fkouho, wp, save_len * SIZEOFSHORT);
     wp += save_len ;
@@ -557,12 +546,9 @@ BYTE *data, *dest;
     return 0;
 }
 
-static int firstKouhoStore_2 pro((int, BYTE *, int, BYTE *));
 
 static int
-firstKouhoStore_2(n, data, len, dest)
-int n, len;
-BYTE *data, *dest;
+firstKouhoStore_2( int n, BYTE* data, int len, BYTE* dest)
 {
     RkcContext *cx = (RkcContext *)dest;
     register Ushort *return_kouho, *wp ;
@@ -588,8 +574,8 @@ BYTE *data, *dest;
 #define TRY_COUNT	    10
 
 
-/* 
-  buf ¤Ï 4 Byte °Ê¾å¤¢¤ê¡¢bufsize >= 4 ¤Ç¤¢¤ë¤³¤È¤ò²¾Äê¤·¤Æ¤¤¤ë
+/*
+  buf ã¯ 4 Byte ä»¥ä¸Šã‚ã‚Šã€bufsize >= 4 ã§ã‚ã‚‹ã“ã¨ã‚’ä»®å®šã—ã¦ã„ã‚‹
  */
 
 #define READIT(ServerFD, requiredsize, p, bufcnt, rest) /* SUPPRESS622 */\
@@ -632,9 +618,7 @@ BYTE *data, *dest;
 
 #ifdef DEBUGPROTO
 static void
-printproto(p, n)
-char *p;
-int n;
+printproto( char* p, int n)
 {
   int i;
 
@@ -649,9 +633,7 @@ int n;
 }
 
 static void
-probe(format, n, p)
-char *format, *p;
-int n;
+probe( char* format, int n, char* p)
 {
   printf(format, n);
   printproto(p, n);
@@ -667,27 +649,25 @@ int n;
    0: Succeed;
   -1: Error;
 
-  RkcRecvWReply ¤Ï¥µ¡¼¥Ğ¤«¤é¤Î reply ¤ò read ¤¹¤ë¡£¤È¤ê¤¢¤¨¤º¡¢RkcRecvWReply
-  ¤Ø¤Ï¥Ğ¥Ã¥Õ¥¡¤È¥Ğ¥Ã¥Õ¥¡¥µ¥¤¥º¤òÅÏ¤¹¤¬¡¢RkcRecvWReply ¤Ï¥Ğ¥Ã¥Õ¥¡¤¬Â­¤ê¤Ê¤¤¤È
-  È½ÃÇ¤¹¤ë¤È¼«Ê¬¤Ç malloc ¤·¤Æ¤½¤Î¥Ğ¥Ã¥Õ¥¡¤ò»È¤¦¡£RkcRecvWReply ¤¬¥Ğ¥Ã¥Õ¥¡¤ò
-  malloc ¤·¤¿¾ì¹ç¤Ë¤Ï allocptr ¤Ë¤½¤Î¥Ğ¥Ã¥Õ¥¡¤Ø¤Î¥İ¥¤¥ó¥¿¤òÊÖ¤¹¡£
-  allocptr ¤Ë 0 ¤¬ÅÏ¤µ¤ì¤¿¾ì¹ç¤Ë¤Ï RkcRecvWReply ¤¬¥Ğ¥Ã¥Õ¥¡¥µ¥¤¥º¤¬Â­¤ê¤Ê¤¤¤È
-  È½ÃÇ¤·¤¿¾ì¹ç¤Ï¡¢¾åµ­ malloc ¤¬¹Ô¤ï¤ì¤º RkcRecvWReply ¤Ï¥¨¥é¡¼¥ê¥¿¡¼¥ó¤¹¤ë¡£
+  RkcRecvWReply ã¯ã‚µãƒ¼ãƒã‹ã‚‰ã® reply ã‚’ read ã™ã‚‹ã€‚ã¨ã‚Šã‚ãˆãšã€RkcRecvWReply
+  ã¸ã¯ãƒãƒƒãƒ•ã‚¡ã¨ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚’æ¸¡ã™ãŒã€RkcRecvWReply ã¯ãƒãƒƒãƒ•ã‚¡ãŒè¶³ã‚Šãªã„ã¨
+  åˆ¤æ–­ã™ã‚‹ã¨è‡ªåˆ†ã§ malloc ã—ã¦ãã®ãƒãƒƒãƒ•ã‚¡ã‚’ä½¿ã†ã€‚RkcRecvWReply ãŒãƒãƒƒãƒ•ã‚¡ã‚’
+  malloc ã—ãŸå ´åˆã«ã¯ allocptr ã«ãã®ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ã€‚
+  allocptr ã« 0 ãŒæ¸¡ã•ã‚ŒãŸå ´åˆã«ã¯ RkcRecvWReply ãŒãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºãŒè¶³ã‚Šãªã„ã¨
+  åˆ¤æ–­ã—ãŸå ´åˆã¯ã€ä¸Šè¨˜ malloc ãŒè¡Œã‚ã‚Œãš RkcRecvWReply ã¯ã‚¨ãƒ©ãƒ¼ãƒªã‚¿ãƒ¼ãƒ³ã™ã‚‹ã€‚
 
-  RkcRecvWReply ¤¬¥¨¥é¡¼¥ê¥¿¡¼¥ó¤·¤¿¾ì¹ç¤Ï malloc ¤Ï¹Ô¤ï¤ì¤Æ¤¤¤Ê¤¤¤ÈÈ½ÃÇ
-  ¤·¤ÆÎÉ¤¤¡£
+  RkcRecvWReply ãŒã‚¨ãƒ©ãƒ¼ãƒªã‚¿ãƒ¼ãƒ³ã—ãŸå ´åˆã¯ malloc ã¯è¡Œã‚ã‚Œã¦ã„ãªã„ã¨åˆ¤æ–­
+  ã—ã¦è‰¯ã„ã€‚
 
-  allocptr: ¥Ğ¥Ã¥Õ¥¡¤¬Â­¤ê¤Ê¤«¤Ã¤¿¾ì¹ç¡¢RkcRecvWReply ¤¬ alloc ¤·¤¿¥Ğ¥Ã¥Õ¥¡
-  len_return: ÆÉ¤ó¤À¥Ç¡¼¥¿¤ÎÄ¹¤µ¡£NULL ¤òÍ¿¤¨¤ì¤Ğ ³ÊÇ¼¤·¤Ê¤¤¡£
+  allocptr: ãƒãƒƒãƒ•ã‚¡ãŒè¶³ã‚Šãªã‹ã£ãŸå ´åˆã€RkcRecvWReply ãŒ alloc ã—ãŸãƒãƒƒãƒ•ã‚¡
+  len_return: èª­ã‚“ã ãƒ‡ãƒ¼ã‚¿ã®é•·ã•ã€‚NULL ã‚’ä¸ãˆã‚Œã° æ ¼ç´ã—ãªã„ã€‚
 
  */
 
 #define ReadServer RkcRecvWReply
 
 int
-RkcRecvWReply(buf, bufsize, len_return, allocptr)
-BYTE *buf, **allocptr;
-int bufsize, *len_return;
+RkcRecvWReply( BYTE* buf, int bufsize, int* len_return, BYTE** allocptr)
 {
   BYTE *bufptr = buf, *p = buf, *q;
   int bufcnt = 0, rest = bufsize, readlen;
@@ -744,9 +724,7 @@ int bufsize, *len_return;
 #define WriteServer RkcSendWRequest
 
 int
-RkcSendWRequest( Buffer, size )
-const BYTE *Buffer ;
-int size ;
+RkcSendWRequest( const BYTE* Buffer, int size )
 {
     register int todo, retval = 0;
     register int write_stat;
@@ -818,10 +796,9 @@ last:
     return retval;
 }
 
+
 static
-SendType0Request(proto, len, name) /* Initialize */
-long proto, len;
-char *name;
+int SendType0Request( long proto, long len, char* name) /* Initialize */
 {
   BYTE lbuf[PROTOBUF], *bufp = lbuf, *p;
   long sz = 8 + len;
@@ -841,9 +818,9 @@ char *name;
   }
 }
 
+
 static
-SendType1Request(majo, mino) /* Finalize , KillServer */
-int majo, mino;
+int SendType1Request( int majo, int mino) /* Finalize , KillServer */
 {
   BYTE buf[4];
 
@@ -854,9 +831,9 @@ int majo, mino;
   return WriteServer(buf, sizeof(buf));
 }
 
+
 static
-SendType2Request(majo, mino, val) /* DuplicateContext */
-int majo, mino, val;
+int SendType2Request( int majo, int mino, int val) /* DuplicateContext */
 {
   BYTE buf[6], *p = buf;
 
@@ -869,9 +846,9 @@ int majo, mino, val;
   return WriteServer(buf, sizeof(buf));
 }
 
+
 static
-SendType3Request(majo, mino, con, val) /* GetDictionaryList */
-int majo, mino, con, val;
+int SendType3Request( int majo, int mino, int con, int val) /* GetDictionaryList */
 {
   BYTE buf[8], *p = buf;
 
@@ -885,14 +862,13 @@ int majo, mino, con, val;
   return WriteServer(buf, sizeof(buf));
 }
 
+
 static
-SendType4Request(majo, mino, con, bgn, end, wstr, wlen) /* SubstYomi */
-int majo, mino, con, bgn, end, wlen;
-Ushort *wstr;
+int SendType4Request(int majo, int mino, int con, int bgn, int end, cannawc* wstr, int wlen) /* SubstYomi */
 {
     int sz = HEADER_SIZE + SIZEOFSHORT * 4 + (SIZEOFSHORT * (wlen + 1));
     int len, i, retval;
-    Ushort *wp;
+    cannawc *wp;
     BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
 
     if (sz <= SENDBUFSIZE || (bufp = (BYTE *)malloc(sz))) {
@@ -920,9 +896,9 @@ Ushort *wstr;
     }
 }
 
+
 static
-SendType5Request(majo, mino, con, val, mod) /* AutoConvert */
-int majo, mino, con, val, mod;
+int SendType5Request(int majo, int mino, int con, int val, int mod) /* AutoConvert */
 {
   BYTE buf[12], *p = buf;
   long mode = mod;
@@ -938,9 +914,9 @@ int majo, mino, con, val, mod;
   return WriteServer(buf, sizeof(buf));
 }
 
+
 static
-SendType6Request(majo, mino, con, bun, val) /* GetYomi */
-int majo, mino, con, val;
+int SendType6Request( int majo, int mino, int con, int bun, int val) /* GetYomi */
 {
   BYTE buf[10], *p = buf;
 
@@ -958,8 +934,7 @@ int majo, mino, con, val;
 #define SendType8Request SendType9Request /* GetHinshi */
 
 static
-SendType9Request(majo, mino, con, bun, cand, val) /* GetLex */
-int majo, mino, con, bun, cand, val;
+int SendType9Request( int majo, int mino, int con, int bun, int cand, int val) /* GetLex */
 {
   BYTE buf[12], *p = buf;
 
@@ -975,10 +950,9 @@ int majo, mino, con, bun, cand, val;
   return WriteServer(buf, sizeof(buf));
 }
 
+
 static
-SendType10Request(majo, mino, cx, n, mod) /* EndConvert */
-int majo, mino, n, mod;
-RkcContext *cx;
+int SendType10Request( int majo, int mino, RkcContext* cx, int n, int mod) /* EndConvert */
 {
     int sz = HEADER_SIZE + SIZEOFSHORT * 2 + SIZEOFLONG + (SIZEOFSHORT * n);
     int len, i, con = (int)cx->server, retval;
@@ -1009,13 +983,12 @@ RkcContext *cx;
     }
 }
 
+
 static
-SendType11Request(majo, mino, con, bun, wstr, wlen) /* StoreYomi */
-int majo, mino, con, bun, wlen;
-Ushort *wstr;
+int SendType11Request( int majo, int mino, int con, int bun, cannawc* wstr, int wlen) /* StoreYomi */
 {
     int sz = HEADER_SIZE + SIZEOFSHORT * 2 + (SIZEOFSHORT * wlen);
-    Ushort *wp;
+    cannawc *wp;
     int len, i, retval;
     BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
 
@@ -1032,11 +1005,11 @@ Ushort *wstr;
 	STOS2(*wp, p); p += SIZEOFSHORT;
       }
       /*
-       * ¤³¤Î¥ê¥¯¥¨¥¹¥È¤Ï¼ÂÁõ¤µ¤ì¤Æ°ÊÍè¡¢¼Âºİ¤Ë¤Ï¶õ¤Îwstr¤òÅÏ¤¹StoreYomi
-       * ¤Ç¤·¤«»È¤ï¤ì¤Æ¤¤¤Ê¤¤¡£¤Ş¤¿¡¢3.6p1¤Ş¤Ç¤Î¥µ¡¼¥Ğ¤Ë¤Ï¥Ğ¥°¤¬¤¢¤ê¡¢
-       * 3.6¤Ş¤Ç¤Ïwstr¤ÎÎÎ°è¤Ï¶õ¤Ç¤Ê¤¯¤Æ¤Ï¤Ê¤é¤º(¥Ì¥ëÊ¸»ú¤âÉÔ²Ä)¡¢
-       * 3.6p1¤Î¾ì¹ç¤Ï¾ï¤Ë¼ºÇÔ¤·¤Æ¤·¤Ş¤¦¡£¤½¤Î¤¿¤á¡¢¤³¤Î¥ê¥¯¥¨¥¹¥È¤Ë
-       * ¤Ä¤¤¤Æ¤ÏÅöÌÌ¡¢¸Æ¤Ó½Ğ¤·Â¦¤¬¥Ì¥ë½ªÃ¼¤«wlen=0¤òÊİ¾Ú¤¹¤ë¤â¤Î¤È¤¹¤ë¡£
+       * ã“ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆã¯å®Ÿè£…ã•ã‚Œã¦ä»¥æ¥ã€å®Ÿéš›ã«ã¯ç©ºã®wstrã‚’æ¸¡ã™StoreYomi
+       * ã§ã—ã‹ä½¿ã‚ã‚Œã¦ã„ãªã„ã€‚ã¾ãŸã€3.6p1ã¾ã§ã®ã‚µãƒ¼ãƒã«ã¯ãƒã‚°ãŒã‚ã‚Šã€
+       * 3.6ã¾ã§ã¯wstrã®é ˜åŸŸã¯ç©ºã§ãªãã¦ã¯ãªã‚‰ãš(ãƒŒãƒ«æ–‡å­—ã‚‚ä¸å¯)ã€
+       * 3.6p1ã®å ´åˆã¯å¸¸ã«å¤±æ•—ã—ã¦ã—ã¾ã†ã€‚ãã®ãŸã‚ã€ã“ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆã«
+       * ã¤ã„ã¦ã¯å½“é¢ã€å‘¼ã³å‡ºã—å´ãŒãƒŒãƒ«çµ‚ç«¯ã‹wlen=0ã‚’ä¿è¨¼ã™ã‚‹ã‚‚ã®ã¨ã™ã‚‹ã€‚
        * 2003.01.05 aida_s
        */
 
@@ -1050,10 +1023,7 @@ Ushort *wstr;
 }
 
 static
-SendType12Request(majo, mino, con, wstr, str) /* DefineWord */
-int majo, mino, con;
-Ushort *wstr;
-char *str;
+int SendType12Request( int majo, int mino, int con, cannawc* wstr, char* str) /* DefineWord */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int slen = strlen(str) + 1, wlen = ushortstrlen(wstr) + 1, i;
@@ -1068,7 +1038,7 @@ char *str;
     STOS2(len, p); p += SIZEOFSHORT;
     STOS2(con, p); p += SIZEOFSHORT;
     for (i = 0 ; i < wlen ; i++) {
-      Ushort wch = wstr[i];
+        cannawc wch = wstr[i];
 
       STOS2(wch, p); p += SIZEOFSHORT;
     }
@@ -1083,12 +1053,11 @@ char *str;
   }
 }
 
+
 static
-SendType13Request(majo, mino, con, str, wstr, wlen, mxk, mxh) 
+int SendType13Request( int majo, int mino, int con, char* str, cannawc* wstr,
+                       int wlen, int mxk, int mxh)
                                                    /* GetSimpleKanji */
-int majo, mino, con, wlen, mxk, mxh;
-Ushort *wstr;
-char *str;
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int slen = strlen(str) + 1, i;
@@ -1105,7 +1074,7 @@ char *str;
     STOS2(con, p); p += SIZEOFSHORT;
     bcopy(str, p, slen); p += slen;
     for (i = 0 ; i < wlen ; i++) {
-      Ushort wch = wstr[i];
+        cannawc wch = wstr[i];
 
       STOS2(wch, p); p += SIZEOFSHORT;
     }
@@ -1123,10 +1092,9 @@ char *str;
   }
 }
 
+
 static
-SendType14Request(majo, mino, mod, con, wstr, wlen) /* BeginConvert */
-int majo, mino, mod, con, wlen;
-Ushort *wstr;
+int SendType14Request( int majo, int mino, int mod, int con, cannawc* wstr, int wlen) /* BeginConvert */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + SIZEOFLONG + SIZEOFSHORT + (SIZEOFSHORT * (wlen + 1));
@@ -1144,7 +1112,7 @@ Ushort *wstr;
     LTOL4(mode, p); p += SIZEOFLONG;
     STOS2(con, p); p += SIZEOFSHORT;
     for (i = 0 ; i < wlen ; i++) {
-      Ushort wch = wstr[i];
+        cannawc wch = wstr[i];
 
       STOS2(wch, p); p += SIZEOFSHORT;
     }
@@ -1159,10 +1127,9 @@ Ushort *wstr;
   }
 }
 
+
 static
-SendType15Request(majo, mino, mod, con, str) /* MountDictionary */
-int majo, mino, mod, con;
-char *str;
+int SendType15Request( int majo, int mino, int mod, int con, char* str) /* MountDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int slen = strlen(str) + 1;
@@ -1189,10 +1156,9 @@ char *str;
   }
 }
 
+
 static
-SendType16Request(majo, mino, mod, con, ostr, nstr) /* RenameDictionary */
-int majo, mino, mod, con;
-char *ostr, *nstr;
+int SendType16Request( int majo, int mino, int mod, int con, char* ostr, char* nstr) /* RenameDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int oslen = strlen(ostr) + 1, nslen = strlen(nstr) + 1;
@@ -1221,10 +1187,9 @@ char *ostr, *nstr;
   }
 }
 
+
 static
-SendType17Request(majo, mino, str, slen) /* QueryExtension */
-int majo, mino, slen;
-char *str;
+int SendType17Request( int majo, int mino, char* str, int slen) /* QueryExtension */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + slen, res;
@@ -1246,11 +1211,10 @@ char *str;
   }
 }
 
+
 #ifdef EXTENSION
 static
-SendType18Request(majo, mino, con, str1, s1len, str2, s2len, val) /* ListDictionary */
-int majo, mino, con, s1len, s2len, val;
-char *str1, *str2;
+int SendType18Request( int majo, int mino, int con, char* str1, int s1len, char* str2, int s2len, int val) /* ListDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + SIZEOFSHORT + s1len + s2len + SIZEOFSHORT;
@@ -1281,9 +1245,7 @@ char *str1, *str2;
 #endif /* EXTENSION */
 
 static
-SendType19Request(majo, mino, mod, con, ustr, dstr) /* QueryDictionary */
-int majo, mino, mod, con;
-char *ustr, *dstr;
+int SendType19Request( int majo, int mino, int mod, int con, char* ustr, char* dstr) /* QueryDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int uslen = strlen(ustr) + 1, dslen = strlen(dstr) + 1;
@@ -1313,9 +1275,7 @@ char *ustr, *dstr;
 }
 
 static
-SendType20Request(majo, mino, con, cmd, dsz, data, bsz) /* Through */
-int majo, mino, con, cmd, dsz, bsz;
-char *data;
+SendType20Request( int majo, int mino, int con, int cmd, int dsz, char* data, int bsz) /* Through */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + SIZEOFSHORT + SIZEOFLONG * 2 + dsz;
@@ -1344,18 +1304,17 @@ char *data;
   }
 }
 
-/* Copy Dic ¤Î¤¿¤á */
+/* Copy Dic ã®ãŸã‚ */
 
 static
-SendType21Request(majo, mino, mod, con, dirstr, ostr, nstr) 
+int SendType21Request( int majo, int mino, int mod, int con, char* dirstr,
+                       char* ostr, char* nstr)
                                                         /* CopyDictionary */
-int majo, mino, mod, con;
-char *dirstr, *ostr, *nstr;
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
-  int dirlen = strlen(dirstr) + 1; 
+  int dirlen = strlen(dirstr) + 1;
   int oslen = strlen(ostr) + 1, nslen = strlen(nstr) + 1;
-  int sz = HEADER_SIZE + SIZEOFLONG + SIZEOFSHORT 
+  int sz = HEADER_SIZE + SIZEOFLONG + SIZEOFSHORT
                                                 +dirlen + oslen + nslen;
   int len, res;
   long mode = mod;
@@ -1382,11 +1341,10 @@ char *dirstr, *ostr, *nstr;
   }
 }
 
-/* ¤³¤³¤Ş¤Ç */
+/* ã“ã“ã¾ã§ */
 
 static
-RecvType0Reply(rep) /* Initialize */
-long *rep;
+int RecvType0Reply( long* rep) /* Initialize */
 {
   BYTE buf[4];
   long res;
@@ -1401,9 +1359,9 @@ long *rep;
   }
 }
 
+
 static
-RecvType1Reply(n, vmajp, vminp) /* GetServerInfo */
-int *n, *vmajp, *vminp;
+int RecvType1Reply( int* n, int* vmajp, int* vminp) /* GetServerInfo */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   int sz, retval;
@@ -1422,9 +1380,9 @@ int *n, *vmajp, *vminp;
   return retval;
 }
 
+
 static
-RecvType2Reply(rep) /* Finalize , KillServer */
-int *rep;
+int RecvType2Reply( int* rep) /* Finalize , KillServer */
 {
   BYTE buf[5];
 
@@ -1437,12 +1395,9 @@ int *rep;
   }
 }
 
-static RecvType3Reply pro((int *, int (*)(int, BYTE *, int, BYTE *), BYTE *));
 
 static
-RecvType3Reply(n, storefunc, extdata) /* GetHinshi */
-int *n, (*storefunc) pro((int, BYTE *, int, BYTE *));
-BYTE *extdata;
+int RecvType3Reply( int* n, int (*storefunc)(int, BYTE*, int, BYTE*), BYTE* extdata) /* GetHinshi */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   int sz, datalen, retval;
@@ -1467,12 +1422,9 @@ BYTE *extdata;
   return retval;
 }
 
-static RecvType4Reply pro((int *, int (*)(int, BYTE *, BYTE *), BYTE *));
 
 static
-RecvType4Reply(n, storefunc, extdata) /* GetStatus */
-int *n, (*storefunc) pro((int, BYTE *, BYTE *));
-BYTE *extdata;
+int RecvType4Reply( int* n, int (*storefunc)(int, BYTE*, BYTE*), BYTE* extdata) /* GetStatus */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   short res;
@@ -1498,9 +1450,9 @@ BYTE *extdata;
   return retval;
 }
 
+
 static
-RecvType5Reply(rep) /* CreateContext */
-int *rep;
+int RecvType5Reply( int* rep) /* CreateContext */
 {
   BYTE buf[6], *p;
   short res;
@@ -1516,11 +1468,9 @@ int *rep;
   }
 }
 
+
 static
-RecvType6Reply(buf, mxi, n) /* GetDictionaryList */
-BYTE *buf;
-int mxi, *n;
-/* ARGSUSED */
+int RecvType6Reply( BYTE* buf, int mxi, int* n) /* GetDictionaryList */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   short res;
@@ -1533,7 +1483,7 @@ int mxi, *n;
     p = bufp + HEADER_SIZE;
     res = (short)S2TOS(p); p += SIZEOFSHORT;
     *n = (int)I16toI32(res);
- /* ¼¡¤Î bcopy ¤Ï¥µ¡¼¥Ğ¤Ï mxi °ÊÆâ¤ÎÄ¹¤µ¤·¤«ÊÖ¤µ¤Ê¤¤¤È¿®¤¸¤Æ¥Î¡¼¥Á¥§¥Ã¥¯ */
+ /* æ¬¡ã® bcopy ã¯ã‚µãƒ¼ãƒã¯ mxi ä»¥å†…ã®é•·ã•ã—ã‹è¿”ã•ãªã„ã¨ä¿¡ã˜ã¦ãƒãƒ¼ãƒã‚§ãƒƒã‚¯ */
     bcopy(p, buf, sz - SIZEOFSHORT);
     res = 0;
     if (bufp != lbuf) free((char *)bufp);
@@ -1541,12 +1491,10 @@ int mxi, *n;
   return res;
 }
 
-static RecvType7Reply pro((int *, int (*)(int, BYTE *, int, BYTE *), BYTE *));
 
 static
-RecvType7Reply(n, storefunc, extdata) /* BeginConvert */
-int *n, (*storefunc) pro((int, BYTE *, int, BYTE *));
-BYTE *extdata;
+int RecvType7Reply( int* n, int (*storefunc)(int, BYTE*, int, BYTE*),
+                    BYTE* extdata) /* BeginConvert */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   short res;
@@ -1573,13 +1521,11 @@ BYTE *extdata;
   return retval;
 }
 
-static RecvType8Reply
-  pro((int *, int (*)(int, BYTE *, BYTE *, BYTE *), BYTE *, BYTE *));
 
 static
-RecvType8Reply(n, storefunc, kdata, hdata) /* GetSimpleKanji */
-int *n, (*storefunc) pro((int, BYTE *, BYTE *, BYTE *));
-BYTE *kdata, *hdata;
+int RecvType8Reply( int* n, int (*storefunc)(int, BYTE*, BYTE*, BYTE*),
+                    BYTE* kdata,
+                    BYTE* hdata) /* GetSimpleKanji */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   short res;
@@ -1608,9 +1554,7 @@ BYTE *kdata, *hdata;
 #define RecvType9Reply RecvType7Reply /* GetLex */
 
 static
-RecvType10Reply(n, buf, bsz) /* Through */
-int *n, bsz;
-char *buf;
+int RecvType10Reply( int* n, char* buf, int bsz) /* Through */
 {
   BYTE lbuf[RECVBUFSIZE], *p, *bufp = lbuf;
   int sz, retval, datalen;
@@ -1631,11 +1575,9 @@ char *buf;
   return retval;
 }
 
-static long rkcw_initialize pro((char *));
 
 static long
-rkcw_initialize( username )
-char *username ;
+rkcw_initialize( char* username )
 {
   long reply;
   long len = strlen( (char *)username ) + 1 ;
@@ -1650,10 +1592,9 @@ char *username ;
   return((long) -1);
 }
 
-static rkcw_finalize pro((void));
 
 static
-rkcw_finalize()
+int rkcw_finalize()
 {
   int reply;
 
@@ -1665,10 +1606,9 @@ rkcw_finalize()
   return -1;
 }
 
-static rkcw_killserver pro((void));
 
 static
-rkcw_killserver()
+int rkcw_killserver()
 {
   int reply;
 
@@ -1680,10 +1620,9 @@ rkcw_killserver()
   return -1;
 }
 
-static rkcw_create_context pro((void));
 
 static
-rkcw_create_context()
+int rkcw_create_context()
 {
   int context;
 
@@ -1694,11 +1633,9 @@ rkcw_create_context()
   return -1;
 }
 
-static rkcw_duplicate_context pro((RkcContext *));
 
 static
-rkcw_duplicate_context( cx )
-register RkcContext *cx ;
+int rkcw_duplicate_context( RkcContext* cx )
 {
   int context;
 
@@ -1709,11 +1646,9 @@ register RkcContext *cx ;
   return -1;
 }
 
-static rkcw_close_context pro((RkcContext *));
 
 static
-rkcw_close_context( cx )
-register RkcContext *cx ;
+int rkcw_close_context( RkcContext* cx )
 {
   int reply;
 
@@ -1724,11 +1659,9 @@ register RkcContext *cx ;
   return -1;
 }
 
+
 static
-dictionary_list(proto, con, dicnames, mxi)
-int proto, con;
-char *dicnames ;
-int mxi;
+int dictionary_list( int proto, int con, char* dicnames, int mxi)
 {
   int res;
 
@@ -1739,23 +1672,16 @@ int mxi;
   return -1;
 }
 
-static rkcw_dictionary_list pro((RkcContext *, char *, int));
 
 static
-rkcw_dictionary_list( cx, dicnames, mxi)
-register RkcContext *cx ;
-char *dicnames ;
-int mxi ;
+int rkcw_dictionary_list( RkcContext* cx, char* dicnames, int mxi)
 {
   return dictionary_list(wGetDictionaryList, (int)cx->server, dicnames, mxi);
 }
 
+
 static
-define_dic(proto, cx, dicname, wordrec)
-int proto;
-register RkcContext *cx ;
-char *dicname ;
-Ushort *wordrec ;
+int define_dic( int proto, RkcContext* cx, char* dicname, cannawc* wordrec)
 {
   int reply;
 
@@ -1766,34 +1692,23 @@ Ushort *wordrec ;
   return -1;
 }
 
-static rkcw_define_dic pro((RkcContext *, char *, Ushort *));
 
 static
-rkcw_define_dic( cx, dicname, wordrec)
-register RkcContext *cx ;
-char *dicname ;
-Ushort *wordrec ;
+int rkcw_define_dic( RkcContext* cx, char* dicname, cannawc* wordrec)
 {
   return define_dic(wDefineWord, cx, dicname, wordrec);
 }
 
-static rkcw_delete_dic pro((RkcContext *, char *, Ushort *));
 
 static
-rkcw_delete_dic( cx,  dicname, wordrec)
-register RkcContext *cx ;
-char *dicname ;
-Ushort *wordrec ;
+int rkcw_delete_dic( RkcContext* cx, char* dicname, cannawc* wordrec)
 {
   return define_dic(wDeleteWord, cx, dicname, wordrec);
 }
 
-static mount_dictionary pro((int, int, int, char *, int));
 
 static
-mount_dictionary(majo, mino, context, data, mode)
-int majo, mino, context, mode ;
-char *data;
+int mount_dictionary( int majo, int mino, int context, char* data, int mode)
 {
   int reply;
 
@@ -1804,46 +1719,31 @@ char *data;
   return -1;
 }
 
-static rkcw_mount_dictionary pro((RkcContext *, char *, int));
 
 static
-rkcw_mount_dictionary( cx, dicname, mode )
-register RkcContext *cx ;
-char *dicname ;
-int  mode ;
+int rkcw_mount_dictionary( RkcContext* cx, char* dicname, int mode )
 {
   return mount_dictionary(wMountDictionary, 0, (int)cx->server, dicname, mode);
 }
 
-static rkcw_umount_dictionary pro((RkcContext *, char *));
 
 static
-rkcw_umount_dictionary( cx, dicname )
-register RkcContext *cx ;
-char *dicname ;
+int rkcw_umount_dictionary( RkcContext* cx, char* dicname )
 {
   return mount_dictionary(wUnmountDictionary, 0, (int)cx->server, dicname, 0);
 }
 
-static rkcw_remount_dictionary pro((RkcContext *, char *, int));
 
 static
-rkcw_remount_dictionary( cx, dicname, where )
-register RkcContext *cx ;
-char *dicname ;
-int where ;
+int rkcw_remount_dictionary( RkcContext* cx, char* dicname, int where )
 {
   return mount_dictionary(wRemountDictionary, 0,
 			  (int)cx->server, dicname, where);
 }
 
-static rkcw_mount_list pro((RkcContext *, char *, int));
 
 static
-rkcw_mount_list( cx, dicnames, mxi)
-register RkcContext *cx ;
-char *dicnames ;
-int mxi;
+int rkcw_mount_list( RkcContext* cx, char* dicnames, int mxi)
 {
   return dictionary_list(wGetMountDictionaryList,
 			 (int)cx->server, dicnames, mxi);
@@ -1862,9 +1762,7 @@ int maxddname ;
 #endif
 
 static
-end_convert(proto, cx, n, mod)
-int proto, n, mod;
-RkcContext *cx;
+int end_convert( int proto, RkcContext* cx, int n, int mod)
 {
   int reply;
 
@@ -1875,39 +1773,29 @@ RkcContext *cx;
   return -1;
 }
 
-static rkcw_convert_end pro((RkcContext *, int));
 
 static
-rkcw_convert_end( cx, mode )
-RkcContext *cx ;
-int mode ;
+int rkcw_convert_end( RkcContext* cx, int mode )
 {
   return end_convert(wEndConvert, cx, cx->maxbun, mode);
 }
 
-static convStore pro((int, BYTE *, int, BYTE *));
 
 static
-convStore(n, data, len, dest)
-int n, len;
-BYTE *data, *dest;
+int convStore( int n, BYTE* data, int len, BYTE* dest)
 {
   RkcContext *cx = (RkcContext *)dest;
 
   if (firstKouhoStore(n, data, len, (BYTE *)cx) < 0) {
-    rkcw_convert_end(cx, 0); /* ¥µ¡¼¥ĞÂ¦¤âRkBgnBun¤ò½ªÎ» */
+    rkcw_convert_end(cx, 0); /* ã‚µãƒ¼ãƒå´ã‚‚RkBgnBunã‚’çµ‚äº† */
     return -1;
   }
   return n;
 }
 
-static rkcw_convert pro((RkcContext *, Ushort *, int, int));
 
 static
-rkcw_convert( cx, yomi, length, mode )
-RkcContext *cx ;
-int length ,mode;
-Ushort *yomi ;
+int rkcw_convert( RkcContext* cx, cannawc* yomi, int length, int mode )
 {
   int n;
 
@@ -1919,19 +1807,15 @@ Ushort *yomi ;
   return -1;
 }
 
+
 /*
  get_yomi()
 
- storefunc ¤Ë 0 ¤ò¤¤¤ì¤¿¤é¤É¤¦¤Ê¤ë¤«ÃÎ¤é¤Ê¤¤¤«¤é¤Í¡£
+ storefunc ã« 0 ã‚’ã„ã‚ŒãŸã‚‰ã©ã†ãªã‚‹ã‹çŸ¥ã‚‰ãªã„ã‹ã‚‰ã­ã€‚
  */
-
-static get_yomi
-  pro((int, int, int, int (*)(int, BYTE *, int, BYTE *), BYTE *));
-
 static
-get_yomi(proto, context, curbun, storefunc, yomibuf)
-int proto, context, curbun, (*storefunc) pro((int, BYTE *, int, BYTE *));
-BYTE *yomibuf;
+int get_yomi( int proto, int context, int curbun,
+              int (*storefunc)(int, BYTE*, int, BYTE*), BYTE* yomibuf)
 {
   int n;
 
@@ -1942,13 +1826,9 @@ BYTE *yomibuf;
   return -1;
 }
 
-static yomiStore pro((int, BYTE *, int, BYTE *));
 
 static
-yomiStore(n, data, len, destb)
-int n, len;
-BYTE *data;
-BYTE *destb;
+int yomiStore( int n, BYTE* data, int len, BYTE* destb)
 {
   Ushort *dest = (Ushort *)destb;
 
@@ -1963,24 +1843,17 @@ BYTE *destb;
   return 0;
 }
 
-static rkcw_get_yomi pro((RkcContext *, Ushort *));
 
 static
-rkcw_get_yomi( cx, yomip ) /* yomip ¤Î¥µ¥¤¥º¤ÏÌµ¸ÂÂç¤«¤è¡© */
-register RkcContext *cx ;
-Ushort *yomip ;
-{		
+int rkcw_get_yomi( RkcContext* cx, cannawc* yomip ) /* yomip ã®ã‚µã‚¤ã‚ºã¯ç„¡é™å¤§ã‹ã‚ˆï¼Ÿ */
+{
   return get_yomi(wGetYomi, (int)cx->server, cx->curbun,
 		  yomiStore, (BYTE *)yomip);
 }
 
-static kanjilistStore pro((int, BYTE *, int, BYTE *));
 
 static
-kanjilistStore(n, data, len, dest)
-int n, len;
-BYTE *data, *dest;
-/* ARGSUSED */
+int kanjilistStore( int n, BYTE* data, int len, BYTE* dest)
 {
   Ushort *p, *wp;
 
@@ -2000,12 +1873,10 @@ BYTE *data, *dest;
   }
 }
 
-static rkcw_get_kanji_list pro((RkcContext *));
 
 static
-rkcw_get_kanji_list( cx )
-register RkcContext *cx ;
-{		
+int rkcw_get_kanji_list( RkcContext* cx )
+{
     RkcBun *bun = &cx->bun[ cx->curbun ] ;
 
     return get_yomi(wGetCandidacyList, (int)cx->server, cx->curbun,
@@ -2041,7 +1912,7 @@ Ushort *yomi ;
   if (maxyomi < wlen) wlen = maxyomi;
 
   if (SendType11Request(proto, 0, (int)cx->server, cx->curbun, yomi, wlen)
-      == 0 && 
+      == 0 &&
       RecvType7Reply(&n, firstKouhoStore, (BYTE *)cx) == 0) {
     return n;
   }
@@ -2082,9 +1953,9 @@ char *reqnames;
     }
     datalen++;
 
-    /* Request Names ¤Ï '\0' ¤ò´Ş¤àÊ¸»úÎó¤Ç¤¢¤ë¤¿¤á¥Ñ¥±¥Ã¥È¤ËºÜ¤»¤ë¤Ù¤­
-       Âç¤­¤µ¤¬È½¤ê¤Ë¤¯¤¤¤Î¤ÇÁ´ÂÎ¤ÎÂç¤­¤µ¤ò datalen ¤Ë»ØÄê¤¹¤ë¡¥ */
-    /* ºÇ¸å¤ËÍ¾·×¤Ê1¥Ğ¥¤¥È¤¬ÉÕ¤¯¡£¤È¤ê¤¢¤¨¤º¤³¤Î¥Ğ¥¤¥È¤Ï0¤Ë¤·¤Æ¤ª¤¯¡£ */
+    /* Request Names ã¯ '\0' ã‚’å«ã‚€æ–‡å­—åˆ—ã§ã‚ã‚‹ãŸã‚ãƒ‘ã‚±ãƒƒãƒˆã«è¼‰ã›ã‚‹ã¹ã
+       å¤§ãã•ãŒåˆ¤ã‚Šã«ãã„ã®ã§å…¨ä½“ã®å¤§ãã•ã‚’ datalen ã«æŒ‡å®šã™ã‚‹ï¼ */
+    /* æœ€å¾Œã«ä½™è¨ˆãª1ãƒã‚¤ãƒˆãŒä»˜ãã€‚ã¨ã‚Šã‚ãˆãšã“ã®ãƒã‚¤ãƒˆã¯0ã«ã—ã¦ãŠãã€‚ */
     if (SendType17Request(wQueryExtensions, 0, reqnames, datalen + 1) == 0 &&
 	RecvType2Reply(&reply) == 0) {
       return reply;
@@ -2116,7 +1987,7 @@ int size ;
 	return( -1 ) ;
 
     if (SendType18Request(extension_base + wListDictionary,
-			  1, (int)cx->server, 
+			  1, (int)cx->server,
 			  (char *)dirname, slen, (char *)0, 0, size)
 	== 0 &&
         RecvType6Reply((BYTE *)dicnames_return, size, &n) == 0) {
@@ -2181,11 +2052,11 @@ int mode;
   return -1;
 }
 
-/* Copy Dic ¤³¤³¤«¤é */
+/* Copy Dic ã“ã“ã‹ã‚‰ */
 
 /*
-  Protocol Version 3.2 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
-  ¤³¤Î¥Á¥§¥Ã¥¯¤Ï rkc.c ¤Ç¹Ô¤Ê¤¦¤³¤È¡£
+  Protocol Version 3.2 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
+  ã“ã®ãƒã‚§ãƒƒã‚¯ã¯ rkc.c ã§è¡Œãªã†ã“ã¨ã€‚
  */
 
 static rkcw_copy_dictionary pro((RkcContext *, char *, char *, char *, int));
@@ -2202,21 +2073,21 @@ int mode;
   if( extension_base < 0 )
       return( -1 ) ;
 
-  if (SendType21Request(extension_base + wCopyDictionary, 1, mode, 
+  if (SendType21Request(extension_base + wCopyDictionary, 1, mode,
                 (int)cx->server, dir, dic, newdic) == 0 &&
                                 RecvType2Reply(&reply) == 0){
     return reply;
   }
   return -1;
 }
-/* ¤³¤³¤Ş¤Ç */
+/* ã“ã“ã¾ã§ */
 /* ARGSUSED */
 
 static rkcw_get_text_dictionary
   pro((RkcContext *, char *, char *, Ushort *, int));
 
 static
-rkcw_get_text_dictionary( cx, dirname, dicname, info, infolen )	
+rkcw_get_text_dictionary( cx, dirname, dicname, info, infolen )
 register RkcContext *cx ;
 char *dirname, *dicname ;
 Ushort *info ;
@@ -2275,7 +2146,7 @@ RkStat *dest;
     data += SIZEOFLONG;
     dest->diccand = (int)L4TOL(data);	/* jisho ni aru kouho suu */
     data += SIZEOFLONG;
-    dest->ylen = (int)L4TOL(data);	/* yomigana no nagasa (in byte) */ 
+    dest->ylen = (int)L4TOL(data);	/* yomigana no nagasa (in byte) */
     data += SIZEOFLONG;
     dest->klen = (int)L4TOL(data);	/* kanji no nagasa (in byte) */
     data += SIZEOFLONG;
@@ -2313,7 +2184,7 @@ RkLex *dest;
   int i;
 
   for (i = 0; i < n; i++, dest++) {
-    dest->ylen = (int)L4TOL(data);	/* yomigana no nagasa (in byte) */ 
+    dest->ylen = (int)L4TOL(data);	/* yomigana no nagasa (in byte) */
     data += SIZEOFLONG;
     dest->klen = (int)L4TOL(data);	/* kanji no nagasa (in byte) */
     data += SIZEOFLONG;
@@ -2347,7 +2218,7 @@ RkLex *info;
     return retval;
 }
 
-/* Ãà¼¡ÊÑ´¹¤ËÉ¬Í×¤Ê´Ø¿ô */
+/* é€æ¬¡å¤‰æ›ã«å¿…è¦ãªé–¢æ•° */
 
 static rkcw_autoconv pro((RkcContext *, int, int));
 
@@ -2389,7 +2260,7 @@ static rkcw_flush_yomi pro((RkcContext *));
 static
 rkcw_flush_yomi( cx )
 register RkcContext *cx ;
-{		
+{
   int n;
 
   if (SendType10Request(wFlushYomi, 0, cx, cx->maxbun, 0) == 0 &&
@@ -2432,13 +2303,13 @@ int mode ;
     if( stat < 0 )
 	return( -1 );
 
-    /* ºï½ü¤¹¤Ù¤­¥Ğ¥Ã¥Õ¥¡¤ÎÂç¤­¤µ¤òÄ´¤Ù¤ë */
+    /* å‰Šé™¤ã™ã¹ããƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã‚’èª¿ã¹ã‚‹ */
     len = 0;
     curbun = cx->curbun + 1;
     for( i = 0; i < curbun; i++ )
 	len += ushortstrlen( first_kouho + len ) + 1;
- 
-    /* ¥³¥Ô¡¼¤¹¤Ù¤­¥Ğ¥Ã¥Õ¥¡¤ÎÂç¤­¤µ¤òÄ´¤Ù¤ë */
+
+    /* ã‚³ãƒ”ãƒ¼ã™ã¹ããƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã‚’èª¿ã¹ã‚‹ */
     first_kouho += len;
     len = 0;
     for( i = curbun; i < cx->maxbun; i++ )
@@ -2447,7 +2318,7 @@ int mode ;
     if( len > 0 ){
 	if( !(return_kouho = (Ushort *)malloc( len * SIZEOFSHORT )) )
 	    return( -1 );
-  
+
 	bcopy( first_kouho, return_kouho, len * SIZEOFSHORT );
 	free( (char *)cx->Fkouho );
 	cx->Fkouho = return_kouho;
@@ -2632,8 +2503,8 @@ char *apname;
 }
 
 /*
-  Protocol Version 3.2 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
-  ¤³¤Î¥Á¥§¥Ã¥¯¤Ï rkc.c ¤Ç¹Ô¤Ê¤¦¤³¤È¡£
+  Protocol Version 3.2 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
+  ã“ã®ãƒã‚§ãƒƒã‚¯ã¯ rkc.c ã§è¡Œãªã†ã“ã¨ã€‚
  */
 
 static rkcw_notice_group_name pro((RkcContext *, char *));
@@ -2647,8 +2518,8 @@ char *groupname;
 }
 
 /*
-  Protocol Version 3.2 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
-  ¤³¤Î¥Á¥§¥Ã¥¯¤Ï rkc.c ¤Ç¹Ô¤Ê¤¦¤³¤È¡£
+  Protocol Version 3.2 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
+  ã“ã®ãƒã‚§ãƒƒã‚¯ã¯ rkc.c ã§è¡Œãªã†ã“ã¨ã€‚
  */
 
 static rkcw_chmod_dic pro((RkcContext *, char *, int));

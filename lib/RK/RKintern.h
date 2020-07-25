@@ -201,11 +201,13 @@ typedef union _rkunion {
 #define s_to_bst	s_to_bst2
 
 #define	L4TOL(l4)\
-	(((((((unsigned long)(l4)[0]<<8)|(l4)[1])<<8) | (l4)[2])<<8)|(l4)[3])
+	(((((((uint32_t)(l4)[0]<<8)|(l4)[1])<<8) | (l4)[2])<<8)|(l4)[3])
+
 #define	L3TOL(l3)\
 	(((((unsigned long)(l3)[0]<<8)|(l3)[1])<<8) | (l3)[2])
 #define	S2TOS(s2)	(((unsigned short)(s2)[0]<<8)|(s2)[1])
-#define	LTOL4(l, l4)	{\
+
+#define	LTOL4(l, l4)	{                               \
 	(l4)[0] = LOMASK((l)>>24); (l4)[1] = LOMASK((l)>>16);\
 	(l4)[2] = LOMASK((l)>> 8); (l4)[3] = LOMASK((l));\
 	}
@@ -947,7 +949,7 @@ struct RkDST {
   int (*d_io) /* jisho he tango to cache no io */
     pro((struct DM *, struct ncache *, int));
   int (*d_ctl)	/* jisho koyuuno sousa */
-    pro((struct DM *, struct DM *, int, Wchar *, struct RkKxGram *));
+    pro((struct DM *, struct DM *, int, const cannawc*, struct RkKxGram *));
   int (*d_sync) /* jisho sync suru */
     pro((struct RkContext *, struct DM *, struct DM *));
 };
@@ -1025,13 +1027,14 @@ Wrec* RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
                   unsigned char* dst, unsigned maxdst);
 
 // ngram.c
-Wrec* RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
+unsigned char* RkParseOWrec(struct RkKxGram* gram, const cannawc* src,
+                      unsigned char* dst,
              unsigned maxdst, unsigned long* lucks);
 
 cannawc* RkUparseGramNum(struct RkKxGram* gram, int row, cannawc* dst,
                          int maxdst);
 
-cannawc* RkParseGramNum(struct RkKxGram* gram, cannawc* src, int* row);
+const cannawc* RkParseGramNum(struct RkKxGram* gram, const cannawc* src, int* row);
 
 #define allocStr  strdup
 
@@ -1242,7 +1245,7 @@ extern size_t WStrlen pro((const cannawc* s));
 //int uslen pro((Wchar *));
 //#define ushortstrlen WStrlen
 
-extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, int n));
+extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, size_t n));
 #define usncopy WStrncpy
 
 //#define ushort2euc CNvW2E

@@ -389,8 +389,8 @@ RkGetGramNum(struct RkKxGram* gram, const char* name)
     return -1;
 }
 
-static cannawc*
-skip_space(cannawc* src)
+static const cannawc*
+skip_space(const cannawc* src)
 {
     assert(src);
 
@@ -403,7 +403,7 @@ skip_space(cannawc* src)
 }
 
 static int
-skip_until_space(cannawc* src, cannawc** next)
+skip_until_space(const cannawc* src, const cannawc** next)
 {
     assert(src);
 
@@ -426,18 +426,19 @@ skip_until_space(cannawc* src, cannawc** next)
 }
 
 static int
-wstowrec(struct RkKxGram* gram, cannawc* src, Wrec* dst, unsigned maxdst,
+wstowrec(struct RkKxGram* gram, const cannawc* src, Wrec* dst, unsigned maxdst,
          unsigned* yomilen, unsigned* wlen, unsigned long* lucks)
 {
     Wrec		*odst = dst;
-    cannawc *yomi, *kanji;
+    const cannawc *yomi;
+    const cannawc *kanji;
   int		klen, ylen, ncand, row = 0, step = 0, spec = 0;
   unsigned	frq;
 
   lucks[0] = lucks[1] = 0L;
   ncand = 0;
   *yomilen = *wlen = 0;
-  yomi = skip_space(src);
+    yomi = skip_space(src);
   ylen = skip_until_space(yomi, &src);
   if (!ylen || ylen > RK_KEY_WMAX)
     return(0);
@@ -463,7 +464,7 @@ wstowrec(struct RkKxGram* gram, cannawc* src, Wrec* dst, unsigned maxdst,
       return(0);
     kanji = src;
     klen = skip_until_space(src, &src);
-    if (klen == 1 && *kanji == (Wchar)'@') {
+    if (klen == 1 && *kanji == (cannawc)'@') {
       klen = ylen;
       kanji = yomi;
     }
@@ -477,7 +478,7 @@ wstowrec(struct RkKxGram* gram, cannawc* src, Wrec* dst, unsigned maxdst,
     for (; klen > 0 ; klen--, kanji++) {
       if (*kanji == RK_ESC_CHAR) {
 	if (!*++kanji) {
-	  return(0);
+            return 0;
 	}
       }
       *dst++ = (Wrec)((*kanji >> 8) & 0xff);
@@ -494,7 +495,8 @@ wstowrec(struct RkKxGram* gram, cannawc* src, Wrec* dst, unsigned maxdst,
 
 
 static Wrec *
-fil_wc2wrec_flag(Wrec* wrec, unsigned* wreclen, unsigned ncand, cannawc* yomi,
+fil_wc2wrec_flag(Wrec* wrec, unsigned* wreclen, unsigned ncand,
+                 const cannawc* yomi,
                  unsigned ylen, unsigned left)
 {
   Wrec		*owrec = wrec;
@@ -612,8 +614,8 @@ RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
 }
 
 
-Wrec*
-RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
+unsigned char*
+RkParseOWrec(struct RkKxGram* gram, const cannawc* src, unsigned char* dst,
              unsigned maxdst, unsigned long* lucks)
 {
   unsigned	wreclen, wlen, ylen, nc;
@@ -645,8 +647,8 @@ RkParseOWrec(struct RkKxGram* gram, cannawc* src, unsigned char* dst,
 }
 
 
-cannawc*
-RkParseGramNum(struct RkKxGram* gram, cannawc* src, int* row)
+const cannawc*
+RkParseGramNum(struct RkKxGram* gram, const cannawc* src, int* row)
 {
     int		rnum;
     cannawc* ws;

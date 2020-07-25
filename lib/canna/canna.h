@@ -875,7 +875,7 @@ extern cannawc* WStrcat pro((cannawc* dest, const cannawc* src));
 
 extern cannawc* WStrcpy pro((cannawc* dest, const cannawc* src));
 
-extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, int n));
+extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, size_t n));
 
 extern int WStrncmp pro((const cannawc* s1, const cannawc* s2, int n));
 

@@ -64,7 +64,7 @@ AC_CHECK_SIZEOF(wchar_t)
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
 
 # DEBUG
-test -z "$GCC" || CFLAGS="$CFLAGS -Wall"  
+test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra"  
 
 AC_CONFIG_FILES([
   Makefile

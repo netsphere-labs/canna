@@ -668,7 +668,7 @@ RkwDeleteDic(int cxnum, char* dicname, cannawc* wordrec)
 }
 
 int
-RkwMountDic( int cxnum, char* dicname, int mode)
+RkwMountDic( int cxnum, const char* dicname, int mode)
 {
     RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
@@ -719,7 +719,7 @@ RkwGetMountList(int cxnum, char* dicnames_return, int max)
 
 /* サーチパスを設定 */
 int
-RkwSetDicPath( int cxnum, char* path )
+RkwSetDicPath( int cxnum, const char* path )
 {
     return( 0 ) ;
 }
@@ -1005,12 +1005,18 @@ _RkwGetKanji( int cxnum, cannawc* kanji, int maxkanji )
 
 
 // ただのコピー.
+// @param dlen dst の大きさ.
+// @return ナル終端を含まない要素数.
 int
 ushort2wchar(const cannawc* src, int slen, cannawc* dst, int dlen)
 {
     assert( src );
-    int len = min(slen, dlen);
+    assert( dst );
+    assert( dlen > 0 );
+
+    int len = min(slen, dlen - 1);
     memmove(dst, src, len * sizeof(cannawc));
+    dst[len] = 0;
 
     return len;
 }
@@ -1903,7 +1909,8 @@ RkwGetSimpleKanji( int cxnum, char* dicname, cannawc* yomi, int maxyomi,
 
 /* S002 */
 int
-RkwQueryDic( int cxnum, char* username, char* dicname, struct DicInfo* status )
+RkwQueryDic( int cxnum, const char* username, char* dicname, struct
+             DicInfo* status )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK );
 
