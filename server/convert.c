@@ -1506,7 +1506,7 @@ size_t len;
 const char *username;
 const char *hostname;
 {
-    int (*ReqCallFunc) pro((char *, int)) ;
+    int (*ReqCallFunc) pro((BYTE *, int)) ;
     register Req0 *req0 = &Request.Request0 ;
     const char *username0 = username ? username : "";
     const char *hostname0 = hostname ? hostname : "";

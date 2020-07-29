@@ -35,19 +35,19 @@ An include file that contains data and function declarations for use by the kana
 Kana-kanji conversion libraries.  Specify "\f4-lcanna\f1" at link time.
 .SH "SUMMARY"
 The dictionary access library provides three major categories of functions:
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Code conversion functions
 .RS
 .P
 Convert character string codes between double-width and single-width characters and between hiragana and katakana.  External data and initialization procedures are not required.
 .RE
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Romaji-kana conversion functions
 .RS
 .PP
 Convert Romaji to kana by using a Romaji-kana conversion table that defines the correspondence between Romaji and kana.  The rules of Romaji-kana conversion can be altered by making modifications to this table.
 .RE
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Kana-kanji conversion functions
 .RS
 .P
@@ -55,7 +55,7 @@ Convert kana to kanji through continuous clause conversion by using a kana-kanji
 .RE
 .P
 Among all the functions of Japanese input processing, this library performs only data conversion.  To be able to enter Japanese text from a keyboard, therefore, it is necessary for users to write a keyboard handling routine within the application program.  
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Code conversion functions
 .RS
 .IP "\f4Rk(w)CvtZen\f1" 22
@@ -69,7 +69,7 @@ Convert double-width katakana to double-width hiragana.
 .IP "\f4RkCvtEuc\f1" 22
 Convert shift JIS code to EUC code.
 .RE
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Romaji-kana conversion functions
 .RS
 .IP "\f4RkOpenRoma\f1" 22
@@ -82,7 +82,7 @@ Romaji-kana conversion dictionary.
 .IP "\f4RkCvtRoma\f1" 22
 Convert an entire character string from Romaji to kana by iteratively using \f4RkMapRoma\f1.
 .RE
-.IP "¡¦" 3
+.IP "ãƒ»" 3
 Kana-kanji conversion functions
 .RS
 .IP "\f4RkInitialize\f1" 22

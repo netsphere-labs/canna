@@ -56,6 +56,7 @@ cannaconf.h: Canna.conf
 	@echo "#define CANNAHOSTFILE '$(cannaLibDir)/cannahost'" >> junkjunk
 	@echo "/* for lib/canna */" >> junkjunk
 	@echo "#define CANNALIBDIR '$(cannaLibDir)'" >> junkjunk
+	@echo "#define CANNASHAREDIR '$(cannaShareDir)'" >> junkjunk
 	@echo "#define SUPPORT_OLD_WCHAR '$(supportOldWchar)'" >> junkjunk
 	@echo "/* for scripts */" >> junkjunk
 	@echo "#define CANNABINDIR $(cannaBinDir)" >> junkjunk
@@ -87,6 +88,7 @@ cannaconf.h: Canna.conf
 	 echo "#define CANNAHOSTFILE \"$(cannaLibDir)/cannahost\"";\
 	 echo "/* for lib/canna */";\
 	 echo "#define CANNALIBDIR \"$(cannaLibDir)\""; \
+	 echo "#define CANNASHAREDIR \"$(cannaShareDir)\""; \
 	 echo "#define SUPPORT_OLD_WCHAR $(supportOldWchar)"; \
 	 echo "/* for scripts */";\
 	 echo "#define CANNABINDIR $(cannaBinDir)"; \

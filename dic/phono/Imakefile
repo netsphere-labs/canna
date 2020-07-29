@@ -28,6 +28,7 @@
        ROMAJI_DIC_DEF = -DSHIFT
 
                DICDIR = $(cannaLibDir)/dic
+	CANNASHAREDIR = $(cannaShareDir)
             SAMPLEDIR = $(cannaLibDir)/sample
          SAMPLESRCDIR = $(cannaLibDir)/sample/src
 
@@ -69,7 +70,7 @@ AllTarget($(ROMKANA_TABLES))
 MakeDirectories(install,$(DICDIR))
 MakeDirectories(install,$(SAMPLESRCDIR))
 
-InstallMultiple($(ROMKANA_TABLES),$(DICDIR))
+InstallMultiple($(ROMKANA_TABLES),$(CANNASHAREDIR))
 
 #ifdef USE_OBSOLETE_STYLE_FILENAME
 InstallNonExec(default.kpdef,$(SAMPLESRCDIR))

@@ -85,6 +85,8 @@ InstallNamedNonExec(necgaiji.t,necgaiji.ctd,$(CANNADICDIR))
 InstallNamedNonExec(kanasmpl.t,kanasmpl.ctd,$(CANNADICDIR))
 InstallNamedNonExec(software.t,software.ctd,$(CANNADICDIR))
 InstallNamedNonExec(chimei.t,chimei.ctd,$(CANNADICDIR))
+InstallNamedNonExec(zipcode.t,zipcode.ctd,$(CANNADICDIR))
+InstallNamedNonExec(geo.t,geo.ctd,$(CANNADICDIR))
 InstallNamedNonExec(hojomwd.t,hojomwd.ctd,$(CANNADICDIR))
 InstallNamedNonExec(hojoswd.t,hojoswd.ctd,$(CANNADICDIR))
 InstallNamedNonExec(suffix.t,suffix.ctd,$(CANNADICDIR))
@@ -97,6 +99,7 @@ install::
 	$(CHOWN) $(cannaOwner) *.ctd ; $(CHGRP) $(cannaGroup) *.ctd
 #else
     TEXTDICS = necgaiji.t kanasmpl.t software.t chimei.t \
+			zipcode.t geo.t \
                hojomwd.t hojoswd.t suffix.t number.t katakana.t keishiki.t
 InstallMultipleFlags($(TEXTDICS),$(CANNADICDIR),-m 0664 $(cannaOwnerGroup))
 #endif

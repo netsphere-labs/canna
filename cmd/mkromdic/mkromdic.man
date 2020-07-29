@@ -2,7 +2,7 @@
 .SH "NAME"
 mkromdic \- To compile romaji-kana conversion table
 .SH "SYNOPSYS"
-.B "mkromdic [\fIoptions\fP ¡Ä] \fIfile\fP"
+.B "mkromdic [\fIoptions\fP â€¦] \fIfile\fP"
 .SH "DESCRIPTION"
 .PP
 .I mkromdic 

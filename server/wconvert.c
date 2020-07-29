@@ -189,7 +189,7 @@ const BYTE *buf;
 size_t size;
 {
     ir_debug( Dmsg(10, "WriteClient:") );
-    ir_debug( DebugDump( 10, buf, size ) );
+    ir_debug( DebugDump( 10, (const char *)buf, size ) );
     return ClientBuf_store_reply(client->client_buf, buf, size);
 }
 #else
@@ -1372,8 +1372,8 @@ ClientPtr *clientp ;
 	/* 以下、パーミッションのチェック */
 	stat = ACCES;
 	if (checkPermissionToRead(client, dirname, (char *)0) >= 0) {
-	  stat = RkwListDic(cxnum, (unsigned char *)dirname,
-			    (unsigned char *)dicnames, requestsize);
+	  stat = RkwListDic(cxnum, (char *)dirname,
+			    (char *)dicnames, requestsize);
 	}
 
       listdicdone:
@@ -1403,7 +1403,7 @@ ClientPtr *clientp ;
 	ir_debug( Dmsg(5, "dicname = %s\n",
 		       (req->dicname)?req->dicname:null) );
 
-	stat = (char)RkwCreateDic(cxnum, (unsigned char *)req->dicname,
+	stat = (char)RkwCreateDic(cxnum, (char *)req->dicname,
 				  req->mode);
     }
 
@@ -1438,7 +1438,7 @@ ClientPtr *clientp ;
 	ir_debug( Dmsg(5, "dicname = %s\n",
 		       (req->dicname)?req->dicname:null) );
 
-	stat = (char)RkwRemoveDic(cxnum, (unsigned char *)req->dicname,
+	stat = (char)RkwRemoveDic(cxnum, (char *)req->dicname,
 				  req->mode);
     }
 
@@ -1456,8 +1456,8 @@ ClientPtr *clientp ;
 
     if (validcontext(cxnum, client, wRenameDictionary)) {
 	diclen = strlen(req->dicname) + 1 ;
-	stat = RkwRenameDic(cxnum, (unsigned char *)req->dicname,
-			    (unsigned char *)&(req->dicname)[diclen],
+	stat = RkwRenameDic(cxnum, (char *)req->dicname,
+			    (char *)&(req->dicname)[diclen],
 			    req->mode);
     }
     return SendType2Reply(client, wRenameDictionary, EXTPROTO, stat);
@@ -1950,8 +1950,8 @@ ClientPtr *clientp ;
       ir_debug( Dmsg(5, "dicname = %s\n", Request.type15.dicname) );
       ir_debug( Dmsg(5, "username = %s\n", username) );
       
-      stat = (RkwQueryDic(cxnum, (unsigned char *)username,
-			  (unsigned char *)Request.type15.dicname,
+      stat = (RkwQueryDic(cxnum, (char *)username,
+			  (char *)Request.type15.dicname,
 			  dicinfo) < 0) ? -1 : 0;
       
       if (stat < 0) {
@@ -2122,12 +2122,12 @@ ClientPtr *clientp;
   char *buf = (char *)0;
 
   if (validcontext(cxnum, client, wThrough)) {
-    buf = malloc((int)Request.type20.bufsize);
+    content_size = Request.type20.datalen - (SIZEOFINT * 2 + SIZEOFSHORT);
+    buf = malloc(content_size);
     if (buf) {
-      content_size = Request.type20.datalen - (SIZEOFINT * 2 + SIZEOFSHORT);
       bcopy(Request.type20.buf, buf, content_size);
       stat = size = RkThrough(cxnum, Request.type20.command,
-			      buf, content_size, (int)Request.type20.bufsize);
+			      buf, content_size, content_size);
     }
   }
   retval = SendType6Reply(client, wThrough, EXTPROTO, stat, buf, size);
