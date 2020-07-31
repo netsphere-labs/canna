@@ -1,3 +1,5 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,60 +14,66 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* sccs_id[]="@(#) NEC UNIX( PC-UX/EWS-UX ) rkc.h 2.4 91/11/11 12:01:18"; */
 /* #ident	"@(#) NEC/V(386) R3.0B rkc.h 5.9 90/03/26 21:04:36" */
 /* $Id: rkc.h,v 1.5 2003/09/17 08:50:53 aida_s Exp $ */
 
-#if defined(ENGINE_SWITCH)
-#include "RKrename.h"
-#endif
+#include "canna/ccompat.h"
+#include "canna/rkcapi.h"
 
-#include "ccompat.h"
-#include "rkcapi.h"
+// Internal APIs.
+#include "canna/sglobal.h"
 
-/*  ∏¿·æ Û•Ï•≥°º•…
+/* ÊñáÁØÄÊÉÖÂ†±„É¨„Ç≥„Éº„Éâ
  *
  */
 
 #define MAX_HOSTNAME	256
 
 typedef struct _RkcBun {
-    unsigned short  *kanji  ;	/* ¬Ë∞Ï∏ı ‰§ﬁ§ø§œ¡¥∏ı ‰ŒÛ */
-    short	    curcand ;	/* •´•Ï•Û•»¥¡ª˙∏ı ‰»÷πÊ */
-    short	    maxcand ;	/* ¥¡ª˙∏ı ‰¡ÌøÙ */
-    short	    flags   ;	/* •’•È•∞ */
+    cannawc* kanji  ;	/* Á¨¨‰∏ÄÂÄôË£ú„Åæ„Åü„ÅØÂÖ®ÂÄôË£úÂàó */
+    short	    curcand ;	/* „Ç´„É¨„É≥„ÉàÊº¢Â≠óÂÄôË£úÁï™Âè∑ */
+    short	    maxcand ;	/* Êº¢Â≠óÂÄôË£úÁ∑èÊï∞ */
+    short	    flags   ;	/* „Éï„É©„Ç∞ */
 #define NOTHING_KOUHO	 0x00
-#define FIRST_KOUHO	0x01	   /* kanji§œ¿Ë∆¨∏ı ‰§Œ§ﬂ */
-#define NUMBER_KOUHO	0x02	   /* kanji§œ∏ı ‰∞ÏÕ˜§Œ•›•§•Û•ø */
-} RkcBun ;			   /* §≥§ŒæÏπÁ°¢curcand§œ0,maxcand§œ1 */
+#define FIRST_KOUHO	0x01	   /* kanji„ÅØÂÖàÈ†≠ÂÄôË£ú„ÅÆ„Åø */
+#define NUMBER_KOUHO	0x02	   /* kanji„ÅØÂÄôË£ú‰∏ÄË¶ß„ÅÆ„Éù„Ç§„É≥„Çø */
+} RkcBun ;			   /* „Åì„ÅÆÂ†¥Âêà„ÄÅcurcand„ÅØ0,maxcand„ÅØ1 */
 
 
 /*
- *  •Ø•È•§•¢•Û•»•≥•Û•∆•Ø•π•»•Ï•≥°›•…
+ *  „ÇØ„É©„Ç§„Ç¢„É≥„Éà„Ç≥„É≥„ÉÜ„ÇØ„Çπ„Éà„É¨„Ç≥‚àí„Éâ
  *
  */
 typedef struct _RkcContext {
-    short	    server ;  /* •µ°›•–°¶•≥•Û•∆•Ø•π•»»÷πÊ */
-    short	    client ;  /* •Ø•È•§•¢•Û•»°¶•≥•Û•∆•Ø•π•»»÷πÊ */
-    RkcBun	    *bun   ;  /*  ∏¿·æ Û•Ï•≥°º•…«€ŒÛ§ÿ§Œ•›•§•Û•ø */
-    unsigned short *Fkouho ; /* ¬Ë∞Ï∏ı ‰ŒÛ§ÿ§Œ•›•§•Û•ø */
-    short	    curbun ;  /* •´•Ï•Û•» ∏¿·»÷πÊ */
-    short	    maxbun ;  /*  ∏¿·¡ÌøÙ */
-    short	    bgnflag ; /* RkBgnBun§Œ•’•È•∞ */
-    unsigned short *lastyomi;
+    short	    server ;  /* „Çµ‚àí„Éê„Éª„Ç≥„É≥„ÉÜ„ÇØ„Çπ„ÉàÁï™Âè∑ */
+    short	    client ;  /* „ÇØ„É©„Ç§„Ç¢„É≥„Éà„Éª„Ç≥„É≥„ÉÜ„ÇØ„Çπ„ÉàÁï™Âè∑ */
+    RkcBun	    *bun   ;  /* ÊñáÁØÄÊÉÖÂ†±„É¨„Ç≥„Éº„ÉâÈÖçÂàó„Å∏„ÅÆ„Éù„Ç§„É≥„Çø */
+    cannawc* Fkouho ; /* Á¨¨‰∏ÄÂÄôË£úÂàó„Å∏„ÅÆ„Éù„Ç§„É≥„Çø */
+    short	    curbun ;  /* „Ç´„É¨„É≥„ÉàÊñáÁØÄÁï™Âè∑ */
+    short	    maxbun ;  /* ÊñáÁØÄÁ∑èÊï∞ */
+    short	    bgnflag ; /* RkBgnBun„ÅÆ„Éï„É©„Ç∞ */
+    cannawc* lastyomi;
     short	    maxyomi;
 } RkcContext ;
 
-extern int ushort2euc(), euc2ushort(), ushort2wchar(), wchar2ushort(),
-    wcharstrlen(), ushortstrlen(), ushortstrcpy() ;
+//#define ushort2euc CNvW2E
+
+int
+euc2ushort(const unsigned char* src, int srclen, cannawc* dest, int destlen);
+
+//#define wcharstrlen WStrlen
+//#define ushortstrlen WStrlen
+
+extern int ushortstrcpy(cannawc* wdest, const cannawc* wsrc) ;
 
 typedef long (*initialize_t) pro((char *));
 typedef int (*finalize_t) pro((void));
@@ -73,31 +81,31 @@ typedef int (*close_context_t) pro((RkcContext *));
 typedef int (*create_context_t) pro((void));
 typedef int (*duplicate_context_t) pro((RkcContext *));
 typedef int (*dictionary_list_t) pro((RkcContext *, char *, int));
-typedef int (*define_dic_t) pro((RkcContext *, char *, Ushort *));
-typedef int (*delete_dic_t) pro((RkcContext *, char *, Ushort *));
-typedef int (*mount_dictionary_t) pro((RkcContext *, char *, int));
+typedef int (*define_dic_t) pro((RkcContext *, const char *, cannawc* wordrec));
+typedef int (*delete_dic_t) pro((RkcContext *, char *, cannawc* wordrec));
+typedef int (*mount_dictionary_t) pro((RkcContext *, const char *, int));
 typedef int (*remount_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*umount_dictionary_t) pro((RkcContext *, char *));
 typedef int (*mount_list_t) pro((RkcContext *, char *, int));
-typedef int (*convert_t) pro((RkcContext *, Ushort *, int, int));
+typedef int (*convert_t) pro((RkcContext *, cannawc*, int, int));
 typedef int (*convert_end_t) pro((RkcContext *, int));
 typedef int (*get_kanji_list_t) pro((RkcContext *));
 typedef int (*get_stat_t) pro((RkcContext *, RkStat *));
 typedef int (*resize_t) pro((RkcContext *, int));
-typedef int (*store_yomi_t) pro((RkcContext *, Ushort *, int));
-typedef int (*get_yomi_t) pro((RkcContext *, Ushort *));
+typedef int (*store_yomi_t) pro((RkcContext *, cannawc*, int));
+typedef int (*get_yomi_t) pro((RkcContext *, cannawc*));
 typedef int (*get_lex_t) pro((RkcContext *, int, RkLex *));
 typedef int (*autoconv_t) pro((RkcContext *, int, int));
-typedef int (*subst_yomi_t) pro((RkcContext *, int, int, int, Ushort *, int));
+typedef int (*subst_yomi_t) pro((RkcContext *, int, int, int, cannawc*, int));
 typedef int (*flush_yomi_t) pro((RkcContext *));
-typedef int (*get_last_yomi_t) pro((RkcContext *, Ushort *, int));
+typedef int (*get_last_yomi_t) pro((RkcContext *, cannawc*, int));
 typedef int (*remove_bun_t) pro((RkcContext *, int));
 typedef int (*get_simple_kanji_t)
-    pro((RkcContext *, char *, Ushort *, int, Ushort *, int, Ushort *, int));
+    pro((RkcContext *, char *, cannawc*, int, cannawc*, int, cannawc*, int));
 typedef int (*query_dic_t)
-    pro((RkcContext *, char *, char *, struct DicInfo *));
-typedef int (*get_hinshi_t) pro((RkcContext *, Ushort *, int));
-typedef int (*store_range_t) pro((RkcContext *, Ushort *, int));
+    pro((RkcContext *, const char *, char *, struct DicInfo *));
+typedef int (*get_hinshi_t) pro((RkcContext *, cannawc*, int));
+typedef int (*store_range_t) pro((RkcContext *, cannawc*, int));
 typedef int (*set_locale_t) pro((RkcContext *, char *));
 typedef int (*set_app_name_t) pro((RkcContext *, char *));
 typedef int (*notice_group_name_t) pro((RkcContext *, char *));
@@ -109,8 +117,8 @@ typedef int (*create_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*remove_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*rename_dictionary_t) pro((RkcContext *, char *, char *, int));
 typedef int (*get_text_dictionary_t)
-     pro((RkcContext *, char *, char *, Ushort *, int));
-typedef int (*sync_t) pro((RkcContext *, char *));
+                pro((RkcContext *, const char *, const char *, cannawc*, int));
+typedef int (*sync_t) pro((RkcContext *, const char *));
 typedef int (*chmod_dic_t) pro((RkcContext *, char *, int));
 typedef int (*copy_dictionary_t)
      pro((RkcContext *, char *, char *, char *, int));
@@ -168,9 +176,10 @@ struct rkcproto {
  *		unsigned char	w
  *		unsigned short	wx
  *		unsigned long	wxyz
- */	
+ */
 #define LOMASK(x)	((x)&255)
-#define	LTOL4(l, l4)	{\
+
+#define	LTOL4(l, l4)	{                               \
 	(l4)[0] = LOMASK((l)>>24); (l4)[1] = LOMASK((l)>>16);\
 	(l4)[2] = LOMASK((l)>> 8); (l4)[3] = LOMASK((l));\
 }
@@ -181,7 +190,7 @@ struct rkcproto {
 	(s2)[0] = LOMASK((s)>> 8); (s2)[1] = LOMASK((s));\
 }
 
-#define RK_LINE_BMAX 1024 /* §≥§Ï§œ RKintern.h §Œ§»∆±§∏√Õ§«§ §±§Ï§–§ §È§ §§ */
+#define RK_LINE_BMAX 1024 /* „Åì„Çå„ÅØ RKintern.h „ÅÆ„Å®Âêå„ÅòÂÄ§„Åß„Å™„Åë„Çå„Å∞„Å™„Çâ„Å™„ÅÑ */
 
 #if 0
 #define I16toI32(x) (((x) & 0x8000) ? ((x) | 0xffff8000) : (x))
@@ -197,7 +206,8 @@ struct rkcproto {
 #endif
 
 #define SIZEOFSHORT 2 /* for protocol */
-#define SIZEOFLONG  4 /* for protocol */
+/* for protocol: not 'long' length. */
+#define SIZEOFLONG  4
 
 #define MAX_CX 100
 
@@ -209,4 +219,4 @@ typedef struct {
 
 /* function prototypes .. */
 
-extern rkc_Connect_Iroha_Server pro((char *));
+extern int rkc_Connect_Iroha_Server pro((char *));

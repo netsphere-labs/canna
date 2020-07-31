@@ -12,18 +12,18 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* sccs_id[]="@(#) NEC UNIX( PC-UX/EWS-UX ) rkw.h 2.3 91/11/11 12:01:34"; */
 /* $Id: rkcw.h,v 1.9 2003/09/17 08:50:53 aida_s Exp $ */
 
-#include "cannaconf.h"
+#include "config.h"
 
 #define exp(x) x
 
@@ -35,25 +35,31 @@
 #define DEBUG
 #define UNIXCONN
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
+
 #ifndef CANNAWC_DEFINED
-# define CANNAWC_DEFINED
-# ifdef CANNA_WCHAR16
-typedef canna_uint16_t cannawc;
-# else
-typedef canna_uint32_t cannawc;
-# endif
-#endif
+  #define CANNAWC_DEFINED
+  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
+typedef uint32_t cannawc;
+    #undef CANNA_WCHAR16
+    #undef WCHAR16
+  #else
+typedef uint16_t cannawc;
+    #define CANNA_WCHAR16
+    #define WCHAR16
+  #endif
+#endif // !CANNAWC_DEFINED
 
 
-#ifndef NULL
-#define NULL 0
-#endif
-
-#include "protodefs.h"
+#include "canna/protodefs.h"
 
 /* function prototypes .. */
 
-extern rkcWCinit pro((void));
-extern rkcw_get_server_info pro((int *, int *));
-extern ushortstrncpy pro((Ushort *, Ushort *, int));
+extern int rkcWCinit pro((void));
+extern int rkcw_get_server_info pro((int *, int *));
+
+// widechar.c
+cannawc* WStrncpy(cannawc* ws1, const cannawc* ws2, size_t destsize);
+extern int ushortstrncpy pro((cannawc* wdest, const cannawc* wsrc, int n));
+
+size_t WStrlen(const cannawc* ws);

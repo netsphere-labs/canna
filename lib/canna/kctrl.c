@@ -31,14 +31,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: kctrl.c,v 1.10 2003/09/21 09:08:17 aida_
 #include <sys/types.h>
 #include <canna/mfdef.h>
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
-#endif
-#define wchar_t cannawc
-
 #define DEFAULT_COLUMN_WIDTH	70
 
 extern char *CANNA_initfilename;
@@ -59,11 +51,11 @@ uiContext d;
   int res = 0;
   wcKanjiStatus ks, *pks;
   extern BYTE *initfunc;
-  wchar_t xxxx[10];
+  cannawc xxxx[10];
 
   d->ch = 0;
   d->buffer_return = xxxx;
-  d->n_buffer = sizeof(xxxx) / sizeof(wchar_t);
+  d->n_buffer = sizeof(xxxx) / sizeof(cannawc);
   d->nbytes = 0;
 
   if (initfunc) {
@@ -227,7 +219,7 @@ uiContext d;
 		   NO_CALLBACK, NO_CALLBACK) == (struct callback *)NULL)
     return NoMoreMemory();
 
-  yc = newYomiContext((wchar_t *)NULL, 0, /* 結果は格納しない */
+  yc = newYomiContext((cannawc *)NULL, 0, /* 結果は格納しない */
 		      CANNA_NOTHING_RESTRICTED,
 		      (int)!CANNA_YOMI_CHGMODE_INHIBITTED,
 		      (int)!CANNA_YOMI_END_IF_KAKUTEI,
@@ -638,11 +630,11 @@ freeKeysup()
   for (i = 0 ; i < nkeysup ; i++) {
     if (keysup[i].cand) {
       free((char *)keysup[i].cand);
-      keysup[i].cand = (wchar_t **)0;
+      keysup[i].cand = (cannawc **)0;
     }
     if (keysup[i].fullword) {
       free((char *)keysup[i].fullword);
-      keysup[i].fullword = (wchar_t *)0;
+      keysup[i].fullword = (cannawc *)0;
     }
   }
   nkeysup = 0;
@@ -939,7 +931,7 @@ uiContext d;
 int how;
 {
   int len = 0, totallen = 0;
-  wchar_t *p = d->buffer_return;
+  cannawc *p = d->buffer_return;
   int totalinfo = 0;
   int maxcount = 32;
 
@@ -1053,10 +1045,10 @@ wcKanjiStatusWithValue *arg;
   d->kanji_status_return = arg->ks;
 
   if(arg->ks->length > 0 && arg->ks->echoStr && arg->ks->echoStr[0]) {
-    wchar_t xxxx[ROMEBUFSIZE]; /* BIGARRAY */
+    cannawc xxxx[ROMEBUFSIZE]; /* BIGARRAY */
 
     WStrncpy(xxxx, arg->ks->echoStr, arg->ks->length);
-    xxxx[arg->ks->length] = (wchar_t)0;
+    xxxx[arg->ks->length] = (cannawc)0;
     
     bzero(d->kanji_status_return, sizeof(wcKanjiStatus));
 
@@ -1223,7 +1215,7 @@ unsigned char *arg;
 static
 KC_queryMode(d, arg)
 uiContext d;
-wchar_t *arg;
+cannawc *arg;
 {
   return queryMode(d, arg);
 }
@@ -1287,12 +1279,12 @@ wcKanjiStatusWithValue *arg;
 {
   extern KanjiModeRec yomi_mode, cy_mode;
   coreContext cc;
-  wchar_t *p, *q;
+  cannawc *p, *q;
   int len = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  wchar_t buf[2048];
+  cannawc buf[2048];
 #else
-  wchar_t *buf = (wchar_t *)malloc(sizeof(wchar_t) * 2048);
+  cannawc *buf = (cannawc *)malloc(sizeof(cannawc) * 2048);
   if (!buf) {
     /* This should the 'no more memory' message on the guide line... */
     arg->val = 0;
@@ -1490,7 +1482,7 @@ int fnum;
 {
   int res = 0, tmpres, ginfo = 0;
   int reallyThrough = 1;
-  wchar_t *prevEcho, *prevGEcho;
+  cannawc *prevEcho, *prevGEcho;
   int prevEchoLen = -1, prevRevPos, prevRevLen;
   int prevGEchoLen, prevGRevPos, prevGRevLen;
 
@@ -1733,10 +1725,10 @@ int arg;
 
 static
 countColumns(str)
-wchar_t *str;
+cannawc *str;
 {
   int len = 0;
-  wchar_t *p;
+  cannawc *p;
 
   if (str) {
     for (p = str ; *p ; p++) {
@@ -1788,7 +1780,7 @@ jrListCallbackStruct *arg;
 {
   if (cannaconf.iListCB) {
     d->client_data = (char *)0;
-    d->list_func = (int (*) pro((char *, int, wchar_t **, int, int *)))0;
+    d->list_func = (int (*) pro((char *, int, cannawc **, int, int *)))0;
     return -1;
   }
   if (arg->callback_func) {
@@ -1807,7 +1799,7 @@ jrListCallbackStruct *arg;
   }
   else {
     d->client_data = (char *)0;
-    d->list_func = (int (*) pro((char *, int, wchar_t **, int, int *)))0;
+    d->list_func = (int (*) pro((char *, int, cannawc **, int, int *)))0;
   }
   return 0;
 }
@@ -1984,7 +1976,7 @@ yomiContext yc;
 #if defined(DEBUG)
   char kana[1024], roma[1024], ka[1024], ya[1024], *kanap, *romap, *kap, *yap;
   int len, i, j, k, maxcol, columns, tmp;
-  wchar_t xxx[1024];
+  cannawc xxx[1024];
 
 #define MANYSPACES "                                                  "
 
@@ -2028,7 +2020,7 @@ yomiContext yc;
 	k++;
       }
       WStrncpy(xxx, yc->kana_buffer + i, k - i);
-      xxx[k - i] = (wchar_t)0;
+      xxx[k - i] = (cannawc)0;
       sprintf(kanap, "%ws ", xxx);
       *kap++ = ' ';
       len = strlen(kanap);
@@ -2059,7 +2051,7 @@ yomiContext yc;
 	k++;
       }
       WStrncpy(xxx, yc->romaji_buffer + j, k - j);
-      xxx[k - j] = (wchar_t)0;
+      xxx[k - j] = (cannawc)0;
       sprintf(romap, "%ws ", xxx);
       len = strlen(romap);
       if (columns > maxcol) {
@@ -2382,10 +2374,3 @@ caddr_t arg;
   return kctlfunc[request](d, arg);
 }
 
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/

@@ -1,0 +1,15 @@
+
+*~
+*.log
+
+# config files
+Canna.conf
+
+# autoconf
+autom4te.cache/
+configure.scan
+Makefile.in
+Makefile
+configure
+config.h
+config.status

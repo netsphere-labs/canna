@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: protodefs.h,v 1.6 2003/09/21 12:56:28 aida_s Exp $ */
@@ -43,16 +43,16 @@ typedef unsigned char BYTE;
 
 #define IR_SERVICE_NAME	    "canna"
 #define IR_DEFAULT_PORT	    5680
-#define IR_UNIX_PATH	    IR_UNIX_DIR "/" IR_UNIX_SOCKNAME
+#define IR_UNIX_PATH    "/tmp/.iroha_unix/IROHA"
 #define NAME_LENGTH	    15
 #define HOST_NAME	    15
-			
+
 #define LOMASK(x)	((x)&255)
 #define L4TOL(l4)\
-        ((((((((unsigned long) ((unsigned char)(l4)[0])) << 8) | \
-                ((unsigned long) ((unsigned char)(l4)[1])))  << 8)  | \
-                ((unsigned long) ((unsigned char)(l4)[2])))  << 8)      | \
-                ((unsigned long) ((unsigned char)(l4)[3])))
+        ((((((((uint32_t) ((unsigned char)(l4)[0])) << 8) | \
+                ((uint32_t) ((unsigned char)(l4)[1])))  << 8)  | \
+                ((uint32_t) ((unsigned char)(l4)[2])))  << 8)      | \
+                ((uint32_t) ((unsigned char)(l4)[3])))
 
 #define	L3TOL(l3)\
 	((unsigned long)(((((unsigned char)(l3)[0]<<8)|\

@@ -1,7 +1,12 @@
+
+#
 The whole distribution is under following license agreements. You must
 agree with both of them to use or distribute Canna.
 
-/* Copyright (c) 2002-2004 Canna Project. All rights reserved.
+/* The Author and Contributors:
+ *   Copyright (c) 2002-2004 Canna Project. 
+ *   Copyright 1990-1997 NEC Corporation, Tokyo, Japan.
+ * All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without
@@ -10,7 +15,7 @@ agree with both of them to use or distribute Canna.
  * appear in supporting documentation, and that the name of the
  * author and contributors not be used in advertising or publicity
  * pertaining to distribution of the software without specific, written
- * prior permission.  The author and contributors no representations
+ * prior permission.  The author and contributors makes no representations
  * about the suitability of this software for any purpose.  It is
  * provided "as is" without express or implied warranty.
  *
@@ -23,32 +28,11 @@ agree with both of them to use or distribute Canna.
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* Copyright 1990-1997 NEC Corporation, Tokyo, Japan.
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for any purpose is hereby granted without
- * fee, provided that the above copyright notice appear in all copies
- * and that both that copyright notice and this permission notice
- * appear in supporting documentation, and that the name of NEC
- * Corporation not be used in advertising or publicity pertaining to
- * distribution of the software without specific, written prior
- * permission.  NEC Corporation makes no representations about the
- * suitability of this software for any purpose.  It is provided "as
- * is" without express or implied warranty.
- *
- * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
- * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
- */
 
+#
 Additionary, a component (lib/RKindep/cksum.c) contained in cannaserver and
 some utilities is under following license.
 
-/*-
  * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -63,11 +47,7 @@ some utilities is under following license.
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -82,11 +62,14 @@ some utilities is under following license.
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
 
+
+#
 Canuum is distributed under GNU GPL. See canuum/README.copyright and
 canuum/COPYRIGHT.
 
+
+#
 Pubdic+ is distributed under so-called MIT license. See
 dic/ideo/pubdic/COPYRIGHT (in both Japanese and English).
 

@@ -30,6 +30,7 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #ifdef HAVE_SYSLOG /* !__EMX__ */
 # include <syslog.h>
 #endif
+#include <grp.h> // initgroups()
 
 #ifdef USE_VARARGS
 #ifdef __STDC__
@@ -104,7 +105,7 @@ static int caught_signal = 0;
 static int openlog_done = 0;
 static int rkw_initialize_done = 0;
 
-static void Reset();
+static void Reset(int );
 
 #ifdef INET6
 #define USAGE "Usage: cannaserver [-p num] [-l num] [-u userid] [-syslog] [-inet] [-inet6] [-d] [dichome]"
@@ -120,9 +121,7 @@ Usage()
 extern void getserver_version pro((void));
 
 void
-EarlyInit ( argc, argv )
-int argc;
-char *argv[];	
+EarlyInit ( int argc, char* argv[] )
 {
     char *ddname = (char *)NULL;
     char buf[ MAXDATA ];
@@ -134,9 +133,9 @@ char *argv[];
 
     for( i = 1; i < argc; i++ ) {
 	if( argv[i][0] == '/' ) {
-	    ddname = malloc(strlen(argv[i]) + 1);
+            ddname = (char*) malloc(strlen(argv[i]) + 1);
 	    if( ddname )
-		strcpy( (char *)ddname, argv[ i ] );
+                strcpy( ddname, argv[ i ] );
 	}
 
 	if( !strcmp( argv[i], "-p") ) {
@@ -199,10 +198,10 @@ char *argv[];
 #endif
 
     if( !ddname ) {
-	ddname = malloc(strlen(DICHOME) + 1);
+        ddname = (char*) malloc(strlen(DICHOME) + 1);
 	if( !ddname )
-	    FatalError("cannaserver:Initialize failed\n");
-	strcpy( (char *)ddname, DICHOME );
+            FatalError("cannaserver:Initialize failed: malloc()\n");
+        strcpy( ddname, DICHOME );
     }
 
     if (userID != NULL) {
@@ -262,7 +261,7 @@ char *argv[];
    ir_debug( Dmsg(5, "辞書ホームディレクトリィ = %s\n", ddname ); )
 
     if ((context = RkwInitialize( (char *)ddname )) < 0)
-	FatalError("cannaserver:Initialize failed\n") ;
+        FatalError("cannaserver:Initialize failed: RkwInitialize()\n") ;
     rkw_initialize_done = 1;
     free( (char *)ddname ) ;
     RkwCloseContext( context ) ;
@@ -282,11 +281,8 @@ char *argv[];
 }
 
 static void
-mysignal(sig, func)
-int sig;
-RETSIGTYPE (*func) pro((int));
+mysignal(int sig, void (*func)(int) )
 {
-#ifdef SA_RESTART
     struct sigaction new_action;
 
     sigemptyset(&new_action.sa_mask);
@@ -297,9 +293,6 @@ RETSIGTYPE (*func) pro((int));
 # endif
 	;
     sigaction(sig, &new_action, NULL);
-#else
-    signal(sig, func);
-#endif
 }
 
 int
@@ -516,9 +509,8 @@ const char *where;
     PrintMsg("out of memory\n");
 }
 
-static RETSIGTYPE
-Reset(sig)
-int	sig;
+// callback
+static void Reset(int sig)
 {
     caught_signal = sig;
 #ifdef SIGNALRETURNSINT

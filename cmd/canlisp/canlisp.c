@@ -27,7 +27,7 @@ static char rcs_id[] = "$Id: canlisp.c,v 1.3 2003/10/02 07:40:30 aida_s Exp $";
 #define CANNA_NEW_WCHAR_AWARE
 #include <canna/jrkanji.h>
 #include <stdio.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 static void
 usage()

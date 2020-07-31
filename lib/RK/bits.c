@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -51,22 +51,16 @@ static char rcsid[]="$Id: bits.c,v 1.2 2003/09/17 08:50:52 aida_s Exp $";
     count      -- 格納したい数
 
   戻り値
-
  */
-
 long
-_RkPackBits(dst_bits, dst_offset, bit_size, src_ints, count)
-unsigned char	*dst_bits;
-long		dst_offset;
-int		bit_size;
-unsigned	*src_ints;
-int		count;
+_RkPackBits(unsigned char* dst_bits, long dst_offset, int bit_size,
+            unsigned* src_ints, int count)
 {
-  unsigned char	*dstB;
-  unsigned		dstQ;
-  unsigned		dstCount;
-  unsigned		bitMask;
-  
+    unsigned char	*dstB;
+    unsigned		dstQ;
+    unsigned		dstCount;
+    unsigned		bitMask;
+
   dstB = dst_bits + dst_offset / BIT_UNIT;
   dstCount = (dst_offset % BIT_UNIT);
 
@@ -89,6 +83,7 @@ int		count;
   return dst_offset;
 }
 
+
 /*
   UnpackBits
 
@@ -104,22 +99,16 @@ int		count;
     count      -- 取り出したい数
 
   戻り値
-
  */
-
 long
-_RkUnpackBits(dst_ints, src_bits, src_offset, bit_size, count)
-unsigned	*dst_ints;
-unsigned char	*src_bits;
-long		src_offset;
-int		bit_size;
-int		count;
+_RkUnpackBits(unsigned* dst_ints, unsigned char* src_bits, long src_offset,
+              int bit_size, int count)
 {
-  unsigned char	*srcB;
-  unsigned		srcQ;
-  unsigned		srcCount;
-  unsigned		bitMask;
-  
+    unsigned char	*srcB;
+    unsigned		srcQ;
+    unsigned		srcCount;
+    unsigned		bitMask;
+
   srcB = src_bits + src_offset / BIT_UNIT;
   srcCount = BIT_UNIT - (src_offset % BIT_UNIT);
   srcQ  = *srcB++ >> (src_offset % BIT_UNIT);
@@ -137,10 +126,11 @@ int		count;
   return src_offset;
 }
 
+
 /*
   CopyBits
 
-  RkCopyBits は src_bits の src_offset に格納されているビット配列を 
+  RkCopyBits は src_bits の src_offset に格納されているビット配列を
   count 個だけ dst_bits の dst_offsetに移動させる。
 
   引数
@@ -152,27 +142,20 @@ int		count;
     count      -- 移動したい数
 
   戻り値
-
  */
-
 long
-_RkCopyBits(dst_bits, dst_offset, bit_size, src_bits, src_offset, count)
-unsigned char	*dst_bits;
-long		dst_offset;
-int		bit_size;
-unsigned char	*src_bits;
-long		src_offset;
-int		count;
+_RkCopyBits(unsigned char* dst_bits, long dst_offset, int bit_size,
+            unsigned char* src_bits, long src_offset, int count)
 {
-  unsigned char	*dstB;
-  unsigned		dstQ;
-  unsigned		dstCount;
-  unsigned char	*srcB;
-  unsigned		srcQ;
-  unsigned		srcCount;
-  unsigned		bitMask;
-  unsigned		bits;
-  
+    unsigned char	*dstB;
+    unsigned		dstQ;
+    unsigned		dstCount;
+    unsigned char	*srcB;
+    unsigned		srcQ;
+    unsigned		srcCount;
+    unsigned		bitMask;
+    unsigned		bits;
+
   dstB = dst_bits + dst_offset / BIT_UNIT;
   dstCount = (dst_offset % BIT_UNIT);
   dstQ  = *dstB & ((1 << dstCount) - 1);
@@ -220,17 +203,13 @@ int		count;
     val        -- 格納する値を与える。
 
   戻り値
-
  */
-
 int
-_RkSetBitNum(dst_bits, dst_offset, bit_size, n, val)
-unsigned char	*dst_bits;
-unsigned long	dst_offset;
-int		bit_size, n, val;
+_RkSetBitNum(unsigned char* dst_bits, unsigned long dst_offset, int bit_size,
+             int n, int val)
 {
-  unsigned char	*dstB;
-  unsigned dstQ, dstCount, bitMask;
+    unsigned char	*dstB;
+    unsigned dstQ, dstCount, bitMask;
 
   dst_offset += bit_size * n;
 
@@ -256,19 +235,14 @@ int		bit_size, n, val;
 }
 
 int
-_RkCalcFqSize(n)
-int	n;
+_RkCalcFqSize(int n)
 {
   return n*(_RkCalcLog2(n) + 1);
 }
 
 #ifdef __BITS_DEBUG__
 #include <stdio.h>
-_RkPrintPackedBits(bits, offset, bit_size, count)
-unsigned char	*bits;
-int		offset;
-int		bit_size;
-int		count;
+_RkPrintPackedBits(unsigned char* bits, int offset, int bit_size, int count)
 {
     fprintf(stderr, "%d <", count);
     while ( count-- > 0 ) {
@@ -280,12 +254,11 @@ int		count;
     fprintf(stderr, ">\n");
 }
 
-int 
-_RkCalcLog2(n)
-     int n;
+int
+_RkCalcLog2(int n)
 {
   int	lg2;
-  
+
   n--;
   for (lg2 = 0; n > 0; lg2++)
     n >>= 1;
@@ -302,7 +275,7 @@ main()
   int	c, i;
   int		ec;
   int	o;
-  
+
   /* create test run */
   for ( size = 1; size <= 32; size++ ) {
     bit_size = _RkCalcLog2(size) + 1;
@@ -315,8 +288,8 @@ main()
     for ( i = 0; i < (bit_size*size+7)/8; i++ )
       printf(" %02x", Bits[i]);
     printf("\n");
-    
-    
+
+
     for ( offset = 0; offset < 16; offset++ ) {
       /* copybits */
       o = _RkCopyBits(bits, offset, bit_size, Bits, 0, size);
@@ -324,13 +297,13 @@ main()
       for ( i = 0; i < (o + 7)/8; i++ )
 	printf(" %02x", bits[i]);
       printf("\n");
-      
+
       /* unpack 'em again */
       ec = 0;
       o = offset;
       for ( i = 0; i < size; i++ ) {
 	unsigned w;
-	  
+
 	o = _RkUnpackBits(&w, bits, o, bit_size, 1);
 	if ( w != i )
 	  ec++;

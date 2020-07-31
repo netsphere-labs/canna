@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "server.h"
@@ -72,6 +72,65 @@ static int ClientBuf_send pro((ClientBuf *obj));
 #define CLIENT_BUF_IS_SENDING(obj) \
     ((obj)->sendbuf.sb_curr != (obj)->sendbuf.sb_buf)
 
+
+static int
+process_request(ClientPtr *clientp, ClientBuf *client_buf, BYTE *data,
+                size_t len)
+{
+  int request;
+  int nwant, r;
+  ClientPtr client = *clientp;
+  const char *username = client ? client->username : NULL;
+  const char *hostname = client ? client->hostname : NULL;
+
+#ifdef DEBUG
+  CallFuncName = NULL;
+#endif
+  if (client && client->version_hi > 1)
+    nwant = parse_wide_request(&request, data, len, username, hostname);
+  else
+    nwant = parse_euc_request(&request, data, len, username, hostname);
+
+  if (nwant)
+    return nwant; /* 失敗、またはもっとデータが必要 */
+
+  /* 実際のプロトコルに応じた処理（関数を呼ぶ） */
+
+  if (client) /* initialize等の場合は呼ばない */
+      (void)ClientStat(client, SETTIME, request, 0);
+  /* プロトコルの種類毎に統計を取る */
+  if (client && client->version_hi > 1) {
+#ifdef EXTENSION
+    if( request < W_MAXREQUESTNO )
+#endif
+      ++client->pcount[request];
+  } else if (client) {
+#ifdef EXTENSION
+    if( request < MAXREQUESTNO )
+#endif
+      ++client->pcount[request];
+  }
+
+#ifdef DEBUG
+  if (CallFuncName)
+    Dmsg( 3,"Now Call %s\n", CallFuncName );
+#endif
+  if (!client)
+    r = ir_nosession(clientp, client_buf);
+  else
+    r = (*CallFunc) (clientp);
+  ir_debug(Dmsg(8,"%s returned %d\n", CallFuncName, r));
+
+  /* クライアントの累積サーバ使用時間を設定する */
+  if (client && client == *clientp) /* initialize,finalize等のときは呼ばない */
+    ClientStat(client, GETTIME, request, 0);
+
+  if (r)
+    r = -1; /* どういう失敗でもとりあえず-1を返す */
+  return r;
+}
+
+
 static int
 set_nonblock(sock)
 sock_type sock;
@@ -109,9 +168,9 @@ ClientBuf *obj;
   RkiStrbuf_destroy(&obj->sendbuf);
 }
 
+
 static int
-ClientBuf_recv(obj)
-ClientBuf *obj;
+ClientBuf_recv(ClientBuf *obj)
 {
   ssize_t size;
   int newwant;
@@ -389,10 +448,7 @@ fail:
 }
 
 static void
-EventMgr_check_fds(obj, rfds, wfds)
-EventMgr *obj;
-rki_fd_set *rfds;
-rki_fd_set *wfds;
+EventMgr_check_fds(EventMgr *obj, rki_fd_set *rfds, rki_fd_set *wfds)
 {
   int listenerno;
   ClibufList **cbl_link;
@@ -403,14 +459,14 @@ rki_fd_set *wfds;
       EventMgr_accept(obj, obj->listeners + listenerno);
   }
 
-  for (cbl_link = &obj->cbl; *cbl_link; cbl_link = &(*cbl_link)->cbl_next) {
-    ClibufList *cbl_ent = *cbl_link;
-    ClientBuf *client_buf = &cbl_ent->cbl_body;
-    int fd = ClientBuf_getfd_fast(client_buf);
-    int error = 0;
+    for (cbl_link = &obj->cbl; *cbl_link; cbl_link = &(*cbl_link)->cbl_next) {
+        ClibufList *cbl_ent = *cbl_link;
+        ClientBuf *client_buf = &cbl_ent->cbl_body;
+        int fd = ClientBuf_getfd_fast(client_buf);
+        int error = 0;
 
-    if (RKI_FD_ISSET(fd, rfds)) 
-      error = ClientBuf_recv(client_buf);
+        if (RKI_FD_ISSET(fd, rfds))
+            error = ClientBuf_recv(client_buf);
     else if (RKI_FD_ISSET(fd, wfds))
       error = ClientBuf_send(client_buf);
 
@@ -466,7 +522,7 @@ EventMgr *obj;
       }
       nfds = RKI_MAX(nfds, fd + 1);
     }
-    
+
     if (obj->quitflag && !needwrite)
       break;
     ir_debug(Dmsg(5, "\nselect()で待ちを開始\n"));
@@ -550,11 +606,11 @@ struct sockaddr_un *unaddr;
   int request = -1;
   int status = SOCK_OTHER_ERROR;
   const int sockpathmax = sizeof(unaddr->sun_path) - 3;
-  
+
   assert(0 <= PortNumberPlus && PortNumberPlus < 100);
   unaddr->sun_family = AF_UNIX;
   oldUmask = umask (0);
-  
+
   if ( mkdir( IR_UNIX_DIR, 0777 ) == -1 &&
       errno != EEXIST ) {
     ir_debug( Dmsg(5, "Can't open %s error No. %d\n",IR_UNIX_DIR, errno));
@@ -592,33 +648,33 @@ struct sockaddr_un *unaddr;
     }
     close(request);
     request = -1; /* listen 失敗 */
-  } 
-  
+  }
+
 last:
-  (void)umask( oldUmask ); 
+  (void)umask( oldUmask );
   *sock = request;
   return status;
 }
-#endif /* USE_UNIX_SOCKET */ 
+#endif /* USE_UNIX_SOCKET */
 
 #ifdef USE_INET_SOCKET  /* ＩＮＥＴドメインの作成 */
 static int
 open_inet_socket (sock)
 sock_type *sock;
 {
-  
+
   struct sockaddr_in insock;
   struct servent *sp;
   int retry, request;
   int status = SOCK_OTHER_ERROR;
-  
+
   /* /etc/servicesからポート番号を取得する */
   if( (sp = getservbyname(IR_SERVICE_NAME ,"tcp")) == NULL )
   {
     ir_debug( Dmsg(5,"Warning: Port number not find on '/etc/services'.\n"));
     ir_debug( Dmsg(5,"         Use %d as default.\n", IR_DEFAULT_PORT));
   }
-  
+
   if ((request = socket( AF_INET, SOCK_STREAM, 0 )) < 0)
   {
     ir_debug( Dmsg(5,"Warning: INET socket for server failed.\n"));
@@ -636,16 +692,16 @@ sock_type *sock;
     insock.sin_family = AF_INET;
     insock.sin_port =
     (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + PortNumberPlus;
-    
+
     ir_debug( Dmsg(5, "ポート番号:[%d]\n",insock.sin_port));
-    
+
     insock.sin_port = htons(insock.sin_port);
     insock.sin_addr.s_addr = htonl(INADDR_ANY);
-    
+
     retry = 0;
-    while ( bind(request, (struct sockaddr *)&insock, sizeof(insock)) < 0 ) 
-    { 
-      ir_debug( Dmsg(5, "bind トライ回数[%d]\n",retry));	
+    while ( bind(request, (struct sockaddr *)&insock, sizeof(insock)) < 0 )
+    {
+      ir_debug( Dmsg(5, "bind トライ回数[%d]\n",retry));
       if (++retry == 5){
 	ir_debug( Dmsg(5,"Warning: Server could not bind.\n"));
 	close(request);
@@ -657,12 +713,12 @@ sock_type *sock;
     if( retry != 5 ) {
       if (listen (request, 5)){
 	ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
-	close(request); 
+	close(request);
 	request = -1; /* listen 失敗  */
       } else {
 	if (set_nonblock(request)) {
 	  ir_debug( Dmsg(5,"Warning: Server could not set nonblocking mode.\n"));
-	  close(request); 
+	  close(request);
 	  request = -1;
 	} else {
 	  status = SOCK_OK;
@@ -681,20 +737,20 @@ static int
 open_inet6_socket (sock)
 sock_type *sock;
 {
-  
+
   struct addrinfo hints, *info, *infolist;
   char portbuf[10];
   struct servent *sp;
   int retry, request = -1;
   int status = SOCK_OTHER_ERROR;
-  
+
   /* /etc/servicesからポート番号を取得する */
   if( (sp = getservbyname(IR_SERVICE_NAME ,"tcp")) == NULL )
   {
     ir_debug( Dmsg(5,"Warning: Port number not find on '/etc/services'.\n"));
     ir_debug( Dmsg(5,"         Use %d as default.\n", IR_DEFAULT_PORT));
   }
-  
+
   sprintf(portbuf, "%d",
     (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + PortNumberPlus);
   ir_debug( Dmsg(5, "ポート番号:[%s]\n", portbuf));
@@ -730,11 +786,11 @@ sock_type *sock;
 		   (char *)&one, sizeof(int));
       }
 #endif /* IR_V6ONLY_BIND */
-      
+
       retry = 0;
-      while ( bind(request, info->ai_addr, info->ai_addrlen) < 0 ) 
-      { 
-	ir_debug( Dmsg(5, "bind トライ回数[%d]\n",retry));	
+      while ( bind(request, info->ai_addr, info->ai_addrlen) < 0 )
+      {
+	ir_debug( Dmsg(5, "bind トライ回数[%d]\n",retry));
 	if (++retry == 5){
 	  ir_debug( Dmsg(5,"Warning: Server could not bind.\n"));
 	  close(request);
@@ -746,12 +802,12 @@ sock_type *sock;
       if( retry != 5 ) {
 	if (listen (request, 5)){
 	  ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
-	  close(request); 
+	  close(request);
 	  request = -1; /* listen 失敗  */
 	} else {
 	  if (set_nonblock(request)) {
 	    ir_debug( Dmsg(5,"Warning: Server could not set nonblocking mode.\n"));
-	    close(request); 
+	    close(request);
 	    request = -1;
 	  } else {
 	    status = SOCK_OK;
@@ -884,16 +940,16 @@ SockHolder_new()
 #endif
 
   ir_debug( Dmsg(3,"今からソケットを作る\n") );
-  
-#ifdef USE_UNIX_SOCKET /* ＵＮＩＸドメイン */    
+
+#ifdef USE_UNIX_SOCKET /* ＵＮＩＸドメイン */
   if ((status = open_unix_socket(&obj->unsock, &obj->unaddr)) != SOCK_OK) {
     ir_debug( Dmsg(5,"Warning: UNIX domain not created.\n"));
     goto fail;
   }
   ir_debug( Dmsg(3,"ＵＮＩＸドメインはできた\n") );
 #endif /*  USE_UNIX_SOCKET */
-  
-#ifdef USE_INET_SOCKET  /* ＩＮＥＴドメイン */    
+
+#ifdef USE_INET_SOCKET  /* ＩＮＥＴドメイン */
   if(UseInet){
     if ((status = open_inet_socket(&obj->insock)) != SOCK_OK) {
       ir_debug( Dmsg(5,"Warning: INET domain not created.\n"));
@@ -911,7 +967,7 @@ SockHolder_new()
   }
 #endif
 #endif /* USE_INET_SOCKET */
-  
+
   ir_debug( Dmsg(3,"ソケットの準備はできた\n") );
   return obj;
 

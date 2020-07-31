@@ -28,7 +28,7 @@ static	char	rcs_id[] = "@(#) 112.1 $Id: RKdelline.c,v 1.3 2003/10/02 07:40:30 ai
 
 #define CANNA_NEW_WCHAR_AWARE
 #include <canna/RK.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 RkDeleteLine(cx_num, name, line)
 int cx_num;

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -27,6 +27,7 @@ static char rcsid[] = "$Id: bun.c,v 1.6 2003/09/21 10:16:49 aida_s Exp $";
 /* LINTLIBRARY */
 
 #include "RKintern.h"
+#include <assert.h>
 
 #define NEED_DEF
 #ifdef RkSetErrno
@@ -40,14 +41,13 @@ static char rcsid[] = "$Id: bun.c,v 1.6 2003/09/21 10:16:49 aida_s Exp $";
 #define	OVERRUN_MARGIN	0
 #endif
 
-#define	STRCMP(d, s)	strcmp((char *)(d), (char *)(s))
-extern	void	usncopy();
+#define STRCMP  strcmp
+//extern	void	usncopy();
 
 #ifdef RK_LOG
 #include	<stdio.h>
 static FILE *
-openLogFile(cxnum)
-int cxnum;
+openLogFile( int cxnum )
 {
     char file[128];
     FILE *fp;
@@ -57,20 +57,17 @@ int cxnum;
 }
 
 static char *
-nword2str(cx, w, yomi)
-struct RkContext *cx;
-struct nword *w;
-Wchar *yomi;
+nword2str( struct RkContext* cx, struct nword* w, cannawc* yomi)
 {
     static unsigned char msg[RK_LINE_BMAX];
     static unsigned char eyomi[RK_LINE_BMAX];
     struct nword *words[RK_CONC_NMAX], **p, *wp;
     int msg_idx = 0;
     char *hinsi;
-    Wchar *kanji, *_RkGetKanji();
-    unsigned char *ekanji, *ustoeuc();
+    cannawc* kanji;
+    unsigned char *ekanji;
 
-    for (wp = w, p = words; wp; wp = wp->nw_left) 
+    for (wp = w, p = words; wp; wp = wp->nw_left)
 	*p++ = wp;
 
     while (p-- > words) {
@@ -83,7 +80,7 @@ Wchar *yomi;
 	ekanji = ustoeuc(kanji, wp->nw_klen - wp->nw_left->nw_klen,
 			 msg + msg_idx, RK_LINE_BMAX - msg_idx);
 	msg_idx = ekanji - msg;
-        ustoeuc(yomi + wp->nw_left->nw_ylen, 
+        ustoeuc(yomi + wp->nw_left->nw_ylen,
                 wp->nw_ylen - wp->nw_left->nw_ylen, eyomi, RK_LINE_BMAX);
         yomi_len = strlen(eyomi);
 	hinsi = RkGetGramName(cx->gram->gramdic, wp->nw_rowcol);
@@ -99,12 +96,11 @@ Wchar *yomi;
 }
 
 static
-dumpBunq(cx, from, end, log, fp)
-struct RkContext *cx;
-int from;
-unsigned end;
-int log; /* 0 候補変更 1 変換開始 2 確定 3 文節長変更 */
-FILE *fp;
+dumpBunq( struct RkContext* cx,
+          int from,
+          unsigned end,
+          int log, /* 0 候補変更 1 変換開始 2 確定 3 文節長変更 */
+          FILE* fp)
 {
     int i;
     struct nstore *store = cx->store;
@@ -183,17 +179,16 @@ FILE *fp;
 		    fprintf(fp, "正解 %s\n", henkan);
 	    }
 	}
-    } 
+    }
     fprintf(fp, "\n");
     fflush(fp);
 }
 #endif
 
 static void
-freeBunStorage(s)
-     struct nstore *s;
+freeBunStorage(struct nstore* s)
 {
-  if (s) {
+    if (s) {
     if (s->yomi)
       (void)free((char *)(s->yomi-OVERRUN_MARGIN));
     if (s->bunq)
@@ -206,15 +201,19 @@ freeBunStorage(s)
   }
 }
 
+// @return If malloc() failed, NULL.
 static struct nstore *
-allocBunStorage(len)
-     unsigned	len;
+allocBunStorage(unsigned len)
 {
-  struct nstore	*s;
+    struct nstore	*s;
 
-  s = (struct nstore *)malloc((unsigned)sizeof(struct nstore));
-  if (s) {
-    Wchar	*p, *q, pat;
+    s = (struct nstore*) malloc( sizeof(struct nstore) );
+    if (!s) {
+        RkSetErrno(RK_ERRNO_ENOMEM);
+        return NULL;
+    }
+
+    cannawc *p, *q, pat;
     int			i;
 
     s->yomi = (Wchar *)0;
@@ -267,21 +266,19 @@ allocBunStorage(len)
     for (i = 0; pat = (Wchar)~i, i < OVERRUN_MARGIN; i++)
       p[-i-1] = q[i] = pat;
     s->word_in_use = 0;
-  };
-  if (!s) /* EMPTY */RkSetErrno(RK_ERRNO_ENOMEM);
-  return s;
+
+    return s;
 }
 
-struct nstore	*
-_RkReallocBunStorage(src, len)
-     struct nstore	*src;
-     unsigned		len;
+struct nstore*
+_RkReallocBunStorage(struct nstore* src, unsigned len)
 {
-  struct nstore	*dst = allocBunStorage(len);
+    struct nstore	*dst = allocBunStorage(len);
+    if (!dst)
+        return NULL;
 
-  if (dst) {
     int		i;
-    
+
     if (src->yomi) {
       for (i = 0; i <= (int)src->maxyomi; i++)
 	dst->yomi[i] = src->yomi[i];
@@ -289,7 +286,7 @@ _RkReallocBunStorage(src, len)
     };
     dst->nyomi = src->nyomi;
     if (src->bunq) {
-      for (i = 0; i <= (int)src->maxbun; i++) 
+      for (i = 0; i <= (int)src->maxbun; i++)
 	dst->bunq[i] = src->bunq[i];
       (void)free((char *)(src->bunq-OVERRUN_MARGIN));
     };
@@ -307,16 +304,14 @@ _RkReallocBunStorage(src, len)
     };
     dst->word_in_use = src->word_in_use;
     (void)free((char *)src);
-    return(dst);
-  }
-  return((struct nstore *)0);
+
+    return dst;
 }
 
 static struct nbun *
-getCurrentBun(store)
-     struct nstore	*store;
+getCurrentBun(struct nstore* store)
 {
-  if (store && 0 <= store->curbun && store->curbun < (int)store->maxbun) 
+  if (store && 0 <= store->curbun && store->curbun < (int)store->maxbun)
     return &store->bunq[store->curbun];
   return (struct nbun *)0;
 }
@@ -330,26 +325,16 @@ getCurrentBun(store)
  *		RK_ERRNO_EINVAL
  *		RK_ERRNO_ENOMEM
  */
-#ifdef __STDC__
 int
 RkwBgnBun(
      int	cx_num,
-     Wchar	*yomi,
+     const cannawc* yomi,
      int	n,
-     int	kouhomode
-)
-#else
-int
-RkwBgnBun(cx_num, yomi, n, kouhomode)
-     int	cx_num;
-     Wchar	*yomi;
-     int	n;
-     int	kouhomode;
-#endif
+     int	kouhomode )
 {
-  struct RkContext	*cx;
-  unsigned long		mask1, mask2;
-  int			asset = 0;
+    struct RkContext	*cx;
+    unsigned long		mask1, mask2;
+    int			asset = 0;
 
   if (!(cx = RkGetContext(cx_num))) {
     RkSetErrno(RK_ERRNO_ECTXNO);
@@ -374,12 +359,12 @@ RkwBgnBun(cx_num, yomi, n, kouhomode)
   }
   cx->flags |= (unsigned)CTX_XFER;
   cx->concmode = (RK_CONNECT_WORD
-		  | (asset ? ((int)mask1 & ~RK_TANBUN) : 
+		  | (asset ? ((int)mask1 & ~RK_TANBUN) :
 		     (RK_MAKE_KANSUUJI | RK_MAKE_WORD | RK_MAKE_EISUUJI)));
   cx->kouhomode = ((unsigned long)kouhomode) & mask2;
   if (yomi) {
     int	i;
-	
+
     if (n <= 0) {
       RkSetErrno(RK_ERRNO_EINVAL);
       RkwEndBun(cx_num, 0);
@@ -413,27 +398,20 @@ RkwBgnBun(cx_num, yomi, n, kouhomode)
 
 /* RkEndBun
  *	bunsetsu henkan wo shuuryou suru
- *	hituyou ni oujite, henkan kekka wo motoni gakushuu wo okonau 
+ *	hituyou ni oujite, henkan kekka wo motoni gakushuu wo okonau
  *
  *	return	0
  *		-1(RK_ERRNO_ECTX)
  */
-#ifdef __STDC__
 int
 RkwEndBun(
      int	cx_num,
      int	mode
 )
-#else
-int
-RkwEndBun(cx_num, mode)
-     int	cx_num;
-     int	mode;
-#endif
 {
-  struct RkContext	*cx;
-  struct nstore		*store;    
-  int			i;
+    struct RkContext	*cx;
+    struct nstore		*store;
+    int			i;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store)) {
@@ -465,17 +443,13 @@ RkwEndBun(cx_num, mode)
   return(0);
 }
 
+
 /* RkRemoveBun
  *	current bunsetu made wo sakujo suru
  *	current bunsetu ha 0 ni naru.
  */
-
-int RkwRemoveBun pro((int, int));
-
 int
-RkwRemoveBun(cx_num, mode)
-     int	cx_num;
-     int	mode;
+RkwRemoveBun( int cx_num, int mode)
 {
   struct RkContext	*cx;
   struct nstore		*store;
@@ -502,24 +476,18 @@ RkwRemoveBun(cx_num, mode)
   return(store->maxbun);
 }
 
+
 /* RkSubstYomi
  *	change the contents of hiragana buffer
  * returns:
  *	# bunsetu
  */
-
-int RkwSubstYomi pro((int, int, int, Wchar *, int));
-
-RkwSubstYomi(cx_num, ys, ye, yomi, newLen)
-     int	cx_num;
-     int	ys, ye;
-     Wchar	*yomi;
-     int	newLen;
+int RkwSubstYomi( int cx_num, int ys, int ye, cannawc* yomi, int newLen)
 {
-  struct RkContext	*cx;
-  struct nstore	*store;
-  struct nbun	*bun;
-  
+    struct RkContext	*cx;
+    struct nstore	*store;
+    struct nbun	*bun;
+
   if (!(cx = RkGetContext(cx_num))) {
     RkSetErrno(RK_ERRNO_ECTXNO);
     return(-1);
@@ -541,14 +509,10 @@ RkwSubstYomi(cx_num, ys, ye, yomi, newLen)
  * returns:
  *	# bunsetu
  */
-
-int RkwFlushYomi pro((int));
-
 int
-RkwFlushYomi(cx_num)
-     int		cx_num;
+RkwFlushYomi( int cx_num )
 {
-  struct RkContext	*cx;
+    struct RkContext	*cx;
   if (!(cx = RkGetContext(cx_num)) ||
       !IS_XFERCTX(cx) ||
       !IS_XAUTCTX(cx)) {
@@ -562,14 +526,11 @@ RkwFlushYomi(cx_num)
  *	current bunsetsu no ookisa wo henkou
  */
 int
-_RkResize(cx_num, len, t)
-     int	cx_num;
-     int	len;
-     int	t;
+_RkResize(int cx_num, int len, int t)
 {
-  struct RkContext	*cx;
-  struct nbun		*bun;
-  struct nstore		*store;
+    struct RkContext	*cx;
+    struct nbun		*bun;
+    struct nstore		*store;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
@@ -596,41 +557,28 @@ _RkResize(cx_num, len, t)
   return(store->maxbun);
 }
 
-int RkwResize pro((int, int));
 
 int
-RkwResize(cx_num, len)
-     int	cx_num;
-     int	len;
+RkwResize(int cx_num, int len)
 {
   return(_RkResize(cx_num, len, 0));
 }
 
-#ifdef __STDC__
+
 int
-RkeResize(
-     int	cx_num,
-     int	len
-)
-#else
-int
-RkeResize(cx_num, len)
-     int	cx_num;
-     int	len;
-#endif
+RkeResize(  int	cx_num,
+            int	len )
 {
   return(_RkResize(cx_num, len, 1));
 }
 
-int RkwEnlarge pro((int));
 
 int
- RkwEnlarge(cx_num)
-     int	cx_num;
+RkwEnlarge( int cx_num )
 {
-  struct RkContext	*cx;
-  struct nstore		*store;
-  struct nbun		*bun;
+    struct RkContext	*cx;
+    struct nstore		*store;
+    struct nbun		*bun;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store)||
@@ -643,7 +591,7 @@ int
     bun->nb_flags |= RK_REARRANGED;
 #ifdef RK_LOG
     {
-	int ret_val = _RkRenbun2(cx, (int)(bun->nb_curlen + 1)); 
+	int ret_val = _RkRenbun2(cx, (int)(bun->nb_curlen + 1));
 	FILE *fp = openLogFile(cx_num);
 	dumpBunq(cx, store->curbun, store->maxbun, 3, fp);
 	fclose(fp);
@@ -656,16 +604,14 @@ int
   return(store->maxbun);
 }
 
-int RkwShorten pro((int));
 
 int
-RkwShorten(cx_num)
-     int	cx_num;
+RkwShorten(int cx_num )
 {
   struct RkContext	*cx;
   struct nstore		*store;
   struct nbun		*bun;
-    
+
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
       !(bun = getCurrentBun(store))) {
@@ -676,7 +622,7 @@ RkwShorten(cx_num)
     bun->nb_flags |= RK_REARRANGED;
 #ifdef RK_LOG
     {
-	int ret_val = _RkRenbun2(cx, (int)(bun->nb_curlen - 1)); 
+	int ret_val = _RkRenbun2(cx, (int)(bun->nb_curlen - 1));
 	FILE *fp = openLogFile(cx_num);
 	dumpBunq(cx, store->curbun, store->maxbun, 3, fp);
 	fclose(fp);
@@ -693,22 +639,16 @@ RkwShorten(cx_num)
  *	current bunsetu no yomi wo sitei sareta mono to okikaeru
  *	okikaeta noti, saihen kan suru
  */
-
-int RkwStoreYomi pro((int, Wchar *, int));
-
 int
-RkwStoreYomi(cx_num, yomi, nlen)
-     int	cx_num;
-     Wchar	*yomi;
-     int	nlen;
+RkwStoreYomi(int cx_num, const cannawc* yomi, int nlen)
 {
-  unsigned		nmax, omax, cp;
-  Wchar			*s, *d, *e;
-  int			i, olen, diff;
-  struct RkContext	*cx;
-  struct nstore		*store;
-  struct nbun		*bun;
-    
+    unsigned		nmax, omax, cp;
+    cannawc *s, *d, *e;
+    int			i, olen, diff;
+    struct RkContext	*cx;
+    struct nstore		*store;
+    struct nbun		*bun;
+
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
       !(bun = getCurrentBun(store))) {
@@ -744,7 +684,7 @@ RkwStoreYomi(cx_num, yomi, nlen)
   }
   store->yomi[nmax] = (Wchar)0;
   store->nyomi = nmax;
-  for (i = store->curbun + 1; i <= (int)store->maxbun; i++) 
+  for (i = store->curbun + 1; i <= (int)store->maxbun; i++)
     store->bunq[i].nb_yoff += diff;
   cp = store->curbun;
   if (!nlen) {
@@ -759,7 +699,7 @@ RkwStoreYomi(cx_num, yomi, nlen)
     usncopy((store->yomi + bun->nb_yoff), yomi, (unsigned)nlen);
 #ifdef RK_LOG
   {
-      int ret_val = _RkRenbun2(cx, 0); 
+      int ret_val = _RkRenbun2(cx, 0);
       FILE *fp = openLogFile(cx_num);
       fputs("読みの置換\n", fp);
       dumpBunq(cx, store->curbun, store->maxbun, 1, fp);
@@ -775,16 +715,12 @@ RkwStoreYomi(cx_num, yomi, nlen)
 #endif
 }
 
+
 /* RkGoTo/RkLeft/RkRight
  * 	current bunsetu no idou
  */
-
-int RkwGoTo pro((int, int));
-
 int
-RkwGoTo(cx_num, bnum)
-     int	cx_num;
-     int	bnum;
+RkwGoTo( int cx_num, int bnum)
 {
   struct RkContext	*cx;
   struct nstore	*store;
@@ -800,19 +736,12 @@ RkwGoTo(cx_num, bnum)
   return(store->curbun);
 }
 
-#ifdef __STDC__
+
 int
-RkwLeft(
-     int	cx_num
-)
-#else
-int
-RkwLeft(cx_num)
-     int	cx_num;
-#endif
+RkwLeft(  int	cx_num )
 {
-  struct RkContext	*cx;
-  struct nstore	*store;
+    struct RkContext	*cx;
+    struct nstore	*store;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
@@ -825,19 +754,12 @@ RkwLeft(cx_num)
   return store->curbun;
 }
 
-#ifdef __STDC__
+
 int
-RkwRight(
-     int	cx_num
-)
-#else
-int
-RkwRight(cx_num)
-     int	cx_num;
-#endif
+RkwRight(  int	cx_num )
 {
-  struct RkContext	*cx;
-  struct nstore	*store;
+    struct RkContext	*cx;
+    struct nstore	*store;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
@@ -854,13 +776,12 @@ RkwRight(cx_num)
  *	current kouho wo henkou
  */
 static int
-countCand(cx)
-     struct RkContext	*cx;
+countCand( struct RkContext* cx)
 {
-  struct nbun		*bun;
-  int			maxcand = 0;
-  unsigned long		mask;
-  
+    struct nbun		*bun;
+    int			maxcand = 0;
+    unsigned long		mask;
+
   bun = getCurrentBun(cx->store);
   if (bun) {
     maxcand = bun->nb_maxcand;
@@ -871,9 +792,7 @@ countCand(cx)
 }
 
 static int
-getXFER(cx, cnum)
-     struct RkContext	*cx;
-     int		cnum;
+getXFER(struct RkContext* cx, int cnum)
 {
   struct nbun	*bun = getCurrentBun(cx->store);
 
@@ -881,21 +800,13 @@ getXFER(cx, cnum)
   return(cnum < 0 ? RK_NFER : (cx->kouhomode>>(RK_XFERBITS*cnum))&RK_XFERMASK);
 }
 
-#ifdef __STDC__
+
 int
-RkwXfer(
-     int	cx_num,
-     int  	knum
-)
-#else
-int
-RkwXfer(cx_num, knum)
-     int	cx_num;
-     int  	knum;
-#endif
+RkwXfer( int	cx_num,
+         int  	knum )
 {
-  struct RkContext	*cx;
-  struct nbun		*bun;
+    struct RkContext	*cx;
+    struct nbun		*bun;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(cx->store) ||
@@ -908,19 +819,12 @@ RkwXfer(cx_num, knum)
   return(bun->nb_curcand);
 }
 
-#ifdef __STDC__
+
 int
-RkwNfer(
-     int	cx_num
-)
-#else
-int
-RkwNfer(cx_num)
-     int	cx_num;
-#endif
+RkwNfer( int	cx_num )
 {
-  struct RkContext	*cx;
-  struct nbun	*bun;
+    struct RkContext	*cx;
+    struct nbun	*bun;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(cx->store) ||
@@ -931,11 +835,9 @@ RkwNfer(cx_num)
   return(bun->nb_curcand = bun->nb_maxcand);
 }
 
-int RkwNext pro((int));
 
 int
-RkwNext(cx_num)
-     int	cx_num;
+RkwNext(int cx_num)
 {
   struct RkContext	*cx;
   struct nbun	*bun;
@@ -951,11 +853,9 @@ RkwNext(cx_num)
   return(bun->nb_curcand);
 }
 
-int RkwPrev pro((int));
 
 int
-RkwPrev(cx_num)
-     int	cx_num;
+RkwPrev(int cx_num)
 {
   struct RkContext	*cx;
   struct nbun		*bun;
@@ -966,7 +866,7 @@ RkwPrev(cx_num)
     RkSetErrno(RK_ERRNO_ECTXNO);
     return(0);
   }
-  
+
   if (!bun->nb_curcand)
     bun->nb_curcand = countCand(cx);
   return(--bun->nb_curcand);
@@ -975,15 +875,12 @@ RkwPrev(cx_num)
 /* findBranch
  * 	shiteisareta kouho wo fukumu path wo motomeru
  */
-static
-struct nword *
-findBranch(store, cnum)
-     struct nstore	*store;	
-     int		cnum;
+static struct nword *
+findBranch(struct nstore* store, int cnum)
 {
-  struct nbun		*bun;
-  struct nword		*w;
-  
+    struct nbun		*bun;
+    struct nword		*w;
+
   if (!(bun = getCurrentBun(store)) ||
       (0 > cnum) ||
       (cnum >= (int)bun->nb_maxcand))
@@ -999,18 +896,9 @@ findBranch(store, cnum)
 
 /* RkGetStat
  */
-#ifdef __STDC__
 int
-RkwGetStat(
-     int	cx_num,
-     RkStat	*st
-)
-#else
-int
-RkwGetStat(cx_num, st)
-     int	cx_num;
-     RkStat	*st;
-#endif
+RkwGetStat( int	cx_num,
+            RkStat	*st )
 {
   struct RkContext	*cx;
   struct nstore		*store;
@@ -1029,7 +917,7 @@ RkwGetStat(cx_num, st)
     st->diccand = st->ylen = st->klen = st->tlen = 0;
   st->bunnum  = store->curbun;
   st->candnum = bun->nb_curcand;
-  
+
   st->maxcand = countCand(cx);
   st->diccand = bun->nb_maxcand;
   st->ylen    = bun->nb_curlen;
@@ -1071,23 +959,14 @@ RkwGetStat(cx_num, st)
 
 /* RkGetStat
  */
-#ifdef __STDC__
 int
-RkeGetStat(
-     int	cx_num,
-     RkStat	*st
-)
-#else
-int
-RkeGetStat(cx_num, st)
-     int	cx_num;
-     RkStat	*st;
-#endif
+RkeGetStat( int	cx_num,
+            RkStat	*st )
 {
-  struct RkContext *cx;
-  struct nstore *store;
-  Wchar *yomi;
-  int res, klen;
+    struct RkContext *cx;
+    struct nstore *store;
+    cannawc* yomi;
+    int res, klen;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   Wchar kanji[RK_LEN_WMAX+1];
 #else
@@ -1096,7 +975,7 @@ RkeGetStat(cx_num, st)
     return -1;
   }
 #endif
-  
+
   if (!(cx = RkGetXContext(cx_num)) || !(store = cx->store)) {
     RkSetErrno(RK_MSG_ECTXNO);
     res = -1;
@@ -1121,27 +1000,18 @@ RkeGetStat(cx_num, st)
   return res;
 }
 
-static int addIt pro((struct nword *, Wchar *, 
-		      int (*proc)(Wchar *, int, int, Wchar *, Wchar *,
-				  RkLex *, struct RkContext *),
-		      Wchar *dst, int, int, unsigned long,
-		      struct RkContext *));
+
 static int
-addIt(cw, key, proc, dst, ind, maxdst, mode, cx)
-struct nword *cw;
-Wchar *key;
-int (*proc) pro((Wchar *, int, int, Wchar *, Wchar *,
-		 RkLex *, struct RkContext *));
-Wchar *dst;
-int ind;
-int maxdst;
-unsigned long mode;
-struct RkContext *cx;
+addIt( struct nword* cw, cannawc* key,
+       int(*proc)(void*, int, int, cannawc*, cannawc*, const RkLex*,
+                  struct RkContext*),
+       void* dst, int ind, int maxdst, unsigned long mode,
+       struct RkContext* cx)
 {
-  struct nword	*lw;
-  Wchar		*y, *_RkGetKanji();
-  RkLex		lex;
-  
+    struct nword	*lw;
+    cannawc *y;
+    RkLex		lex;
+
   lw = cw->nw_left;
   if (lw) {
     ind = addIt(lw, key, proc, dst, ind, maxdst, mode, cx);
@@ -1159,17 +1029,15 @@ struct RkContext *cx;
 }
 
 static int
-getIt(cx, cnum, proc, dst, max)
-struct RkContext *cx;
-int cnum;
-int (*proc) pro((Wchar *, int, int, Wchar *, Wchar *,
-		 RkLex *, struct RkContext *));
-Wchar *dst;
-int max;
+getIt(struct RkContext* cx, int cnum,
+      int(*proc)(void*, int, int, cannawc*, cannawc*, const RkLex*,
+                 struct RkContext*),
+      void* dst,
+      int max )
 {
-  struct nstore *store = cx->store;
-  struct nbun	*bun;
-  struct nword	*w;
+    struct nstore *store = cx->store;
+    struct nbun	*bun;
+    struct nword	*w;
 
   if (!(bun = getCurrentBun(store)) ||
       !(w = findBranch(store, cnum)))
@@ -1178,18 +1046,13 @@ int max;
 	       (unsigned long)cx->concmode, cx);
 }
 
-/*ARGSUSED*/
+
 static int
-addYomi(dst, ind, max, yomi, kanji, lex)
-     Wchar	*dst;
-     int	ind;
-     int	max;
-     Wchar	*yomi;
-     Wchar	*kanji;
-     RkLex	*lex;
+addYomi(cannawc* dst, int ind, int max, cannawc* yomi, cannawc* kanji,
+        RkLex* lex)
 {
-  int		ylen;
-    
+    int		ylen;
+
   ylen = lex->ylen;
   while (ylen--) {
     if (ind < max) {
@@ -1200,23 +1063,19 @@ addYomi(dst, ind, max, yomi, kanji, lex)
   }
   return ind;
 }
+
+
 /* RkGetYomi
  *	current bunsetu no yomi wo toru
  */
-
-int RkwGetYomi pro((int, Wchar *, int));
-
 int
-RkwGetYomi(cx_num, yomi, maxyomi)
-     int	cx_num;
-     Wchar	*yomi;
-     int	maxyomi;
+RkwGetYomi( int cx_num, cannawc* yomi, int maxyomi)
 {
-  struct RkContext	*cx;
-  struct nbun	*bun;
-  RkLex	lex;
-  int		i;
-  struct nstore	*store;
+    struct RkContext	*cx;
+    struct nbun	*bun;
+    RkLex	lex;
+    int		i;
+    struct nstore	*store;
 
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
@@ -1238,19 +1097,15 @@ RkwGetYomi(cx_num, yomi, maxyomi)
   return i;
 }
 
-int RkwGetLastYomi pro((int, Wchar *, int));
 
 int
-RkwGetLastYomi(cx_num, yomi, maxyomi)
-     int	cx_num;
-     Wchar	*yomi;
-     int	maxyomi;
+RkwGetLastYomi(int cx_num, cannawc* yomi, int maxyomi)
 {
   struct RkContext	*cx;
   struct nbun	*bun;
   struct nstore	*store;
   int		nyomi;
-    
+
   if (!(cx = RkGetXContext(cx_num)) ||
       !(store = cx->store) ||
       !(bun = &store->bunq[store->maxbun])) {
@@ -1273,40 +1128,33 @@ RkwGetLastYomi(cx_num, yomi, maxyomi)
   return nyomi;
 }
 
-/*ARGSUSED*/
+
 static int
-addKanji(dst, ind, max, yomi, kanji, lex, cx)
-     Wchar	*dst;
-     int	ind;
-     int	max;
-     Wchar	*yomi;
-     Wchar	*kanji;
-     RkLex	*lex;
-     struct RkContext	*cx; /* ARGSUSED */
+addKanji(void* dst, int ind, int max, cannawc* yomi, cannawc* kanji,
+         const RkLex* lex, struct RkContext* cx)
 {
-  int		klen;
-  
-  klen = lex->klen;
-  while (klen-- > 0) {
-    if (ind < max) {
-      if (dst)
-	dst[ind] = *kanji++;
-      ind++;
+    assert(lex);
+
+    int		klen;
+    cannawc* dst_ = (cannawc*) dst;
+
+    klen = lex->klen;
+    while (klen-- > 0) {
+        if (ind < max) {
+            if (dst_)
+                dst_[ind] = *kanji++;
+            ind++;
+        }
     }
-  }
-  return ind;
+    return ind;
 }
 
 static int
-getKanji(cx, cnum, dst, maxdst)
-     struct RkContext	*cx;
-     int		cnum;
-     Wchar		*dst;
-     int		maxdst;
+getKanji(struct RkContext* cx, int cnum, cannawc* dst, int maxdst)
 {
-  struct nbun	*bun = getCurrentBun(cx->store);
-  Wchar		*yomi;
-  int		i, ylen;
+    struct nbun	*bun = getCurrentBun(cx->store);
+    cannawc* yomi;
+    int		i, ylen;
 
   i = getIt(cx, cnum, addKanji, dst, maxdst - 1);
   if (i < 0) {
@@ -1332,14 +1180,8 @@ getKanji(cx, cnum, dst, maxdst)
 /* RkGetKanji
  *	current bunsetu no kanji tuduri wo toru
  */
-
-int RkwGetKanji pro((int, Wchar *, int));
-
 int
-RkwGetKanji(cx_num, dst, maxdst)
-     int	cx_num;
-     Wchar	*dst;
-     int	maxdst;
+RkwGetKanji(int cx_num, cannawc* dst, int maxdst)
 {
   RkContext	*cx;
   struct nbun	*bun;
@@ -1351,7 +1193,7 @@ RkwGetKanji(cx_num, dst, maxdst)
     RkSetErrno(RK_ERRNO_ECTXNO);
     return -1;
   }
-  
+
   i = getKanji(cx, (int)bun->nb_curcand, dst, maxdst);
   if (dst && i < maxdst)
     dst[i] = 0;
@@ -1361,20 +1203,11 @@ RkwGetKanji(cx_num, dst, maxdst)
 /* RkGetKanjiList
  * 	genzai sentaku sareta kouho mojiretu wo toridasu
  */
-#ifdef __STDC__
 int
 RkwGetKanjiList(
      int	cx_num,
      Wchar	*dst,
-     int	maxdst
-)
-#else
-int
-RkwGetKanjiList(cx_num, dst, maxdst)
-     int	cx_num;
-     Wchar	*dst;
-     int	maxdst;
-#endif
+     int	maxdst )
 {
   struct RkContext	*cx;
   int			i, len, ind = 0, num = 0;
@@ -1406,39 +1239,27 @@ RkwGetKanjiList(cx_num, dst, maxdst)
 /* RkGetLex
  *	current bunsetu no hishi jouhou wo toru
  */
-/*ARGSUSED*/
 static int
-addLex(dst, ind, max, yomi, kanji, lex, cx)
-     RkLex	*dst;
-     int	ind;
-     int	max;
-     Wchar	*yomi;
-     Wchar	*kanji;
-     RkLex	*lex;
-     struct RkContext	*cx; /* ARGSUSED */
+addLex(void* dst, int ind, int max, cannawc* yomi, cannawc* kanji,
+       const RkLex* lex,
+       struct RkContext* cx)
 {
-  if (ind + 1 <= max) {
-    if (dst)
-      dst[ind] = *lex;
-    ind++;
-  }
-  return ind;
+    RkLex* dst_ = (RkLex*) dst;
+
+    if (ind + 1 <= max) {
+        if (dst_)
+            dst_[ind] = *lex;
+        ind++;
+    }
+    return ind;
 }
 
-#ifdef __STDC__
+
 int
 RkwGetLex(
      int	cx_num,
      RkLex	*dst,
-     int	maxdst
-)
-#else
-int
-RkwGetLex(cx_num, dst, maxdst)
-     int	cx_num;
-     RkLex	*dst;
-     int	maxdst;
-#endif
+     int	maxdst )
 {
   RkContext	*cx;
   struct nbun	*bun;
@@ -1465,26 +1286,16 @@ RkwGetLex(cx_num, dst, maxdst)
 }
 
 /* RkeGetLex -- ほぼ RkwGetLex と同じだが長さはバイト長で返る */
-
-#ifdef __STDC__
 int
 RkeGetLex(
      int	cx_num,
      RkLex	*dst,
-     int	maxdst
-)
-#else
-int
-RkeGetLex(cx_num, dst, maxdst)
-     int	cx_num;
-     RkLex	*dst;
-     int	maxdst;
-#endif
+     int	maxdst )
 {
-  struct RkContext *cx;
-  struct nstore *store;
-  Wchar *yomi, *kp;
-  int nwords, i;
+    struct RkContext *cx;
+    struct nstore *store;
+    cannawc *yomi, *kp;
+    int nwords, i;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   Wchar kanji[RK_LEN_WMAX+1];
 #else
@@ -1521,19 +1332,13 @@ RkeGetLex(cx_num, dst, maxdst)
   return nwords;
 }
 
-/*ARGSUSED*/
 static int
-addHinshi(dst, ind, max, yomi, kanji, lex, cx)
-     Wchar	*dst;
-     int	ind;
-     int	max;
-     Wchar	*yomi;
-     Wchar	*kanji;
-     RkLex	*lex;
-     struct RkContext	*cx;
+addHinshi(void* dst, int ind, int max, cannawc* yomi, cannawc* kanji,
+          const RkLex* lex, struct RkContext* cx)
 {
-  int	bytes;
-  Wchar	*p;
+    int	bytes;
+    cannawc *p;
+    cannawc* dst_ = (cannawc*) dst;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   Wchar	hinshi[256];
 #else
@@ -1543,17 +1348,17 @@ addHinshi(dst, ind, max, yomi, kanji, lex, cx)
   }
 #endif
 
-  if (cx) {
-    p = RkUparseGramNum(cx->gram->gramdic, lex->rownum, hinshi, 256);
-    if (p) {
-      bytes = p - hinshi;
-      if (ind + bytes  < max) {
-	if (dst)
-	  usncopy(dst + ind, hinshi, bytes);
-	ind += bytes;
-      }
+    if (cx) {
+        p = RkUparseGramNum(cx->gram->gramdic, lex->rownum, hinshi, 256);
+        if (p) {
+            bytes = p - hinshi;
+            if (ind + bytes  < max) {
+                if (dst_)
+                    usncopy(dst_ + ind, hinshi, bytes);
+                ind += bytes;
+            }
+        }
     }
-  }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free((char *)hinshi);
 #endif
@@ -1563,14 +1368,8 @@ addHinshi(dst, ind, max, yomi, kanji, lex, cx)
 /* RkGetHinshi
  *	current bunsetu no hinshi mojiretu wo toru
  */
-
-int RkwGetHinshi pro((int, Wchar *, int));
-
 int
-RkwGetHinshi(cx_num, dst, maxdst)
-     int	cx_num;
-     Wchar	*dst;
-     int	maxdst;
+RkwGetHinshi( int cx_num, cannawc* dst, int maxdst)
 {
   struct RkContext	*cx;
   struct nbun		*bun;
@@ -1584,7 +1383,7 @@ RkwGetHinshi(cx_num, dst, maxdst)
   }
   i = getIt(cx, (int)bun->nb_curcand, addHinshi, dst, maxdst - 1);
   if (i < 0) {
-    if (dst && 1 < maxdst) 
+    if (dst && 1 < maxdst)
       dst[0] = (Wchar)0;
     i = 1;
   }
@@ -1597,29 +1396,20 @@ RkwGetHinshi(cx_num, dst, maxdst)
 #define	CloseContext(a)	{if ((a) != cx_num) RkwCloseContext(a);}
 
 int
-#ifdef __STDC__
 RkwQueryDic(
      int		cx_num,
-     char	*dirname,
+     const char* dirname,
      char	*dicname,
-     struct DicInfo	*status
-)
-#else
-RkwQueryDic(cx_num, dirname, dicname, status)
-     int		cx_num;
-     char	*dirname;
-     char	*dicname;
-     struct DicInfo	*status;
-#endif
+     struct DicInfo	*status )
 {
-  struct RkContext	*cx;
-  int			new_cx_num, size;
-  unsigned char		*buff;
-  char			*file;
-  struct DM		*dm;
-  struct DF		*df;
-  struct stat		st;
-    
+    struct RkContext	*cx;
+    int			new_cx_num, size;
+    unsigned char		*buff;
+    char			*file;
+    struct DM		*dm;
+    struct DF		*df;
+    struct stat		st;
+
   if (!(cx = RkGetContext(cx_num))
       || !status || !dirname || !dicname || !dicname[0])
     return(-1);
@@ -1628,7 +1418,7 @@ RkwQueryDic(cx_num, dirname, dicname, status)
     return(-1);
   (void)strcpy((char *)buff, dicname);
   if (*dirname && strcmp(dirname, cx->ddpath[0]->dd_name)
-      && strcmp(dirname, (char *)SYSTEM_DDHOME_NAME)) {
+      && strcmp(dirname, SYSTEM_DDHOME_NAME)) {
     if((new_cx_num = RkwCreateContext()) < 0) {
       (void)free((char *)buff);
       return BADCONT;
@@ -1643,13 +1433,13 @@ RkwQueryDic(cx_num, dirname, dicname, status)
       return(-1);
     }
   } else {
-    if (!strcmp(dirname, (char *)SYSTEM_DDHOME_NAME))
+    if (!strcmp(dirname, SYSTEM_DDHOME_NAME))
       dirname = SYSTEM_DDHOME_NAME;
     else
       dirname = cx->ddpath[0]->dd_name;
     new_cx_num = cx_num;
   }
-  if (!strcmp(dirname, (char *)SYSTEM_DDHOME_NAME)) {
+  if (!strcmp(dirname, SYSTEM_DDHOME_NAME)) {
     if (!(dm = _RkSearchDDP(cx->ddpath, dicname))) {
       CloseContext(new_cx_num);
       (void)free((char *)buff);
@@ -1688,29 +1478,25 @@ RkwQueryDic(cx_num, dirname, dicname, status)
 
 
 int
-_RkwSync(cx, dicname)
-     struct RkContext	*cx;
-     char *dicname;
+_RkwSync(struct RkContext* cx, const char* dicname)
 {
-  struct DM	*dm, *qm;
+    struct DM	*dm, *qm;
 
-  dm = _RkSearchDicWithFreq(cx->ddpath, dicname, &qm);  
+  dm = _RkSearchDicWithFreq(cx->ddpath, dicname, &qm);
 
   if (dm)
     return(DST_SYNC(cx, dm, qm));
-  else 
+  else
     return (-1);
 }
 
 
 int
-RkwSync(cx_num, dicname)
-     int cx_num;
-     char *dicname;
+RkwSync(int cx_num, const char* dicname)
 {
   struct RkContext	*cx;
   int ret = -1;
-  
+
   if (!(cx = RkGetContext(cx_num)))
     return (-1);
 
@@ -1725,7 +1511,7 @@ RkwSync(cx_num, dicname)
       return -1;
     }
 #endif
-    
+
     if (!(i = RkwGetDicList(cx_num, diclist, DL_SIZE))) {
       ret = 0;
     }
@@ -1752,31 +1538,23 @@ RkwSync(cx_num, dicname)
   return ret;
 }
 
-/*ARGSUSED*/
-RkwGetSimpleKanji(cxnum, dicname, yomi, maxyomi,
-		  kanjis, maxkanjis, hinshis, maxhinshis)
-int cxnum, maxyomi, maxkanjis, maxhinshis;
-char *dicname;
-Wchar *yomi, *kanjis, *hinshis;
+
+int
+RkwGetSimpleKanji(int cxnum, char* dicname, cannawc* yomi, int maxyomi,
+                  cannawc* kanjis, int maxkanjis, unsigned char* hinshis,
+                  int maxhinshis)
 {
-  return -1;
+    return -1;
 }
 
-/*ARGSUSED*/
 int
-RkwStoreRange(cx_num, yomi, maxyomi)
-     int		cx_num;
-     Wchar		*yomi;
-     int		maxyomi;
+RkwStoreRange(int cx_num, cannawc* yomi, int maxyomi)
 {
-  return(0);
+    return 0;
 }
 
-/*ARGSUSED*/
 int
-RkwSetLocale(cx_num, locale)
-     int		cx_num;
-     unsigned char	*locale;
+RkwSetLocale(int cx_num, unsigned char* locale)
 {
-  return(0);
+    return 0;
 }

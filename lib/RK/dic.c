@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -58,11 +58,8 @@ static char rcsid[]="@(#) 102.1 $Id: dic.c,v 1.4 2003/09/17 08:50:52 aida_s Exp 
        0: 成功
    ACCES: エラー(グループを指定したのに DDPATH に存在しない)
  */
-
 static int
-locatepath(userDDP, ddpath, mode)
-struct DD *userDDP[], *ddpath[];
-int mode;
+locatepath(struct DD* userDDP[], struct DD* ddpath[], int mode)
 {
   /* find dictionary under system and user/group directory */
   if (mode & RK_SYS_DIC) {
@@ -72,7 +69,7 @@ int mode;
     else {
       return ACCES;
     }
-  } else  
+  } else
   if (mode & RK_GRP_DIC) {
     if (ddpath[1] && ddpath[2]) {
       /* グループ辞書とシステム辞書がちゃんとあれば */
@@ -97,7 +94,7 @@ int mode;
  *         int            cx_num    コンテクストナンバー
  *	   unsigned char  *dicname  辞書へのポインタ
  *	   int            mode      辞書の種類と強制モードのOR
- *             辞書の種類 
+ *             辞書の種類
  *                 #define	Rk_MWD		0x80
  *                 #define	Rk_SWD		0x40
  *                 #define	Rk_PRE		0x20
@@ -125,15 +122,11 @@ int mode;
  *             modeが異常値であった場合                   -99  BADARG
  *             コンテクスト構造体が存在しない場合        -100 BADCONT
  */
-
 int
-RkwCreateDic(cx_num, dicname, mode)
-int cx_num;
-char *dicname;
-int     mode;
+RkwCreateDic(int cx_num, char* dicname, int mode)
 {
   struct RkParam	*sx = RkGetSystem();
-						  
+
   struct RkContext	*cx = RkGetContext(cx_num);
   struct DM             *sm, *um, *tm;
   int			type;
@@ -148,7 +141,7 @@ int     mode;
     return NOTALC;
   }
 #endif
-  
+
   if(!dicname || !dicname[0]) {
     ret = ACCES;
     goto return_ret;
@@ -205,12 +198,12 @@ int     mode;
     }
     if (!um) {
       struct DM	*dm;
-      
+
       if (!(filename = _RkCreateUniquePath(userDDP[0], FREQ_TEMPLATE))) {
 	ret = ACCES;
 	goto return_ret;
       }
-      (void)sprintf(spec, "%s(%s) -%s--%s-\n",
+      sprintf(spec, "%s(%s) -%s--%s-\n",
 		    filename, sm->dm_dicname, sm->dm_nickname,
 		    DEFAULT_PERMISSION);
       if (!DMcheck(spec, dicname)) {
@@ -280,7 +273,7 @@ int     mode;
 	  /* return INVAL;	*/
 	  (void)strcpy(extent, "mwd");
       };
-      (void)sprintf(spec, "%s(.%s) -%s--%s-\n", filename, extent, dicname,
+      sprintf(spec, "%s(.%s) -%s--%s-\n", filename, extent, dicname,
 		    DEFAULT_PERMISSION);
       if (!DMcheck(spec, dicname)) {
 	ret = NOENT;
@@ -320,9 +313,8 @@ int     mode;
   return ret;
 }
 
-copyFile(src, dst)
-struct DM	*src;
-struct DM	*dst;
+
+int copyFile(struct DM* src, struct DM* dst)
 {
   struct DF	*srcF = src->dm_file;
   struct DD	*srcD = srcF->df_direct;
@@ -336,7 +328,7 @@ struct DM	*dst;
   srcN = _RkCreatePath(srcD, srcF->df_link);
   if (srcN) {
     srcFd = open(srcN, 0);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
     setmode(srcFd, O_BINARY);
 #endif
     (void)free(srcN);
@@ -344,7 +336,7 @@ struct DM	*dst;
       dstN = _RkCreatePath(dstD, dstF->df_link);
       if (dstN) {
 	dstFd = creat(dstN, 0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
 	setmode(dstFd, O_BINARY);
 #endif
 	(void)free(dstN);
@@ -372,7 +364,7 @@ struct DM	*dst;
   }
   return ecount ? -1 : 0;
 }
-
+
 /*
  * RkwListDic(cx_num, dirname, buf, size)
  * int  cx_num;             コンテクストナンバー
@@ -380,18 +372,14 @@ struct DM	*dst;
  * unsigned char *buf;      辞書リストが返ってくるバッファ
  * int  size;               バッファのサイズ
  *
- * リターン値               
+ * リターン値
  *             成功した場合                      辞書の数
  *             コンテクストナンバーが負の場合          BADCONT
  *             RkwCreateContextに失敗した場合           BADCONT
  *             RkwSetDicPathに失敗した場合              NOTALC
  */
 int
-RkwListDic( cx_num, dirname, buf, size )
-int  cx_num;
-char *dirname;
-char *buf;
-int  size;
+RkwListDic( int cx_num, char* dirname, char* buf, int size )
 {
   int dicscnt;
   int new_cx_num;
@@ -410,7 +398,8 @@ int  size;
   (void)RkwCloseContext(new_cx_num);
   return (dicscnt);
 }
-
+
+
 /* int
  * RkwRemoveDic(cx_num, dicname, mode)
  *
@@ -430,10 +419,7 @@ int  size;
  *             コンテクスト構造体が存在しない場合    -100 BADCONT
  */
 int
-RkwRemoveDic(cx_num, dicname, mode)
-int cx_num;
-char *dicname;
-int mode;
+RkwRemoveDic( int cx_num, char* dicname, int mode)
 {
   struct RkContext	*cx = RkGetContext(cx_num);
 /*  struct RkParam	*sx = RkGetSystem();	*/
@@ -456,7 +442,7 @@ int mode;
   if (!dm || ((mode & PL_DIC) && dm->dm_file->df_type != DF_FREQDIC)) {
     return NOENT;
   }
-  if ( dm->dm_rcount > 0 ) 
+  if ( dm->dm_rcount > 0 )
 	return TXTBSY;
   if ( !dm->dm_file ) /* ? */
 	return BADCONT;
@@ -467,7 +453,7 @@ int mode;
   if (!(path = _RkMakePath(dm->dm_file)))
 	return NOTALC;
   res = unlink(path);
-  (void)free(path);  
+  (void)free(path);
   if(res)
     return ACCES;
   dum_direct = dm->dm_file->df_direct;
@@ -475,10 +461,9 @@ int mode;
   (void)_RkRealizeDD(dum_direct);
   return 0;
 }
-
-/* int
- * RkwRenameDic(cx_num, oldnick, newnick, mode)
- *
+
+
+/**
  * 指定されたコンテクストに指定された辞書が存在すれば
  * その辞書の名前を変更する。
  *
@@ -500,27 +485,23 @@ int mode;
  *          コンテクスト構造体が存在しない場合    -100   BADCONT
  */
 int
-RkwRenameDic(cx_num, old, new, mode)
-  int cx_num;
-  char *old;
-  char *new;
-  int mode;
+RkwRenameDic( int cx_num, char* old, char* new_, int mode)
 {
-  struct RkContext	*cx = RkGetContext(cx_num);
-  struct DD		*userDDP[2], *dd;
-  struct DM		*dm1, *dm2;
-  char			*path;
-  char            	spec[RK_LINE_BMAX];
-  /* I leave this array on the stack because this will not glow so big.
+    struct RkContext	*cx = RkGetContext(cx_num);
+    struct DD		*userDDP[2], *dd;
+    struct DM		*dm1, *dm2;
+    char			*path;
+    char            	spec[RK_LINE_BMAX];
+    /* I leave this array on the stack because this will not glow so big.
    1996.6.5 kon */
-  
+
   if(!old || !*old)
     return NOENT;
-  if(!new || !*new)
+  if(!new_ || !*new_)
     return ACCES;
   if (!cx || !cx->ddpath || !cx->ddpath[0])
     return BADCONT;
-  if (strlen((char *)new) >= (unsigned)RK_NICK_BMAX) {
+  if (strlen(new_) >= (unsigned)RK_NICK_BMAX) {
     return INVAL;
   }
 
@@ -538,12 +519,12 @@ RkwRenameDic(cx_num, old, new, mode)
     return ACCES;
   }
 
-  dm2 = _RkSearchDDP(userDDP, (char *)new);
+  dm2 = _RkSearchDDP(userDDP, new_);
 
-  if (dm1->dm_rcount > 0) 
+  if (dm1->dm_rcount > 0)
     return TXTBSY;
   if (dm2) { /* 新しい名前が、既に辞書として存在すれば */
-    if (dm2->dm_rcount > 0) 
+    if (dm2->dm_rcount > 0)
       return TXTBSY;
     if (!(mode & KYOUSEI))
       return EXIST;
@@ -552,23 +533,23 @@ RkwRenameDic(cx_num, old, new, mode)
     (void)unlink(path);
     (void)free(path);
     DMremove(dm2);
-    DMrename(dm1, new);
+    DMrename(dm1, new_);
     (void)_RkRealizeDD(dd);
     return 1;
   } else {
 #ifndef WINDOWS_STYLE_FILENAME
-    (void)sprintf(spec, "%s(.%s) -%s--%s%s-\n", "tmp.t", "mwd", new,
+    (void)sprintf(spec, "%s(.%s) -%s--%s%s-\n", "tmp.t", "mwd", new_,
 		  (dm1->dm_flags & DM_READOK) ? "r" : "",
 		  (dm1->dm_flags & DM_WRITEOK) ? "w" : "");
 #else
-    (void)sprintf(spec, "%s(.%s) -%s--%s%s-\n", "tmp.ctd", "mwd", new,
+    (void)sprintf(spec, "%s(.%s) -%s--%s%s-\n", "tmp.ctd", "mwd", new_,
 		  (dm1->dm_flags & DM_READOK) ? "r" : "",
 		  (dm1->dm_flags & DM_WRITEOK) ? "w" : "");
 #endif
-    if (!DMcheck(spec, new))
+    if (!DMcheck(spec, new_))
       return NOENT; /* なんなんだか良く分からない (1993.11 今) */
     /* ためしにやってみているのかな？ (1993.11 今) */
-    DMrename(dm1, new);
+    DMrename(dm1, new_);
     (void)_RkRealizeDD(dd);
     return 0;
   }
@@ -599,20 +580,17 @@ RkwRenameDic(cx_num, old, new, mode)
  *          newnickをマウントしていた場合         -26    TXTBSY
  *          コンテクスト構造体が存在しない場合    -100   BADCONT
  */
-
 int
-RkwCopyDic(co, dir, from, to, mode)
-int co;
-char *dir, *from, *to;
-int mode;
+RkwCopyDic(int co, char* dir, char* from, char* to, int mode)
 {
-  struct RkContext	*cx;
-  struct DD		*userDDP[2];
-  struct DM		*dm1, *dm2;
-  char			*path, *perm = DEFAULT_PERMISSION;
-  char *myddname;
-  int res, v, con;
-  
+    struct RkContext	*cx;
+    struct DD		*userDDP[2];
+    struct DM		*dm1, *dm2;
+    char* path;
+    const char* perm = DEFAULT_PERMISSION;
+    char *myddname;
+    int res, v, con;
+
   if (!dir || !*dir) {
     return BADF;
   }
@@ -651,7 +629,7 @@ int mode;
     }
 
     res = NOTALC;
-    path = malloc(strlen(dir) + 1 + strlen(myddname) + 1);
+    path = (char*) malloc(strlen(dir) + 1 + strlen(myddname) + 1);
     if (path) {
       strcpy(path, dir);
       strcat(path, ":");
@@ -712,22 +690,23 @@ int mode;
 	      }
 
 	      { /* いよいよ辞書を作る */
-		char *template, *filename;
+                  const char* template_;
+                  char* filename;
 
 		RkwSync(co, from); /* sometimes, this failes to an error */
-		template =
+		template_ =
 		  (type == DF_FREQDIC) ? FREQ_TEMPLATE :
 		    (type == DF_TEMPDIC) ? USER_TEMPLATE :
 		      PERM_TEMPLATE;
 
 		res = ACCES;
-		filename = _RkCreateUniquePath(userDDP[0], template);
+		filename = _RkCreateUniquePath(userDDP[0], template_);
 		if (filename) {
 		  char spec[RK_LINE_BMAX];
   /* I leave this array on the stack because this will not glow so big.
    1996.6.5 kon */
 
-		  (void)sprintf(spec, "%s(%s) -%s--%s-\n",
+                  sprintf(spec, "%s(%s) -%s--%s-\n",
 				filename, dm1->dm_dicname, to, perm);
 		  res = NOTALC;
 		  dm2 = DMcreate(userDDP[0], spec);
@@ -754,6 +733,7 @@ int mode;
   return res;
 }
 
+
 /* int
  * RkwChmodDic(cx_num, dicname, mode)
  *
@@ -771,10 +751,7 @@ int mode;
  *          コンテクスト構造体が存在しない場合    -100   BADCONT
  */
 int
-RkwChmodDic(cx_num, dicname, mode)
-int cx_num;
-char *dicname;
-int mode;
+RkwChmodDic( int cx_num, char* dicname, int mode)
 {
   struct RkContext	*cx = RkGetContext(cx_num);
   struct DD		*dd, *userDDP[2];
@@ -826,6 +803,7 @@ int mode;
   return res;
 }
 
+
 /*
  * GetLine(cx, gram, tdp, line)
  * struct RkContext            *cx
@@ -837,26 +815,25 @@ int mode;
  *        失敗 -1
  */
 static struct td_n_tupple *
-pushTdn(cx, tdp)
-struct RkContext *cx;
-struct TD *tdp;
+pushTdn(struct RkContext* cx, struct TD* tdp)
 {
-  struct td_n_tupple	*new;
-  struct _rec		*gwt;
+    struct td_n_tupple	*new_;
+    struct _rec		*gwt;
   if (!cx || !(gwt = (struct _rec *)cx->cx_gwt) ||
-      !(new = (struct td_n_tupple *)malloc(sizeof(struct td_n_tupple)))) {
+      !(new_ = (struct td_n_tupple *)malloc(sizeof(struct td_n_tupple)))) {
     return (struct td_n_tupple *)0;
   }
-  new->td = (char *)tdp;
-  new->n = 0;
-  new->next = (struct td_n_tupple *)gwt->tdn;
-  gwt->tdn = (struct td_n_tupple *)new;
-  return new;
+  new_->td = (char *)tdp;
+  new_->n = 0;
+  new_->next = (struct td_n_tupple *)gwt->tdn;
+  gwt->tdn = new_;
+  return new_;
 }
 
+
+/* tdn を next をたどりながら free する */
 void
-freeTdn(cx)  /* tdn を next をたどりながら free する */
-struct RkContext *cx;
+freeTdn(struct RkContext* cx)
 {
   struct td_n_tupple *work;
   struct _rec	*gwt = (struct _rec *)cx->cx_gwt;
@@ -869,8 +846,7 @@ struct RkContext *cx;
 }
 
 static void
-popTdn(cx)
-struct RkContext *cx;
+popTdn(struct RkContext* cx)
 {
   struct td_n_tupple *work;
   struct _rec	*gwt = (struct _rec *)cx->cx_gwt;
@@ -881,18 +857,14 @@ struct RkContext *cx;
   }
 }
 
-static
-GetLine(cx, gram, tdp, line, size)
-     struct RkContext	*cx;
-     struct RkKxGram	*gram;
-     struct TD		*tdp;
-     Wchar		*line;
-     int		size;
+static int
+GetLine(struct RkContext* cx, struct RkKxGram* gram, struct TD* tdp,
+        cannawc* line, int size)
 {
   struct TD	*vtd;
   struct TN	*vtn;
   struct _rec	*gwt = (struct _rec *)cx->cx_gwt;
-  
+
   if (tdp) {
     if (gwt->tdn)
       freeTdn(cx);
@@ -919,16 +891,15 @@ GetLine(cx, gram, tdp, line, size)
     return -1;
 }
 
-/*
- * RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
- *
+
+/**
  * int            cx_num      コンテクストNO
  * unsigned char  *dirname    ディレクトリ名
  * unsigned char  *dicname    辞書名
  * unsigned char  *info       バッファ
  * int            infolen     バッファの長さ
  *
- * 返り値 : 実際にinfoに入った長さ
+ * @return 実際にinfoに入った長さ
  *          最後まで読んでいたら          ０を返す
  *          RkwCreateContextに失敗した     BADCONT
  *          RkwDuplicateContextに失敗した  BADCONT
@@ -940,30 +911,26 @@ GetLine(cx, gram, tdp, line, size)
  *          dics.dirに異常があった場合                 -10   BADDR
  */
 int
-RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
-     int		cx_num;
-     unsigned char	*dirname;
-     unsigned char	*dicname;
-     Wchar		*info ;
-     int		infolen ;
+RkwGetWordTextDic(int cx_num, const char* dirname, const char* dicname,
+                  cannawc* info, int infolen)
 {
-  struct RkContext *new_cx, *cx;
-  struct DM *dm;
-  int new_cx_num;
-  struct TD *initial_td;
-  unsigned size;
-  unsigned char *buff = 0;
-  struct _rec	*gwt;
+    struct RkContext *new_cx, *cx;
+    struct DM *dm;
+    int new_cx_num;
+    struct TD *initial_td;
+    unsigned size;
+    unsigned char *buff = 0;
+    struct _rec	*gwt;
 
-  if (!dicname || !dirname || !info || !(cx = RkGetContext(cx_num)) || 
+    if (!dicname || !dirname || !info || !(cx = RkGetContext(cx_num)) ||
       !(gwt = (struct _rec *)cx->cx_gwt))
     return BADCONT;
 
-  if(dicname[0] != '\0') {
-    size = strlen((char *)dicname) + 1;
-    if (!(buff = (unsigned char *)malloc(size)))
-      return (NOTALC);
-    (void)strcpy((char *)buff, (char *)dicname);
+    if(dicname[0] != '\0') {
+        size = strlen(dicname) + 1;
+        if (!(buff = (unsigned char *)malloc(size)))
+            return (NOTALC);
+        strcpy((char *)buff, dicname);
 
     if(dirname[0] != '\0') {
       if((new_cx_num = RkwCreateContext()) < 0) {
@@ -998,9 +965,9 @@ RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
       RkwCloseContext(gwt->gwt_cx);
       gwt->gwt_cx = -1;
     }
-    
+
     if(!STRCMP(dirname, SYSTEM_DDHOME_NAME)) {
-      if (!(dm = _RkSearchDDP(new_cx->ddpath, (char *)dicname))) {
+      if (!(dm = _RkSearchDDP(new_cx->ddpath, dicname))) {
 	if (dirname[0] != '\0') {
 	  RkwCloseContext(new_cx_num);
 	}
@@ -1023,13 +990,13 @@ RkwGetWordTextDic(cx_num, dirname, dicname, info, infolen)
       (void)free((char *)buff);
       return BADF;
     }
-    if(RkwMountDic(new_cx_num, (char *)dicname,0) == -1) {
+    if(RkwMountDic(new_cx_num, dicname, 0) == -1) {
       RkwCloseContext(new_cx_num);
       (void)free((char *)buff);
       return NOMOUNT;
     }
 
-    if (!_RkSearchDDP(new_cx->ddpath, (char *)dicname)) {
+    if (!_RkSearchDDP(new_cx->ddpath, dicname)) {
       RkwCloseContext(new_cx_num);
       (void)free((char *)buff);
       return BADDR;

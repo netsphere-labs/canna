@@ -26,7 +26,7 @@ static char rcsid[]="@(#) 102.1 $Id: crxgram.c,v 1.6 2003/03/24 04:04:25 aida_s 
 
 /* #include	"RKintern.h" */
 
-#include	"ccompat.h"
+#include "canna/ccompat.h"
 #include	<stdio.h>
 #include	"RKindep/file.h"
 

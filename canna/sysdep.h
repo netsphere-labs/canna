@@ -25,14 +25,9 @@
 #ifndef CANNA_SYSDEP_H
 #define CANNA_SYSDEP_H
 
-#include <canna/pubconf.h>
-#if defined(CANNA_HAVE_INTTYPES_H)
-# include <inttypes.h>
-#elif defined(CANNA_HAVE_STDINT_H)
-# include <stdint.h>
-#else
-# include <sys/types.h>
-#endif
+#include <inttypes.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 #ifndef _WCHAR_T
 # if defined(WCHAR_T) || defined(_WCHAR_T_) || defined(__WCHAR_T) \
@@ -41,7 +36,8 @@
 # endif
 #endif
 
-#ifdef CANNA_HAVE_INT32_T
+// 32bit => ILP32 model.
+// 64bit => LP64 (major UNIX), ILP64 and LLP64 (Windows)
 typedef int8_t canna_int8_t;
 typedef int16_t canna_int16_t;
 typedef int32_t canna_int32_t;
@@ -50,17 +46,6 @@ typedef uint8_t canna_uint8_t;
 typedef uint16_t canna_uint16_t;
 typedef uint32_t canna_uint32_t;
 typedef uintptr_t canna_uintptr_t;
-#else /* CANNA_HAVE_INT32_T */
-/* ILP32 and LP64 */
-typedef signed char canna_int8_t;
-typedef short canna_int16_t;
-typedef int canna_int32_t;
-typedef unsigned long canna_intptr_t;
-typedef unsigned char canna_uint8_t;
-typedef unsigned short canna_uint16_t;
-typedef unsigned int canna_uint32_t;
-typedef unsigned long canna_uintptr_t;
-#endif /* !CANNA_HAVE_INT32_T */
 
 #endif /* CANNA_SYSDEP_H */
 /* vim: set sw=2: */

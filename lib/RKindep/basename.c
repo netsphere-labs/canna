@@ -17,11 +17,11 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "cannaconf.h"
-#include "ccompat.h"
+#include "config.h"
+#include "canna/ccompat.h"
 #include "RKindep/file.h"
 
 RCSID("$Id: basename.c,v 1.2 2003/03/24 04:04:25 aida_s Exp $");
@@ -54,12 +54,13 @@ RCSID("$Id: basename.c,v 1.2 2003/03/24 04:04:25 aida_s Exp $");
  * is needed in canna.
  */
 
-char *
-RkiBasename(path)
-const char *path;
+#include <string.h>
+
+const char *
+RkiBasename(const char* path)
 {
-  char *p = strrchr(path, '/');
-  return p ? p + 1 : (char *)path;
+    const char* p = strrchr(path, '/');
+    return p ? p + 1 : path;
 }
 
 /* vim: set sw=2: */

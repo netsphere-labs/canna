@@ -33,24 +33,9 @@
 extern "C" {
 #endif
 
-#ifndef HAVE_MALLOC
-# define HAVE_MALLOC 0
-#endif
-#if !HAVE_MALLOC
-extern void *RkiMalloc pro((size_t size));
-extern void *RkiCalloc pro((size_t num, size_t size));
-# define malloc(size) RkiMalloc(size)
-# define calloc(num, size) RkiCalloc(num, size)
-#endif
 
-#ifndef HAVE_MEMSET
-extern void *RkiMemset pro((void *ptr, int ch, size_t size));
-# define memset(buf, ch, size) RkiMemset(buf, ch, size)
-#endif
-
-#ifndef HAVE_STRDUP
-extern char *RkiStrdup pro((const char *str));
-# define strdup(s) RkiStrdup(s)
+#ifdef _MSC_VER
+  #define strdup(s) _strdup(s)
 #endif
 
 #ifdef __cplusplus

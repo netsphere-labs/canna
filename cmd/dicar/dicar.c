@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -84,7 +84,7 @@ char *name;
   name[len++] = '.';
   name[len++] = 'd';
   name[len++] = '\0';
-} 
+}
 
 /* ヘッダ情報を書き出す */
 static void
@@ -105,44 +105,43 @@ struct HD *hd;
   }
 }
 
-static int
-openForRead(name)
-char *name;
-{
-  int newfd;
 
-  if ((newfd = open(name, O_RDONLY)) < 0) {
-    (void)fprintf(stderr, "%s: %s cannot read.\n", program, name);
-  }
-#ifdef __CYGWIN32__
-  setmode(newfd, O_BINARY);
+// @return If open() failed, -1.
+static int
+openForRead(const char* name)
+{
+    int newfd;
+
+    if ((newfd = open(name, O_RDONLY)) < 0) {
+        fprintf(stderr, "%s: %s cannot open to read.\n", program, name);
+    }
+#ifdef _WIN32
+    setmode(newfd, O_BINARY);
 #endif
-  return newfd;
+    return newfd;
 }
 
+// @return If open() failed, -1.
 static int
-openForWrite(name)
-char *name;
+openForWrite(const char* name)
 {
-  int newfd;
+    int newfd;
 
-  if ((newfd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0) {
-    (void)fprintf(stderr, "%s: %s cannot create\n", program, name);
-  }
-#ifdef __CYGWIN32__
-  setmode(newfd, O_BINARY);
+    if ((newfd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0) {
+        fprintf(stderr, "%s: %s cannot create\n", program, name);
+    }
+#ifdef _WIN32
+    setmode(newfd, O_BINARY);
 #endif
   return newfd;
 }
 
 static void
-closeForWrite(fd, name)
-int fd;
-char *name;
+closeForWrite(int fd, const char* name)
 {
-  if (close(fd) < 0) {
-    (void)fprintf(stderr, "%s: write failed for %s\n", program, name);
-  }
+    if (close(fd) < 0) {
+        fprintf(stderr, "%s: write failed for %s\n", program, name);
+    }
 }
 
 /* src の内容を dst に siz 分コピーする */
@@ -308,7 +307,7 @@ int src, atm, dst;
   int num, i;
   off_t offset = 0;
   unsigned dmsize;
-  
+
   num = getchild(atm, childdic); /* 子辞書情報の構造体の作成 */
 
   if (src >= 0) {
@@ -510,7 +509,7 @@ char	**args;
 
   opchar = args[1] + (args[1][0] == '-');
   if (opchar[1]) usage();
-  
+
   switch (opchar[0]) {
   case 'c': doCreate(argn, args); break;
   case 'd': doDelete(argn, args); break;

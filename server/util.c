@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -25,241 +25,8 @@ static char rcs_id[] = "$Id: util.c,v 1.8 2003/09/21 12:56:29 aida_s Exp $";
 #endif
 
 #include "server.h"
-#if 1 /* unused */
-#include "widedef.h"
-#endif
+#include "canna/widedef.h"
 
-size_t
-ushort2euc(src, srclen, dest, destlen)
-const Ushort *src;
-char *dest;
-size_t srclen, destlen;
-{
-  register size_t i, j;
-  register Ushort wc;
-
-  for (i = 0, j = 0 ; i < srclen && j + 2 < destlen ; i++) {
-    wc = src[i];
-    switch (wc & 0x8080) {
-    case 0:
-      /* ASCII */
-      dest[j++] = (char)((unsigned)wc & 0x7f);
-      break;
-    case 0x0080:
-      /* È¾³Ñ¥«¥Ê */
-      dest[j++] = (char)0x8e; /* SS2 */
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8000:
-      /* ³°»ú */
-      dest[j++] = (char)0x8f; /* SS3 */
-      dest[j++] = (char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    case 0x8080:
-      /* ´Á»ú */
-      dest[j++] = (char)((((unsigned)wc & 0x7f00) >> 8) | 0x80);
-      dest[j++] = (char)(((unsigned)wc & 0x7f) | 0x80);
-      break;
-    }
-  }
-  dest[j] = '\0';
-  return j;
-}
-
-size_t
-euc2ushort(src, srclen, dest, destlen)
-const char *src;
-Ushort *dest;
-size_t srclen, destlen;
-{
-  register size_t i, j;
-  register unsigned ec;
-
-  for (i = 0, j = 0 ; i < srclen && j + 1 < destlen ; i++) {
-    ec = (unsigned)(unsigned char)src[i];
-    if (ec & 0x80) {
-      switch (ec) {
-      case 0x8e: /* SS2 */
-	dest[j++] = (Ushort)(0x80 | ((unsigned)src[++i] & 0x7f));
-	break;
-      case 0x8f: /* SS3 */
-	dest[j++] = (Ushort)(0x8000
-			      | (((unsigned)src[i + 1] & 0x7f) << 8)
-			      | ((unsigned)src[i + 2] & 0x7f));
-	i += 2;
-	break;
-      default:
-	dest[j++] = (Ushort)(0x8080 | (((unsigned)src[i] & 0x7f) << 8)
-			      | ((unsigned)src[i + 1] & 0x7f));
-	i++;
-	break;
-      }
-    }
-    else {
-      dest[j++] = (Ushort)ec;
-    }
-  }
-  dest[j] = (Ushort)0;
-  return j;
-}
-
-#if 1 /* unused */
-size_t
-wchar2ushort32(src, srclen, dest, destlen)
-register const wchar_t *src;
-register Ushort *dest;
-size_t srclen, destlen;
-{
-  register size_t i;
-
-  for (i = 0 ; i < srclen && i + 1 < destlen ; i++) {
-    switch ((unsigned)(*src & 0xf0000000) >> 28) {
-    case 0:
-      /* ASCII */
-      *dest = (Ushort)((unsigned)*src & 0x7f);
-      break;
-    case 1:
-      /* È¾³Ñ¥«¥Ê */
-      *dest = (Ushort)(0x80 | ((unsigned)*src & 0x7f));
-      break;
-    case 2:
-      /* ³°»ú */
-      *dest = (Ushort)(0x8000
-			     | (((unsigned)*src & 0x3f80) << 1)
-			     | ((unsigned)*src & 0x7f));
-      break;
-    case 3:
-      /* ´Á»ú */
-      *dest = (Ushort)(0x8080 
-			     | (((unsigned)*src & 0x3f80) << 1)
-			     | ((unsigned)*src & 0x7f));
-      break;
-    }
-    src++;
-    dest++;
-  }
-  *dest = (Ushort)0;
-  return i;
-}
-
-size_t
-ushort2wchar32(src, srclen, dest, destlen)
-register const Ushort *src;
-register wchar_t *dest;
-size_t srclen, destlen;
-{
-  register size_t i;
-
-  for (i = 0 ; i < srclen && i + 1 < destlen ; i++) {
-    switch (*src & 0x8080) {
-    case 0:
-      /* ASCII */
-      *dest = (wchar_t)(*src & 0x7f);
-      break;
-    case 0x0080:
-      /* È¾³Ñ¥«¥Ê */
-     * dest = (wchar_t)((0x1 << 28) | (*src & 0x7f));
-      break;
-    case 0x8000:
-      /* ³°»ú */
-      *dest = (wchar_t)((0x2 << 28)
-			| ((unsigned)(*src & 0x7f00) >> 1) | (*src & 0x7f));
-      break;
-    case 0x8080:
-      /* ´Á»ú */
-      *dest = (wchar_t)((0x3 << 28)
-			| ((unsigned)(*src & 0x7f00) >> 1) | (*src & 0x7f));
-      break;
-    }
-    src++;
-    dest++;
-  }
-  *dest = (wchar_t)0;
-  return i;
-}
-
-size_t
-wchar2ushort16(src, srclen, dest, destlen)
-register const wchar_t *src;
-register Ushort *dest;
-size_t srclen, destlen;
-{
-  register size_t i;
-
-  for (i = 0 ; i < srclen && i + 1 < destlen ; i++)
-      *dest++ = (Ushort)*src++;
-
-  *dest = (Ushort)0;
-  return i;
-}
-
-size_t
-ushort2wchar16(src, srclen, dest, destlen)
-register const Ushort *src;
-register wchar_t *dest;
-size_t srclen, destlen;
-{
-  register size_t i;
-
-  for (i = 0 ; i < srclen && i + 1 < destlen ; i++)
-      *dest++ = (wchar_t)*src++;
-
-  *dest = (wchar_t)0;
-  return i;
-}
-#endif /* unused */
-
-size_t
-ushortstrlen(ws)
-const Ushort *ws;
-{
-  size_t res = 0;
-  while (*ws++) {
-    res++;
-  }
-  return res;
-}
-
-Ushort *
-ushortmemchr(ws, ch, len)
-const Ushort *ws;
-int ch;
-size_t len;
-{
-  const Ushort *p, *end;
-  for (p = ws, end = ws + len; p < end; ++p)
-      if (*p == (Ushort)ch)
-	  return (Ushort *)p;
-  return NULL;
-}
-
-size_t
-ushortstrcpy(wd, ws)
-Ushort *wd;
-const Ushort *ws;
-{
-  register size_t res = 0;
-  while ((*wd++ = *ws++) != (Ushort)0) {
-    res++;
-  }
-  return res;
-}
-
-size_t
-ushortstrncpy(wd, ws, n)
-Ushort *wd;
-const Ushort *ws;
-size_t n;
-{
-  register size_t res = 0;
-
-  while (res < n && (*wd = *ws) != (Ushort)0) {
-    wd++; ws++; res++;
-  }
-  *wd = 0;
-  return res;
-}
 
 /*
   WidenClientContext
@@ -356,11 +123,11 @@ ClientPtr cl;
 int cn;
 {
   int i, n = cl->ncon, *contexts = cl->context_flag;
-  
+
   for (i = 0 ; i < n ; i++) {
     if (contexts[i] == cn) {
       return 1;
-    }   
+    }
   }
   return 0;
 }

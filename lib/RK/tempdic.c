@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -27,28 +27,18 @@ static char rcsid[]="$Id: tempdic.c,v 1.4 2003/09/17 08:50:52 aida_s Exp $";
 
 #include	"RKintern.h"
 
-#include	<stdio.h>
-
-#ifdef __CYGWIN32__
+#include <stdio.h>
 #include <fcntl.h> /* for O_BINARY */
-#endif
-
-#ifdef sony_news
 #include <sys/types.h>
-#endif
+#include <assert.h>
 
-#if defined(__STDC__) || defined(SVR4)
 #include <time.h>
 #define TIME_T time_t
-#else
-#define TIME_T long
-#endif
 
 #define	dm_td	dm_extdata.ptr
 
 static void
-freeTD(td)
-     struct TD	*td;
+freeTD(struct TD* td)
 {
   int	i;
   for (i = 0; i < (int)td->td_n; i++) {
@@ -66,37 +56,39 @@ freeTD(td)
   }
 }
 
-/* newTD: allocates a fresh node */
+/**
+ * newTD: allocates a fresh node
+ * @return If failed, NULL.
+ */
 static TD *
 newTD()
 {
-  struct TD	*td;
+    struct TD* td;
 
-  td = (struct TD *)malloc(sizeof(struct TD));
-  if (td) {
+    td = (struct TD*) malloc(sizeof(struct TD));
+    if (!td)
+        return NULL;
+
     td->td_n = 0;
     td->td_max = 1;
     if (!(td->td_node = (struct TN *)calloc(td->td_max, sizeof(struct TN)))) {
       freeTD(td);
       return((struct TD *)0);
     }
-  }
-  return(td);
+
+    return td;
 }
 
 /*
  * INSERT
  */
 static TN *
-extendTD(tdic, key, tw)
-     struct TD		*tdic;
-     Wchar		key;
-     struct TW		*tw;
+extendTD(struct TD* tdic, cannawc key, struct TW* tw)
 {
   int		i, j;
   struct TN	*tp;
   struct TW	*ntw;
-    
+
   if (!(ntw = RkCopyWrec(tw)))
     return (struct TN *)0;
   tp = tdic->td_node;
@@ -125,9 +117,7 @@ extendTD(tdic, key, tw)
 }
 
 static
-yomi_equal(x, y, n)
-     Wrec *x, *y;
-     int n;
+int yomi_equal(Wrec* x, Wrec* y, int n)
 {
   int l;
 
@@ -147,11 +137,8 @@ yomi_equal(x, y, n)
   return(0);
 }
 
-static
-Wchar
-nthKey(w, n)
-     Wrec	*w;
-     int	n;
+static cannawc
+nthKey(Wrec* w, int n)
 {
   if (n < (int)((*w >> 1) & 0x3f)) {
     if (*w & 0x80)
@@ -172,21 +159,15 @@ nthKey(w, n)
  *    newW  登録するワードレコード
  *    nlen  不明
  */
-
 static TN *
-defineTD(dm, tab, n, newTW, nlen)
-     struct DM	*dm;
-     struct TD	*tab;
-     int	n;
-     struct TW	*newTW;
-     int	nlen;
+defineTD(struct DM* dm, struct TD* tab, int n, struct TW* newTW, int nlen)
 {
-  int		i;
-  Wchar		key;
-  struct TN	*tn;
-  struct ncache	*cache;
-  struct TW	*mergeTW, *oldTW;
-  Wrec		*oldW, *newW = newTW->word;
+    int		i;
+    cannawc key;
+    struct TN	*tn;
+    struct ncache	*cache;
+    struct TW	*mergeTW, *oldTW;
+    Wrec		*oldW, *newW = newTW->word;
 
   key = nthKey(newW, n); n++;
   tn = tab->td_node;
@@ -228,30 +209,23 @@ defineTD(dm, tab, n, newTW, nlen)
   return extendTD(tab, key, newTW);
 }
 
-static
-enterTD(dm, td, gram, word)
-     struct DM		*dm;
-     struct TD		*td;
-     struct RkKxGram	*gram;
-     Wchar		*word;
+// @return malloc() failed, -1.
+static int
+enterTD(struct DM* dm, struct TD* td, struct RkKxGram* gram, cannawc* word)
 {
-  struct TW	tw;
-  int ret = -1;
-#ifndef USE_MALLOC_FOR_BIG_ARRAY
-  Wrec		wrec[RK_LINE_BMAX*10];
-#else
-  Wrec *wrec = (Wrec *)malloc(sizeof(Wrec) * RK_LINE_BMAX * 10);
-  if (!wrec) {
-    return ret;
-  }
-#endif
+    struct TW	tw;
+    int ret = -1;
+
+    Wrec* wrec = (Wrec*) malloc(sizeof(Wrec) * RK_LINE_BMAX * 10);
+    if (!wrec)
+        return -1;
 
   if (word[0] == (Wchar)'#') {
     ret = 1;
   }
   else if (RkParseOWrec(gram, word, wrec, RK_LINE_BMAX * 10, tw.lucks)) {
     struct TN *tn;
-    
+
     tw.word = wrec;
     tn = defineTD(dm, td, 0, &tw, RK_LINE_BMAX * 10);
     if (tn) {
@@ -264,9 +238,8 @@ enterTD(dm, td, gram, word)
   else {
     ret = 1;
   }
-#ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free((char *)wrec);
-#endif
+
+  free( wrec);
   return ret;
 }
 
@@ -274,13 +247,11 @@ enterTD(dm, td, gram, word)
  * DELETE
  */
 static void
-shrinkTD(td, key)
-     struct TD *td;
-     Wchar key;
+shrinkTD(struct TD* td, cannawc key)
 {
   int		i;
   struct TN	*tn = td->td_node;
-    
+
   for (i = 0; i < (int)td->td_n; i++) {
     if (key == tn[i].tn_key) {
       while (++i < (int)td->td_n) tn[i - 1] = tn[i];
@@ -300,28 +271,24 @@ shrinkTD(td, key)
  *    newW  定義するワードレコード
  */
 static int
-deleteTD(dm, tab, n, newW)
-     struct DM	*dm;
-     struct TD	**tab;
-     int	n;
-     Wrec	*newW;
+deleteTD(struct DM* dm, struct TD** tab, int n, Wrec* newW)
 {
-  struct TD	*td = *tab;
-  int		i;
-  Wchar		key;
-    
+    struct TD	*td = *tab;
+    int		i;
+    cannawc key;
+
   key = nthKey(newW, n); n ++;
   for (i = 0; i < (int)td->td_n; i++) {
     struct TN	*tn = &td->td_node[i];
-    
+
     if (key == tn->tn_key ) {
       if (IsWordNode(tn)) {
 	struct TW	*oldTW = tn->tn_word;
 	Wrec		*oldW = oldTW->word;
-	
+
 	if (!key || yomi_equal(newW, oldW, n)) {
 	  struct ncache	*cache = _RkFindCache(dm, (long)oldTW);
-	  
+
 	  if (!cache || cache->nc_count <= 0) {
 	    struct TW	*subW, newTW;
 
@@ -359,64 +326,55 @@ deleteTD(dm, tab, n, newW)
   return(0);
 }
 
-/*
- * OPEN
- */
-/*ARGSUSED*/
-int
-_Rktopen(dm, file, mode, gram)
-     struct DM	*dm;
-     char	*file;
-     int	mode;
-     struct RkKxGram	*gram;
-{
-  struct DF	*df = dm->dm_file;
-  struct DD	*dd = df->df_direct;
-  struct TD	*xdm;
-  FILE		*f;
-  long		offset = 0L;
-  int		ecount = 0;
-  int ret = -1;
-#ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char		line[RK_LINE_BMAX*10];
-  Wchar	wcline[RK_LINE_BMAX*10];
-#else
-  char *line = malloc(RK_LINE_BMAX * 10);
-  Wchar *wcline = (Wchar *)malloc(sizeof(Wchar) * RK_LINE_BMAX * 10);
-  if (!line || !wcline) {
-    if (line) (void)free(line);
-    if (wcline) (void)free((char *)wcline);
-    return ret;
-  }
-#endif
-    
-  if (!df->df_rcount) {
-    if (close(open(file, 0)))
-      goto return_ret;
-    df->df_flags |= DF_EXIST;
-    dm->dm_flags |= DM_EXIST;
-    if (!close(open(file, 2)))
-      dm->dm_flags |= DM_WRITABLE;
-  }
-  if (!(dm->dm_flags & DM_EXIST))
-    ;
-#ifdef __EMX__
-  else if (!(f = fopen(file, "rt"))) {
-#else
-  else if (!(f = fopen(file, "r"))) {
-#endif
-    df->df_flags &= ~DF_EXIST;
-    dm->dm_flags &= ~DM_EXIST;
-  }
-  else if (!(xdm = newTD())) {
-    fclose(f);
-  }
-  else {
-    while (fgets((char *)line, RK_LINE_BMAX*10, f)) {
-      int		sz;
 
-      offset += strlen(line);
-      sz = RkCvtWide(wcline, RK_LINE_BMAX*10, line, strlen(line));
+/**
+ * OPEN
+ * @return If malloc() failed, -1.
+ */
+int
+_Rktopen(struct DM* dm, const char* file, int mode, struct RkKxGram* gram)
+{
+    assert(dm);
+
+    struct DF	*df = dm->dm_file;
+    struct DD	*dd = df->df_direct;
+    struct TD	*xdm;
+    FILE		*f;
+    long		offset = 0L;
+    int		ecount = 0;
+    int ret = -1;
+
+    unsigned char* line = (unsigned char*) malloc(RK_LINE_BMAX * 10);
+    cannawc* wcline = (cannawc*) malloc(sizeof(cannawc) * RK_LINE_BMAX * 10);
+    if (!line || !wcline) {
+        free(line);
+        free(wcline);
+        return -1;
+    }
+
+    if (!df->df_rcount) {
+        if (close(open(file, 0)))
+            goto return_ret;
+        df->df_flags |= DF_EXIST;
+        dm->dm_flags |= DM_EXIST;
+        if (!close(open(file, 2)))
+            dm->dm_flags |= DM_WRITABLE;
+    }
+    if (!(dm->dm_flags & DM_EXIST))
+        ;
+    else if (!(f = fopen(file, "rt"))) {
+        df->df_flags &= ~DF_EXIST;
+        dm->dm_flags &= ~DM_EXIST;
+    }
+    else if (!(xdm = newTD())) {
+        fclose(f);
+    }
+    else {
+        while (fgets((char *)line, RK_LINE_BMAX*10, f)) {
+            int		sz;
+
+            offset += strlen((char*) line);
+            sz = RkCvtWide(wcline, RK_LINE_BMAX*10, line, strlen((char*) line));
       if (sz < RK_LINE_BMAX*10 - 1) {
 	if ( enterTD(dm, xdm, gram, wcline) < 0 )
 	  ecount++;
@@ -426,7 +384,7 @@ _Rktopen(dm, file, mode, gram)
     (void)fclose(f);
     dm->dm_offset = 0L;
     df->df_size = offset;
-    if (ecount) {		
+    if (ecount) {
       freeTD((struct TD *)xdm);
       dm->dm_td = (pointer)0;
       dm->dm_flags &= ~DM_EXIST;
@@ -438,50 +396,46 @@ _Rktopen(dm, file, mode, gram)
       ret = 0;
     };
   }
- return_ret:
-#ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free((char *)wcline);
-  (void)free(line);
-#endif
-  return ret;
+
+return_ret:
+    free( wcline);
+    free(line);
+    return ret;
 }
 
 /*
  * CLOSE
  */
-static int writeTD pro((struct TD *, struct RkKxGram *, int));
-
 static int
-writeTD(td, gram, fdes)
-     struct TD		*td;
-     struct RkKxGram	*gram;
-     int		fdes;
+writeTD(struct TD* td, struct RkKxGram* gram, int fdes)
 {
-  int	i, tmpres;
-  int	ecount = 0;
-  Wchar *wcline = (Wchar *)0;
+    int	i, tmpres;
+    int	ecount = 0;
+    cannawc* wcline = NULL;
 
-  wcline = (Wchar *)malloc(RK_WREC_BMAX * sizeof(Wchar));
-  if (wcline) {
+    wcline = (cannawc*) malloc( sizeof(cannawc) * RK_WREC_BMAX );
+    if (!wcline)
+        return -1;
+
     for (i = 0; i < (int)td->td_n; i++) {
-      struct TN		*tn = &td->td_node[i];
-      unsigned char	*line;
-      Wchar		*wc;
-      int		sz;
-    
-      if (IsWordNode(tn)) {
-        wc = _RkUparseWrec(gram, tn->tn_word->word, wcline,
+        struct TN		*tn = &td->td_node[i];
+        unsigned char	*line;
+        cannawc* wc;
+        int		sz;
+
+        if (IsWordNode(tn)) {
+            wc = _RkUparseWrec(gram, tn->tn_word->word, wcline,
                           RK_LINE_BMAX * sizeof(Wchar), tn->tn_word->lucks, 1);
-        if (wc) {
-          sz = RkCvtNarrow((char *)0, 9999, wcline, (int)(wc - wcline));
+            if (wc) {
+                sz = RkCvtNarrow(NULL, 9999, wcline, (int)(wc - wcline));
           if (sz > RK_LINE_BMAX
               && !(wc = _RkUparseWrec(gram, tn->tn_word->word, wcline,
                          RK_LINE_BMAX * sizeof(Wchar), tn->tn_word->lucks, 0)))
             ecount++;
           else {
 	    line = (unsigned char *)malloc( RK_LINE_BMAX*3 );
-	    if(line) { 
-              sz = RkCvtNarrow((char *)line, RK_LINE_BMAX,
+	    if(line) {
+              sz = RkCvtNarrow(line, RK_LINE_BMAX,
                                 wcline, (int)(wc - wcline));
 #ifdef USE_SJIS_TEXT_DIC
 	      line[sz++] = '\r';
@@ -500,23 +454,20 @@ writeTD(td, gram, fdes)
       } else
         ecount += writeTD(tn->tn_tree, gram, fdes);
     }
-    free((char *)wcline);
-    return(ecount);
-  }
-  return 0;
+
+    free( wcline);
+    return ecount;
 }
 
-int	
-_Rktclose(dm, file, gram)
-     struct DM	*dm;
-     char	*file;
-     struct RkKxGram	*gram;
+
+int
+_Rktclose(struct DM* dm, char* file, struct RkKxGram* gram)
 {
-  struct DF	*df = dm->dm_file;
-  struct TD	*xdm = (struct TD *)dm->dm_td;
+    struct DF	*df = dm->dm_file;
+    struct TD	*xdm = (struct TD *)dm->dm_td;
   int		ecount;
   int		fdes;
-  
+
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char	backup[RK_PATH_BMAX];
   char	header[RK_LINE_BMAX];
@@ -533,20 +484,20 @@ _Rktclose(dm, file, gram)
     return 0;
   }
 #endif
-    
+
   _RkKillCache(dm);
   if (dm->dm_flags & DM_UPDATED) {
     char	*p = rindex(file, '/');
-    
+
     if (p) {
       strcpy(backup, file);
       p++;
       backup[(int)(p - file)] = '#';
       strcpy(&backup[(int)(p-file) + 1], p);
     };
-    
+
     fdes = creat(backup, (unsigned)0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
     setmode(fdes, O_BINARY);
 #endif
     ecount = 0;
@@ -602,32 +553,27 @@ _Rktclose(dm, file, gram)
   return 0;
 }
 
+extern cannawc uniqAlnum(cannawc c);
+
 int
-_Rktsearch(cx, dm, key, n, nread, maxcache, cf)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     Wchar		*key;
-     int		n;
-     struct nread	*nread;
-     int		maxcache;
-     int		*cf;
+_Rktsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
+           struct nread* nread, int maxcache, int* cf)
 {
-  Wchar		uniqAlnum();
-  struct TD	*xdm = (struct TD *)dm->dm_td;
-  int		nc = 0;
-  int		i, j;
-    
-  *cf = 0;
-  for (j = 0; j < n;) {
-    Wchar	k = uniqAlnum(key[j++]);
-    struct TN	*tn;
-    
-    tn = xdm->td_node;
-    for (i = 0; i < (int)xdm->td_n && tn->tn_key <= k; i++, tn++) {
-      if (k == tn->tn_key) {
-	if (IsWordNode(tn)) {
-	  Wrec	*w;
-	  int	l;
+    struct TD	*xdm = (struct TD *)dm->dm_td;
+    int		nc = 0;
+    int		i, j;
+
+    *cf = 0;
+    for (j = 0; j < n;) {
+        cannawc k = uniqAlnum(key[j++]);
+        struct TN	*tn;
+
+        tn = xdm->td_node;
+        for (i = 0; i < (int)xdm->td_n && tn->tn_key <= k; i++, tn++) {
+            if (k == tn->tn_key) {
+                if (IsWordNode(tn)) {
+                    Wrec	*w;
+                    int	l;
 
 	  w = tn->tn_word->word;
 	  l = (*w >> 1) & 0x3f;
@@ -646,14 +592,14 @@ _Rktsearch(cx, dm, key, n, nread, maxcache, cf)
 		nc++;
 	      } else
 		(*cf)++;
-	    } else 
+	    } else
 	      (*cf)++;
 	  }
 	  return nc;
 	} else {
 	  struct TD	*ct = tn->tn_tree;
 	  struct TN	*n0 = &ct->td_node[0];
-	  
+
 	  if (ct->td_n && !n0->tn_key) {
 	    unsigned char	*w;
 	    int			l;
@@ -696,11 +642,8 @@ _Rktsearch(cx, dm, key, n, nread, maxcache, cf)
  * IO
  */
 /*ARGSUSED*/
-int	
-_Rktio(dm, cp, io)
-     struct DM		*dm;
-     struct ncache	*cp;
-     int		io;
+int
+_Rktio(struct DM* dm, struct ncache* cp, int io)
 {
   if (io == 0) {
     cp->nc_word = ((struct TW *)cp->nc_address)->word;
@@ -714,14 +657,12 @@ _Rktio(dm, cp, io)
 /*
  * CTL
  */
-int	
-_Rktctl(dm, qm, what, arg, gram)
-     struct DM	*dm;
-     struct DM	*qm; /* no use : dummy*/
-     int	what;
-     Wchar	*arg;
-     struct RkKxGram	*gram;
-/* ARGSUSED */
+int
+_Rktctl(struct DM* dm,
+        struct DM* qm, /* no use : dummy*/
+        int what,
+        const cannawc* arg,
+        struct RkKxGram* gram)
 {
   struct TD	*xdm = (struct TD *)dm->dm_td;
   int		status = 0;
@@ -735,7 +676,7 @@ _Rktctl(dm, qm, what, arg, gram)
     return status;
   }
 #endif
-  
+
   switch(what) {
   case DST_DoDefine:
     if ((dm->dm_flags & (DM_WRITABLE | DM_WRITEOK)) !=
@@ -768,11 +709,9 @@ _Rktctl(dm, qm, what, arg, gram)
   return status;
 }
 
+
 int
-_Rktsync(cx, dm, qm)
-     struct RkContext *cx;
-     struct DM	*dm, *qm;
-/* ARGSUSED */
+_Rktsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
 {
   struct RkKxGram  *gram = cx->gram->gramdic;
   struct DF	*df_p;
@@ -806,7 +745,7 @@ _Rktsync(cx, dm, qm)
   if (file) {
     if (dm->dm_flags & DM_UPDATED) {
       char	*p = rindex(file, '/');
-      
+
       if (p) {
 	strcpy(backup, file);
 	p++;
@@ -815,14 +754,14 @@ _Rktsync(cx, dm, qm)
       };
 
       fdes = creat(backup, (unsigned)0666);
-#ifdef __CYGWIN32__
+#ifdef _WIN32
       setmode(fdes, O_BINARY);
 #endif
       ecount = 0;
       if (fdes >= 0) {
 	int	n;
 	TIME_T	tloc;
-	
+
 	tloc = time(0);
 	strcpy(whattime, ctime(&tloc));
 	whattime[strlen(whattime)-1] = 0;
@@ -837,14 +776,14 @@ _Rktsync(cx, dm, qm)
 	(void)strcat(header, "\n");
 #endif
 	n = strlen(header);
-	if (write(fdes, header, n) != n) { 
+	if (write(fdes, header, n) != n) {
 	  ecount++;
 	}
 	ecount += writeTD(xdm, gram, fdes);
 	(void)close(fdes);
       } else
 	ecount++;
-      
+
       if (!ecount) {
 #ifdef HAVE_RENAME
 #ifdef __EMX__
@@ -866,7 +805,7 @@ _Rktsync(cx, dm, qm)
     };
     (void)free(file);
     ret = 0;
-  } 
+  }
  return_ret:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
   (void)free(backup);

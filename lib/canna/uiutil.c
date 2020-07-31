@@ -25,7 +25,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: uiutil.c,v 1.3 2003/09/17 08:50:53 aida_
 #endif
 
 #include "canna.h"
-#include "patchlevel.h"
+#include "canna/patchlevel.h"
 
 /*********************************************************************
  *                      wchar_t replace begin                        *

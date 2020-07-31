@@ -25,7 +25,7 @@ static	char	rcs_id[] = "@(#) 102.1 $Id: henkan.c,v 1.8.2.2 2004/04/26 22:53:02 a
 #endif /* lint */
 
 #include	"canna.h"
-#include	"rkcapi.h"
+#include "canna/rkcapi.h"
 
 #include	<errno.h>
 #include	<fcntl.h>

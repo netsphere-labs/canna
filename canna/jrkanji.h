@@ -31,21 +31,9 @@
 #ifndef _JR_KANJI_H_
 #define _JR_KANJI_H_
 
-#ifndef _WCHAR_T
-# if defined(WCHAR_T) || defined(_WCHAR_T_) || defined(__WCHAR_T) \
-  || defined(_GCC_WCHAR_T) || defined(_WCHAR_T_DEFINED)
-#  define _WCHAR_T
-# endif
-#endif
 
-#ifdef pro
-#define CANNA_PRO_PREDEFINED
-#else
-#if defined(__STDC__) || defined(__cplusplus)
-#define pro(x) x
-#else
-#define pro(x) ()
-#endif
+#ifndef pro
+  #define pro(x) x
 #endif
 
 #include <canna/sysdep.h>
@@ -192,19 +180,18 @@ typedef struct {
 } jrEUCListCallbackStruct;
 
 #ifndef CANNAWC_DEFINED
-# if defined(_WCHAR_T) || defined(CANNA_NEW_WCHAR_AWARE)
-#  define CANNAWC_DEFINED
-#  ifdef CANNA_NEW_WCHAR_AWARE
-#   ifdef CANNA_WCHAR16
-typedef canna_uint16_t cannawc;
-#   else
-typedef canna_uint32_t cannawc;
-#   endif
-#  elif defined(_WCHAR_T) /* !CANNA_NEW_WCHAR_AWARE */
-typedef wchar_t cannawc;
-#  endif
-# endif
-#endif
+  #define CANNAWC_DEFINED
+  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
+typedef uint32_t cannawc;
+    #undef CANNA_WCHAR16
+    #undef WCHAR16
+  #else
+typedef uint16_t cannawc;
+    #define CANNA_WCHAR16
+    #define WCHAR16
+  #endif
+#endif // !CANNAWC_DEFINED
+
 
 #ifdef CANNAWC_DEFINED
 
@@ -294,14 +281,14 @@ int createKanjiContext pro((void));
 int jrCloseKanjiContext pro((const int, jrKanjiStatusWithValue *));
 
 #ifdef CANNAWC_DEFINED
-#ifdef CANNA_NEW_WCHAR_AWARE
-# define wcKanjiString cannawcKanjiString
-# define wcKanjiControl cannawcKanjiControl
-# define wcCloseKanjiContext cannawcCloseKanjiContext
-#endif /*CANNA_NEW_WCHAR_AWARE */
+// New APIs
+#define wcKanjiString cannawcKanjiString
+#define wcKanjiControl cannawcKanjiControl
+#define wcCloseKanjiContext cannawcCloseKanjiContext
+
 int wcKanjiString pro((const int, const int, cannawc *, const int,
 			    wcKanjiStatus *));
-int wcKanjiControl pro((const int, const int, char *));
+int wcKanjiControl pro((int, int, char*));
 int wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 #endif /* CANNAWC_DEFINED */
 
@@ -309,11 +296,6 @@ int wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 }
 #endif
 
-#ifdef CANNA_PRO_PREDEFINED
-#undef CANNA_PRO_PREDEFINED
-#else
-#undef pro
-#endif
 
 #endif /* _JR_KANJI_H_ */
 

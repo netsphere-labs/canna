@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: server.h,v 1.4 2003/09/23 07:11:31 aida_s Exp $ */
@@ -25,11 +25,11 @@
 #ifndef	SERVER_H
 #define SERVER_H
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include <stdio.h>
 #include <sys/types.h>
 
-#include <sys/time.h>		
+#include <sys/time.h>
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
 #endif
@@ -38,7 +38,7 @@
 #include <sys/select.h>
 #endif
 
-#include "net.h"
+#include "canna/net.h"
 #include <unistd.h>
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
@@ -83,7 +83,7 @@ typedef struct _ClientStat *ClientStatPtr;
 #ifdef DEBUG
 #define ir_debug( cannadebug )	 cannadebug
 #else
-#define ir_debug( cannadebug )	
+#define ir_debug( cannadebug )
 #endif
 
 /* subset of struct addrinfo */
@@ -132,7 +132,7 @@ typedef struct _Client {
     int		*context_flag;               /* コンテクスト管理フラグ */
     int		cfsize, ncon;		     /* 上のテーブルの大きさ管理 */
     char	*clientname ;		     /* クライアント名  */
-} ClientRec ;			
+} ClientRec ;
 
 typedef struct _ClientStat {
     int 	id ;			     /* ソケット番号 */
@@ -144,7 +144,7 @@ typedef struct _ClientStat {
     char	username[ NAME_LENGTH+1] ;   /* ユーザ名  */
     char	hostname[ HOST_NAME ] ;      /* ホスト名  */
     char	context_flag[ OLD_MAX_CX ] ;	 /* コンテクスト管理フラグ */
-} ClientStatRec ;		
+} ClientStatRec ;
 
 typedef struct _AddrList {
     Address addr;
@@ -186,11 +186,7 @@ extern int canna_server_lo;
 #ifdef __STDC__
 # define USE_VARARGS
 #endif
-#if defined(USE_VARARGS) && defined(__STDC__)
-# define vapro(x) x
-#else
-# define vapro(x) ()
-#endif
+#define vapro(x) x
 
 #ifdef DEBUG
 void Dmsg vapro((int Pri, const char *f, ...));
@@ -229,11 +225,6 @@ char *insertUserSla pro((char *, int));
 int checkPermissionToRead pro((ClientPtr client,
       char *dirname, char *dicname));
 
-/* main.c */
-int process_request pro((
-      ClientPtr *clientp, ClientBuf *client_buf,
-      BYTE *data, size_t len));
-
 /* session.c */
 UserTable *UserTable_new pro((void));
 void UserTable_delete pro((UserTable *obj));
@@ -243,8 +234,8 @@ void ClientStat pro((ClientPtr client, int type,
       int request_Type, char *return_date));
 
 /* util.c */
-size_t ushort2euc pro((const Ushort *src, size_t srclen,
-      char *dest, size_t destlen));
+#define ushort2euc CNvW2E
+
 size_t euc2ushort pro((const char *src, size_t srclen,
       Ushort *dest, size_t destlen));
 size_t ushortstrlen pro((const Ushort *ws));

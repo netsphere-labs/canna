@@ -27,7 +27,7 @@ static char rcs[] = "@(#) 112.1 $Id: can.c,v 1.4 2003/02/01 19:34:20 aida_s Exp 
 #ifdef ENGINE_SWITCH
 #include "RKrename.h"
 #endif
-#include "cannaconf.h"
+#include "config.h"
 #define CANNA_NEW_WCHAR_AWARE
 
 #include <stdio.h>
@@ -37,7 +37,7 @@ static char rcs[] = "@(#) 112.1 $Id: can.c,v 1.4 2003/02/01 19:34:20 aida_s Exp 
 #include <pwd.h>
 #include <sys/types.h>
 #include <grp.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #ifdef __EMX__
 #include <netdb.h>
 #endif
@@ -1760,13 +1760,13 @@ static struct  command {
 	{"mkdic"   ,mk_main,6 },
 	{"mvdic"   ,mv_main,7 },
 	{"rmdic"   ,rm_main,8 },
-	{"downloaddic" ,cat_main,2 },
-	{"cpuserdic"   ,cp_main,3 },
-	{"lsuserdic"   ,ls_main,5 },
-	{"mkuserdic"   ,mk_main,6 },
-	{"uploaddic"   ,mk_main,6 },
-	{"mvuserdic"   ,mv_main,7 },
-	{"rmuserdic"   ,rm_main,8 },
+//	{"downloaddic" ,cat_main,2 },
+//	{"cpuserdic"   ,cp_main,3 },
+//	{"lsuserdic"   ,ls_main,5 },
+//	{"mkuserdic"   ,mk_main,6 },
+//	{"uploaddic"   ,mk_main,6 },
+//	{"mvuserdic"   ,mv_main,7 },
+//	{"rmuserdic"   ,rm_main,8 },
 	{"chmoddic"    ,ch_main,9 },
 	{"syncdic"     ,sy_main,10},
 	{"cannakill"   ,kill_main,11}

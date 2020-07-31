@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +14,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -27,30 +29,30 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 /*
  * MODIFICATION HISTORY
  *	S000	funahasi@oa2	Fri Oct  2 20:14:13 JST 1992
- *		- debugÍÑ´Ø¿ô RkThrough()¤Î¤¿¤á¤Ë protocol¤òÄÉ²Ã
+ *		- debugç”¨é–¢æ•° RkThrough()ã®ãŸã‚ã« protocolã‚’è¿½åŠ 
  *	S001	funahasi@oa2	Tue Oct 13 15:40:08 JST 1992
- *		- version2.x°ÊÁ°¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë»ş RkQueryDic()¤¬ -1
- *		  ¤òÊÖ¤¹¤è¤¦»ÅÍÍ¤òÊÑ¹¹
+ *		- version2.xä»¥å‰ã®ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹æ™‚ RkQueryDic()ãŒ -1
+ *		  ã‚’è¿”ã™ã‚ˆã†ä»•æ§˜ã‚’å¤‰æ›´
  *	S002	funahasi@oa2	Thu Nov  5 13:22:49 JST 1992
- *		- RkQueryDic()¤Î°ú¤­¿ô¤Ë userÌ¾¤ò»ØÄê½ĞÍè¤ë¤è¤¦»ÅÍÍ¤òÊÑ¹¹
- *		- fixed bug RkBgnBun()¤Çµì¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë¾ì¹ç¡¤mode¤«¤é
- *		  ¥³¡¼¥ÉÊÑ´¹ÉôÊ¬¤À¤±¤ò¼è¤ê½Ğ¤¹½èÍı¤ò½¤Àµ
+ *		- RkQueryDic()ã®å¼•ãæ•°ã« useråã‚’æŒ‡å®šå‡ºæ¥ã‚‹ã‚ˆã†ä»•æ§˜ã‚’å¤‰æ›´
+ *		- fixed bug RkBgnBun()ã§æ—§ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹å ´åˆï¼Œmodeã‹ã‚‰
+ *		  ã‚³ãƒ¼ãƒ‰å¤‰æ›éƒ¨åˆ†ã ã‘ã‚’å–ã‚Šå‡ºã™å‡¦ç†ã‚’ä¿®æ­£
  *	S003	funahasi@oa2	Fri Nov 13 01:19:52 JST 1992
- *		- fixed bug version1.1¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³½ĞÍè¤Ê¤¤
- *		  rkc_get_yomi()¤ò¹Ô¤Ã¤Æ¤¤¤ë¤Î¤¬¸¶°ø
- *		- RkwSetAppName()¤¬Ìµ¤«¤Ã¤¿¤Î¤ÇÄÉ²Ã
- *		- fixed bug version2.1¤Î¥µ¡¼¥Ğ¤ËÀÜÂ³½ĞÍè¤Ê¤¤
- *		  rkc_set_app_name()¤ò¹Ô¤Ã¤Æ¤¤¤ë¤Î¤¬¸¶°ø
+ *		- fixed bug version1.1ã®ã‚µãƒ¼ãƒã«æ¥ç¶šå‡ºæ¥ãªã„
+ *		  rkc_get_yomi()ã‚’è¡Œã£ã¦ã„ã‚‹ã®ãŒåŸå› 
+ *		- RkwSetAppName()ãŒç„¡ã‹ã£ãŸã®ã§è¿½åŠ 
+ *		- fixed bug version2.1ã®ã‚µãƒ¼ãƒã«æ¥ç¶šå‡ºæ¥ãªã„
+ *		  rkc_set_app_name()ã‚’è¡Œã£ã¦ã„ã‚‹ã®ãŒåŸå› 
  *	S004	funahasi@oa2	Fri Dec  4 02:04:38 JST 1992
- *		- cannastat, cshos¤Î¤¿¤á¤Ë rkc¤ÎÆâÉô´Ø¿ô¤ò¸Æ¤Ó½Ğ¤¹
- *		  ¥¤¥ó¥¿¥Õ¥§¡¼¥¹¤òÄÉ²Ã
+ *		- cannastat, cshosã®ãŸã‚ã« rkcã®å†…éƒ¨é–¢æ•°ã‚’å‘¼ã³å‡ºã™
+ *		  ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹ã‚’è¿½åŠ 
  *	S005	funahasi@oa2	Thu Feb 18 12:18:41 JST 1993
- *		- fixed bug Rk[w]GetKanjiList()¤¬»ÅÍÍ¤È°Û¤Ê¤Ã¤Æ¤¤¤ë¡¥
+ *		- fixed bug Rk[w]GetKanjiList()ãŒä»•æ§˜ã¨ç•°ãªã£ã¦ã„ã‚‹ï¼
  */
 
 /* LINTLIBRARY */
 
-#include    "sglobal.h" 
+#include "canna/sglobal.h"
 #include    "rkcw.h"
 #include    "canna/RK.h"
 #include    "rkc.h"
@@ -62,19 +64,19 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #include    <grp.h>
 #include    <signal.h>
 #include    <unistd.h>
-	
-/* CX:	¥³¥ó¥Æ¥¯¥¹¥È¥Æ¡¼¥Ö¥ë
- *	É¬Í×¤Ê¥ì¥³¡¼¥É¤À¤±¤òmalloc¤ÇºîÀ®¤¹¤ë¡£
+#include <assert.h>
+
+static int min(int a, int b) { return a <= b ? a : b; }
+
+extern int _RkwGetYomi( RkcContext* cx, cannawc* yomi, int maxyomi);
+extern size_t CNvW2E(const cannawc* src, int srclen, unsigned char* dest, size_t destlen);
+extern int rkc_get_dir_list( RkcContext* cx, char* ddname, int maxddname );
+
+
+/* CX:	ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆãƒ†ãƒ¼ãƒ–ãƒ«
+ *	å¿…è¦ãªãƒ¬ã‚³ãƒ¼ãƒ‰ã ã‘ã‚’mallocã§ä½œæˆã™ã‚‹ã€‚
  *	^^^^^^^^^^^^^^^^^^
  */
-
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
-#endif
-#define wchar_t cannawc
 
 static RkcContext *RkcCX[MAX_CX] ;
 
@@ -84,8 +86,8 @@ static RkcContext *RkcCX[MAX_CX] ;
 #define AUTO_YOMI_SIZE	512
 
 static short
-rkc_call_flag = 0x00   ; /* RkInitialize¤¬¸Æ¤Ğ¤ì¤ÆRkFinalize¤¬¸Æ¤Ğ¤ì¤ë¤Ş¤Ç */
-			 /* BUSY¥Ó¥Ã¥È¤¬Î©¤Ã¤Æ¤¤¤ë			   */
+rkc_call_flag = 0x00   ; /* RkInitializeãŒå‘¼ã°ã‚Œã¦RkFinalizeãŒå‘¼ã°ã‚Œã‚‹ã¾ã§ */
+			 /* BUSYãƒ“ãƒƒãƒˆãŒç«‹ã£ã¦ã„ã‚‹			   */
 
 static short ProtocolMinor = 0 ;
 static short ProtocolMajor = 0;
@@ -106,14 +108,14 @@ static char *ServerNameSpecified;
 static RkcConfigErrorProc config_error_handler;
 
 /*
- * ¥µ¥İ¡¼¥È¤¹¤ë¥×¥í¥È¥³¥ë¤Î¥ê¥¹¥È
- * ¤³¤Î½ç¤Ë¥×¥í¥È¥³¥ë¤ò»ÈÍÑ¤·¡¤¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤è¤¦¤È¤¹¤ë
+ * ã‚µãƒãƒ¼ãƒˆã™ã‚‹ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã®ãƒªã‚¹ãƒˆ
+ * ã“ã®é †ã«ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ç”¨ã—ï¼Œã‚µãƒ¼ãƒã«æ¥ç¶šã—ã‚ˆã†ã¨ã™ã‚‹
  */
-static char *ProtoVerTbl[] = {
-    W_VERSION,/* ¥µ¡¼¥Ğ¤ÈÆ±¤¸¥á¥¸¥ã¡¼ÈÖ¹æ¤Î»ş¤Ï¡¢¥µ¡¼¥Ğ¤Î
-                                    ¥Ğ¡¼¥¸¥ç¥ó¤Î¥×¥í¥È¥³¥ë¤ò»È¤Ã¤Æ¤¤¤ë¡£*/
-    "2.1",    /* ¥µ¡¼¥Ğ¤è¤ê¥á¥¸¥ã¡¼ÈÖ¹æ¤¬¾®¤µ¤¤»ş¤Ï¡¢
-              ¾®¤µ¤¤Êı¤Î¥×¥í¥È¥³¥ë¤ò»È¤¦¡£(¤³¤³¤Ï¥Ş¥¯¥í¤Ë¤·¤¿Êı¤¬¤è¤¤¤Í)*/ 
+static const char* ProtoVerTbl[] = {
+    W_VERSION,/* ã‚µãƒ¼ãƒã¨åŒã˜ãƒ¡ã‚¸ãƒ£ãƒ¼ç•ªå·ã®æ™‚ã¯ã€ã‚µãƒ¼ãƒã®
+                                    ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ã£ã¦ã„ã‚‹ã€‚*/
+    "2.1",    /* ã‚µãƒ¼ãƒã‚ˆã‚Šãƒ¡ã‚¸ãƒ£ãƒ¼ç•ªå·ãŒå°ã•ã„æ™‚ã¯ã€
+              å°ã•ã„æ–¹ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ã†ã€‚(ã“ã“ã¯ãƒã‚¯ãƒ­ã«ã—ãŸæ–¹ãŒã‚ˆã„ã­)*/
 #ifdef USE_EUC_PROTOCOL
     E_VERSION,	/* ver1.2 */
     "1.0",
@@ -122,18 +124,18 @@ static char *ProtoVerTbl[] = {
 };
 
 static struct {
-  Ushort cbuf[CBUFSIZE];
-  char buffer[BUFSIZE];
-  wchar_t wbuf[CBUFSIZE];
-} rkc; /* general buffer¡£¤¿¤À¤·¡¢RkwXXX ¤Î¤Ê¤«¤À¤±¤Ç»È¤¦¤³¤È¤Ë¤·¤è¤¦¡£*/
+    cannawc cbuf[CBUFSIZE];
+    char buffer[BUFSIZE];
+    cannawc wbuf[CBUFSIZE];
+} rkc; /* general bufferã€‚ãŸã ã—ã€RkwXXX ã®ãªã‹ã ã‘ã§ä½¿ã†ã“ã¨ã«ã—ã‚ˆã†ã€‚*/
 
 /*
- * ¥¯¥é¥¤¥¢¥ó¥È¡¦¥³¥ó¥Æ¥¯¥¹¥È¥æ¡¼¥Æ¥£¥ê¥Æ¥£´Ø¿ô
+ * ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒ»ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°
  */
 
 
 /*
- * ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë¡£
+ * æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
  */
 static
 RkcContext  *
@@ -147,9 +149,9 @@ newCC()
 	    cx = (RkcContext *)malloc( sizeof( RkcContext ) ) ;
 	    if( cx ) {
 		cx->client = i ;
-		cx->bun = (RkcBun *)NULL ;
-		cx->Fkouho = (Ushort *)NULL ;
-		cx->lastyomi = (Ushort *)NULL ;
+		cx->bun =    NULL ;
+		cx->Fkouho = NULL ;
+		cx->lastyomi = NULL ;
 		cx->curbun = cx->maxbun = cx->bgnflag = cx->maxyomi = 0 ;
 		RkcCX[ i ] = cx ;
 	    }
@@ -160,25 +162,23 @@ newCC()
 }
 
 /*
- * »ØÄê¤µ¤ì¤¿Ê¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤Ş¤¿¤Ï¡¢¸õÊäÎó¤ÎÎÎ°è¤ò²òÊü¤¹¤ë
+ * æŒ‡å®šã•ã‚ŒãŸæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã¾ãŸã¯ã€å€™è£œåˆ—ã®é ˜åŸŸã‚’è§£æ”¾ã™ã‚‹
  */
 static
 void
-freeBUN(cx, from)
-register RkcContext *cx ;
-register int	    from ;
+freeBUN( RkcContext* cx, int from)
 {
-    register RkcBun *bun ;
+    RkcBun *bun ;
 
     for( ; from < cx->maxbun; from++ ) {
 	bun = &cx->bun[ from ] ;
 	if( bun->flags == NUMBER_KOUHO ) {
-	    /* Âè°ì¸õÊä¤·¤«Æş¤Ã¤Æ¤¤¤Ê¤¤Ê¸Àá¤Ï¡¢¼Âºİ¤Ë¤Ïmalloc¤·¤¿¤ï¤±¤Ç¤Ï¤Ê¤¯
-	     * ¥µ¡¼¥Ğ¤«¤éÄÌÃÎ¤µ¤ì¤¿³ÆÊ¸Àá¤ÎÂè°ì¸õÊäÎó¤ÎÃæ¤Ø¤Î¥İ¥¤¥ó¥¿¤ò
-	     * ÀßÄê¤·¤Æ¤¤¤ë¤À¤±¤À¤«¤é¥Õ¥ê¡¼¤·¤Ê¤¤¡£
+	    /* ç¬¬ä¸€å€™è£œã—ã‹å…¥ã£ã¦ã„ãªã„æ–‡ç¯€ã¯ã€å®Ÿéš›ã«ã¯mallocã—ãŸã‚ã‘ã§ã¯ãªã
+	     * ã‚µãƒ¼ãƒã‹ã‚‰é€šçŸ¥ã•ã‚ŒãŸå„æ–‡ç¯€ã®ç¬¬ä¸€å€™è£œåˆ—ã®ä¸­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’
+	     * è¨­å®šã—ã¦ã„ã‚‹ã ã‘ã ã‹ã‚‰ãƒ•ãƒªãƒ¼ã—ãªã„ã€‚
 	     */
 	    RkcFree( (char *)bun->kanji ) ;
-	    bun->kanji = (Ushort *)NULL ;
+	    bun->kanji = NULL ;
 	    bun->curcand = bun->maxcand = 0 ;
 	    bun->flags = NOTHING_KOUHO ;
 	}
@@ -186,14 +186,13 @@ register int	    from ;
 }
 
 /*
- * »ØÄê¤µ¤ì¤¿¥³¥ó¥Æ¥¯¥¹¥È¤ò²òÊü¤¹¤ë¡£
+ * æŒ‡å®šã•ã‚ŒãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’è§£æ”¾ã™ã‚‹ã€‚
  */
 static
 void
-freeCC( clientcx )
-int clientcx ;
+freeCC( int clientcx )
 {
-    register RkcContext     *cx ;
+    RkcContext     *cx ;
 
     if( (0 <= clientcx) && (clientcx < MAX_CX) ) {
 	cx = RkcCX[ clientcx ] ;
@@ -203,9 +202,9 @@ int clientcx ;
 	    cx->bun = (RkcBun *)NULL ;
 	}
 	RkcFree( (char *)cx->Fkouho ) ;
-	cx->Fkouho = (Ushort *)NULL ;
+	cx->Fkouho = NULL ;
 	RkcFree( (char *)cx->lastyomi );
-	cx->lastyomi = (Ushort *)NULL;
+	cx->lastyomi = NULL;
 	cx->curbun = cx->maxbun = 0 ;
 	cx->bgnflag = 0 ;
 	RkcFree( (char *)cx ) ;
@@ -215,38 +214,35 @@ int clientcx ;
 }
 
 /*
- * ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ¤ËÂĞ±ş¤·¤¿¥³¥ó¥Æ¥¯¥¹¥È¤ò¼èÆÀ¤¹¤ë¡£
- * (¥¯¥é¥¤¥¢¥ó¥ÈÂ¦)
+ * ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå·ã«å¯¾å¿œã—ãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
+ * (ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´)
  */
 #define NOCHECK    0
 #define CHECK	   1
-static
-RkcContext *
-getCC( clientcx, type )
-int	clientcx, type ;
+
+static RkcContext *
+getCC( int clientcx, int type )
 {
-    register RkcContext     *cx = (RkcContext *)NULL ;
+    RkcContext     *cx = (RkcContext *)NULL ;
 
     if( (0 <= clientcx) && (clientcx < MAX_CX) ) {
         cx = RkcCX[clientcx];
 	if (cx)
 	    if( (type == CHECK) && (cx->bgnflag != BUSY) )
-		/* ÊÑ´¹Ãæ¤Î»ş,maxbun¤ÏºÇÄã£±¤Ç¤¢¤ë */
+		/* å¤‰æ›ä¸­ã®æ™‚,maxbunã¯æœ€ä½ï¼‘ã§ã‚ã‚‹ */
 		cx = (RkcContext *)NULL ;
     }
     return( cx ) ;
 }
 
-int RkwSetUserInfo pro((char *, char *, char *));
 
 static RkUserInfo *uinfo;
 
 int
-RkwSetUserInfo(user, group, topdir)
-char *user, *group, *topdir;
+RkwSetUserInfo( char* user, char* group, char* topdir)
 {
-  if (user && group && topdir) {
-    uinfo = (RkUserInfo *)malloc(sizeof(RkUserInfo));
+    if (user && group && topdir) {
+        uinfo = (RkUserInfo *)malloc(sizeof(RkUserInfo));
     if (uinfo) {
       uinfo->uname = user;
       uinfo->gname = group;
@@ -257,83 +253,81 @@ char *user, *group, *topdir;
   return 0;
 }
 
+
 static char *
 FindLogname()
 {
-  if (uinfo)
-    return uinfo->uname;
-  else {
-    char *username = NULL, *getenv(), *getlogin();
-  
+    if (uinfo)
+        return uinfo->uname;
+
     struct passwd *pass = getpwuid(getuid());
     if( pass )
-    username = pass->pw_name;
-    if (username == NULL){
-      if ( (username = getlogin()) == NULL ) {	
-        if( (username = getenv( "LOGNAME" )) == NULL ) {
-          username = getenv( "USER" );
-        }
-      }
+        return pass->pw_name;
+
+    char* username = NULL;
+    if ( !(username = getlogin()) ) {
+        if ( !(username = getenv("LOGNAME")) )
+            username = getenv("USER");
     }
-    return( username );
-  }
-  return (char *)NULL;
+
+    return username;
 }
+
 
 static char *
 FindGroupname()
 {
-  if (uinfo)
-    return uinfo->gname;
-  else {
+    if (uinfo)
+        return uinfo->gname;
+    else {
     struct group *gr = getgrgid(getgid()) ;
     if (gr && gr->gr_name) {
       return gr->gr_name;
-    } 
+    }
     else{
       return (char *)NULL;
     }
   }
   return (char *)NULL;
 }
+
 /*
  *  RkwInitialize ()
  *
  *  Description:
  *  -----------
- *  ¤«¤Ê´Á»úÊÑ´¹¤Î½é´ü²½
+ *  ã‹ãªæ¼¢å­—å¤‰æ›ã®åˆæœŸåŒ–
  *
  *  Returns:
  *  -------
  *  0 or -1
  */
 int
-RkwInitialize( hostname ) /* ¤È¤ê¤¢¤¨¤ºrkc¤Î¾ì¹ç¤Ï¡¢°ú¤­¿ô¤òÌµ»ë¤¹¤ë */
-char *hostname ;
+RkwInitialize( const char* hostname ) /* ã¨ã‚Šã‚ãˆãšrkcã®å ´åˆã¯ã€å¼•ãæ•°ã‚’ç„¡è¦–ã™ã‚‹ */
 {
-    register int    i;
-    register long  server ;
-    register RkcContext *cx ;
+    int    i;
+    long  server ;
+    RkcContext *cx ;
     char *username, *data ;
 
     if( rkc_call_flag == BUSY )
-		return( 0 );	
+        return 0;
 
     rkc_configure();
     if (config_error_handler)
 	(*config_error_handler)(RkcErrorBuf_get(&rkc_errors));
     if (ServerNameSpecified) {
         free(ServerNameSpecified);
-	ServerNameSpecified = (char *)0;
+        ServerNameSpecified = NULL;
     }
     ConnectIrohaServerName[0] = '\0';
-    if( hostname && (unsigned)strlen(hostname) > 0 &&
+    if( hostname && strlen(hostname) > 0 &&
 #ifdef __EMX__
 	    !_fnisabs( hostname ) &&
 #else
 	    hostname[0] != '/' &&
 #endif
-       (ServerNameSpecified = malloc(strlen(hostname) + 1))) {
+        (ServerNameSpecified = (char*) malloc(strlen(hostname) + 1)) ) {
         strcpy(ServerNameSpecified, hostname);
     }
 
@@ -342,37 +336,39 @@ char *hostname ;
         goto init_err;
     }
 
-    /* ¥æ¡¼¥¶Ì¾¤ò¼èÆÀ¤¹¤ë */
+    /* ãƒ¦ãƒ¼ã‚¶åã‚’å–å¾—ã™ã‚‹ */
     username = FindLogname() ;
 
-    if( !username || !(data = malloc( strlen(username) + strlen(W_VERSION)+2 )))
-	    goto init_err;
+    if( !username ||
+        !(data = (char*) malloc( strlen(username) + strlen(W_VERSION)+2 ))) {
+        goto init_err;
+    }
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤ò½é´ü²½¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ */
     for( i=0; i < MAX_CX; i++)
 	RkcCX[ i ] = (RkcContext *)NULL ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx = newCC()) == (RkcContext *)NULL ) {
         RkcFree(data);
         goto init_err;
     }
 
-    /* ºÇ½é¤Ï¥ï¥¤¥É¥­¥ã¥é¥Ù¡¼¥¹¤Î¥×¥í¥È¥³¥ë¤ò»ÈÍÑ¤¹¤ë */
+    /* æœ€åˆã¯ãƒ¯ã‚¤ãƒ‰ã‚­ãƒ£ãƒ©ãƒ™ãƒ¼ã‚¹ã®ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’ä½¿ç”¨ã™ã‚‹ */
     for( i = 0; *ProtoVerTbl[i]; i++ ){
 	strcpy( data, ProtoVerTbl[i] );
 	strcat( data, ":" );
 	strcat( data, username );
-	ProtocolMajor = *ProtoVerTbl[i] - '0'; /* Major¤¬1·å¤¿¤±ÂĞ±ş */
+	ProtocolMajor = *ProtoVerTbl[i] - '0'; /* MajorãŒ1æ¡ãŸã‘å¯¾å¿œ */
         PROTOCOL = (ProtocolMajor > 1);
 
 #ifdef USE_EUC_PROTOCOL
 	RKCP = PROTOCOL > 0 ? &wideproto : &eucproto;
 #endif
 
-        /* ¥µ¡¼¥Ğ¤Ë½é´ü²½¤òÍ×µá¤·¡¢¥µ¡¼¥Ğ¤Î¥³¥ó¥Æ¥¯¥¹¥È¤ò¼èÆÀ¤¹¤ë */
+        /* ã‚µãƒ¼ãƒã«åˆæœŸåŒ–ã‚’è¦æ±‚ã—ã€ã‚µãƒ¼ãƒã®ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ */
 	if ((server = (*RKCP->initialize)( data )) < 0) {
-	    /* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	    /* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	    if( (ServerFD = rkc_Connect_Iroha_Server( ConnectIrohaServerName )) < 0 ) { /* S004 */
 		freeCC( cx->client ) ;
 		RkcFree(data);
@@ -392,15 +388,15 @@ char *hostname ;
       goto init_err;
     }
 
-    /* ¥µ¡¼¥Ğ¤Î¥Ş¥¤¥Ê¡¼¥Ğ¡¼¥¸¥ç¥ó¤òÆÀ¤ë */
-    ProtocolMinor = 
+    /* ã‚µãƒ¼ãƒã®ãƒã‚¤ãƒŠãƒ¼ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å¾—ã‚‹ */
+    ProtocolMinor =
       (short)((unsigned long)(server & 0xffff0000) >> (unsigned)0x10);
 
-    /* ¥µ¡¼¥Ğ¤«¤é¼èÆÀ¤·¤¿¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ¤òÆş¤ì¤ë */
+    /* ã‚µãƒ¼ãƒã‹ã‚‰å–å¾—ã—ãŸã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå·ã‚’å…¥ã‚Œã‚‹ */
     cx->server = server & 0x0000ffff ;
     rkc_call_flag = BUSY ;
 
-    /* ¥×¥í¥È¥³¥ë¥Ğ¡¼¥¸¥ç¥ó¤¬ 3.2 °Ê¾å¤À¤Ã¤¿¤é¥°¥ë¡¼¥×Ì¾¤òÄÌÃÎ¤¹¤ë */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒ 3.2 ä»¥ä¸Šã ã£ãŸã‚‰ã‚°ãƒ«ãƒ¼ãƒ—åã‚’é€šçŸ¥ã™ã‚‹ */
     if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
       char *gname = FindGroupname();
 
@@ -419,24 +415,24 @@ char *hostname ;
  *
  *  Description:
  *  -----------
- *  ¤«¤Ê´Á»úÊÑ´¹¤Î½ªÎ»
+ *  ã‹ãªæ¼¢å­—å¤‰æ›ã®çµ‚äº†
  */
 void
 RkwFinalize()
 {
-    register int i ;
+    int i ;
 
     if( rkc_call_flag != BUSY )
 		return;
 
-    /* Á´¥³¥ó¥Æ¥¯¥¹¥È¤ò²òÊü¤¹¤ë
-     *	    ÊÑ´¹Ãæ¤Î¥³¥ó¥Æ¥¯¥¹¥È¤Ï¤É¤¦¤¹¤ë¤Î¤« ?
+    /* å…¨ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’è§£æ”¾ã™ã‚‹
+     *	    å¤‰æ›ä¸­ã®ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã¯ã©ã†ã™ã‚‹ã®ã‹ ?
      */
     for( i = 0; i < MAX_CX; i++ ){
 	if( RkcCX[ i ] ) {
 	    freeCC( i ) ;
 	}
-    }	
+    }
 
     (*RKCP->finalize)();
 
@@ -460,7 +456,7 @@ RkwFinalize()
  *
  *  Description:
  *  -----------
- *  ¥³¥ó¥Æ¥¯¥¹¥È¤Î³«Êü
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®é–‹æ”¾
  *
  *  Input:
  *  -----
@@ -471,8 +467,7 @@ RkwFinalize()
  *  0 or -1
  */
 int
-RkwCloseContext(cxnum)
-int cxnum ;
+RkwCloseContext( int cxnum )
 {
     register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
@@ -485,18 +480,20 @@ int cxnum ;
     freeCC( cxnum ) ;
     return( 0 );
 }
-/* 
- * KillServer 
+
+
+/*
+ * KillServer
  *
- * Version 3.3 °ÊÁ°¤Î¥µ¡¼¥Ğ¤Ë¤ÏÁ÷¤é¤Ê¤¤ Ìá¤êÃÍ OLDSRV = -110
- * Version 3.3 ¤Î¥µ¡¼¥Ğ¤Ë¤ÏÁ÷¤ë 
+ * Version 3.3 ä»¥å‰ã®ã‚µãƒ¼ãƒã«ã¯é€ã‚‰ãªã„ æˆ»ã‚Šå€¤ OLDSRV = -110
+ * Version 3.3 ã®ã‚µãƒ¼ãƒã«ã¯é€ã‚‹
  *
  */
 int
 RkwKillServer()
 {
 /*
-  Protocol Version 3.3 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
+  Protocol Version 3.3 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
 */
 
   if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 2)) {
@@ -513,27 +510,27 @@ RkwKillServer()
  *
  *  Description:
  *  -----------
- *  ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤ÎºîÀ®
+ *  æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®ä½œæˆ
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
 RkwCreateContext()
 {
-    register int    server ;
-    register RkcContext *cx ;
+    int    server ;
+    RkcContext *cx ;
 
     if( rkc_call_flag != BUSY )
 	return( -1 ) ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx = newCC()) == (RkcContext *)NULL )
 	return( -1 ) ;
 
     if ((server = (*RKCP->create_context)()) == -1) {
-	/* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	/* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	freeCC( cx->client ) ;
 	return( -1 ) ;
     }
@@ -547,7 +544,7 @@ RkwCreateContext()
  *
  *  Description:
  *  -----------
- *  ¿·¤·¤¤¥³¥ó¥Æ¥¯¥¹¥È¤ÎºîÀ®
+ *  æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã®ä½œæˆ
  *
  *  Input:
  *  -----
@@ -555,11 +552,10 @@ RkwCreateContext()
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
-RkwDuplicateContext( src_cx )
-int src_cx ;
+RkwDuplicateContext( int src_cx )
 {
     register RkcContext *cx_dest, *cx_src = getCC( src_cx, NOCHECK ) ;
     register int	dest_cx ;
@@ -567,12 +563,12 @@ int src_cx ;
     if( !cx_src || (rkc_call_flag != BUSY) )
 	return( -1 ) ;
 
-    /* ¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤¹¤ë */
+    /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ */
     if( (cx_dest = newCC()) == (RkcContext *)NULL )
 	return( -1 ) ;
 
     if ((dest_cx = (*RKCP->duplicate_context)(cx_src)) == -1) {
-	/* ´û¤Ë¥³¥ó¥Æ¥¯¥¹¥È¤ò³ÎÊİ¤·¤Æ¤¤¤ë¤Î¤Ç¡¢¤½¤ì¤ò²òÊü¤¹¤ë */
+	/* æ—¢ã«ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ç¢ºä¿ã—ã¦ã„ã‚‹ã®ã§ã€ãã‚Œã‚’è§£æ”¾ã™ã‚‹ */
 	freeCC( cx_dest->client ) ;
 	return( -1 ) ;
     }
@@ -581,12 +577,13 @@ int src_cx ;
     return( cx_dest->client ) ;
 }
 
+
 /*
  *  RkwGetDicList ()
  *
  *  Description:
  *  -----------
- *  ¼­½ñ¥ê¥¹¥È¤ËÄÉ²Ã¤Ç¤­¤ë¼­½ñÌ¾¤Î¼èÆÀ
+ *  è¾æ›¸ãƒªã‚¹ãƒˆã«è¿½åŠ ã§ãã‚‹è¾æ›¸åã®å–å¾—
  *
  *  Input:
  *  -----
@@ -594,20 +591,17 @@ int src_cx ;
  *
  *  Returns:
  *  -------
- *  ¼­½ñÌ¾¤Î¸Ä¿ô or -1
+ *  è¾æ›¸åã®å€‹æ•° or -1
  */
 int
-RkwGetDicList(cxnum, dicnames, max)
-int cxnum ;
-char *dicnames ;
-int max ;
+RkwGetDicList( int cxnum, char* dicnames, int max)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !cx )
 	return( -1 ) ;
 
-    if( max <= 0 ) 
+    if( max <= 0 )
 	return( 0 ) ;
     else if( !dicnames ) {
       return (*RKCP->dictionary_list)(cx, rkc.buffer, BUFSIZE);
@@ -615,13 +609,12 @@ int max ;
     return (*RKCP->dictionary_list)(cx, dicnames, max);
 }
 
+
+/* å˜èªç™»éŒ² */
 static int
-_RkwDefineDic( cxnum, dicname, wordrec )	/* Ã±¸ìÅĞÏ¿ */
-int cxnum ;
-char *dicname ;
-Ushort *wordrec ;
+_RkwDefineDic( int cxnum, const char* dicname, cannawc* wordrec )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !cx )
 	return( -1 ) ;
@@ -629,12 +622,9 @@ Ushort *wordrec ;
     return (*RKCP->define_dic)(cx, dicname, wordrec);
 }
 
-/*
- *  RkwDefineDic ()
- *
- *  Description:
- *  -----------
- *  Ã±¸ìÅĞÏ¿
+
+/**
+ *  å˜èªç™»éŒ²
  *
  *  Input:
  *  -----
@@ -642,28 +632,24 @@ Ushort *wordrec ;
  *
  *  Returns:
  *  -------
- *  ¥³¥ó¥Æ¥¯¥¹¥ÈÈÖ¹æ or -1
+ *  ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç•ªå· or -1
  */
 int
-RkwDefineDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname;
-wchar_t *wordrec;
+RkwDefineDic(int cxnum, const char* dicname, const cannawc* wordrec)
 {
-    if( !dicname || !wordrec )
-	return( -1 ) ;
+    if ( !dicname || !wordrec )
+        return -1;
 
-    wchar2ushort(wordrec, wcharstrlen(wordrec), rkc.cbuf, CBUFSIZE);
+    WStrncpy(rkc.cbuf, wordrec, CBUFSIZE);
     return _RkwDefineDic(cxnum, dicname, rkc.cbuf);
 }
 
+
+/* å˜èªå‰Šé™¤ */
 static int
-_RkwDeleteDic( cxnum, dicname, wordrec )	  /* Ã±¸ìºï½ü */
-int cxnum ;
-char *dicname ;
-Ushort *wordrec ;
+_RkwDeleteDic( int cxnum, char* dicname, cannawc* wordrec )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !cx )
 	return( -1 ) ;
@@ -672,23 +658,19 @@ Ushort *wordrec ;
 }
 
 int
-RkwDeleteDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname;
-wchar_t *wordrec;
+RkwDeleteDic(int cxnum, char* dicname, cannawc* wordrec)
 {
-  if( !dicname || !wordrec ) return -1;
+    if( !dicname || !wordrec )
+        return -1;
 
-  wchar2ushort(wordrec, wcharstrlen(wordrec), rkc.cbuf, CBUFSIZE);
-  return _RkwDeleteDic(cxnum, dicname, rkc.cbuf);
+    WStrncpy(rkc.cbuf, wordrec, CBUFSIZE);
+    return _RkwDeleteDic(cxnum, dicname, rkc.cbuf);
 }
 
 int
-RkwMountDic(cxnum, dicname, mode)
-int cxnum, mode ;
-char *dicname ;
+RkwMountDic( int cxnum, const char* dicname, int mode)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !dicname || !cx )
 	return( -1 ) ;
@@ -697,11 +679,9 @@ char *dicname ;
 }
 
 int
-RkwRemountDic(cxnum, dicname, where)
-int cxnum, where  ;
-char *dicname ;
+RkwRemountDic(int cxnum, char* dicname, int where)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !dicname || !cx )
 	return( -1 ) ;
@@ -710,11 +690,9 @@ char *dicname ;
 }
 
 int
-RkwUnmountDic(cxnum, dicname)
-int cxnum ;
-char *dicname ;
+RkwUnmountDic(int cxnum, char* dicname)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !dicname || !cx )
 	return( -1 ) ;
@@ -723,11 +701,9 @@ char *dicname ;
 }
 
 int
-RkwGetMountList(cxnum, dicnames_return, max)
-int cxnum, max ;
-char *dicnames_return ;
+RkwGetMountList(int cxnum, char* dicnames_return, int max)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if( !cx )
 	return( -1 ) ;
@@ -740,73 +716,70 @@ char *dicnames_return ;
     return (*RKCP->mount_list)(cx, dicnames_return, max);
 }
 
+
+/* ã‚µãƒ¼ãƒãƒ‘ã‚¹ã‚’è¨­å®š */
 int
-RkwSetDicPath( cxnum, path ) /* ¥µ¡¼¥Á¥Ñ¥¹¤òÀßÄê */
-int cxnum ;
-char *path ;
-/* ARGSUSED */
+RkwSetDicPath( int cxnum, const char* path )
 {
     return( 0 ) ;
 }
 
-/*
- * StoreFirstKouho
- *	¥«¥ì¥ó¥ÈÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤òµá¤á¡¢³ÊÇ¼¤¹¤ë
+
+/**
+ *	ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã‚’æ±‚ã‚ã€æ ¼ç´ã™ã‚‹
  */
 static void
-StoreFirstKouho( cx, bun_max )
-register RkcContext *cx ;
-int bun_max ;
+StoreFirstKouho( RkcContext* cx, int bun_max )
 {
-    /* ¤³¤³¤Ï¡¢¤è¤¯¹Í¤¨¤Ê¤¤¤È¹½Â¤¤Ş¤ÇÊÑ¤¨¤¿°ÕÌ£¤¬Ìµ¤¯¤Ê¤ë¤·
-     *	 ¸å¤Ç¤¨¤é¤¤ÌÜ¤ËÁø¤¦¤«¤âÃÎ¤ì¤Ê¤¤
+    /* ã“ã“ã¯ã€ã‚ˆãè€ƒãˆãªã„ã¨æ§‹é€ ã¾ã§å¤‰ãˆãŸæ„å‘³ãŒç„¡ããªã‚‹ã—
+     *	 å¾Œã§ãˆã‚‰ã„ç›®ã«é­ã†ã‹ã‚‚çŸ¥ã‚Œãªã„
      */
-    register	int		i ;
-    register	RkcBun		*bun ;
-    register	Ushort	*kouhobuf ;
+    int		i ;
+    RkcBun		*bun ;
+    cannawc* kouhobuf ;
 
-    /* ¥«¥ì¥ó¥ÈÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤Î¸õÊä¤ò²òÊü¤¹¤ë */	
-    freeBUN( cx, cx->curbun ) ; 
+    /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®å€™è£œã‚’è§£æ”¾ã™ã‚‹ */
+    freeBUN( cx, cx->curbun ) ;
 
-    /* ¤³¤³¤Ë¤Ï¡¢rkc_*(rkcConvert.c)¤ÇÂè°ì¸õÊäÎó¤¬³ÊÇ¼¤µ¤ì¤Æ¤¤¤ë */
+    /* ã“ã“ã«ã¯ã€rkc_*(rkcConvert.c)ã§ç¬¬ä¸€å€™è£œåˆ—ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ */
     kouhobuf = cx->Fkouho ;
 
-    /* ¥¼¥íÊ¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç¤ÎÂè°ì¸õÊä¤Î¥İ¥¤¥ó¥¿¤òÀßÄê¤¹¤ë */
+    /* ã‚¼ãƒ­æ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§ã®ç¬¬ä¸€å€™è£œã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹ */
     for( i = 0; i < bun_max; i++ ) {
 	bun = &cx->bun[ i ] ;
-	/* ¥«¥ì¥ó¥ÈÊ¸Àá¤Ş¤Ç¤ÎÊ¸Àá¤Ç¸õÊä°ìÍ÷¤ò´û¤Ë¼èÆÀ¤·¤Æ¤¤¤ëÊ¸Àá¤Ï¡¢
-	 * ¥İ¥¤¥ó¥¿¤ÎºÆÀßÄê¤Ï¤·¤Ê¤¤¡£
+	/* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã¾ã§ã®æ–‡ç¯€ã§å€™è£œä¸€è¦§ã‚’æ—¢ã«å–å¾—ã—ã¦ã„ã‚‹æ–‡ç¯€ã¯ã€
+	 * ãƒã‚¤ãƒ³ã‚¿ã®å†è¨­å®šã¯ã—ãªã„ã€‚
 	 */
 	if( bun->flags != NUMBER_KOUHO ) {
 	    bun->kanji = kouhobuf ;
-	    bun->curcand = 0 ;		/*  Ê¸Àá0Ê¸Àá1Ê¸Àá2Ê¸Àá3Ê¸Àá4@@ */
-	    bun->maxcand = 1 ;		/*  ¢¬	 ¢¬   ¢¬   ¢¬	¢¬	*/
+	    bun->curcand = 0 ;		/*  æ–‡ç¯€0æ–‡ç¯€1æ–‡ç¯€2æ–‡ç¯€3æ–‡ç¯€4@@ */
+	    bun->maxcand = 1 ;		/*  â†‘	 â†‘   â†‘   â†‘	â†‘	*/
 	    bun->flags = FIRST_KOUHO ;	/*	bun->kaji		*/
 	}
-	kouhobuf += ushortstrlen( (Ushort *)kouhobuf)+1 ;
+        kouhobuf += ushortstrlen(kouhobuf) + 1 ;
     }
     cx->maxbun = bun_max ;
 }
 
-/*
- *    Ï¢Ê¸ÀáÊÑ´¹³«»Ï
+
+/**
+ *    é€£æ–‡ç¯€å¤‰æ›é–‹å§‹
+ * @param yomi NULL ã‚ã‚Šã†ã‚‹.
  */
-static int	
-_RkwBgnBun(cxnum, yomi, maxyomi, mode)
-int cxnum, maxyomi, mode ; 
-Ushort *yomi ;
+static int
+_RkwBgnBun(int cxnum, cannawc* yomi, int maxyomi, int mode)
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
     int nbun, mask;					/* S002 */
 
     if( (maxyomi <= 0) || !cx )
-	return( -1 ) ;
+        return -1;
 
-    /* RkBgnBun¤À¤±¤Ï¡¢BUSY¥Õ¥é¥°¤¬Î©¤Ã¤Æ¤¤¤ë¤ÈÆş¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤ */
+    /* RkBgnBunã ã‘ã¯ã€BUSYãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹ã¨å…¥ã£ã¦ã¯ã„ã‘ãªã„ */
     if( cx->bgnflag == BUSY )
-	return( -1 ) ;
+        return -1;
 
-    /* µì¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤Æ¤¤¤ë¾ì¹ç¡¤mode¤«¤é¥³¡¼¥ÉÊÑ´¹ÉôÊ¬¤À¤±¤ò¼è¤ê½Ğ¤¹ */
+    /* æ—§ã‚µãƒ¼ãƒã«æ¥ç¶šã—ã¦ã„ã‚‹å ´åˆï¼Œmodeã‹ã‚‰ã‚³ãƒ¼ãƒ‰å¤‰æ›éƒ¨åˆ†ã ã‘ã‚’å–ã‚Šå‡ºã™ */
     if( ProtocolMajor < 3 ){
         int code;
 
@@ -819,84 +792,81 @@ Ushort *yomi ;
 	mode &= mask;					/* S002 */
     }
 
-    /* maxyomi¤ÎÊ¸Àá¿ô¤À¤±¥¢¥í¥±¡¼¥È¤·¤Æ¤ª¤¯ */
-    /* ¤³¤ì°Ê¾å¤ÎÊ¸Àá¿ô¤ÏÂ¸ºß¤·¤Ê¤¤¤Ï¤º */
+    /* maxyomiã®æ–‡ç¯€æ•°ã ã‘ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã—ã¦ãŠã */
+    /* ã“ã‚Œä»¥ä¸Šã®æ–‡ç¯€æ•°ã¯å­˜åœ¨ã—ãªã„ã¯ãš */
 
     cx->curbun = cx->maxbun = 0 ;
-    if( yomi != NULL ){
+    if ( yomi != NULL ) {
 	if( !(cx->bun = (RkcBun *)calloc( maxyomi, sizeof(RkcBun) )) )
 	    return( -1 ) ;
-	cx->lastyomi = (Ushort *)NULL;
+	cx->lastyomi = NULL;
 	nbun = (*RKCP->convert)(cx, yomi, maxyomi, mode);
-	if( nbun <= 0 ) {				
-	    RkcFree( (char *)cx->bun ) ;
-	    cx->bun = (RkcBun *)NULL ;
+	if( nbun <= 0 ) {
+	    RkcFree( cx->bun ) ;
+	    cx->bun = NULL ;
 	    return( -1 ) ;
 	}
 	StoreFirstKouho( cx, nbun ) ;
     } else {
 	if( !(cx->bun = (RkcBun *)calloc( AUTO_YOMI_SIZE, sizeof(RkcBun) )) )
 	    return( -1 ) ;
-	if( !(cx->lastyomi = (Ushort *)malloc( CBUFSIZE )) ) {
-	    RkcFree( (char *)cx->bun );
-	    cx->bun = (RkcBun *)NULL ;
+	if( !(cx->lastyomi = (cannawc*) malloc( sizeof(cannawc) * CBUFSIZE )) ) {
+	    RkcFree( cx->bun );
+	    cx->bun = NULL ;
 	    return( -1 ) ;
 	}
 
 	nbun = (*RKCP->autoconv)(cx, maxyomi, mode);
-	if( nbun < 0 ) {				
-	    RkcFree( (char *)cx->bun ) ;
-	    cx->bun = (RkcBun *)NULL ;
-	    RkcFree( (char *)cx->lastyomi );
-	    cx->lastyomi = (Ushort *)NULL;
+	if( nbun < 0 ) {
+	    RkcFree( cx->bun ) ;
+	    cx->bun = NULL ;
+	    RkcFree( cx->lastyomi );
+	    cx->lastyomi = NULL;
 	    return( -1 ) ;
 	}
-	*(cx->lastyomi) = ( Ushort )0;
+	*(cx->lastyomi) = (cannawc) 0;
     }
     cx->bgnflag = BUSY ;
-    return( nbun ) ;
+    return nbun;
 }
 
+
+// @param maxyomi   yomi ã®é•·ã•. ãƒŠãƒ«ã‚’å«ã¾ãªã„.
 int
-RkwBgnBun(cxnum, yomi, maxyomi, mode)
-int cxnum;
-wchar_t *yomi;
-int maxyomi;
-int mode;
+RkwBgnBun(int cxnum, const cannawc* yomi, int maxyomi, int mode)
 {
     int len;
 
     if (yomi) {
-      len = wchar2ushort(yomi, maxyomi, rkc.cbuf, CBUFSIZE);
-      return _RkwBgnBun(cxnum, rkc.cbuf, len, mode);
+        len = ushortstrncpy(rkc.cbuf, yomi, min(maxyomi + 1, CBUFSIZE));
+        return _RkwBgnBun(cxnum, rkc.cbuf, len, mode);
     }
-    else {  /* ¼«Æ°ÊÑ´¹³«»Ï */
-      return _RkwBgnBun(cxnum, (Ushort *)NULL, maxyomi, mode);
+    else {  /* è‡ªå‹•å¤‰æ›é–‹å§‹ */
+        return _RkwBgnBun(cxnum, NULL, maxyomi, mode);
     }
 }
 
 int
-RkwEndBun( cxnum, mode )
-int cxnum, mode ;
+RkwEndBun( int cxnum, int mode )
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
     int ret ;
 
     if( cx ) {
 	/*
-	 * rkc_convert_end¤Ç³Ø½¬¤¹¤Ù¤­¸õÊä¤ò¥µ¡¼¥Ğ¤ËÃÎ¤é¤»¤ë
+	 * rkc_convert_endã§å­¦ç¿’ã™ã¹ãå€™è£œã‚’ã‚µãƒ¼ãƒã«çŸ¥ã‚‰ã›ã‚‹
 	 */
 	if ((ret = (*RKCP->convert_end)(cx, mode )) >= 0) {
 	    freeBUN( cx, 0 ) ;
-	    RkcFree( (char *)cx->bun ) ;
-	    RkcFree( (char *)cx->Fkouho ) ;
-	    cx->bun = (RkcBun *)NULL ;
-	    cx->Fkouho = (Ushort *)NULL ;
+	    RkcFree( cx->bun ) ;
+	    RkcFree( cx->Fkouho ) ;
+	    cx->bun = NULL ;
+	    cx->Fkouho = NULL ;
 	    cx->curbun = cx->maxbun = 0 ;
 	    cx->bgnflag = 0 ;
 
-	    RkcFree( (char *)cx->lastyomi );
-	    cx->lastyomi = (Ushort *)NULL;
+	    RkcFree( cx->lastyomi );
+	    cx->lastyomi = NULL;
 	    cx->maxyomi = 0;
 	}
 	return( ret ) ;
@@ -905,23 +875,22 @@ int cxnum, mode ;
     return( 0 ) ;
 }
 
-/* LoadKouho
- *	É¬Í×¤Ë±ş¤¸¤ÆÁ´¸õÊä¤òÆÉ¤ß½Ğ¤¹
+
+/**
+ *	å¿…è¦ã«å¿œã˜ã¦å…¨å€™è£œã‚’èª­ã¿å‡ºã™
  */
-static
-int
-LoadKouho( cx )
-register RkcContext	 *cx ;
+static int
+LoadKouho( RkcContext* cx )
 {
-    register RkcBun	*bun = &cx->bun[ cx->curbun ] ;
+    RkcBun	*bun = &cx->bun[ cx->curbun ] ;
     int 		ret ;
 
     if( bun->flags == FIRST_KOUHO ) {
-	/*	¸õÊä¤òÁ´¤ÆÆÉ¤ß½Ğ¤¹¡£
-	 *	ÆÉ¤ß½Ğ¤·¤Ë¼ºÇÔ¤·¤¿¤é¡¢ÀèÆ¬¸õÊä¤·¤«¤Ê¤¤¤Õ¤ê¤ò¤¹¤ë
+	/*	å€™è£œã‚’å…¨ã¦èª­ã¿å‡ºã™ã€‚
+	 *	èª­ã¿å‡ºã—ã«å¤±æ•—ã—ãŸã‚‰ã€å…ˆé ­å€™è£œã—ã‹ãªã„ãµã‚Šã‚’ã™ã‚‹
 	 */
 	if ((ret = (*RKCP->get_kanji_list)(cx)) >= 0) {
-	    /* ÆÉ¤ß¤À¤·À®¸ù */
+	    /* èª­ã¿ã ã—æˆåŠŸ */
 	    bun->curcand = 0 ;
 	    bun->maxcand = ret ;
 	} else if( errno == EPIPE )
@@ -933,17 +902,16 @@ register RkcContext	 *cx ;
 }
 
 int
-RkwXfer(cxnum, knum)
-int cxnum, knum ;
+RkwXfer( int cxnum, int knum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
-    register RkcBun	 *bun ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcBun	 *bun ;
 
     if( cx ) {
 	bun = &cx->bun[cx->curbun];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
-	if ( 0 <= knum && knum < bun->maxcand ) 
+	if ( 0 <= knum && knum < bun->maxcand )
 	    bun->curcand = knum;
 	return( bun->curcand );
     }
@@ -951,31 +919,29 @@ int cxnum, knum ;
 }
 
 int
-RkwNfer(cxnum)
-int cxnum ;
+RkwNfer( int cxnum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
-    register RkcBun	 *bun ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcBun	 *bun ;
 
     if( cx ) {
-	bun = &cx->bun[ cx->curbun ];	
+	bun = &cx->bun[ cx->curbun ];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
-	bun->curcand = bun->maxcand - 1; /* ÆÉ¤ß¤Ï¡¢ºÇ¸å¤Ë¤¢¤ë(0¥ª¥ê¥¸¥ó) */
+	bun->curcand = bun->maxcand - 1; /* èª­ã¿ã¯ã€æœ€å¾Œã«ã‚ã‚‹(0ã‚ªãƒªã‚¸ãƒ³) */
 	return( bun->curcand ) ;
     }
     return( 0 );
 }
 
 int
-RkwNext(cxnum)
-int cxnum ;
+RkwNext(int cxnum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
-    register RkcBun	 *bun ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcBun	 *bun ;
 
     if( cx ) {
-	bun = &cx->bun[ cx->curbun ];	
+	bun = &cx->bun[ cx->curbun ];
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
 	if ( ++bun->curcand > bun->maxcand-1 )
@@ -986,8 +952,7 @@ int cxnum ;
 }
 
 int
-RkwPrev(cxnum)
-int cxnum ;
+RkwPrev(int cxnum)
 {
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
     register RkcBun	 *bun ;
@@ -997,56 +962,72 @@ int cxnum ;
 	if( LoadKouho( cx ) < 0 )
 	    return( -1 ) ;
 	if ( --bun->curcand < 0 )
-	    bun->curcand = bun->maxcand-1 ; /* £°¥ª¥ê¥¸¥ó */
+	    bun->curcand = bun->maxcand-1 ; /* ï¼ã‚ªãƒªã‚¸ãƒ³ */
 	return( bun->curcand ) ;
     }
     return( 0 );
 }
 
-static
-Ushort *
-SeekKouho( bun, to )
-register RkcBun     *bun ;
-register int	    to ;
+
+static cannawc*
+SeekKouho( RkcBun* bun, int to )
 {
-    register int    i ;
-    Ushort   *src_yomi ;
+    int    i ;
+    cannawc* src_yomi ;
 
     src_yomi = bun->kanji ;
     for( i = 0; i < to; i++ )
-	src_yomi += ushortstrlen( (Ushort *)src_yomi ) + 1 ;
+        src_yomi += ushortstrlen(src_yomi) + 1 ;
 
-    return( src_yomi ) ;
+    return src_yomi;
 }
 
+
 static int
-_RkwGetKanji( cxnum, kanji, maxkanji )
-int cxnum, maxkanji ;
-Ushort *kanji ;
+_RkwGetKanji( int cxnum, cannawc* kanji, int maxkanji )
 {
     RkcContext		    *cx = getCC( cxnum, CHECK ) ;
     RkcBun		    *bun ;
-    register Ushort  *src_kouho ;
+    cannawc* src_kouho ;
 
-    if( cx ){
-	bun = &cx->bun[ cx->curbun ] ;
-			     /* ÆÉ¤ß¤·¤«¤Ê¤¤¾ì¹ç¤ÏÆÉ¤ß¤òÊÖ¤¹ */
+    if( !cx )
+        return -1;
+
+    bun = &cx->bun[ cx->curbun ] ;
+			     /* èª­ã¿ã—ã‹ãªã„å ´åˆã¯èª­ã¿ã‚’è¿”ã™ */
 	src_kouho = SeekKouho( bun, (bun->maxcand ? bun->curcand : 0) ) ;
-	if( ushortstrlen( (Ushort *)src_kouho ) > maxkanji )
+	if( ushortstrlen(src_kouho ) > maxkanji )
 	    return( 0 ) ;
 	ushortstrcpy( kanji, src_kouho );
-	return( ushortstrlen( (Ushort *)src_kouho ) ) ;
-    }
-    return( -1 ) ;
+
+    return ushortstrlen(src_kouho);
 }
 
+
+// ãŸã ã®ã‚³ãƒ”ãƒ¼.
+// @param dlen dst ã®å¤§ãã•.
+// @return ãƒŠãƒ«çµ‚ç«¯ã‚’å«ã¾ãªã„è¦ç´ æ•°.
 int
-RkwGetKanji(cxnum, kanji, maxkanji)
-int cxnum;
-wchar_t *kanji;
-int maxkanji;
+ushort2wchar(const cannawc* src, int slen, cannawc* dst, int dlen)
 {
-  int len;
+    assert( src );
+    assert( dst );
+    assert( dlen > 0 );
+
+    int len = min(slen, dlen - 1);
+    memmove(dst, src, len * sizeof(cannawc));
+    dst[len] = 0;
+
+    return len;
+}
+
+#define wchar2ushort ushort2wchar
+
+
+int
+RkwGetKanji(int cxnum, cannawc* kanji, int maxkanji)
+{
+    int len;
 
     len = _RkwGetKanji(cxnum, rkc.cbuf, CBUFSIZE);
     if (len < 0) {
@@ -1065,15 +1046,15 @@ int maxkanji;
     }
 }
 
+
+// @param kouho  maybe NULL.
 static int
-_RkwGetKanjiList(cxnum, kouho, max)
-int cxnum, max ;
-Ushort *kouho ;
+_RkwGetKanjiList( int cxnum, cannawc* kouho, int max)
 {
     RkcContext	*cx = getCC( cxnum, CHECK ) ;
     RkcBun	*bun ;
-    register Ushort  *dest_kouho, *src_kouho ;
-    register int i, len ;
+    cannawc *dest_kouho, *src_kouho ;
+    int i, len ;
     int total ;
 
     if( cx ) {
@@ -1084,7 +1065,7 @@ Ushort *kouho ;
 	    return( 0 ) ;
 	if( !kouho )
 	    return( bun->maxcand ? bun->maxcand : 1 ) ;
-	/* ¸õÊä¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* å€™è£œã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	src_kouho = bun->kanji ;
 	dest_kouho = kouho ;
 	for( total = ushortstrlen( src_kouho ) + 1, i = 0;
@@ -1093,32 +1074,29 @@ Ushort *kouho ;
 	    src_kouho += len ;
 	    dest_kouho += len ;
 	}
-	*(dest_kouho++) = (Ushort)0 ;
-	*(dest_kouho) = (Ushort)0 ;
-	return( i ) ;
+        *(dest_kouho++) = (cannawc) 0 ;
+        *(dest_kouho) = (cannawc) 0 ;
+        return i ;
     }
-    return( -1 ) ;
+    return -1;
 }
 
+
 int
-RkwGetKanjiList(cxnum, kanjis, maxkanjis)
-int cxnum;
-wchar_t *kanjis;
-int maxkanjis;
+RkwGetKanjiList( int cxnum, cannawc* kanjis, int maxkanjis )
 {
-  int nkanji, len, i, j = 0, k = 0;
-  int retval;
+    int nkanji, len, i, j = 0, k = 0;
+    int retval;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  Ushort cbuf[CBIGBUFSIZE];
+    cannawc cbuf[CBIGBUFSIZE];
 #else
-  Ushort *cbuf = GlobalAlloc(GMEM_FIXED, sizeof(Ushort) * CBIGBUFSIZE);
-  if (!cbuf) {
-    return 0;
-  }
+    cannawc* cbuf = GlobalAlloc(GMEM_FIXED, sizeof(cannawc) * CBIGBUFSIZE);
+    if (!cbuf)
+        return 0;
 #endif
 
   if( !kanjis ) {
-    retval = _RkwGetKanjiList(cxnum, (Ushort *)0, 0);
+    retval = _RkwGetKanjiList(cxnum, NULL, 0);
   }
   else if (maxkanjis <= 0) {
     retval = 0;
@@ -1131,23 +1109,22 @@ int maxkanjis;
     if (k + len > maxkanjis - 2)				/* S005 */
       break;							/* S005 */
     k += ushort2wchar(cbuf + j, len, kanjis + k, maxkanjis);	/* S005 */
-    kanjis[k++] = (wchar_t)0;
+    kanjis[k++] = (cannawc)0;
     j += len + 1;
   }
-  kanjis[k] = (wchar_t)0;
+  kanjis[k] = (cannawc)0;
   retval = i;
   }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  GlobalFree((HGLOBAL)cbuf);
+    GlobalFree( cbuf);
 #endif
-  return retval;
+    return retval;
 }
 
 int
-RkwGoTo(cxnum, bnum)
-int cxnum, bnum ;
+RkwGoTo( int cxnum, int bnum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
 
     if( cx ){
 	if ( 0 <= bnum && bnum < cx->maxbun )
@@ -1158,10 +1135,9 @@ int cxnum, bnum ;
 }
 
 int
-RkwLeft(cxnum)
-int cxnum;
+RkwLeft( int cxnum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
 
     if( cx ){
 	if ( --cx->curbun < 0 )
@@ -1172,10 +1148,9 @@ int cxnum;
 }
 
 int
-RkwRight(cxnum)
-int cxnum;
+RkwRight( int cxnum)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
 
     if( cx ){
 	if ( ++cx->curbun > cx->maxbun-1 )
@@ -1189,28 +1164,22 @@ int cxnum;
 #define SHORTEN     -2
 #define MIN_YOMI     1
 
-#ifdef __STDC__
-int _RkwGetYomi(RkcContext *, Ushort *, int);
-#else
-int _RkwGetYomi();
-#endif
 
 static int
-RKReSize( cxnum, len )
-int cxnum, len ;
+RKReSize( int cxnum, int len )
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
-    int ret;		/* ÁíÊ¸Àá¿ô */
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    int ret;		/* ç·æ–‡ç¯€æ•° */
 
-    if( cx ) {	
-	/* Ê¸ÀáÄ¹¤¬ÊÑ¹¹¤Ç¤­¤ë¤«¤É¤¦¤«¥Á¥§¥Ã¥¯¤¹¤ë */
+    if( cx ) {
+	/* æ–‡ç¯€é•·ãŒå¤‰æ›´ã§ãã‚‹ã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 	register RkcBun *bun = &cx->bun[ cx->curbun ] ;
 
-	/* ¥«¥ì¥ó¥ÈÊ¸Àá¤¬¸õÊäÎó¤ò´û¤ËÆÉ¤ß¹ş¤ó¤Ç¤¤¤ë¾ì¹ç¤Î½èÍı */
+	/* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ãŒå€™è£œåˆ—ã‚’æ—¢ã«èª­ã¿è¾¼ã‚“ã§ã„ã‚‹å ´åˆã®å‡¦ç† */
 	if( bun->flags == NUMBER_KOUHO ) {
-	     /* Ê¸Àá½Ì¤á¤Ç¥«¥ì¥ó¥ÈÆÉ¤ß¤ÎÄ¹¤µ¤¬MIN_YOMI¤Î¾ì¹ç¤Ï²¿¤â¤»¤º¤Ë */
-	     /* ¥«¥ì¥ó¥ÈÊ¸Àá¿ô¤òÊÖ¤¹ */
-	    int yomilen = ushortstrlen((Ushort *)SeekKouho( bun,
+	     /* æ–‡ç¯€ç¸®ã‚ã§ã‚«ãƒ¬ãƒ³ãƒˆèª­ã¿ã®é•·ã•ãŒMIN_YOMIã®å ´åˆã¯ä½•ã‚‚ã›ãšã« */
+	     /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€æ•°ã‚’è¿”ã™ */
+            int yomilen = ushortstrlen(SeekKouho( bun,
 				       (bun->maxcand ? (bun->maxcand-1) : 0)));
 
 	    if( (len == SHORTEN) || (len == MIN_YOMI) ) {
@@ -1223,10 +1192,10 @@ int cxnum, len ;
 		for( yomi_zan = 0; cx->curbun < cx->maxbun; cx->curbun++ ) {
 		    int ylen, retval = 0;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-		    Ushort tmp_yomi[CBUFSIZE];
+                    cannawc tmp_yomi[CBUFSIZE];
 #else
-		    Ushort *tmp_yomi = GlobalAlloc(GMEM_FIXED,
-						   sizeof(Ushort) * CBUFSIZE);
+                    cannawc* tmp_yomi = GlobalAlloc(GMEM_FIXED,
+                                                    sizeof(cannawc) * CBUFSIZE);
 		    if (!tmp_yomi) {
 		      return -1;
 		    }
@@ -1252,12 +1221,12 @@ int cxnum, len ;
 		    return( cx->maxbun ) ;
 	    }
 	}
-	/* ¡»Ê¸Àá¤«¤éºÇ½ªÊ¸Àá¤Ş¤Ç³ÊÇ¼¤µ¤ì¤ë */	
+	/* ã€‡æ–‡ç¯€ã‹ã‚‰æœ€çµ‚æ–‡ç¯€ã¾ã§æ ¼ç´ã•ã‚Œã‚‹ */
 	if ((ret = (*RKCP->resize)(cx, len)) <= 0) {
 	    return( -1 ) ;
 	}
 	StoreFirstKouho( cx, ret ) ;
-	if( cx->lastyomi != (Ushort *)NULL ){
+        if ( cx->lastyomi != NULL ){
 	    if ((len = (*RKCP->get_last_yomi)(cx, cx->lastyomi, CBUFSIZE))
 		< 0) return -1;
 	    cx->maxyomi = len;
@@ -1268,8 +1237,7 @@ int cxnum, len ;
 }
 
 int
-RkwResize( cxnum, len )
-int cxnum, len ;
+RkwResize( int cxnum, int len )
 {
     if( len <= 0 ) {
 	register RkcContext  *cx = getCC( cxnum, CHECK ) ;
@@ -1283,85 +1251,83 @@ int cxnum, len ;
     return( RKReSize( cxnum, len ) ) ;
 }
 
+
+/* æ–‡ç¯€ä¼¸ã°ã— */
 int
-RkwEnlarge( cxnum )  /* Ê¸Àá¿­¤Ğ¤· */
-int cxnum ;
+RkwEnlarge( int cxnum )
 {
     return( RKReSize( cxnum, ENLARGE  ) ) ;
 }
 
+
+/* æ–‡ç¯€ç¸®ã‚ */
 int
-RkwShorten(cxnum)    /* Ê¸Àá½Ì¤á */
-int cxnum ;
+RkwShorten( int cxnum)
 {
     return( RKReSize( cxnum, SHORTEN ) ) ;
 }
 
+
 static int
-_RkwStoreYomi(cxnum, yomi, max)
-int cxnum, max ;
-Ushort *yomi ;
+_RkwStoreYomi( int cxnum, cannawc* yomi, int max)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
     int ret, len ;
 
     ret = 0 ;
-    if( cx ) {
-	if ((ret =  (*RKCP->store_yomi)(cx, yomi, max)) < 0) {
+    if ( !cx )
+        return 0;
+
+    if ((ret =  (*RKCP->store_yomi)(cx, yomi, max)) < 0) {
 	    return( -1 ) ;
 	}
 	StoreFirstKouho( cx, ret ) ;
 	if (!max && cx->curbun && cx->curbun == cx->maxbun)
 	  cx->curbun--;
-	if( cx->lastyomi != (Ushort *)NULL ){
+        if ( cx->lastyomi != NULL ){
 	    if ((len = (*RKCP->get_last_yomi)(cx, cx->lastyomi, CBUFSIZE))
 		< 0 ) return -1;
 	    cx->maxyomi = len;
 	}
-    }
-    return( ret ) ;
 }
+
 
 int
-RkwStoreYomi(cxnum, yomi, maxyomi)
-int cxnum;
-wchar_t *yomi;
-int maxyomi;
+RkwStoreYomi(int cxnum, const cannawc* yomi, int maxyomi)
 {
-  int len;
+    int len;
 
-  if (yomi && maxyomi >= 0) {
-    len = RKI_MIN(wcharstrlen(yomi),maxyomi); 
-    len = wchar2ushort(yomi, len, rkc.cbuf, CBUFSIZE) + 1;
-  } else {
-    rkc.cbuf[0] = 0;
-    len = 0;
-  }
-  return _RkwStoreYomi(cxnum, rkc.cbuf, len);
+    if (yomi && maxyomi >= 0) {
+        WStrncpy(rkc.cbuf, yomi, min(maxyomi + 1, CBUFSIZE));
+        len = WStrlen(rkc.cbuf);
+    }
+    else {
+        rkc.cbuf[0] = 0;
+        len = 0;
+    }
+    return _RkwStoreYomi(cxnum, rkc.cbuf, len);
 }
 
-int								/* S003 */
-_RkwGetYomi(cx, yomi, maxyomi)
-RkcContext *cx;
-int maxyomi;
-Ushort	*yomi;
+
+/* S003 */
+int
+_RkwGetYomi( RkcContext* cx, cannawc* yomi, int maxyomi)
 {
-    register RkcBun	*bun ;
-    Ushort	*src_yomi;
+    RkcBun	*bun ;
+    cannawc* src_yomi;
     int len, retval = -1;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-    Ushort	tmp_yomi[CBUFSIZE];
+    cannawc tmp_yomi[CBUFSIZE];
 #else
-    Ushort *tmp_yomi = GlobalAlloc(GMEM_FIXED, sizeof(Ushort) * CBUFSIZE);
-    if (!tmp_yomi) {
-      return -1;
-    }
+    cannawc* tmp_yomi = GlobalAlloc(GMEM_FIXED, sizeof(cannawc) * CBUFSIZE);
+    if (!tmp_yomi)
+        return -1;
 #endif
 
     if( cx ){
-	bun = &cx->bun[ cx->curbun ] ;		
+	bun = &cx->bun[ cx->curbun ] ;
 	if( !PROTOCOL && (ProtocolMinor == 0) ) {
-	    /* Ver 1.0 ¤Ç¤Ï¡¤¼è¤ê¤¢¤¨¤º¸õÊä°ìÍ÷¤ò¼è¤Ã¤Æ¤¯¤ë */
+	    /* Ver 1.0 ã§ã¯ï¼Œå–ã‚Šã‚ãˆãšå€™è£œä¸€è¦§ã‚’å–ã£ã¦ãã‚‹ */
 	    if( LoadKouho( cx ) < 0 )
 	      retval = -1;
 	}
@@ -1373,10 +1339,10 @@ Ushort	*yomi;
 	    src_yomi = tmp_yomi;
 	}
 
-	if( (len = ushortstrlen( (Ushort *)src_yomi )) > maxyomi )
+	if( (len = ushortstrlen(src_yomi )) > maxyomi )
 	    retval = 0;
 
-	bcopy( src_yomi, yomi, (len + 1) * sizeof( short ) );
+	bcopy( src_yomi, yomi, (len + 1) * sizeof(cannawc) );
 	retval = len;
     }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -1386,17 +1352,14 @@ Ushort	*yomi;
 }
 
 int
-RkwGetYomi(cxnum, yomi, maxyomi)
-int cxnum;
-wchar_t *yomi;
-int maxyomi;
+RkwGetYomi( int cxnum, cannawc* yomi, int maxyomi)
 {
-  int len;
+    int len;
 
-  if ((len = _RkwGetYomi(getCC( cxnum, CHECK ), rkc.cbuf, CBUFSIZE)) < 0) {
-    return( len );
-  }
-  else {
+    if ((len = _RkwGetYomi(getCC( cxnum, CHECK ), rkc.cbuf, CBUFSIZE)) < 0) {
+        return( len );
+    }
+    else {
     if( !yomi ) {
       return ushort2wchar(rkc.cbuf, len, rkc.wbuf, CBUFSIZE);
     }
@@ -1408,11 +1371,9 @@ int maxyomi;
 }
 
 int
-RkwGetLex(cxnum, lex, maxlex)
-int cxnum, maxlex ;
-RkLex *lex ;
+RkwGetLex(int cxnum, RkLex* lex, int maxlex)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
     int ret = -1 ;
 
     if( cx ){
@@ -1425,7 +1386,7 @@ RkLex *lex ;
 	  return 0;
 	}
 #endif
-	ret = (*RKCP->get_lex)(cx, 1024, buf); 
+	ret = (*RKCP->get_lex)(cx, 1024, buf);
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
 	GlobalFree((HGLOBAL)buf);
 #endif
@@ -1439,11 +1400,9 @@ RkLex *lex ;
 }
 
 int
-RkwGetStat(cxnum, stat)
-int cxnum ;
-RkStat *stat ;
+RkwGetStat(int cxnum, RkStat* stat)
 {
-    register RkcContext  *cx = getCC( cxnum, CHECK ) ;
+    RkcContext  *cx = getCC( cxnum, CHECK ) ;
     int ret ;
 
     if( cx && stat ){
@@ -1481,8 +1440,7 @@ RkwGetServerName()
 }
 
 int
-RkwGetProtocolVersion(majorp, minorp)
-int *majorp, *minorp;
+RkwGetProtocolVersion( int* majorp, int* minorp)
 {
     *majorp = ProtocolMajor;
     *minorp = ProtocolMinor;
@@ -1490,8 +1448,7 @@ int *majorp, *minorp;
 }
 
 exp(int)
-RkwGetServerVersion(majorp, minorp)
-int *majorp, *minorp;
+RkwGetServerVersion( int* majorp, int* minorp)
 {
     if( !PROTOCOL )
 	return( RkwGetProtocolVersion(majorp, minorp) );
@@ -1513,36 +1470,34 @@ G070_RkcGetServerFD()
 }
 
 int
-RkcConnectIrohaServer( servername )
-char* servername;
+RkcConnectIrohaServer( char* servername )
 {
     /* XXX:
-     * RkcDisconnectIrohaServer¤ËÁêÅö¤¹¤ë¥¤¥ó¥¿¡¼¥Õ¥§¡¼¥¹¤¬Ìµ¤¤¤Î¤Ç¡¢
-     * ¤³¤ì¤Ï¥á¥â¥ê¥ê¡¼¥¯¤ò°ú¤­µ¯¤³¤¹¡£º£¤Î¤È¤³¤í¤³¤ÎAPI¤Ï¸Å¤¤cannastat¤¬
-     * ver 1.x¤Î¥µ¡¼¥Ğ¤ÈÄÌ¿®¤¹¤ë¾ì¹ç¤Ë¤À¤±»È¤¦¤Î¤Ç¡¢¤³¤ÎÌäÂê¤ÏÌµ»ë¤¹¤ë
-     * ¤³¤È¤Ë¤¹¤ë¡£
+     * RkcDisconnectIrohaServerã«ç›¸å½“ã™ã‚‹ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ãŒç„¡ã„ã®ã§ã€
+     * ã“ã‚Œã¯ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã‚’å¼•ãèµ·ã“ã™ã€‚ä»Šã®ã¨ã“ã‚ã“ã®APIã¯å¤ã„cannastatãŒ
+     * ver 1.xã®ã‚µãƒ¼ãƒã¨é€šä¿¡ã™ã‚‹å ´åˆã«ã ã‘ä½¿ã†ã®ã§ã€ã“ã®å•é¡Œã¯ç„¡è¦–ã™ã‚‹
+     * ã“ã¨ã«ã™ã‚‹ã€‚
      */
     rkc_configure();
     return( rkc_Connect_Iroha_Server( servername ) );
 }
 							/* end:S004 */
 int
-G069_RkcConnectIrohaServer( servername )
-char* servername;
+G069_RkcConnectIrohaServer( char* servername )
 {
     return RkcConnectIrohaServer(servername);
 }
 
 void
-RkcListenConfigErrors( handler )
-RkcConfigErrorProc handler;
+RkcListenConfigErrors( RkcConfigErrorProc handler )
 {
     config_error_handler = handler;
 }
 
+
 #ifdef EXTENSION
 static
-CheckRemoteToolProtoVersion(mode)
+int CheckRemoteToolProtoVersion(int mode)
 {
   if (!PROTOCOL && ProtocolMinor < 2) /* protocol version 1.2 */
     return -1;
@@ -1554,11 +1509,9 @@ CheckRemoteToolProtoVersion(mode)
 }
 
 int
-RkwListDic( cxnum, dirname, dicnames_return, size )
-int cxnum, size ;
-char *dirname, *dicnames_return ;
+RkwListDic( int cxnum, char* dirname, char* dicnames_return, int size )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx) {
       return -1;
@@ -1596,11 +1549,9 @@ char *dirname, *dicnames_return ;
 }
 
 int
-RkwCreateDic( cxnum, dicname, mode )
-int cxnum, mode ;
-char *dicname ;
+RkwCreateDic( int cxnum, char* dicname, int mode )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx || !dicname) {
       return -1;
@@ -1613,11 +1564,9 @@ char *dicname ;
 }
 
 exp(int)
-RkwRemoveDic( cxnum, dicname, mode )
-int cxnum ;
-char *dicname ;
+RkwRemoveDic( int cxnum, char* dicname, int mode )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx || !dicname) {
       return -1;
@@ -1630,11 +1579,9 @@ char *dicname ;
 }
 
 exp(int)
-RkwRenameDic( cxnum, dicname, newdicname, mode )
-int cxnum, mode ;
-char *dicname, *newdicname;
+RkwRenameDic( int cxnum, char* dicname, char* newdicname, int mode )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx || !dicname || !newdicname) {
       return -1;
@@ -1646,20 +1593,18 @@ char *dicname, *newdicname;
     return (*RKCP->rename_dictionary)(cx, dicname, newdicname, mode);
 }
 
-/* CopyDic ¤ò Æş¤ì¤ë¡£ */
 
 exp(int)
-RkwCopyDic(cxnum, dirname, dicname, newdicname, mode )
-int cxnum, mode ;
-char *dirname,*dicname, *newdicname ;
+RkwCopyDic( int cxnum, char* dirname, char* dicname, char* newdicname,
+            int mode )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx || !dirname || !dicname) {
       return -1;
     }
 /*
-  Protocol Version 3.2 ¤«¤é¥µ¥İ¡¼¥È¡£¤½¤ì°ÊÁ°¤Î¥µ¡¼¥Ğ¤Ø¤ÏÁ÷¤Ã¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
+  Protocol Version 3.2 ã‹ã‚‰ã‚µãƒãƒ¼ãƒˆã€‚ãã‚Œä»¥å‰ã®ã‚µãƒ¼ãƒã¸ã¯é€ã£ã¦ã¯ã„ã‘ãªã„ã€‚
 */
 
   if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
@@ -1671,15 +1616,12 @@ char *dirname,*dicname, *newdicname ;
 
 }
 
-/* ¤³¤³¤Ş¤Ç */
 
 static
-_RkwGetWordTextDic( cxnum, dirname, dicname, info, infolen )
-int cxnum, infolen ;
-unsigned char *dirname, *dicname;
-Ushort *info;
+int _RkwGetWordTextDic( int cxnum, const char* dirname, const char* dicname, cannawc* info,
+                    int infolen )
 {
-    register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    RkcContext *cx = getCC( cxnum, NOCHECK ) ;
 
     if (!cx || !dirname || !dicname) {
       return -1;
@@ -1690,30 +1632,31 @@ Ushort *info;
     }
 
     return (*RKCP->get_text_dictionary)
-      (cx, (char *)dirname, (char *)dicname, info, infolen);
+                (cx, dirname, dicname, info, infolen);
 }
 
-exp(int)
-RkwGetWordTextDic(cxnum, dirname, dicname, info, infolen)
-int cxnum, infolen ;
-unsigned char *dirname, *dicname;
-wchar_t *info;
-{
-  int len;
 
-  len = _RkwGetWordTextDic(cxnum, dirname, dicname, rkc.cbuf, CBUFSIZE);
-  if (len < 0){
-    return len;
-  }
-  else {
-    if( !info ) {
-      return ushort2wchar(rkc.cbuf, len, rkc.buffer, BUFSIZE);
-    }
-    else if( infolen <= 0 )
+// info [é•·ã•=infolen] ã«æ ¼ç´ã™ã‚‹.
+exp(int)
+RkwGetWordTextDic( int cxnum, const char* dirname, const char* dicname,
+                   cannawc* info,
+                   int infolen)
+{
+    int len;
+    if ( !info )
+        return -1;
+
+    len = _RkwGetWordTextDic(cxnum, dirname, dicname, rkc.cbuf, CBUFSIZE);
+    if (len < 0)
+        return len;
+
+    //if( !info ) {
+    //  return ushort2wchar(rkc.cbuf, len, rkc.buffer, BUFSIZE);
+    //}
+    if ( infolen <= 0 )
       return 0;
 
     return ushort2wchar(rkc.cbuf, len, info, infolen);
-  }
 }
 
 #else
@@ -1724,24 +1667,21 @@ RkwRenameDic(){}
 RkwGetWordTextDic(){}
 #endif /* EXTENSION */
 
-/* Ãà¼¡¼«Æ°ÊÑ´¹µ¡Ç½´Ø¿ô				*/
+/* é€æ¬¡è‡ªå‹•å¤‰æ›æ©Ÿèƒ½é–¢æ•°				*/
 /*						*/
-/* Ãà¼¡¼«Æ°ÊÑ´¹µ¡Ç½Æ³Æş¤Ë¤è¤Ã¤ÆÄÉ²Ã¤µ¤ì¤ë´Ø¿ô	*/
+/* é€æ¬¡è‡ªå‹•å¤‰æ›æ©Ÿèƒ½å°å…¥ã«ã‚ˆã£ã¦è¿½åŠ ã•ã‚Œã‚‹é–¢æ•°	*/
 
 static int
-_RkwSubstYomi( cxnum, ys, ye, yomi, nyomi )
-int cxnum, ys, ye, nyomi;
-Ushort	*yomi;
+_RkwSubstYomi( int cxnum, int ys, int ye, cannawc* yomi, int nyomi )
 {
-    register RkcContext *cx = getCC( cxnum, CHECK );
+    RkcContext *cx = getCC( cxnum, CHECK );
     int len, curbun, nbun = -1, pbun, retval = -1;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-    Ushort cbuf[CBUFSIZE];
+    cannawc cbuf[CBUFSIZE];
 #else
-    Ushort *cbuf = GlobalAlloc(GMEM_FIXED, sizeof(Ushort) * CBUFSIZE);
-    if (!cbuf) {
-      return -1;
-    }
+    cannawc* cbuf = GlobalAlloc(GMEM_FIXED, sizeof(cannawc) * CBUFSIZE);
+    if (!cbuf)
+        return -1;
 #endif
 
     if( cx ){
@@ -1751,7 +1691,7 @@ Ushort	*yomi;
 	  goto done;
 	}
 
-	nyomi = RKI_MIN( ushortstrlen( yomi ), nyomi);
+        nyomi = min( ushortstrlen( yomi ), nyomi);
 	curbun = cx->curbun;
 	cx->curbun = 0;
 	if ((nbun = (*RKCP->subst_yomi)(cx, cx->maxbun, ys, ye, yomi, nyomi))
@@ -1762,7 +1702,7 @@ Ushort	*yomi;
 	}
 
 	pbun = cx->maxbun;
-	cx->maxbun = 0; /* StoreFirstKouho ¤Ç¤¢¤ó¤Ş¤ê¤â¤Î¤ò¼Î¤Æ¤Ê¤¤¤è¤¦¤Ë */
+	cx->maxbun = 0; /* StoreFirstKouho ã§ã‚ã‚“ã¾ã‚Šã‚‚ã®ã‚’æ¨ã¦ãªã„ã‚ˆã†ã« */
 	StoreFirstKouho(cx, nbun);
 
 	if (nbun != pbun) {
@@ -1782,29 +1722,28 @@ Ushort	*yomi;
     retval = nbun;
   done:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-    GlobalFree((HGLOBAL)cbuf);
+    GlobalFree( cbuf);
 #endif
     return retval;
 }
 
-int
-RkwSubstYomi( cxnum, ys, ye, yomi, nyomi )
-int cxnum, ys, ye, nyomi;
-wchar_t *yomi;
-{
-  RkcContext *cx = getCC( cxnum, CHECK );
-  int len;
 
-  if(cx) {
+int
+RkwSubstYomi( int cxnum, int ys, int ye, cannawc* yomi, int nyomi )
+{
+    RkcContext *cx = getCC( cxnum, CHECK );
+    int len;
+
+    if( !cx )
+        return -1;
+
     len = wchar2ushort(yomi, nyomi, rkc.cbuf, CBUFSIZE);
     return _RkwSubstYomi(cxnum, ys, ye, rkc.cbuf, len);
-  }
-  return( -1 ) ;
 }
 
+
 int
-RkwFlushYomi( cxnum )
-int cxnum;
+RkwFlushYomi( int cxnum )
 {
     RkcContext *cx = getCC( cxnum, CHECK );
     int curbun, nbun = -1;
@@ -1829,35 +1768,32 @@ int cxnum;
     return( nbun ) ;
 }
 
+
 static int
-_RkwGetLastYomi( cxnum, yomi, maxyomi )
-int	cxnum, maxyomi;
-Ushort	*yomi;
+_RkwGetLastYomi( int cxnum, cannawc* yomi, int maxyomi )
 {
-    register RkcContext *cx = getCC( cxnum, CHECK );
+    RkcContext *cx = getCC( cxnum, CHECK );
     int	len = -1;
 
-    if( cx ){
-	if( !maxyomi || cx->maxyomi > maxyomi )
-	    return( 0 );
-	len = ushortstrncpy( yomi, cx->lastyomi, cx->maxyomi );
-    }
-    return( len ) ;
+    if( !cx )
+        return -1;
+
+    if( !maxyomi || cx->maxyomi > maxyomi )
+        return( 0 );
+    len = ushortstrncpy( yomi, cx->lastyomi, cx->maxyomi );
+    return len;
 }
 
-int
-RkwGetLastYomi( cxnum, yomi, maxyomi )
-int cxnum;
-wchar_t *yomi;
-int maxyomi;
-{
-  int len;
 
-  len = _RkwGetLastYomi(cxnum, rkc.cbuf, CBUFSIZE);
-  if (len < 0) {
-    return -1;
-  }
-  else {
+int
+RkwGetLastYomi( int cxnum, cannawc* yomi, int maxyomi )
+{
+    int len;
+
+    len = _RkwGetLastYomi(cxnum, rkc.cbuf, CBUFSIZE);
+    if (len < 0)
+        return -1;
+
     if( !yomi ) {
       return ushort2wchar(rkc.cbuf, len, rkc.wbuf, CBUFSIZE);
     }
@@ -1865,30 +1801,27 @@ int maxyomi;
       return 0;
 
     return ushort2wchar(rkc.cbuf, len, yomi, maxyomi);
-  }
 }
 
+
 /*
- * ÀèÆ¬Ê¸Àá¤«¤é»ØÄê¤µ¤ì¤¿Ê¸Àá¤Ş¤Ç¤ÎÀèÆ¬¸õÊä¤Ş¤¿¤Ï¡¢¸õÊäÎó¤ÎÎÎ°è¤ò²òÊü¤¹¤ë
+ * å…ˆé ­æ–‡ç¯€ã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸæ–‡ç¯€ã¾ã§ã®å…ˆé ­å€™è£œã¾ãŸã¯ã€å€™è£œåˆ—ã®é ˜åŸŸã‚’è§£æ”¾ã™ã‚‹
  */
-static
-void
-removeBUN( cx, to )
-RkcContext *cx;
-register int to;
+static void
+removeBUN( RkcContext* cx, int to )
 {
-    register RkcBun *bun ;
-    register i;
+    RkcBun *bun ;
+    int i;
 
     for( i = 0; i < to; i++ ) {
 	bun = &cx->bun[ i ] ;
 	if( bun->flags == NUMBER_KOUHO ) {
-	    /* Âè°ì¸õÊä¤·¤«Æş¤Ã¤Æ¤¤¤Ê¤¤Ê¸Àá¤Ï¡¢¼Âºİ¤Ë¤Ïmalloc¤·¤¿¤ï¤±¤Ç¤Ï¤Ê¤¯
-	     * ¥µ¡¼¥Ğ¤«¤éÄÌÃÎ¤µ¤ì¤¿³ÆÊ¸Àá¤ÎÂè°ì¸õÊäÎó¤ÎÃæ¤Ø¤Î¥İ¥¤¥ó¥¿¤ò
-	     * ÀßÄê¤·¤Æ¤¤¤ë¤À¤±¤À¤«¤é¥Õ¥ê¡¼¤·¤Ê¤¤¡£
+	    /* ç¬¬ä¸€å€™è£œã—ã‹å…¥ã£ã¦ã„ãªã„æ–‡ç¯€ã¯ã€å®Ÿéš›ã«ã¯mallocã—ãŸã‚ã‘ã§ã¯ãªã
+	     * ã‚µãƒ¼ãƒã‹ã‚‰é€šçŸ¥ã•ã‚ŒãŸå„æ–‡ç¯€ã®ç¬¬ä¸€å€™è£œåˆ—ã®ä¸­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’
+	     * è¨­å®šã—ã¦ã„ã‚‹ã ã‘ã ã‹ã‚‰ãƒ•ãƒªãƒ¼ã—ãªã„ã€‚
 	     */
 	    RkcFree( (char *)bun->kanji ) ;
-	    bun->kanji = (Ushort *)NULL ;
+            bun->kanji = NULL ;
 	    bun->curcand = bun->maxcand = 0 ;
 	    bun->flags = NOTHING_KOUHO ;
 	}
@@ -1896,16 +1829,15 @@ register int to;
 }
 
 int
-RkwRemoveBun( cx_num, mode )
-int cx_num, mode;
+RkwRemoveBun( int cx_num, int mode )
 {
-    register RkcContext  *cx = getCC( cx_num, CHECK );
-    register int cnt, i;
+    RkcContext  *cx = getCC( cx_num, CHECK );
+    int cnt, i;
     int ret;
 
     if( cx ) {
 	/*
-	 * rkcw_remove_bun ¤Ç³Ø½¬¤¹¤Ù¤­¸õÊä¤ò¥µ¡¼¥Ğ¤ËÃÎ¤é¤»¤ë
+	 * rkcw_remove_bun ã§å­¦ç¿’ã™ã¹ãå€™è£œã‚’ã‚µãƒ¼ãƒã«çŸ¥ã‚‰ã›ã‚‹
 	 */
 	if ((ret = (*RKCP->remove_bun)(cx, mode)) < 0)
 	    return( -1 );
@@ -1916,7 +1848,7 @@ int cx_num, mode;
 	    cx->bun[cnt].curcand = cx->bun[i].curcand;
 	    cx->bun[cnt].maxcand = cx->bun[i].maxcand;
 	    cx->bun[cnt].flags = cx->bun[i].flags;
-	    cx->bun[i].kanji = (Ushort *)NULL ;
+            cx->bun[i].kanji = NULL ;
 	    cx->bun[i].curcand = cx->bun[i].maxcand = 0 ;
 	    cx->bun[i].flags = NOTHING_KOUHO ;
 	}
@@ -1929,11 +1861,9 @@ int cx_num, mode;
 }
 
 static int
-_RkwGetSimpleKanji(cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis,
-		   hinshis, maxhinshis)
-unsigned char *dicname;
-int cxnum, maxyomi, maxkanjis, maxhinshis;
-Ushort *yomi, *kanjis, *hinshis;
+_RkwGetSimpleKanji( int cxnum, char* dicname, cannawc* yomi, int maxyomi,
+                    cannawc* kanjis, int maxkanjis,
+                    cannawc* hinshis, int maxhinshis)
 {
     RkcContext *cx = getCC( cxnum, CHECK ) ;
 
@@ -1946,16 +1876,15 @@ Ushort *yomi, *kanjis, *hinshis;
 }
 
 int
-RkwGetSimpleKanji( cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis, hinshis, maxhinshis )
-int cxnum, maxyomi, maxkanjis, maxhinshis ;
-wchar_t *yomi, *kanjis, *hinshis;
-char *dicname;
+RkwGetSimpleKanji( int cxnum, char* dicname, cannawc* yomi, int maxyomi,
+                   cannawc* kanjis, int maxkanjis,
+                   unsigned char* hinshis, int maxhinshis )
 {
-  Ushort cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
-  int nkanji, len, i, j = 0, k = 0, l = 0, m = 0;
+    cannawc cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
+    int nkanji, len, i, j = 0, k = 0, l = 0, m = 0;
 
-  if( !dicname || !yomi || maxyomi <= 0 )
-    return( -1 );
+    if( !dicname || !yomi || maxyomi <= 0 )
+        return( -1 );
 
   len = wchar2ushort(yomi, maxyomi, cbuf, CBUFSIZE);
   nkanji = _RkwGetSimpleKanji(cxnum, dicname, cbuf, len,
@@ -1974,16 +1903,14 @@ char *dicname;
 		   hinshis + l, maxhinshis - l) + 1;
     m += ushortstrlen(cbuf3 + m) + 1;
   }
-  kanjis[k] = hinshis[l] = (wchar_t)0;
-  return ( nkanji );
+    kanjis[k] = hinshis[l] = '\0';
+    return nkanji ;
 }
 
+/* S002 */
 int
-RkwQueryDic( cxnum, username, dicname, status )			/* S002 */
-int cxnum;
-char *username;					/* S002 */
-char *dicname;
-struct DicInfo *status;
+RkwQueryDic( int cxnum, const char* username, char* dicname, struct
+             DicInfo* status )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK );
 
@@ -1995,7 +1922,7 @@ struct DicInfo *status;
 	    return( -1 ) ;
 
     if( !status ) {
-      struct DicInfo buffer; /* ¥À¥ß¡¼ */
+      struct DicInfo buffer; /* ãƒ€ãƒŸãƒ¼ */
 
       return (*RKCP->query_dic)(cx, username, dicname, &buffer);
     }
@@ -2005,9 +1932,7 @@ struct DicInfo *status;
 }
 
 static int
-_RkwGetHinshi( cxnum, dst, maxdst )
-int cxnum, maxdst;
-Ushort *dst;
+_RkwGetHinshi( int cxnum, cannawc* dst, int maxdst )
 {
     RkcContext *cx = getCC( cxnum, CHECK );
 
@@ -2017,17 +1942,16 @@ Ushort *dst;
     return( -1 ) ;
 }
 
-int
-RkwGetHinshi( cxnum, dst, maxdst )
-int cxnum, maxdst;
-wchar_t *dst;
-{
-  int len;
 
-  len = _RkwGetHinshi(cxnum, rkc.cbuf, CBUFSIZE);
-  if (len < 0) {
-    return -1;
-  }
+int
+RkwGetHinshi( int cxnum, cannawc* dst, int maxdst )
+{
+    int len;
+
+    len = _RkwGetHinshi(cxnum, rkc.cbuf, CBUFSIZE);
+    if (len < 0) {
+        return -1;
+    }
   else {
     if( !dst ) {
       return ushort2wchar(rkc.cbuf, len, rkc.wbuf, CBUFSIZE);
@@ -2039,10 +1963,9 @@ wchar_t *dst;
   }
 }
 
+
 static int
-_RkwStoreRange( cxnum, yomi, maxyomi )
-int cxnum, maxyomi;
-Ushort *yomi;
+_RkwStoreRange( int cxnum, cannawc* yomi, int maxyomi )
 {
     RkcContext *cx = getCC( cxnum, CHECK );
 
@@ -2052,24 +1975,22 @@ Ushort *yomi;
     return( -1 ) ;
 }
 
-int
-RkwStoreRange( cxnum, yomi, maxyomi )
-int cxnum, maxyomi;
-wchar_t *yomi;
-{
-  int len;
 
-  if( !yomi || maxyomi <= 0 )
-    return -1;
+int
+RkwStoreRange( int cxnum, cannawc* yomi, int maxyomi )
+{
+    int len;
+
+    if( !yomi || maxyomi <= 0 )
+        return -1;
 
   len = wchar2ushort(yomi, maxyomi, rkc.cbuf, CBUFSIZE);
   return _RkwStoreRange(cxnum, rkc.cbuf, len);
 }
 
+
 int
-RkwSetLocale( cxnum, locale )
-int cxnum;
-unsigned char *locale;
+RkwSetLocale( int cxnum, char* locale )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK );
 
@@ -2079,28 +2000,20 @@ unsigned char *locale;
     return( -1 ) ;
 }
 
-/*
- *  RkwSync ()
- *
- *  Description:
- *  -----------
- *  ¼­½ñ¥Õ¥¡¥¤¥ë¤Ø¤ÎÆ±´ü½èÍı
+
+/**
+ *  è¾æ›¸ãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®åŒæœŸå‡¦ç†
  *
  *  Input:
  *  -----
- *  dicname: ¼­½ñÌ¾@¼­½ñÌ¾@...@@
+ *  dicname: è¾æ›¸å@è¾æ›¸å@...@@
  *
- *  Returns:
- *  -------
- *  0 or -1
+ * @return  0 or -1
  */
-
 int
-RkwSync( cxnum, dicname )
-int cxnum;
-char *dicname;
+RkwSync( int cxnum, const char* dicname )
 {
-  RkcContext *cx = getCC( cxnum, NOCHECK );
+    RkcContext *cx = getCC( cxnum, NOCHECK );
 
   if (cx) {
     if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
@@ -2110,28 +2023,20 @@ char *dicname;
   return -1;
 }
 
-/*
- *  RkwSetAppName ()
- *
- *  Description:
- *  -----------
- *  ¥¢¥×¥ê¥±¡¼¥·¥ç¥óÌ¾¤ÎÅĞÏ¿
+
+/**
+ *  ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³åã®ç™»éŒ²
  *
  *  Input:
  *  -----
- *  apname: ¥¢¥×¥ê¥±¡¼¥·¥ç¥óÌ¾
+ *  apname: ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å
  *
  *  Returns:
  *  -------
  *  0 or -1
  */
-
-int RkwSetAppName pro((int, char *));
-
 int
-RkwSetAppName( cxnum, apname )
-int cxnum;
-char *apname;
+RkwSetAppName( int cxnum, char* apname )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK );
 
@@ -2141,47 +2046,43 @@ char *apname;
     return( -1 ) ;
 }
 
-int RkSetAppName pro((int, char *));
 
 /*
  *  RkwChmodDic ()
  *
  *  Description:
  *  -----------
- *  ¼­½ñ¤Î¥¢¥¯¥»¥¹¸¢¤ÎÊÑ¹¹
+ *  è¾æ›¸ã®ã‚¢ã‚¯ã‚»ã‚¹æ¨©ã®å¤‰æ›´
  *
  *  Input:
  *  -----
- *  dicname: ¼­½ñ¤ÎÌ¾Á°
+ *  dicname: è¾æ›¸ã®åå‰
  *
- *  mode: ¥â¡¼¥É
+ *  mode: ãƒ¢ãƒ¼ãƒ‰
  *
  *  Returns:
  *  -------
  *  0 or -1
  */
 exp(int)
-RkwChmodDic(cxnum, dicname, mode)
-int cxnum;
-char *dicname;
-int  mode;
+RkwChmodDic(int cxnum, char* dicname, int mode)
 {
-  RkcContext *cx = getCC( cxnum, NOCHECK );
+    RkcContext *cx = getCC( cxnum, NOCHECK );
 
-  if (cx &&
+    if (cx &&
       canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
     return (*RKCP->chmod_dic)(cx, dicname, mode);
   }
   return -1;
 }
 
+
 /* EUC functions */
 
 #ifndef OMIT_EUC_FUNCS
 
 int
-RkInitialize( hostname )
-char *hostname ;
+RkInitialize( char* hostname )
 {
     return( RkwInitialize( hostname ) ) ;
 }
@@ -2192,14 +2093,13 @@ RkFinalize()
     RkwFinalize() ;
 }
 
-RkKillServer()
+int RkKillServer()
 {
     return RkwKillServer();
 }
 
 int
-RkCloseContext( cxnum )
-int cxnum ;
+RkCloseContext( int cxnum )
 {
     return( RkwCloseContext( cxnum ) ) ;
 }
@@ -2211,97 +2111,85 @@ RkCreateContext()
 }
 
 int
-RkDuplicateContext( src_cx )
-int src_cx ;
+RkDuplicateContext( int src_cx )
 {
     return( RkwDuplicateContext( src_cx ) ) ;
 }
 
+
 int
-RkGetDicList(cxnum, dicnames, max)
-int cxnum ;
-char *dicnames ;
-int max ;
+RkGetDicList( int cxnum, char* dicnames, int max)
 {
     return( RkwGetDicList( cxnum, dicnames, max ) ) ;
 }
 
+
 int
-RkDefineDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname, *wordrec;
+RkDefineDic( int cxnum, char* dicname, unsigned char* wordrec)
 {
     if( !dicname || !wordrec )
 	return( -1 ) ;
 
-    euc2ushort(wordrec, strlen(wordrec), rkc.cbuf, CBUFSIZE);
+    euc2ushort(wordrec, strlen((char*) wordrec), rkc.cbuf, CBUFSIZE);
     return _RkwDefineDic(cxnum, dicname, rkc.cbuf);
 }
 
+
 int
-RkDeleteDic(cxnum, dicname, wordrec)
-int cxnum;
-char *dicname, *wordrec;
+RkDeleteDic(int cxnum, char* dicname, unsigned char* wordrec)
 {
-    Ushort cbuf[CBUFSIZE];
+    cannawc cbuf[CBUFSIZE];
 
     if( !dicname || !wordrec )
 	return( -1 ) ;
 
-    euc2ushort(wordrec, strlen(wordrec), cbuf, CBUFSIZE);
+    euc2ushort(wordrec, strlen((char*) wordrec), cbuf, CBUFSIZE);
     return( _RkwDeleteDic(cxnum, dicname, cbuf) );
 }
 
+
 int
-RkMountDic( cxnum, dicname, mode )
-int cxnum, mode;
-char *dicname;
+RkMountDic( int cxnum, char* dicname, int mode )
 {
     return( RkwMountDic( cxnum, dicname, mode ) );
 }
 
+
 int
-RkRemountDic( cxnum, dicname, where )
-int cxnum, where;
-char *dicname;
+RkRemountDic( int cxnum, char* dicname, int where )
 {
     return( RkwRemountDic( cxnum, dicname, where ) );
 }
 
+
 int
-RkUnmountDic( cxnum, dicname )
-int cxnum;
-char *dicname;
+RkUnmountDic( int cxnum, char* dicname )
 {
     return( RkwUnmountDic( cxnum, dicname ) );
 }
 
-int
-RkGetMountList( cxnum, dicnames_return, max )
-int cxnum, max;
-char *dicnames_return;
-{
-    return( RkwGetMountList( cxnum, dicnames_return, max ) );
-}
 
 int
-RkSetDicPath( cxnum, path ) /* ¥µ¡¼¥Á¥Ñ¥¹¤òÀßÄê */
-int cxnum ;
-char *path ;
-/* ARGSUSED */
+RkGetMountList( int cxnum, char* dicnames_return, int max_ )
+{
+    return( RkwGetMountList( cxnum, dicnames_return, max_ ) );
+}
+
+
+/* ã‚µãƒ¼ãƒãƒ‘ã‚¹ã‚’è¨­å®š */
+int
+RkSetDicPath( int cxnum, char* path )
 {
     /*
-     * ¥µ¡¼¥Ğ¤¬Î©¤Á¾å¤¬¤ë¤È¤­¤ËÀßÄê¤¹¤ë¤Î¤ÇRKC¤Ç¤Ï²¿¤â¤»¤º¤ËÊÖ¤¹
+     * ã‚µãƒ¼ãƒãŒç«‹ã¡ä¸ŠãŒã‚‹ã¨ãã«è¨­å®šã™ã‚‹ã®ã§RKCã§ã¯ä½•ã‚‚ã›ãšã«è¿”ã™
      */
     return( 0 ) ;
 }
 
+
+/* è¾æ›¸ãƒªã‚¹ãƒˆã‚’å–å¾— */
 int
-RkGetDirList( cxnum, ddname, maxddname )   /* ¼­½ñ¥ê¥¹¥È¤ò¼èÆÀ */
-int cxnum ;
-char *ddname ;
-int maxddname ;
-/* ARGSUSED */
+RkGetDirList( int cxnum, char* ddname, int maxddname )
 {
 #ifdef USE_EUC_PROTOCOL
     register RkcContext *cx = getCC( cxnum, NOCHECK ) ;
@@ -2322,67 +2210,61 @@ int maxddname ;
 #endif /* !USE_EUC_PROTOCOL */
 }
 
+
 int
-RkBgnBun(cxnum, yomi, maxyomi, mode)
-int cxnum;
-char *yomi;
-int maxyomi;
-int mode;
+RkBgnBun(int cxnum, unsigned char* yomi, int maxyomi, int mode)
 {
-    Ushort cbuf[CBIGBUFSIZE];
+    cannawc cbuf[CBIGBUFSIZE];
     int len;
 
     if (yomi) {
-      len = euc2ushort(yomi, maxyomi, cbuf, CBIGBUFSIZE);
-      return( _RkwBgnBun(cxnum, cbuf, len, mode) );
+        len = euc2ushort(yomi, maxyomi, cbuf, CBIGBUFSIZE);
+        return( _RkwBgnBun(cxnum, cbuf, len, mode) );
     }
-    else {  /* ¼«Æ°ÊÑ´¹³«»Ï */
-      return _RkwBgnBun(cxnum, (Ushort *)NULL, maxyomi, mode);
+    else {  /* è‡ªå‹•å¤‰æ›é–‹å§‹ */
+      return _RkwBgnBun(cxnum, NULL, maxyomi, mode);
     }
 }
 
+
 int
-RkEndBun( cxnum, mode )
-int cxnum, mode ;
+RkEndBun( int cxnum, int mode )
 {
     return( RkwEndBun( cxnum, mode ) );
 }
 
 int
-RkXfer( cxnum, knum )
-int cxnum, knum;
+RkXfer( int cxnum, int knum )
 {
     return( RkwXfer( cxnum, knum ) );
 }
 
+
 int
-RkNfer( cxnum )
-int cxnum ;
+RkNfer( int cxnum )
 {
     return( RkwNfer( cxnum ) );
 }
 
+
 int
-RkNext( cxnum )
-int cxnum ;
+RkNext( int cxnum )
 {
     return( RkwNext( cxnum ) );
 }
 
+
 int
-RkPrev(cxnum)
-int cxnum ;
+RkPrev( int cxnum)
 {
     return( RkwPrev( cxnum ) );
 }
 
+
 int
-RkGetKanji(cxnum, kanji, maxkanji)
-int cxnum;
-unsigned char *kanji;
-int maxkanji;
+RkGetKanji( int cxnum, unsigned char* kanji, int maxkanji)
 {
-    Ushort cbuf[CBUFSIZE];
+    cannawc cbuf[CBUFSIZE];
     int len;
 
     if( (len = _RkwGetKanji(cxnum, cbuf, CBUFSIZE)) < 0 ){
@@ -2390,39 +2272,36 @@ int maxkanji;
     }
     else {
 	if( !kanji ) {
-	    char buffer[CBUFSIZE];
-
-	    return( ushort2euc(cbuf, len, buffer, CBUFSIZE) );
+            unsigned char buffer[CBUFSIZE];
+            return ushort2euc(cbuf, len, buffer, CBUFSIZE) ;
 	}
 	else if( maxkanji <= 0 )
 	    return( 0 );
 
-	return ushort2euc(cbuf, len, (char *)kanji, maxkanji);
+        return ushort2euc(cbuf, len, kanji, maxkanji);
     }
 }
 
+
 int
-RkGetKanjiList(cxnum, kanjis, maxkanjis)
-int cxnum;
-unsigned char *kanjis;
-int maxkanjis;
+RkGetKanjiList( int cxnum, unsigned char* kanjis, int maxkanjis)
 {
-  Ushort cbuf[CBIGBUFSIZE];
-  int nkanji, len, i, j = 0, k = 0;
-  char eucbuf[CBUFSIZE*2];				/* S005 */
-  int euclen;							/* S005 */
+    cannawc cbuf[CBIGBUFSIZE];
+    int nkanji, len, i, j = 0, k = 0;
+    unsigned char eucbuf[CBUFSIZE*2];				/* S005 */
+    int euclen;							/* S005 */
 
   if( !kanjis ) {
-    return( _RkwGetKanjiList(cxnum, (Ushort *)0, 0) );
+    return( _RkwGetKanjiList(cxnum, NULL, 0) );
   }
   else if( maxkanjis <= 0 )
     return( 0 );
 
   nkanji = _RkwGetKanjiList(cxnum, cbuf, CBIGBUFSIZE);
 
-  for (i = 0 ; i < nkanji ; i++) {
-    len = ushortstrlen(cbuf + j);
-    euclen = ushort2euc(cbuf + j, len, eucbuf, CBUFSIZE * 2);	/* S005 */
+    for (i = 0 ; i < nkanji ; i++) {
+        len = ushortstrlen(cbuf + j);
+        euclen = ushort2euc(cbuf + j, len, eucbuf, CBUFSIZE * 2);	/* S005 */
     if (k + euclen > maxkanjis - 2)				/* S005 */
       break;							/* S005 */
     strcpy((char *)kanjis + k, (char *)eucbuf);			/* S005 */
@@ -2433,35 +2312,35 @@ int maxkanjis;
   return( i );							/* S005 */
 }
 
+
 int
-RkGoTo(cxnum, bnum)
-int cxnum, bnum ;
+RkGoTo( int cxnum, int bnum)
 {
     return( RkwGoTo( cxnum, bnum ) );
 }
 
+
 int
-RkLeft( cxnum )
-int cxnum;
+RkLeft( int cxnum )
 {
     return( RkwLeft( cxnum ) );
 }
 
+
 int
-RkRight( cxnum )
-int cxnum;
+RkRight( int cxnum )
 {
     return( RkwRight( cxnum ) );
 }
 
+
 int
-RkResize(cxnum, len)
-int cxnum, len ;
+RkResize( int cxnum, int len)
 {
-    /* ¤³¤Î len ¤Ï¥Ğ¥¤¥È¤ä¤±¤É¡¤RkwResize ¤Ë¤ÏÊ¸»ú¿ô¤òÅÏ¤µ¤Ê¤¢¤«¤ó¤Î¤È
-       ¤Á¤ã¤¦¤ä¤í¤«? ¤³¤ó¤Ê¤ó¡¤¤É¤Ê¤¤¤ä¤Ã¤ÆÊÑ´¹¤·¤¿¤é¤¨¤¨¤ó¤ä¤í? */
-    Ushort cbuf[CBUFSIZE];
-    char tmpbuf[BUFSIZE];
+    /* ã“ã® len ã¯ãƒã‚¤ãƒˆã‚„ã‘ã©ï¼ŒRkwResize ã«ã¯æ–‡å­—æ•°ã‚’æ¸¡ã•ãªã‚ã‹ã‚“ã®ã¨
+       ã¡ã‚ƒã†ã‚„ã‚ã‹? ã“ã‚“ãªã‚“ï¼Œã©ãªã„ã‚„ã£ã¦å¤‰æ›ã—ãŸã‚‰ãˆãˆã‚“ã‚„ã‚? */
+    cannawc cbuf[CBUFSIZE];
+    unsigned char tmpbuf[BUFSIZE];
     register int euclen, uslen = 0;
     int curbun, ret;
     register RkcContext  *cx = getCC( cxnum, CHECK ) ;
@@ -2470,10 +2349,10 @@ int cxnum, len ;
 	if( len <= 0 )
 	    return( cx->maxbun );
 
-	/* ¤·¤ã¤¢¤Ê¤¤¤«¤é¡¤ÆÉ¤ß¤ò¼è¤Ã¤Æ¤­¤ÆÊ¸»ú¿ô¤òÄ´¤Ù¤¿¤í */
+	/* ã—ã‚ƒã‚ãªã„ã‹ã‚‰ï¼Œèª­ã¿ã‚’å–ã£ã¦ãã¦æ–‡å­—æ•°ã‚’èª¿ã¹ãŸã‚ */
 	curbun = cx->curbun;
 	for( ; (cx->curbun < cx->maxbun) && len; (cx->curbun)++ ) {
-	    /* ¤³¤ó¤Ê¤ó¤·¤È¤Ã¤¿¤é¤á¤Á¤ã¤¯¤Á¤ã¸úÎ¨°­¤¤¤¬¤Ê...¤È¤Û¤Û */
+	    /* ã“ã‚“ãªã‚“ã—ã¨ã£ãŸã‚‰ã‚ã¡ã‚ƒãã¡ã‚ƒåŠ¹ç‡æ‚ªã„ãŒãª...ã¨ã»ã» */
 	    if( (ret = _RkwGetYomi( cx, cbuf, CBUFSIZE )) < 0 ) {
 		cx->curbun = curbun;
 		return( -1 ) ;
@@ -2494,72 +2373,67 @@ int cxnum, len ;
     return( RKReSize( cxnum, uslen ) );
 }
 
+
+/* æ–‡ç¯€ä¼¸ã°ã— */
 int
-RkEnlarge( cxnum )  /* Ê¸Àá¿­¤Ğ¤· */
-int cxnum ;
+RkEnlarge( int cxnum )
 {
     return( RKReSize( cxnum, ENLARGE  ) ) ;
 }
 
+
+/* æ–‡ç¯€ç¸®ã‚ */
 int
-RkShorten(cxnum)    /* Ê¸Àá½Ì¤á */
-int cxnum ;
+RkShorten( int cxnum)
 {
     return( RKReSize( cxnum, SHORTEN ) ) ;
 }
 
-int
-RkStoreYomi(cxnum, yomi, maxyomi)
-int cxnum;
-char *yomi;
-int maxyomi;
-{
-  Ushort cbuf[CBUFSIZE];
-  int len;
 
-  if (yomi && maxyomi >= 0) {
-    len = RKI_MIN((int)strlen(yomi),maxyomi); 
-    len = euc2ushort(yomi, len, cbuf, CBUFSIZE) + 1;
-  } else {
-    cbuf[0] = 0;
-    len = 0;
-  }
-  return( _RkwStoreYomi(cxnum, cbuf, len) );
+int
+RkStoreYomi( int cxnum, unsigned char* yomi, int maxyomi)
+{
+    cannawc cbuf[CBUFSIZE];
+    int len;
+
+    if (yomi && maxyomi >= 0) {
+        len = min( (int)strlen((char*) yomi), maxyomi);
+        len = euc2ushort(yomi, len, cbuf, CBUFSIZE) + 1;
+    }
+    else {
+        cbuf[0] = 0;
+        len = 0;
+    }
+    return _RkwStoreYomi(cxnum, cbuf, len) ;
 }
 
+
 int
-RkGetYomi(cxnum, yomi, maxyomi)
-int cxnum;
-unsigned char *yomi;
-int maxyomi;
+RkGetYomi( int cxnum, unsigned char* yomi, int maxyomi)
 {
-  Ushort cbuf[CBUFSIZE];
-  int len;
+    cannawc cbuf[CBUFSIZE];
+    int len;
 
-  if ((len = _RkwGetYomi(getCC( cxnum, CHECK ), cbuf, CBUFSIZE)) < 0) {
-    return( len );
-  }
-  else {
+    if ((len = _RkwGetYomi(getCC( cxnum, CHECK ), cbuf, CBUFSIZE)) < 0)
+      return len ;
+
     if( !yomi ) {
-      char buffer[CBUFSIZE];
-
-      return( ushort2euc(cbuf, len, buffer, CBUFSIZE) );
+        unsigned char buffer[CBUFSIZE];
+      return ushort2euc(cbuf, len, buffer, CBUFSIZE) ;
     }
     else if( maxyomi <= 0 )
       return( 0 );
 
-    return ushort2euc(cbuf, len, (char *)yomi, maxyomi);
-  }
+    return ushort2euc(cbuf, len, yomi, maxyomi);
 }
 
+
 int
-RkGetLex(cxnum, lex, maxlex)
-int cxnum, maxlex ;
-RkLex *lex ;
+RkGetLex( int cxnum, RkLex* lex, int maxlex)
 {
     RkLex *tango;
-    Ushort ybuf[CBUFSIZE], kbuf[CBUFSIZE];
-    char cbuf[BUFSIZE];
+    cannawc ybuf[CBUFSIZE], kbuf[CBUFSIZE];
+    unsigned char cbuf[BUFSIZE];
     int i, len, ylen, klen, ret;
 
     if( (ret = RkwGetLex( cxnum, lex, maxlex )) <= 0 )
@@ -2582,10 +2456,9 @@ RkLex *lex ;
     return( ret );
 }
 
+
 int
-RkGetStat(cxnum, stat)
-int cxnum ;
-RkStat *stat ;
+RkGetStat( int cxnum, RkStat* stat)
 {
     unsigned char cbuf[BUFSIZE];
     int ret;
@@ -2597,66 +2470,57 @@ RkStat *stat ;
     return( ret );
 }
 
+
 #ifdef EXTENSION
-RkListDic( cxnum, dirname, dicnames_return, size )
-int cxnum, size;
-unsigned char *dirname, *dicnames_return;
+int
+RkListDic( int cxnum, char* dirname, char* dicnames_return, int size )
 {
-  return RkwListDic(cxnum, (char *)dirname,(char *) dicnames_return, size);
+    return RkwListDic(cxnum, (char *)dirname,(char *) dicnames_return, size);
 }
 
 exp(int)
-RkCreateDic( cxnum, dicname, mode )
-int cxnum, mode;
-unsigned char *dicname;
+RkCreateDic( int cxnum, char* dicname, int mode )
 {
-  return RkwCreateDic(cxnum, (char *)dicname, mode);
+    return RkwCreateDic(cxnum, (char *)dicname, mode);
 }
 
-RkRemoveDic( cxnum, dicname, mode )
-int cxnum;
-unsigned char *dicname;
+int RkRemoveDic( int cxnum, char* dicname, int mode )
 {
-  return RkwRemoveDic(cxnum, (char *)dicname, mode);
+    return RkwRemoveDic(cxnum, (char *)dicname, mode);
 }
 
-RkRenameDic( cxnum, dicname, newdicname, mode )
-int cxnum, mode;
-unsigned char *dicname, *newdicname;
+int RkRenameDic( int cxnum, char* dicname, char* newdicname, int mode )
 {
-  return RkwRenameDic(cxnum, (char *)dicname, (char *)newdicname, mode);
+    return RkwRenameDic(cxnum, (char *)dicname, (char *)newdicname, mode);
 }
 
-RkCopyDic(cxnum, dirname, dicname, newdicname, mode)
-int cxnum, mode;
-unsigned char *dirname, *dicname, *newdicname;
+
+int RkCopyDic( int cxnum, char* dirname, char* dicname, char* newdicname,
+               int mode)
 {
-  return RkwCopyDic(cxnum, (char *)dirname, (char *)dicname,
+    return RkwCopyDic(cxnum, (char *)dirname, (char *)dicname,
 		    (char *)newdicname, mode);
 }
 
+
 exp(int)
-RkGetWordTextDic(cxnum, dirname, dicname, info, infolen)
-int cxnum, infolen ;
-unsigned char *dirname, *dicname, *info;
+RkGetWordTextDic( int cxnum, char* dirname, char* dicname,
+                  char* info, int infolen)
 {
-  Ushort cbuf[CBUFSIZE];
-  int len;
+    cannawc cbuf[CBUFSIZE];
+    int len;
 
-  if ((len = _RkwGetWordTextDic(cxnum, dirname, dicname, cbuf, CBUFSIZE)) < 0){
-    return len;
-  }
-  else {
+    if ((len = _RkwGetWordTextDic(cxnum, dirname, dicname, cbuf, CBUFSIZE)) < 0)
+        return len;
+
     if( !info ) {
-      char buffer[CBUFSIZE];
-
-      return( ushort2euc(cbuf, len, buffer, CBUFSIZE) );
+        unsigned char buffer[CBUFSIZE];
+        return ushort2euc(cbuf, len, buffer, CBUFSIZE) ;
     }
     else if( infolen <= 0 )
       return 0;
 
-    return ushort2euc(cbuf, len, (char *)info, infolen);
-  }
+    return ushort2euc(cbuf, len, (unsigned char*) info, infolen);
 }
 
 #else
@@ -2668,14 +2532,12 @@ RkGetWordTextDic(){}
 #endif /* EXTENSION */
 
 int
-RkSubstYomi( cxnum, ys, ye, yomi, nyomi )
-int cxnum, ys, ye, nyomi;
-char *yomi;
+RkSubstYomi( int cxnum, int ys, int ye, unsigned char* yomi, int nyomi )
 {
-  RkcContext *cx = getCC( cxnum, CHECK );
-  char cbuf[CBUFSIZE];
-  Ushort cbuf2[CBUFSIZE];
-  int len;
+    RkcContext *cx = getCC( cxnum, CHECK );
+    unsigned char cbuf[CBUFSIZE];
+    cannawc cbuf2[CBUFSIZE];
+    int len;
 
   if (cx) {
     ushort2euc(cx->lastyomi, cx->maxyomi, cbuf, CBUFSIZE);
@@ -2687,57 +2549,52 @@ char *yomi;
   return( -1 ) ;
 }
 
+
 int
-RkFlushYomi( cxnum )
-int cxnum;
+RkFlushYomi( int cxnum )
 {
     return( RkwFlushYomi( cxnum ) );
 }
 
 int
-RkGetLastYomi( cxnum, yomi, maxyomi )
-int cxnum;
-char *yomi;
-int maxyomi;
+RkGetLastYomi( int cxnum, unsigned char* yomi, int maxyomi )
 {
-  Ushort cbuf[CBUFSIZE];
-  int len;
+    cannawc cbuf[CBUFSIZE];
+    int len;
 
-  if( (len = _RkwGetLastYomi(cxnum, cbuf, CBUFSIZE)) < 0 ){
-    return -1;
-  }
-  else {
+    if( (len = _RkwGetLastYomi(cxnum, cbuf, CBUFSIZE)) < 0 )
+        return -1;
+
     if( !yomi ) {
-      char buffer[CBUFSIZE];
-
-      return( ushort2euc(cbuf, len, buffer, CBUFSIZE) );
+        unsigned char buffer[CBUFSIZE];
+        return ushort2euc(cbuf, len, buffer, CBUFSIZE) ;
     }
     else if( maxyomi <= 0 )
       return 0;
 
     return ushort2euc(cbuf, len, yomi, maxyomi);
-  }
 }
 
+
 int
-RkRemoveBun( cxnum, mode )
-int cxnum, mode ;
+RkRemoveBun( int cxnum, int mode )
 {
     return( RkwRemoveBun( cxnum, mode ) );
 }
 
+
 int
-RkGetSimpleKanji( cxnum, dicname, yomi, maxyomi, kanjis, maxkanjis, hinshis, maxhinshis )
-int cxnum, maxyomi, maxkanjis, maxhinshis ;
-unsigned char *yomi, *kanjis, *hinshis ;
+RkGetSimpleKanji( int cxnum, char* dicname, unsigned char* yomi, int maxyomi,
+                  unsigned char* kanjis, int maxkanjis,
+                  unsigned char* hinshis, int maxhinshis )
 {
-  Ushort cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
-  int nkanji, len, i, j = 0, k = 0, l = 0, m = 0;
+    cannawc cbuf[CBUFSIZE], cbuf2[CBIGBUFSIZE], cbuf3[CBIGBUFSIZE];
+    int nkanji, len, i, j = 0, k = 0, l = 0, m = 0;
 
   if( !dicname || !yomi || maxyomi <= 0 )
     return( -1 );
 
-  len = euc2ushort((char *)yomi, maxyomi, cbuf, CBUFSIZE);
+  len = euc2ushort(yomi, maxyomi, cbuf, CBUFSIZE);
   nkanji = _RkwGetSimpleKanji(cxnum, dicname, cbuf, len,
 			  cbuf2, CBIGBUFSIZE, cbuf3, CBIGBUFSIZE );
 
@@ -2748,96 +2605,79 @@ unsigned char *yomi, *kanjis, *hinshis ;
 
   for( i = 0 ; i < nkanji ; i++ ) {
     k += ushort2euc(cbuf2 + j, ushortstrlen(cbuf2 + j),
-		    (char *)kanjis + k, maxkanjis - k) + 1;
+                    kanjis + k, maxkanjis - k) + 1;
     j += ushortstrlen(cbuf2 + j) + 1;
     l += ushort2euc(cbuf3 + m, ushortstrlen(cbuf3 + m),
-		    (char *)hinshis + l, maxhinshis - l) + 1;
+                    hinshis + l, maxhinshis - l) + 1;
     m += ushortstrlen(cbuf3 + m) + 1;
   }
   kanjis[k] = hinshis[l] = (unsigned char)0;
   return ( nkanji );
 }
 
+
+/* S002 */
 int
-RkQueryDic( cxnum, username, dicname, status )			/* S002 */
-int cxnum;
-char *username;					/* S002 */
-char *dicname;
-struct DicInfo *status;
+RkQueryDic( int cxnum, char* username, char* dicname, struct DicInfo* status )
 {
-  return RkwQueryDic(cxnum, username, dicname, status);
+    return RkwQueryDic(cxnum, username, dicname, status);
 }
 
 int
-RkGetHinshi( cxnum, dst, maxdst )
-int cxnum, maxdst;
-unsigned char *dst;
+RkGetHinshi( int cxnum, unsigned char* dst, int maxdst )
 {
-  Ushort cbuf[CBUFSIZE];
-  int len;
+    cannawc cbuf[CBUFSIZE];
+    int len;
 
-  if( (len = _RkwGetHinshi( cxnum, cbuf, CBUFSIZE )) < 0 ){
-    return -1;
-  }
-  else {
+    if( (len = _RkwGetHinshi( cxnum, cbuf, CBUFSIZE )) < 0 )
+        return -1;
+
     if( !dst ) {
-      char buffer[CBUFSIZE];
-
-      return( ushort2euc(cbuf, len, buffer, CBUFSIZE) );
+        unsigned char buffer[CBUFSIZE];
+        return ushort2euc(cbuf, len, buffer, CBUFSIZE) ;
     }
     else if( maxdst <= 0 )
       return 0;
 
-    return ushort2euc(cbuf, len, (char *)dst, maxdst);
-  }
+    return ushort2euc(cbuf, len, dst, maxdst);
 }
 
+
 int
-RkStoreRange( cxnum, yomi, maxyomi )
-int cxnum, maxyomi;
-unsigned char *yomi;
+RkStoreRange( int cxnum, unsigned char* yomi, int maxyomi )
 {
-  Ushort cbuf[CBUFSIZE];
-  int len;
+    cannawc cbuf[CBUFSIZE];
+    int len;
 
-  if( !yomi || maxyomi <= 0 )
-    return -1;
+    if( !yomi || maxyomi <= 0 )
+        return -1;
 
-  len = euc2ushort((char *)yomi, maxyomi, cbuf, CBUFSIZE);
-  return( _RkwStoreRange( cxnum, cbuf, len ) );
+    len = euc2ushort(yomi, maxyomi, cbuf, CBUFSIZE);
+    return _RkwStoreRange( cxnum, cbuf, len ) ;
 }
 
 int
-RkSetLocale( cxnum, locale )
-int cxnum;
-unsigned char *locale;
+RkSetLocale( int cxnum, char* locale )
 {
     return( RkwSetLocale( cxnum, locale ) );
 }
 
 int
-RkSync( cxnum, dicname )
-int cxnum;
-char *dicname;
+RkSync( int cxnum, char* dicname )
 {
     return( RkwSync( cxnum, dicname ) );
 }
 
 int
-RkSetAppName( cxnum, apname )
-int cxnum;
-char *apname;
+RkSetAppName( int cxnum, char* apname )
 {
     return( RkwSetAppName( cxnum, apname ) );
 }
 
 int
-RkChmodDic(cxnum, dicname, mode)
-int cxnum;
-unsigned char *dicname;
-int mode;
+RkChmodDic( int cxnum, char* dicname, int mode)
 {
-  return RkwChmodDic(cxnum, (char *)dicname, mode);
+    return RkwChmodDic(cxnum, (char *)dicname, mode);
 }
 #endif /* OMIT_EUC_FUNCS */
 
@@ -2896,31 +2736,25 @@ exp(struct rkfuncs) RkFuncs = {
   RkwGetSimpleKanji,
 };
 #endif /* ENGINE_SWITCH */
-/*
- *  RkThrough ()
- *
- *  Description:
- *  -----------
- *  command¤Ç¼¨¤µ¤ì¤ëµ¡Ç½¤ò¼Â¹Ô¤¹¤ë
+
+
+/**
+ *  commandã§ç¤ºã•ã‚Œã‚‹æ©Ÿèƒ½ã‚’å®Ÿè¡Œã™ã‚‹
  *
  *  Input:
  *  -----
- *  command: ¥³¥Ş¥ó¥ÉÈÖ¹æ
- *  buf: ¥Ç¡¼¥¿/·ë²Ì¤ÎÀèÆ¬¥İ¥¤¥ó¥¿
- *  content_size: ¥Ç¡¼¥¿¤Î¥µ¥¤¥º
- *  buffer_size: ·ë²ÌÎÎ°è¤Î¥µ¥¤¥º
+ *  command: ã‚³ãƒãƒ³ãƒ‰ç•ªå·
+ *  buf: ãƒ‡ãƒ¼ã‚¿/çµæœã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿
+ *  content_size: ãƒ‡ãƒ¼ã‚¿ã®ã‚µã‚¤ã‚º
+ *  buffer_size: çµæœé ˜åŸŸã®ã‚µã‚¤ã‚º
  *
  *  Returns:
  *  -------
- *  buf¤Ë³ÊÇ¼¤µ¤ì¤¿Âç¤­¤µ or -1
+ *  bufã«æ ¼ç´ã•ã‚ŒãŸå¤§ãã• or -1
  */
 int
-RkThrough( cxnum, command, buf, content_size, buffer_size )
-int cxnum;
-int command;
-unsigned char *buf;
-int content_size;
-int buffer_size;
+RkThrough( int cxnum, int command, char* buf, int content_size,
+           int buffer_size )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK );
 
@@ -2930,11 +2764,3 @@ int buffer_size;
     }
     return( -1 ) ;
 }							/* S000:end */
-
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/

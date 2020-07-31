@@ -3,10 +3,10 @@
 set -e
 set -x
 cp Canna.conf.dist Canna.conf
-autoconf259
-autoheader259
+autoconf
+autoheader
 rm -rf autom4te.cache
 cd canuum
-autoconf213
-autoheader259
+autoconf
+autoheader
 rm -rf autom4te.cache

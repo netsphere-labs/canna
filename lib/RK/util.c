@@ -1,3 +1,5 @@
+﻿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +14,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -26,9 +28,8 @@ static char rcsid[]="@(#)$Id: util.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $ $Aut
 
 #include "RKintern.h"
 #include <stdio.h>
-#ifdef __STDC__
 #include <stdarg.h>
-#endif
+#include <assert.h>
 
 #define	isEndTag(s)	(s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 0)
 
@@ -60,7 +61,7 @@ static char rcsid[]="@(#)$Id: util.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $ $Aut
 #define HD_TAG_GRAM	"GRAM"
 #define HD_TAG_GRSZ	"GRSZ"
 
-static char	*Hdrtag[] = {
+static const char* Hdrtag[] = {
   HD_TAG_MAG,
   HD_TAG_SIZ,
   HD_TAG_HSZ,
@@ -88,106 +89,14 @@ static char	*Hdrtag[] = {
   HD_TAG_CRC,
   HD_TAG_GRAM,
   HD_TAG_GRSZ,
-  0,
+  NULL,
 };
 
-int
-uslen(us)
-     Wchar	*us;
-{
-  Wchar *ous = us;
-  
-  if (!us)
-    return 0;
-  while (*us & RK_WMASK)
-    us++;
-  return (us - ous);
-}
+
+static FILE* log = NULL;
 
 void
-usncopy(dst, src, len)
-     Wchar	*dst, *src;
-     int	len;
-{
-  while (len-- > 0 && (*dst++ = *src++)) /* EMPTY */;
-}
-
-unsigned char *
-ustoeuc(src, srclen, dest, destlen)
-     Wchar		*src;
-     unsigned char	*dest;
-     int		srclen, destlen;
-{
-    if (!src || !dest || !srclen || !destlen)
-	return dest;
-    while (*src && --srclen >= 0 && --destlen >= 0) {
-	if (us_iscodeG0(*src)) {
-	    *dest++ = (unsigned char)*src++;
-	} else if (us_iscodeG2(*src)) {
-	    *dest++ = RK_SS2;
-	    *dest++ = (unsigned char)*src++;
-	    destlen--;
-	} else if (destlen > 2) {
-	  if (us_iscodeG3(*src)) {
-	    *dest++ = RK_SS3;
-	  }
-	  *dest++ = (unsigned char)(*src >> 8);
-	  *dest++ = (unsigned char)(*src++ | 0x80);
-	  destlen--;
-	};
-    };
-    *dest = (unsigned char)0;
-    return dest;
-}
-
-Wchar *
-euctous(src, srclen, dest, destlen)
-     unsigned char	*src;
-     Wchar		*dest;
-     int		srclen, destlen;
-{
-  Wchar	*a = dest;
-    
-  if (!src || !dest || !srclen || !destlen)
-    return(a);
-  while (*src && (srclen-- > 0) && (destlen-- > 0)) {
-    if (!(*src & 0x80) ) {
-      *dest++ = (Wchar)*src++;
-    } else if (srclen-- > 0) {
-      if (*src == RK_SS2) {
-	src++;
-	*dest++ = (Wchar)(0x0080 | (*src++ & 0x7f));
-      } else if ((*src == RK_SS3) && (srclen-- > 0)) {
-	src++;
-	*dest++ = (Wchar)(0x8000 | ((src[0] & 0x7f) << 8) | (src[1] & (0x7f)));
-	src += 2;
-      } else {
-	*dest++ = (Wchar)(0x8080 | ((src[0] & 0x7f) << 8) | (src[1] & 0x7f));
-	src += 2;
-      }
-    } else {
-      break;
-    }
-  }
-  if (destlen-- > 0)
-    *dest = (Wchar)0;
-  return dest;
-}
-
-static FILE	*log = (FILE *)0;
-
-void
-_Rkpanic(
-#ifdef __STDC__
-    const char *fmt, ...
-#else
-    fmt, p, q, r
-#endif
-    )
-#ifndef __STDC__
-     const char	*fmt;
-/* VARARGS2 */
-#endif
+_Rkpanic( const char* fmt, ... )
 {
   FILE *target = log ? log : stderr;
 #ifdef __STDC__
@@ -207,47 +116,43 @@ _Rkpanic(
 }
 
 void
-RkAssertFail(file, line, expr)
-     const char *file;
-     int line;
-     const char *expr;
+RkAssertFail(const char* file, int line, const char* expr)
 {
   _Rkpanic("RK assertion failed: %s:%d %s", file, line, expr);
   /* NOTREACHED */
 }
 
 int
-_RkCalcUnlog2(x)
-     int	x;
+_RkCalcUnlog2( int x )
 {
   return((1 << x) - 1);
 }
 
-int 
-_RkCalcLog2(n)
-     int n;
+
+int
+_RkCalcLog2(int n)
 {
-  int	lg2;
-  
+    int	lg2;
+
   n--;
   for (lg2 = 0; n > 0; lg2++)
     n >>= 1;
   return(lg2);
 }
 
-Wchar
-uniqAlnum(c)
-     Wchar c;
+// 全角数字・アルファベットのみを半角に変換する。それ以外はそのまま返す
+cannawc
+uniqAlnum(cannawc c)
 {
-  return((0xa3a0 < c && c < 0xa3ff) ? (Wchar)(c & 0x7f) : c);
+    return (c >= 0xa3b0 && c <= 0xa3b9 || c >= 0xa3c1 && c <= 0xa3da ||
+            c >= 0xa3e1 && c <= 0xa3fa) ? (c & 0x7f) : c;
 }
 
 void
-_RkClearHeader(hd)
-     struct HD	*hd;
+_RkClearHeader(struct HD* hd)
 {
   int	i;
-    
+
   if (hd) {
     for (i = 0; i < HD_MAXTAG; i++) {
       if (hd->flag[i] > 0) {
@@ -258,11 +163,8 @@ _RkClearHeader(hd)
 }
 
 static int
-read_tags(hd, srctop, srcend, pass)
-     struct HD	*hd;
-     const unsigned char *srctop;
-     const unsigned char *srcend;
-     int	pass;
+read_tags(struct HD* hd, const unsigned char* srctop,
+          const unsigned char* srcend, int pass)
 {
   unsigned long	len, off;
   const unsigned char *src = srctop;
@@ -307,10 +209,7 @@ read_tags(hd, srctop, srcend, pass)
 }
 
 int
-_RkReadHeader(fd, hd, off_from_top)
-     int	fd;
-     struct HD	*hd;
-     off_t	off_from_top;
+_RkReadHeader(int fd, struct HD* hd, off_t off_from_top)
 {
   off_t tmpres;
   ssize_t pass1size;
@@ -354,7 +253,7 @@ _RkReadHeader(fd, hd, off_from_top)
   hdrsiz = (size_t)hd->data[HD_HSZ].var;
 
   /* Pass 2 */
-  pass2buf = malloc(hdrsiz);
+  pass2buf = (unsigned char*) malloc(hdrsiz);
   if (!pass2buf)
     goto read_err;
   if (pass1size < hdrsiz) {
@@ -388,9 +287,7 @@ _RkReadHeader(fd, hd, off_from_top)
 }
 
 unsigned char *
-_RkCreateHeader(hd, size)
-     struct HD	*hd;
-     size_t *size;
+_RkCreateHeader(struct HD* hd, size_t* size)
 {
   unsigned char	*tagdst, *datadst, *ptr;
   unsigned int i;
@@ -416,7 +313,7 @@ _RkCreateHeader(hd, size)
       datasz += hd->flag[i];
   }
 
-  if (!(ptr = malloc(tagsz + HD_TAGSIZ + datasz)))
+  if (!(ptr = (unsigned char*) malloc(tagsz + HD_TAGSIZ + datasz)))
     return NULL;
 
   tagdst = ptr;
@@ -447,18 +344,14 @@ _RkCreateHeader(hd, size)
 }
 
 unsigned long
-_RkGetTick(mode)
-     int	mode;
+_RkGetTick(int mode)
 {
   static unsigned long time = 10000;
   return(mode ? time++ : time);
 }
 
 int
-set_hdr_var(hd, n, var)
-     struct HD		*hd;
-     int		n;
-     unsigned long	var;
+set_hdr_var(struct HD* hd, int n, unsigned long var)
 {
     if (!hd)
 	return -1;
@@ -467,16 +360,14 @@ set_hdr_var(hd, n, var)
     return 0;
 }
 
-_RkGetLink(dic, pgno, off, lvo, csn)
-     struct ND	*dic;
-     long	pgno;
-     unsigned long	off;
-     unsigned long	*lvo;
-     unsigned long	*csn;
+
+int
+_RkGetLink(struct ND* dic, long pgno, unsigned long off, unsigned long* lvo,
+           unsigned long* csn)
 {
-  struct NP	*pg = dic->pgs + pgno;
-  unsigned char	*p;
-  unsigned	i;
+    struct NP	*pg = dic->pgs + pgno;
+    unsigned char	*p;
+    unsigned	i;
 
   for (i = 0, p = pg->buf + 14 + 4 * pg->ndsz; i < pg->lnksz; i++, p += 5) {
     if (thisPWO(p) == off) {
@@ -489,9 +380,7 @@ _RkGetLink(dic, pgno, off, lvo, csn)
 }
 
 unsigned long
-_RkGetOffset(dic, pos)
-     struct ND		*dic;
-     unsigned char	*pos;
+_RkGetOffset(struct ND* dic, unsigned char* pos)
 {
   struct NP	*pg;
   unsigned char	*p;
@@ -523,58 +412,20 @@ _RkGetOffset(dic, pos)
   _Rkpanic("Cannot get Offset", 0, 0, 0);
 }
 
-int
-HowManyChars(yomi, len)
-     Wchar	*yomi;
-     int	len;
+
+#ifndef NDEBUG
+
+static void
+printWord(const struct nword* w)
 {
-  int chlen, bytelen;
+    assert(w);
 
-  for (chlen = 0, bytelen = 0; bytelen < len; chlen++) {
-    Wchar ch = yomi[chlen];
-    
-    if (us_iscodeG0(ch))
-      bytelen++;
-    else if (us_iscodeG3(ch))
-      bytelen += 3;
-    else
-      bytelen += 2;
-  }
-  return(chlen);
-}
-
-int
-HowManyBytes(yomi, len)
-     Wchar	*yomi;
-     int	len;
-{
-  int chlen, bytelen;
-
-  for (chlen = 0, bytelen = 0; chlen < len; chlen++) {
-    Wchar ch = yomi[chlen];
-
-    if (us_iscodeG0(ch))
-      bytelen++;
-    else if (us_iscodeG3(ch))
-      bytelen += 3;
-    else {
-      bytelen += 2;
-    }
-  }
-  return(bytelen);
-}
-
-#ifdef TEST
-
-printWord(w)
-struct nword *w;
-{
-  printf("[0x%x] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
+    printf("[0x%p] Y=%d, K=%d, class=0x%x, flg=0x%x, lit=%d, prio=%d, kanji=",
 	 w, w->nw_ylen, w->nw_klen, w->nw_class, w->nw_flags,
 	 w->nw_lit, w->nw_prio);
-  if (w->nw_kanji) {
-    int i, klen = w->nw_left ? w->nw_klen - w->nw_left->nw_klen : w->nw_klen;
-    char *p = w->nw_kanji + 2;
+    if (w->nw_kanji) {
+        int i, klen = w->nw_left ? w->nw_klen - w->nw_left->nw_klen : w->nw_klen;
+        unsigned char *p = w->nw_kanji + 2;
 
     for (i = 0 ; i < klen ; i++) {
       printf("%c%c", p[0], p[1]);
@@ -584,20 +435,17 @@ struct nword *w;
   printf("\n");
 }
 
-showWord(w)
-struct nword *w;
+void showWord(const struct nword* w)
 {
-  struct nword *p, *q;
+    const struct nword *p, *q;
 
-  printf("next:\n");
-  for (p = w ; p ; p = p->nw_next) {
-    printWord(p);
-    for (q = p->nw_left ; q ; q = q->nw_left) {
-      printWord(q);
+    printf("next:\n");
+    for (p = w ; p ; p = p->nw_next) {
+        printWord(p);
+        for (q = p->nw_left ; q ; q = q->nw_left)
+            printWord(q);
+        printf("\n");
     }
-    printf("\n");
-  }
 }
 
-#endif /* TEST */
-/* vim: set sw=2: */
+#endif /* !NDEBUG */

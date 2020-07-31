@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -29,6 +29,7 @@ static char rcsid[]="$Id: fq.c,v 1.6 2003/09/17 08:50:52 aida_s Exp $";
 #ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
 #endif
+#include <assert.h>
 
 #define dm_xdm	dm_extdata.ptr
 
@@ -38,10 +39,9 @@ struct xqm {
 };
 
 struct RUT *
-allocRUT(hn)
-     unsigned long hn;
+allocRUT(unsigned long hn)
 {
-  struct RUT	*tempo;
+    struct RUT	*tempo;
 
   if (!(tempo = (struct RUT *)calloc(1, sizeof(struct RUT))))
     return((struct RUT *) 0);
@@ -52,13 +52,11 @@ allocRUT(hn)
   return tempo;
 }
 
-static int 
-WrToRut(ruc, csn, tick)
-     struct RUT *ruc;
-     unsigned long csn, tick;
+static int
+WrToRut(struct RUT* ruc, unsigned long csn, unsigned long tick)
 {
-  unsigned long whn;
-  struct CTdata *wd, **pwd;
+    unsigned long whn;
+    struct CTdata *wd, **pwd;
 
   whn = HashFunc(csn);
   for (pwd = ruc->dp+whn, wd = *pwd ; wd; pwd = &wd->next, wd = *pwd) {
@@ -75,39 +73,36 @@ WrToRut(ruc, csn, tick)
 }
 
 static
-unsigned long 
-UpdateFrst(ruc)          
-     struct RUT *ruc;
+unsigned long
+UpdateFrst(struct RUT* ruc)
 {
-  unsigned long wmin, wtick, frst, lc;
-  struct CTdata *wd;
-  
+    unsigned long wmin, wtick, frst, lc;
+    struct CTdata *wd;
+
   wmin = 0xffffffffL;
   frst = 0xfffffL;
-  
+
   for (lc = 0; lc < HN; lc++) {
     for (wd = *(ruc->dp+lc) ; wd; wd = wd->next) {
       if (wmin > (wtick = wd->ct[1])) {
-	frst = wd->ct[0];            
+	frst = wd->ct[0];
 	wmin = wtick;
       }
     }
   }
-  if(frst == (unsigned long) 0xffffffff) 
+  if(frst == (unsigned long) 0xffffffff)
     return (unsigned long) 0L;
   return frst;
 }
 
-static int 
-deleteCT(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+static int
+deleteCT(struct RUT* ruc, unsigned long csn)
 {
-  unsigned long whn;
-  struct CTdata *wd, **pre;
-  
+    unsigned long whn;
+    struct CTdata *wd, **pre;
+
   whn = HashFunc(csn);
-  
+
   for (pre = ruc->dp+whn, wd = *pre; ; pre = &wd->next, wd = *pre){
     if (!wd)
       return 0;
@@ -116,13 +111,11 @@ deleteCT(ruc, csn)
   }
   *pre = wd->next;
   free(wd);
-  return 1; 
+  return 1;
 }
 
-unsigned long 
-searchRut(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+unsigned long
+searchRut(struct RUT* ruc, unsigned long csn)
 {
   unsigned long whn;
   struct CTdata *wd;
@@ -135,15 +128,13 @@ searchRut(ruc, csn)
   return (unsigned long) 0L;
 }
 
-static
-struct CTdata *
-searchCTadd(ruc, csn)
-     struct RUT *ruc;
-     unsigned long csn;
+
+static struct CTdata *
+searchCTadd(struct RUT* ruc, unsigned long csn)
 {
-  unsigned long whn;
-  struct CTdata *wd;
-  
+    unsigned long whn;
+    struct CTdata *wd;
+
   whn = HashFunc(csn);
   for (wd = *(ruc->dp+whn) ; wd; wd = wd->next) {
     if (wd->ct[0] == csn)
@@ -152,15 +143,13 @@ searchCTadd(ruc, csn)
   return (struct CTdata *) 0;
 }
 
-int 
-entryRut(ruc, csn, tick)
-     struct RUT *ruc;
-     unsigned long csn, tick;
+int
+entryRut(struct RUT* ruc, unsigned long csn, unsigned long tick)
 {
   struct CTdata *wpadd;
   int retval;
- 
-  retval = 1; 
+
+  retval = 1;
   if (ruc->cs < ruc->sz)
     switch (WrToRut(ruc, csn, tick)) {
     case  0:
@@ -176,9 +165,9 @@ entryRut(ruc, csn, tick)
     wpadd = searchCTadd(ruc, csn);
     if (wpadd) {
       WriteCT(csn, tick, wpadd->ct);
-      if (csn == ruc->frst) 
+      if (csn == ruc->frst)
 	ruc->frst = UpdateFrst(ruc);
-    } 
+    }
     else {
       if (deleteCT(ruc, ruc->frst)){
         if (WrToRut(ruc, csn, tick) < 0){
@@ -186,7 +175,7 @@ entryRut(ruc, csn, tick)
 	  retval = 0;
         }
       }
-      else 
+      else
         retval = 0;
       ruc->frst = UpdateFrst(ruc);
     }
@@ -194,13 +183,12 @@ entryRut(ruc, csn, tick)
   return retval;
 }
 
-static
-struct WRT *
-allocWRT(size)
-     unsigned long size;
+
+static struct WRT *
+allocWRT(unsigned long size)
 {
-  struct WRT *tempo;
-  
+    struct WRT *tempo;
+
   if (!(tempo = (struct WRT *)calloc(1, sizeof(struct WRT))))
     return((struct WRT *) 0);
   if (!(tempo->buf = (unsigned char *)calloc(1, (int) 5*size))){
@@ -213,23 +201,22 @@ allocWRT(size)
 
 static
 struct WRT *
-readWRT(fr)
-     int fr;
+readWRT(int fr)
 {
   unsigned	long wsz, wcs, wfrst, wtm;
   unsigned char	ll[4];
   struct WRT	*wrt;
 
-  if (read(fr, (char *)ll, 4) != 4) 
+  if (read(fr, (char *)ll, 4) != 4)
     return (struct WRT *) 0;
   wsz = (unsigned long) bst4_to_l(ll);
-  if (read(fr, (char *)ll, 4) != 4) 
+  if (read(fr, (char *)ll, 4) != 4)
     return (struct WRT *) 0;
   wcs = (unsigned long) bst4_to_l(ll);
-  if (read(fr, (char *)ll, 4) != 4) 
+  if (read(fr, (char *)ll, 4) != 4)
     return (struct WRT *) 0;
   wfrst = (unsigned long) bst4_to_l(ll);
-  if (read(fr, (char *)ll, 4) != 4) 
+  if (read(fr, (char *)ll, 4) != 4)
     return (struct WRT *) 0;
   wtm  = (unsigned long) bst4_to_l(ll);
   if (!(wrt = allocWRT(wsz)))
@@ -247,12 +234,9 @@ readWRT(fr)
   return wrt;
 }
 
-static int writeToWRT pro((int, struct WRT *));
 
-static int 
-writeToWRT(fr, wrt)
-     int	fr;
-     struct WRT	*wrt;
+static int
+writeToWRT(int fr, struct WRT* wrt)
 {
   unsigned char ll[4];
 
@@ -260,13 +244,13 @@ writeToWRT(fr, wrt)
   if (write(fr, (char *)ll, 4) != 4)
     return 0;
   l_to_bst4(wrt->cs, ll);
-  if (write(fr, (char *)ll, 4) != 4) 
+  if (write(fr, (char *)ll, 4) != 4)
     return 0;
   l_to_bst4(wrt->frst, ll);
-  if (write(fr, (char *)ll, 4) != 4) 
+  if (write(fr, (char *)ll, 4) != 4)
     return 0;
   l_to_bst4(wrt->tm, ll);
-  if (write(fr, (char *)ll, 4) != 4) 
+  if (write(fr, (char *)ll, 4) != 4)
     return 0;
   if (wrt->sz) {
     if (write(fr, wrt->buf, (unsigned) 5*wrt->sz) != 5*(int)wrt->sz)
@@ -277,12 +261,10 @@ writeToWRT(fr, wrt)
 
 static
 void
-abolishNV(nv)
-     struct NV	*nv;
-
+abolishNV(struct NV* nv)
 {
-  struct NVE	*p, **q, *r;
-  unsigned i;
+    struct NVE	*p, **q, *r;
+    unsigned i;
 
   if (nv && nv->tsz && nv->buf) {
     for (i = 0, q = nv->buf + i; i < nv->tsz; i++, q = nv->buf + i) {
@@ -299,14 +281,14 @@ abolishNV(nv)
   return;
 }
 
+
 static
 struct NV *
-readNV(fd)
-     int	fd;
+readNV(int fd)
 {
-  struct NV	*vn;
-  unsigned char	ll[4], *buf, *p;
-  long		i, cnt;
+    struct NV	*vn;
+    unsigned char	ll[4], *buf, *p;
+    long		i, cnt;
 
   vn = (struct NV *)malloc(sizeof(struct NV));
   if (vn) {
@@ -357,15 +339,14 @@ readNV(fd)
   return(vn);
 }
 
+
 static int
-writeNV(fd, nv)
-     int	fd;
-     struct NV	*nv;
+writeNV(int fd, struct NV* nv)
 {
-  unsigned char	ll[4];
-  unsigned char	*buf = (unsigned char *)0, *r;
-  struct NVE	*p, **q;
-  unsigned long i;
+    unsigned char	ll[4];
+    unsigned char	*buf = (unsigned char *)0, *r;
+    struct NVE	*p, **q;
+    unsigned long i;
 
   if (!nv)
     return(-1);
@@ -409,16 +390,16 @@ writeNV(fd, nv)
   return(0);
 }
 
+
 static void
-freeRUT(ruc)
-struct RUT *ruc;
+freeRUT(struct RUT* ruc)
 {
-  struct CTdata *wd, *nex;
-  unsigned long lc;
+    struct CTdata *wd, *nex;
+    unsigned long lc;
 
   for (lc = 0; lc < HN; lc++) {
     for (wd = *(ruc->dp+lc); wd; wd = nex) {
-      nex = wd->next; 
+      nex = wd->next;
       free(wd);
     }
   }
@@ -426,14 +407,14 @@ struct RUT *ruc;
   free(ruc);
 }
 
+
 struct RUT *
-LoadRUC(fr)
-int fr;
+LoadRUC(int fr)
 {
-  struct WRT *wruc;
-  struct RUT *ruc;
-  unsigned long lc, csn, tick;
-  
+    struct WRT *wruc;
+    struct RUT *ruc;
+    unsigned long lc, csn, tick;
+
   if (!(wruc = readWRT(fr)))
     return (struct RUT *) 0;
 
@@ -441,18 +422,18 @@ int fr;
     freeWRT(wruc);
     return (struct RUT *) 0;
   }
-  
+
   ruc->sz = wruc->sz;
   ruc->cs = 0L;
   ruc->frst = wruc->frst;
   ruc->tm = wruc->tm;
-  
+
   for (lc = 0; lc < wruc->cs; lc++) {
     unsigned char *tmp = wruc->buf + 5 * lc;
     csn  = a_csn(tmp);
     tick = _RkGetTick(0) - a_tick(wruc->buf+5*lc);
     if (!entryRut(ruc, csn, tick)) {
-      freeRUT(ruc);             
+      freeRUT(ruc);
       ruc = (struct RUT *) 0;
     }
   }
@@ -460,17 +441,14 @@ int fr;
   return ruc;
 }
 
-static int SaveRUC pro((int, struct RUT *));
 
-static int 
-SaveRUC(fr, ruc)
-int fr;
-struct RUT *ruc;
+static int
+SaveRUC(int fr, struct RUT* ruc)
 {
-  struct WRT	*wruc;
-  struct CTdata	*wdp;
-  unsigned	long lc, count;
-  int		retval;
+    struct WRT	*wruc;
+    struct CTdata	*wdp;
+    unsigned	long lc, count;
+    int		retval;
 
   if (!ruc)
     return (int) 0;
@@ -483,7 +461,7 @@ struct RUT *ruc;
   wruc->cs = ruc->cs;
   wruc->frst = ruc->frst;
   wruc->tm = ruc->tm;
-  
+
   count = 0L;
   for (lc = 0L; lc < HN; lc++) {
     for (wdp = *(ruc->dp+lc) ; wdp; wdp = wdp->next) {
@@ -500,34 +478,34 @@ struct RUT *ruc;
   return retval;
 }
 
+
+// @return If open(file) failed, -1.
 static int
-FQscan(df, codm, file, w)
-     struct DF	*df;
-     struct DM	*codm;
-     char	*file;
-     int	*w;
+FQscan(struct DF* df, struct DM* codm, const char* file, int* w)
 {
-  int count = 0;
-  struct HD	hd;
-  struct DM	*dm, *dmh;
-  unsigned char	ll[4];
-  unsigned long	bitsiz, bitoff;
-  off_t		off;
-  int		fd;
-    
-  *w = 1;
-  if ((fd = open(file, 2)) < 0) {
-    *w = 0;
-    if ((fd = open(file, 0)) < 0)
-      return -1;
-  }
-#ifdef __CYGWIN32__
-  setmode(fd, O_BINARY);
+    assert(w);
+
+    int count = 0;
+    struct HD	hd;
+    struct DM	*dm, *dmh;
+    unsigned char	ll[4];
+    unsigned long	bitsiz, bitoff;
+    off_t		off;
+    int		fd;
+
+    *w = 1; // write
+    if ( (fd = open(file, O_RDWR)) < 0 ) {
+        *w = 0; // read-only
+        if ((fd = open(file, O_RDONLY)) < 0)
+            return -1;
+    }
+#ifdef _WIN32
+    setmode(fd, O_BINARY);
 #endif
-  
+
   for (off = 0; _RkReadHeader(fd, &hd, off) >= 0;) {
     long		start = off;
-    
+
     if (!hd.data[HD_DMNM].ptr ||
 	(strncmp(".fq",
 		 (char *)hd.data[HD_DMNM].ptr +
@@ -564,7 +542,7 @@ FQscan(df, codm, file, w)
     for (dm = dmh->dm_next; dm != dmh; dm = dm->dm_next) {
       if (!strcmp((char *)dm->dm_dicname, (char *)hd.data[HD_CODM].ptr)) {
 	struct xqm 		*xqm;
-	
+
 	if (!(xqm = (struct xqm *)malloc(sizeof(struct xqm))))
 	  break;
 	dm->dm_extdata.ptr = (pointer)xqm;
@@ -588,18 +566,15 @@ FQscan(df, codm, file, w)
   return fd;
 }
 
+
 int
-FQopen(dm, qm, file, mode)
-     struct DM	*dm;
-     struct DM	*qm;
-     char	*file;
-     int	mode;
+FQopen(struct DM* dm, struct DM* qm, char* file, int mode)
 {
-  struct DF	*df;
-  struct DD	*dd;
-  struct xqm 	*xqm;
-  int		writable;
-  int		fd;
+    struct DF	*df;
+    struct DD	*dd;
+    struct xqm 	*xqm;
+    int		writable;
+    int		fd;
 
   /* missing file info ? */
     if (!(df = qm->dm_file) || !(dd = df->df_direct))
@@ -609,9 +584,9 @@ FQopen(dm, qm, file, mode)
         df->df_extdata.var = (long)FQscan(df, dm, file, &writable);
 	if (df->df_extdata.var < 0)
 	    return -1;
-	if (writable) 
+	if (writable)
 	  df->df_flags |= DF_WRITABLE;
-	else 
+	else
 	  df->df_flags &= ~DF_WRITABLE;
 	df->df_flags |= DF_EXIST;
 	dd->dd_rcount++;
@@ -631,7 +606,7 @@ FQopen(dm, qm, file, mode)
     qm->dm_nv = (struct NV *)0;
   /* dispatch */
     qm->dm_qbits = (unsigned char *)malloc((unsigned)xqm->ex_bsiz);
-    if (!qm->dm_qbits) 
+    if (!qm->dm_qbits)
       return -1;
     (void)lseek(fd, xqm->ex_boff, 0);
     (void)read(fd, (char *)qm->dm_qbits, (int)xqm->ex_bsiz);
@@ -644,21 +619,18 @@ FQopen(dm, qm, file, mode)
     return 0;
 }
 
+
 /*
  * CLOSE
  */
 /*ARGSUSED*/
-void	
-FQclose(cx, dm, qm, file)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     struct DM		*qm;
-     char		*file;
+void
+FQclose(struct RkContext* cx, struct DM* dm, struct DM* qm, char* file)
 {
-  struct DF		*df = qm->dm_file;
-  struct xqm		*xqm;
-  int			fd = (int)df->df_extdata.var;
-  
+    struct DF		*df = qm->dm_file;
+    struct xqm		*xqm;
+    int			fd = (int)df->df_extdata.var;
+
   xqm = (struct xqm *)qm->dm_extdata.ptr;
   if (xqm) {
     if (qm->dm_qbits) {
@@ -685,7 +657,7 @@ FQclose(cx, dm, qm, file)
   qm->dm_flags &= ~DM_UPDATED;
   if (--df->df_rcount == 0)  {
     struct DM	*dmh, *ddm;
-    
+
     (void)close(fd);
     dmh = &df->df_members;
     for (ddm = dmh->dm_next; ddm != dmh; ddm = ddm->dm_next) {
@@ -698,18 +670,14 @@ FQclose(cx, dm, qm, file)
   }
 }
 
-int	
-FQsync(cx, dm, qm, file)
-     struct RkContext	*cx;
-     struct DM		*dm;
-     struct DM		*qm;
-     char		*file;
-/* ARGSUSED */
+
+int
+FQsync(struct RkContext* cx, struct DM* dm, struct DM* qm, char* file)
 {
-  struct DF		*df = qm->dm_file;
-  struct xqm		*xqm;
-  int rv;
-  int			fd = (int)df->df_extdata.var;
+    struct DF		*df = qm->dm_file;
+    struct xqm		*xqm;
+    int rv;
+    int			fd = (int)df->df_extdata.var;
 
   rv = 0;
   xqm = (struct xqm *)qm->dm_extdata.ptr;
@@ -717,7 +685,7 @@ FQsync(cx, dm, qm, file)
     if (qm->dm_qbits) {
       if (qm->dm_flags & DM_UPDATED) {
 	(void)lseek(fd, xqm->ex_boff, 0);
-	if (write(fd, (char *)qm->dm_qbits, (int)xqm->ex_bsiz) != 
+	if (write(fd, (char *)qm->dm_qbits, (int)xqm->ex_bsiz) !=
 	    (int) xqm->ex_bsiz)
 	  rv = -1;
 	if (qm->dm_rut)

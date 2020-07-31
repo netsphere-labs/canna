@@ -28,14 +28,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: jrbind.c,v 1.4 2003/09/17 08:50:53 aida_
 #include <canna/mfdef.h>
 #include <sys/types.h>
 
-/*********************************************************************
- *                      wchar_t replace begin                        *
- *********************************************************************/
-#ifdef wchar_t
-# error "wchar_t is already defined"
-#endif
-#define wchar_t cannawc
-
 #define ACTHASHTABLESIZE 64
 #define KEYHASHTABLESIZE 16
    
@@ -63,12 +55,12 @@ extern BYTE *actFromHash();
 exp(int)
 wcKanjiString(context_id, ch, buffer_return, nbuffer, kanji_status_return)
 const int context_id, ch, nbuffer;
-wchar_t        *buffer_return;
+cannawc        *buffer_return;
 wcKanjiStatus  *kanji_status_return;
 {
   int res;
 
-  *buffer_return = (wchar_t)ch;
+  *buffer_return = (cannawc)ch;
 
   res = XwcLookupKanji2((unsigned int)0, (unsigned int)context_id,
 			buffer_return, nbuffer,
@@ -78,12 +70,8 @@ wcKanjiStatus  *kanji_status_return;
 }
 
 /* jrKanjiControl -- カナ漢字変換の制御を行う */
-
-exp(int)
-wcKanjiControl(context, request, arg)
-     const int context;
-     const int request;
-     char *arg;
+int
+wcKanjiControl(int context, int request, char* arg)
 {
   return XwcKanjiControl2((unsigned int)0, (unsigned int)context,
 			  (unsigned int)request, (BYTE *)arg);
@@ -114,7 +102,7 @@ XwcLookupKanji2(dpy, win, buffer_return, nbuffer, nbytes, functionalChar,
 		kanji_status_return)
 unsigned int dpy, win;
 int functionalChar, nbytes;
-wchar_t *buffer_return;
+cannawc *buffer_return;
 int nbuffer;
 wcKanjiStatus *kanji_status_return;
 {
@@ -269,10 +257,3 @@ uiContext d;
   free(oldCB);
 }
 
-#ifndef wchar_t
-# error "wchar_t is already undefined"
-#endif
-#undef wchar_t
-/*********************************************************************
- *                       wchar_t replace end                         *
- *********************************************************************/
