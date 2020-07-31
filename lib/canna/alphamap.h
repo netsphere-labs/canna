@@ -56,7 +56,7 @@ BYTE alpha_kmap[256] =
 /* C-l */       CANNA_FN_SelfInsert,
 /* C-m */       CANNA_FN_SelfInsert,
 /* C-n */       CANNA_FN_SelfInsert,
-/* C-o */       CANNA_FN_JapaneseMode,
+/* C-o */       CANNA_FN_SelfInsert,
 /* C-p */       CANNA_FN_SelfInsert,
 /* C-q */       CANNA_FN_SelfInsert,
 /* C-r */       CANNA_FN_SelfInsert,

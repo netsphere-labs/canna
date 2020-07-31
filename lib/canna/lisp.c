@@ -1355,8 +1355,6 @@ int c;
 static int
 tyi()
 {
-  char *gets(), *fgets();
-
   if (untyibuf) {
     int ret = untyibuf[--untyip];
     if (untyip == 0) {

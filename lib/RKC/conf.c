@@ -1495,7 +1495,7 @@ const NumberDefaultRec top_num_defaults[] = {
 };
 
 const NumberDefaultRec host_num_defaults[] = {
-  { CONF_SERVER_TIMEOUT, 1500u },
+  { CONF_SERVER_TIMEOUT, 0u },
 };
 
 const char *

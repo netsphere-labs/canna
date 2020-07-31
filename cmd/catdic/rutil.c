@@ -271,7 +271,7 @@ unsigned char  *dicname;
 	 "Dictionary \"%s\" does not exist.\n"), dicname);
     break;
   case NOTALC :
-    (void)fprintf(stderr, msg_mem);
+    (void)fprintf(stderr, "%s", msg_mem);
     break;
   case BADF :
     (void)fprintf(stderr, gettxt("cannacmd:196",
@@ -297,7 +297,7 @@ unsigned char  *dicname;
 	(void)fprintf(stderr,msg_abnls,init);
     }
     else {
-	(void)fprintf(stderr,msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     break;
   }
@@ -321,7 +321,7 @@ int mode ;
 	(void)fprintf(stderr, msg_abnls, init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     ret = -1;
     return ret;
@@ -332,13 +332,13 @@ int mode ;
 	  (void)fprintf(stderr, msg_mnts, init);
       }
       else {
-	  (void)fprintf(stderr, msg_mnt);
+	  (void)fprintf(stderr, "%s", msg_mnt);
       }
       ret = -1;
       return ret;
     }
     if ((mode & PL_DIC) == PL_DIC ) {
-      (void)fprintf(stderr,msg_fq);
+      (void)fprintf(stderr, "%s", msg_fq);
       ret = -1 ;
       return ret ;
     }
@@ -359,7 +359,7 @@ int mode ;
     ret = 0;
     break;
   case NOTALC :
-    (void)fprintf(stderr, msg_mem);
+    (void)fprintf(stderr, "%s", msg_mem);
     ret = -1;
     break;
   case BADF :
@@ -421,7 +421,7 @@ int mode ;
     ret = -1;
     break;
   case BADCONT :
-    (void)fprintf(stderr,msg_cnt);
+    (void)fprintf(stderr, "%s", msg_cnt);
     ret = -1;
     break;
   default:
@@ -429,7 +429,7 @@ int mode ;
       (void)fprintf(stderr, msg_abnls, init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     exit(ERR_VALUE);
     break;
@@ -448,7 +448,7 @@ int mode ;
     ret = 0;
     break;
   case NOTALC :
-    (void)fprintf(stderr, msg_mem);
+    (void)fprintf(stderr, "%s", msg_mem);
     ret = -1;
     break;
   case BADF :
@@ -509,11 +509,11 @@ int mode ;
     ret = -1;
     break;
   case BADARG :
-    (void)fprintf(stderr,msg_fq);
+    (void)fprintf(stderr, "%s", msg_fq);
     ret = -1;
     break;
   case BADCONT :
-    (void)fprintf(stderr,msg_cnt);
+    (void)fprintf(stderr, "%s", msg_cnt);
     ret = -1;
     break;
   case NOENT  :   /* 91.12.03 */
@@ -526,7 +526,7 @@ int mode ;
       (void)fprintf(stderr, msg_abnls, init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     exit(ERR_VALUE);
     break;
@@ -556,7 +556,7 @@ int  mode ;
       (void)fprintf(stderr, msg_abnls,init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     ret = -1;
     return ret;
@@ -567,13 +567,13 @@ int  mode ;
 	(void)fprintf(stderr, msg_mnts, init);
       }
       else {
-	  (void)fprintf(stderr, msg_mnt);
+	  (void)fprintf(stderr, "%s", msg_mnt);
       }
       ret = -1;
       return ret;
     }
     if ((mode & PL_DIC) == PL_DIC ) {
-      (void)fprintf(stderr, msg_fq);
+      (void)fprintf(stderr, "%s", msg_fq);
       ret = -1 ;
       return ret ;
     }
@@ -608,7 +608,7 @@ int  mode ;
     ret = -2;   /* 93.03.03 */
     break;
   case BADCONT :
-    (void)fprintf(stderr, msg_cnt);
+    (void)fprintf(stderr, "%s", msg_cnt);
     ret = -1;
     break;
   default:
@@ -616,7 +616,7 @@ int  mode ;
 	(void)fprintf(stderr, msg_abnls, init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     ret = -1;
     break;
@@ -651,7 +651,7 @@ int  mode ;
     ret = -2;   /* 93.03.03 */
     break;
   case BADCONT :
-    (void)fprintf(stderr, msg_cnt);
+    (void)fprintf(stderr, "%s", msg_cnt);
     ret = -1;
     break;
   default:
@@ -659,7 +659,7 @@ int  mode ;
 	(void)fprintf(stderr, msg_abnls, init);
     }
     else {
-	(void)fprintf(stderr, msg_abnl);
+	(void)fprintf(stderr, "%s", msg_abnl);
     }
     ret = -1;
     break;

@@ -3,11 +3,7 @@
 
          CANNAROOT = ..
      INSTUGIDFLAGS = /* -m 6555 $(cannaOwnerGroup) */
-#ifdef __EMX__
          INSTFLAGS = $(INSTUGIDFLAGS)
-#else
-         INSTFLAGS = -s $(INSTUGIDFLAGS)
-#endif
            DEFINES = $(CANNASERVER_DEFINES) $(SIGNAL_DEFINES) ConnectionFlags
           INCLUDES = -I$(CANNAROOT)/include
 

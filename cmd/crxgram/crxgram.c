@@ -485,7 +485,7 @@ enterNeg(fp)
 	    int j;
 
 	    nextS = scanToken(nextS, namevec, sizeof(namevec));
-	    name = strtok(namevec, SEP);
+	    name = strtok((char *)namevec, SEP);
 	    for (j = 0; name && j < 255;) {
 		if (r = probeIdent(Row, name))
 		    rdata[i][j++] = r->rownum;

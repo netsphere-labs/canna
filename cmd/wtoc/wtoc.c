@@ -144,8 +144,8 @@ wtoi_write( fp, yomi, hinshi, kouho, hindo )
      int	hindo;
 {
   if( !strcmp((char *)hinshi,"#kxuru") || !strcmp((char *)hinshi,"#sxuru")){
-    strcat(yomi,"る");
-    strcat(kouho,"る");
+    strcat((char *)yomi,"る");
+    strcat((char *)kouho,"る");
   }
   if( hindo == 0 )
     fprintf( fp, "%s %s %s \n", yomi, hinshi, kouho );
