@@ -40,8 +40,11 @@ static char sccsid[] = "@(#)crc.c	8.1 (Berkeley) 6/17/93";
 #include <sys/cdefs.h>
 //__FBSDID("$FreeBSD$");
 
-#include <sys/types.h>
+#include "config.h"
+#include "canna/ccompat.h"
+#include "RKindep/cksum.h"
 
+#include <sys/types.h>
 #include <stdint.h>
 #include <unistd.h>
 
@@ -142,4 +145,43 @@ crc(int fd, uint32_t *cval, off_t *clen)
 	*cval = ~lcrc;
 	crc_total = ~crc_total;
 	return (0);
+}
+
+
+/////////////////////////////////////////////////////////
+
+int
+RkiCksumCRCInit(RkiCksumCalc* cx)
+{
+  cx->curr = 0;
+  cx->len = 0;
+  return 0;
+}
+
+#define	CRC(varp, ch) (*(varp) = *(varp) << 8 ^ crctab[*(varp) >> 24 ^ (ch)])
+static void
+RkiCksumCRCAdd(RkiCksumCalc* cx, const void* data, size_t len)
+{
+  const unsigned char *p = (const unsigned char *)data;
+  const unsigned char *endp = p + len;
+
+  for (; p < endp; ++p)
+    CRC(&cx->curr, *p);
+  cx->len += len;
+}
+
+canna_uint32_t
+RkiCksumCRCFinish(RkiCksumCalc* cx)
+{
+  for (; cx->len != 0; cx->len >>= 8) /* LSB first, variable length */
+    CRC(&cx->curr, cx->len & 0xff);
+  return ~cx->curr;
+}
+
+
+int
+RkiCksumAdd(RkiCksumCalc* cx, const void* data, size_t len)
+{
+  RkiCksumCRCAdd(cx, data, len);
+  return 0;
 }

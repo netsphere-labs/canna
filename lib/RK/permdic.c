@@ -383,7 +383,7 @@ SearchInPage(struct DM* dm, struct ND* xdm, long pgno, unsigned char* buf,
              unsigned long val, cannawc* key, int cur, int ylen,
              struct nread* nread, int mc, int nc, int* cf)
 {
-  Wchar		kv, wc;
+    cannawc	kv, wc;
   unsigned char	*pos = buf + val;
 
   if (!*pos && !*(pos + 1)) {
@@ -418,7 +418,7 @@ static int
 SearchInDir(struct DM* dm, struct ND* xdm, unsigned char* pos, cannawc* key,
             int cur, int ylen, struct nread* nread, int mc, int nc, int* cf)
 {
-  Wchar		kv, wc, nw;
+    cannawc	kv, wc, nw;
   unsigned long	val;
   long		next, pgno, iw;
   unsigned char	*p;
@@ -443,7 +443,7 @@ SearchInDir(struct DM* dm, struct ND* xdm, unsigned char* pos, cannawc* key,
   kv = uniqAlnum(*(key + cur));
   next = (int)(kv % nw);
   do {
-    p = pos + (((Wchar) next++) % nw) * 5;
+    p = pos + (((cannawc) next++) % nw) * 5;
     if ((wc = bst2_to_s(p)) == 0xffff)
       return(nc);
   } while (wc != kv);
@@ -529,16 +529,16 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
   unsigned long	lucks[2];
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   Wrec		wrec[PERM_WRECSIZE];
-  Wchar         key[64];
+    cannawc        key[64];
   struct nread  nread[PERM_NREADSIZE];
   unsigned	permutation[RK_CAND_NMAX];
 #else
   Wrec *wrec;
-  Wchar *key;
+    cannawc* key;
   struct nread *nread;
   unsigned *permutation;
   wrec = (Wrec *)malloc(sizeof(Wrec) * PERM_WRECSIZE);
-  key = (Wchar *)malloc(sizeof(Wchar) * 64);
+  key = (cannawc*) malloc(sizeof(cannawc) * 64);
   nread = (struct nread *)malloc(sizeof(struct nread) * PERM_NREADSIZE);
   permutation = (unsigned *)malloc(sizeof(unsigned) * RK_CAND_NMAX);
   if (!wrec || !key || !nread || !permutation) {
@@ -560,7 +560,7 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
 
     if (RkParseOWrec(gram, arg, wrec, PERM_WRECSIZE, lucks)) {
       Wrec	    *p, *q, *kanji;
-      Wchar         *wkey;
+       cannawc* wkey;
       int	    maxcache = PERM_NREADSIZE;
       int           ylen, klen, cnum, y_off = 2, k_off;
 

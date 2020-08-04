@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -247,7 +247,7 @@ wchar_t *insert;
   WStrncpy(buf, insert, insertlen);
   buf[insertlen] = '\0';
 
-  generalReplace(yc->kana_buffer, yc->kAttr, &yc->kRStartp, 
+  generalReplace(yc->kana_buffer, yc->kAttr, &yc->kRStartp,
 		 &yc->kCurs, &yc->kEndp,
 		 where, insert, insertlen, mask);
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -329,18 +329,16 @@ uiContext d;
 extern ckverbose;
 
 static struct RkRxDic *
-OpenRoma(table)
-char *table;
+OpenRoma(char* table)
 {
-  struct RkRxDic *retval = (struct RkRxDic *)0, *RkwOpenRoma();
+    struct RkRxDic *retval = NULL, *RkwOpenRoma();
   char *p, *getenv();
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char rdic[1024];
 #else
-  char *rdic = malloc(1024);
-  if (!rdic) {
-    return (struct RkRxDic *)0;
-  }
+    char *rdic = (char*) malloc(1024);
+    if (!rdic)
+        return NULL;
 #endif
 
   if (table || *table) {
@@ -406,7 +404,7 @@ char *table;
 
       if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
         extern jrUserInfoStruct *uinfo;
-	
+
         rdic[0] = '\0';
         if (uinfo && uinfo->topdir) {
 	  strcpy(rdic, uinfo->topdir);
@@ -417,7 +415,7 @@ char *table;
 	strcat(rdic, "/");
 	strcat(rdic, table);
 	retval = RkwOpenRoma(rdic);
-	
+
 	if (ckverbose) {
 	  if (retval != (struct RkRxDic *)NULL) {
 	    if (ckverbose == CANNA_FULL_VERBOSE) {
@@ -426,21 +424,21 @@ char *table;
 	  }
 	}
       }
-      
+
       if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
         extern jrUserInfoStruct *uinfo;
-	
+
         rdic[0] = '\0';
         if (uinfo && uinfo->topdir) {
 	  strcpy(rdic, uinfo->topdir);
         }
         else {
-          strcpy(rdic, CANNASHAREDIR);
+          strcpy(rdic, PKGDATADIR);
         }
 	strcat(rdic, "/");
 	strcat(rdic, table);
 	retval = RkwOpenRoma(rdic);
-	
+
 	if (ckverbose) {
 	  if (retval != (struct RkRxDic *)NULL) {
 	    if (ckverbose == CANNA_FULL_VERBOSE) {
@@ -449,9 +447,9 @@ char *table;
 	  }
 	}
       }
-      
+
       if (retval == (struct RkRxDic *)NULL) { /* 全部オープンできない */
-	sprintf(rdic, 
+	sprintf(rdic,
 #ifndef CODED_MESSAGE
 		"ローマ字かな変換テーブル(%s)がオープンできません。",
 #else
@@ -485,7 +483,7 @@ RomkanaInit()
     if (uinfo->romkanatable) {
       if (RomkanaTable) {
         free(RomkanaTable);
-      }      
+      }
       RomkanaTable = malloc(strlen(uinfo->romkanatable) + 1);
       if (RomkanaTable) {
         strcpy(RomkanaTable, uinfo->romkanatable);
@@ -554,14 +552,14 @@ RomkanaInit()
     /* ローマ字かな変換テーブルのオープン */
     if (extrafunc1->keyword == EXTRA_FUNC_DEFMODE) {
       if (extrafunc1->u.modeptr->romaji_table) {
-        if (RomkanaTable && 
+        if (RomkanaTable &&
             !strcmp(RomkanaTable,
 		    (char *)extrafunc1->u.modeptr->romaji_table)) {
 	  extrafunc1->u.modeptr->romdic = romajidic;
 	  extrafunc1->u.modeptr->romdic_owner = 0;
         }
 #ifndef NOT_ENGLISH_TABLE
-        else if (EnglishTable && 
+        else if (EnglishTable &&
 	         !strcmp(EnglishTable,
 			 (char *)extrafunc1->u.modeptr->romaji_table)) {
 	  extrafunc1->u.modeptr->romdic = englishdic;
@@ -582,7 +580,7 @@ RomkanaInit()
 	    }
 	  }
 	  if (extrafunc2 == extrafunc1) {
-	    extrafunc1->u.modeptr->romdic = 
+	    extrafunc1->u.modeptr->romdic =
               OpenRoma(extrafunc1->u.modeptr->romaji_table);
 	    extrafunc1->u.modeptr->romdic_owner = 1;
 	  }
@@ -694,7 +692,7 @@ newYomiContext(buf, bufsize, allowedc, chmodinhibit,
 
 /*
 
-  GetKanjiString は漢字かな混じり文を取ってくる関数である。実際には 
+  GetKanjiString は漢字かな混じり文を取ってくる関数である。実際には
   empty モードを設定するだけでリターンする。最終的な結果が buf で指定
   されたバッファに格納され exitCallback が呼び出されることによって呼び
   出し側は漢字かな混じり文字を得ることができる。
@@ -869,10 +867,10 @@ yomiContext yc;
 {
   int r = yc->rStartp, k = yc->kRStartp, i;
 
-  do { 
+  do {
     yc->kRStartp--;
     yc->rStartp--;
-  } while ( yc->kRStartp >= 0 
+  } while ( yc->kRStartp >= 0
 	   && !(yc->kAttr[yc->kRStartp] & HENKANSUMI)
 	   );
   yc->kRStartp++;
@@ -1236,7 +1234,7 @@ int flag, english;
     else {
       if (cond) { /* && keysup[sup - 1].ncand == 0 */
       /* defsymbol の新しい機能に対応した処理。入力文字自身を置き換える */
-	yc->kana_buffer[yc->kRStartp] = 
+	yc->kana_buffer[yc->kRStartp] =
 	  yc->romaji_buffer[yc->rStartp] = keysup[sup - 1].xkey;
       }
       if (yc->romdic != (struct RkRxDic *)NULL
@@ -1264,7 +1262,7 @@ int flag, english;
 	}
 	else {
 	  engflag = 0;
-	  if (RkwMapPhonogram(yc->romdic, kana_char, 1024, 
+	  if (RkwMapPhonogram(yc->romdic, kana_char, 1024,
 			      yc->kana_buffer + yc->kRStartp,
 			      yc->kCurs - yc->kRStartp,
 			      (wchar_t) key,
@@ -1671,7 +1669,7 @@ moveStrings(str, attr, start, end, distance)
 wchar_t *str;
 BYTE *attr;
 int  start, end, distance;
-{     
+{
   int i;
 
   if (distance > 0) { /* 後ろにずれれば */
@@ -1700,7 +1698,7 @@ yomiContext yc;
     BYTE *st = yc->kAttr;
     BYTE *cur = yc->kAttr + yc->kCurs;
     BYTE *p = cur;
-    
+
     for (--p ; p > st && !(*p & SENTOU) ;) {
       --p;
     }
@@ -1954,14 +1952,14 @@ uiContext d;
 
 /* RomajiFlushYomi(d, buffer, bufsize) ユーティリティ関数
  *
- * この関数は、(uiContext)d に蓄えられている読みの情報 
+ * この関数は、(uiContext)d に蓄えられている読みの情報
  * (yc->romaji_buffer と yc->kana_buffer)を用いて、buffer にその読みをフ
  * ラッシュした結果を返す関数である。フラッシュした結果の文字列の長さ
  * はこの関数の返り値として返される。
  *
  * buffer として NULL が指定された時は、バッファに対する格納は行わない
  *
- * 【作用】   
+ * 【作用】
  *
  *    読みを確定する
  *
@@ -2299,13 +2297,13 @@ typedef struct _autoDefRec {
     st から et の直前までの tanContext/yomiContext を確定させる
     s から e の範囲に確定結果が格納される。
     yc_return は yomiContext を一つ残して欲しい場合に、残った yomiContext
-    を格納して返すためのアドレス。yc_return がヌルなら、何も残さず free 
+    を格納して返すためのアドレス。yc_return がヌルなら、何も残さず free
     する。
     et->left は呼び出したところで 0 にすること。
 
     確定した文字の長さが返される。
 
-    この関数を呼んだら d->modec が壊れているので入れ直さなければならない 
+    この関数を呼んだら d->modec が壊れているので入れ直さなければならない
 
  */
 
@@ -2403,7 +2401,7 @@ yomiContext *yc_return;
     if (s < e) {
       *s++ = (wchar_t)'\0';
     }
-    
+
     if (yomiInfoLevel > 1) {
       for (tan = st ; tan != et ; tan = tan->right) {
 	if (tan->id == TAN_CONTEXT) {
@@ -2643,10 +2641,10 @@ clearChikujiContext(yc)
 
 /* RomajiClearYomi(d) ユーティリティ関数
  *
- * この関数は、(uiContext)d に蓄えられている読みの情報 
+ * この関数は、(uiContext)d に蓄えられている読みの情報
  * をクリアする。
  *
- * 【作用】   
+ * 【作用】
  *
  *    読みをクリアする。
  *
@@ -2702,7 +2700,7 @@ int retval;
  *
  * この関数は、(uiContext)d に読みの情報をストアする。
  *
- * 【作用】   
+ * 【作用】
  *
  *    読みを格納する。
  *
@@ -2800,7 +2798,7 @@ uiContext d;
       yc->kRStartp--;
     /* これ必ず真では? */
     prevflag = (yc->kAttr[yc->kRStartp] & SENTOU);
-    kanaReplace(yc->kRStartp - yc->kCurs, 
+    kanaReplace(yc->kRStartp - yc->kCurs,
 		yc->romaji_buffer + yc->rStartp,
 		yc->rCurs - yc->rStartp,
 		0);
@@ -2816,13 +2814,13 @@ uiContext d;
   else {
     yc->generalFlags &= ~CANNA_YOMI_BREAK_ROMAN;
     if ( yc->kAttr[yc->kCurs - howManyDelete] & HENKANSUMI ) {
-      if (yc->kAttr[yc->kCurs - howManyDelete] & SENTOU) { 
+      if (yc->kAttr[yc->kCurs - howManyDelete] & SENTOU) {
 	/* ローマ字かな変換の先頭だったら */
 	if (yc->kAttr[yc->kCurs] & SENTOU) {
 	  int n;
-	
+
 	  /* 先頭だったらローマ字も先頭マークが立っているところまで戻す */
-	
+
 	  for (n = 1 ; yc->rCurs > 0 && !(yc->rAttr[--yc->rCurs] & SENTOU) ;) {
 	    n++;
 	  }
@@ -3440,7 +3438,7 @@ mapAsHex(d)
   return 1;
 }
 
-/* ConvertAsHex -- １６進とみなしての変換 
+/* ConvertAsHex -- １６進とみなしての変換
 
   ローマ字入力されて反転表示されている文字列を１６進で表示されているコードと
   みなして変換する。
@@ -3487,7 +3485,7 @@ uiContext d;
 
   これは内部的に使用するためのルーチンである。d->romaji_buffer に含ま
   れる文字列を１６進で表された漢字コードであるとみなして、そのコードに
-  よって表現される漢字文字に変換する。変換した文字列は buffer_return 
+  よって表現される漢字文字に変換する。変換した文字列は buffer_return
   に格納する。リターン値はエラーがなければ buffer_return に格納した文
   字列の長さである(通常は２である)。エラーが発生している時は−１が格納
   される。
@@ -3502,14 +3500,14 @@ uiContext d;
 
 int
 cvtAsHex(d, buf, hexbuf, hexlen)
-uiContext d;     
+uiContext d;
 wchar_t *buf, *hexbuf;
 int hexlen;
 {
   int i;
   char tmpbuf[5], *a, *b;
   wchar_t rch;
-  
+
   if (hexlen != 4) { /* 入力された文字列の長さが４文字でないのであれば変換
 			してあげない */
     d->kanji_status_return->length = -1;
@@ -3889,7 +3887,7 @@ uiContext	d;
 
 /* ベース文字の切り替え */
 
-extern EmptyBaseHira pro((uiContext)), EmptyBaseKata pro((uiContext)); 
+extern EmptyBaseHira pro((uiContext)), EmptyBaseKata pro((uiContext));
 extern EmptyBaseEisu pro((uiContext));
 extern EmptyBaseZen pro((uiContext)), EmptyBaseHan pro((uiContext));
 
@@ -4435,7 +4433,7 @@ chikujiEndBun(d)
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
     (void)free((char *)ycsv);
   }
-#endif 
+#endif
   return(ret);
 }
 
@@ -4487,7 +4485,7 @@ uiContext d;
   int rc, rp, i;
 #endif
   yomiContext yc = (yomiContext)d->modec;
-  
+
 #if defined(DEBUG)
   if (iroha_debug) {
     fprintf(stderr,"yc->kCurs=%d yc->cmark=%d\n", yc->kCurs,yc->cmark);
@@ -4631,7 +4629,7 @@ int fnum;
 
       WStrncpy(roma, yc->kana_buffer + yc->kRStartp, len);
       roma[len++] = (wchar_t)key;
-    
+
       prevrule = yc->last_rule;
       if ((RkwMapPhonogram(yc->romdic, kana, 128, roma, len, (wchar_t)key,
 			   flag | RK_SOKON, &n, &m, &t, &prevrule) &&

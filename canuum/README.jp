@@ -125,7 +125,9 @@ ASTEC により開発された Wnn のオリジナル版をベースに作られていました。
  * Copyright ASTEC, Inc. 1987, 1988, 1989, 1990, 1991, 1992
  * Copyright FreeWnn Project 1999, 2000, 2002
  *
- * Maintainer:  FreeWnn Project   <freewnn@tomo.gr.jp>
+ * Canuum
+ * Copyright 1993 NEC Corporation, Tokyo, Japan.
+ *
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,28 +142,6 @@ ASTEC により開発された Wnn のオリジナル版をベースに作られていました。
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/* Copyright 1993 NEC Corporation, Tokyo, Japan.
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for any purpose is hereby granted without
- * fee, provided that the above copyright notice appear in all copies
- * and that both that copyright notice and this permission notice
- * appear in supporting documentation, and that the name of NEC
- * Corporation not be used in advertising or publicity pertaining to
- * distribution of the software without specific, written prior
- * permission.  NEC Corporation makes no representations about the
- * suitability of this software for any purpose.  It is provided "as
- * is" without express or implied warranty.
- *
- * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
- * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
  */
 
 /* $Id: README.jp,v 1.3 2003/09/15 14:52:27 aida_s Exp $ */

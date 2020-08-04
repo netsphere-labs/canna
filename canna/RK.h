@@ -167,26 +167,19 @@ extern "C" {
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
   // 'cannawc' は、EUC-JP を1文字 = 1ワイド文字にしたもの。
-  // wchar_t は Unicode または opaque. 過去の互換性のため、wchar_t と同じ大きさ
-  // になるように, cannawc を定める.
+  // 32bit widechar は、元々正常に動いていない。16bit のみとする。
   // See man 5 euc.
-  // G0 ISO 646 IRV              0x0000 - 0x007f.
-  // G1 JIS X 0208 Kanji         the values having the bits 0x8080 set.
-  // G2 JIS X 0201 Hankaku-kana. 0x0080 - 0x00ff.
-  // G3 JIS X 0212 Hojo-Kanji.   0x8000 - 0xff7f excluding the values which
+  //   G0 ISO 646 IRV              0x0000 - 0x007f.
+  //   G1 JIS X 0208 Kanji         the values having the bits 0x8080 set.
+  //   G2 JIS X 0201 Hankaku-kana. 0x0080 - 0x00ff.
+  //   G3 JIS X 0212 Hojo-Kanji.   0x8000 - 0xff7f excluding the values which
   //                             have the 0x0080 bit set.
-  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
-typedef uint32_t cannawc;
-    #undef CANNA_WCHAR16
-    #undef WCHAR16
-  #else
-typedef uint16_t cannawc;
-    #define CANNA_WCHAR16
-    #define WCHAR16
+  #ifndef CANNA_NEW_WCHAR_AWARE
+    #define CANNA_NEW_WCHAR_AWARE
   #endif
+  #define CANNA_WCHAR16
+typedef uint16_t cannawc;
 #endif // !CANNAWC_DEFINED
-
-#ifdef CANNAWC_DEFINED
 
 canna_export(void) RkwFinalize pro((void));
 canna_export(int) RkwInitialize pro((const char *));
@@ -250,7 +243,6 @@ canna_export(int) RkwGetSimpleKanji pro((int, char *, cannawc *, int,
 					 cannawc *, int, unsigned char*, int));
 canna_export(int) RkwStoreRange pro((int, cannawc *, int));
 
-#endif
 
 void	RkFinalize pro((void));
 int     RkInitialize pro((char *));

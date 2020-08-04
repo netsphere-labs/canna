@@ -39,17 +39,12 @@
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
-  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
-typedef uint32_t cannawc;
-    #undef CANNA_WCHAR16
-    #undef WCHAR16
-  #else
-typedef uint16_t cannawc;
-    #define CANNA_WCHAR16
-    #define WCHAR16
+  #ifndef CANNA_NEW_WCHAR_AWARE
+    #define CANNA_NEW_WCHAR_AWARE
   #endif
+  #define CANNA_WCHAR16
+typedef uint16_t cannawc;
 #endif // !CANNAWC_DEFINED
-
 
 #include "canna/protodefs.h"
 

@@ -53,11 +53,18 @@
 #define USE_MALLOC_FOR_BIG_ARRAY
 #endif
 
-#define Wchar cannawc
+#ifndef CANNAWC_DEFINED
+  #define CANNAWC_DEFINED
+  #ifndef CANNA_NEW_WCHAR_AWARE
+    #define CANNA_NEW_WCHAR_AWARE
+  #endif
+  #define CANNA_WCHAR16
+typedef uint16_t cannawc;
+#endif // !CANNAWC_DEFINED
+
+typedef cannawc Wchar; // For compatibility
 
 #define RK_INTERNAL
-//#define CANNAWC_DEFINED
-#define CANNA_NEW_WCHAR_AWARE
 #include "canna/RK.h"
 
 #include "canna/ccompat.h"
@@ -811,7 +818,7 @@ struct henkanlog {
 #endif
 
 struct nstore {
-    Wchar		*yomi;		/* yomigana buffer */
+    cannawc 	*yomi;		/* yomigana buffer */
 #ifdef RK_LOG
     unsigned		nblog;
     char		**blog;
@@ -871,8 +878,8 @@ struct TW {
 };
 
 typedef struct TN {
-  unsigned char	tn_flags;	/* type of node (see blow) */
-  Wchar		tn_key;
+    unsigned char	tn_flags;	/* type of node (see blow) */
+    cannawc		tn_key;
   union {
     struct TD	*tree;
     struct TW	*word;
@@ -943,8 +950,8 @@ struct RkDST {
     pro((struct DM *, char *, int, struct RkKxGram *));
   int (*d_close) /* jisho ga close sareta toki */
     pro((struct DM *, char *, struct RkKxGram *));
-  int (*d_search) /* jisho kara tango wo search suru */
-    pro((struct RkContext *, struct DM *, Wchar *,
+    int (*d_search) /* jisho kara tango wo search suru */
+        pro((struct RkContext *, struct DM *, cannawc*,
 	 int, struct nread *, int, int *));
   int (*d_io) /* jisho he tango to cache no io */
     pro((struct DM *, struct ncache *, int));
@@ -1230,11 +1237,11 @@ void RkEndGram pro((struct RkGramIterator *, const struct RkKxGram *));
 int _RkRegisterNV pro((struct NV *, Wrec *, int, int));
 int FQopen pro((struct DM *, struct DM *, char *, int));
 void FQclose pro((struct RkContext *, struct DM *, struct DM *, char *));
-int _RkSubstYomi pro((struct RkContext *, int, int, Wchar *, int));
+int _RkSubstYomi pro((struct RkContext *, int, int, cannawc*, int));
 long _RkCopyBits
      pro((unsigned char *, long, int, unsigned char *, long, int));
 int _RkIsInDDP pro((struct DD **, struct DD *));
-int _RkEql pro((Wchar *, unsigned char *, int));
+int _RkEql pro((cannawc*, unsigned char *, int));
 int DMcheck pro((char *, char *));
 int copyFile pro((struct DM *, struct DM *));
 int DDchmod pro((struct DD *, int));
@@ -1252,7 +1259,7 @@ extern cannawc* WStrncpy pro((cannawc* dest, const cannawc* src, size_t n));
 
 unsigned char *ustoeuc pro((const cannawc* src, int srclen,
                             unsigned char* dest, int destlen));
-int _RkSubstYomi pro((struct RkContext *, int, int, Wchar *, int));
+int _RkSubstYomi pro((struct RkContext *, int, int, cannawc*, int));
 int HowManyChars pro((const cannawc*, int));
 
 int ushort2eucsize(const cannawc* yomi, int len);

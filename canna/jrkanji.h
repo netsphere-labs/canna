@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -49,7 +49,7 @@
 #define KanjiEmptyInfo		0x10
 
 #define KanjiExtendInfo		0x20
-#define KanjiKigoInfo		0x40 
+#define KanjiKigoInfo		0x40
 #define KanjiRussianInfo	0x80
 #define KanjiGreekInfo		0x100
 #define KanjiLineInfo		0x200
@@ -109,7 +109,7 @@
 
 #define CANNA_NOTHING_RESTRICTED	0
 #define CANNA_ONLY_ASCII		1
-#define CANNA_ONLY_ALPHANUM		2	
+#define CANNA_ONLY_ALPHANUM		2
 #define CANNA_ONLY_HEX			3
 #define CANNA_ONLY_NUMERIC		4
 #define CANNA_NOTHING_ALLOWED		5
@@ -181,19 +181,13 @@ typedef struct {
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED
-  #if WCHAR_MAX >= 65536 || defined(__STDC_ISO_10646__)
-typedef uint32_t cannawc;
-    #undef CANNA_WCHAR16
-    #undef WCHAR16
-  #else
-typedef uint16_t cannawc;
-    #define CANNA_WCHAR16
-    #define WCHAR16
+  #ifndef CANNA_NEW_WCHAR_AWARE
+    #define CANNA_NEW_WCHAR_AWARE
   #endif
+  #define CANNA_WCHAR16
+typedef uint16_t cannawc;
 #endif // !CANNAWC_DEFINED
 
-
-#ifdef CANNAWC_DEFINED
 
 typedef struct {
     cannawc *echoStr;		/* local echo string */
@@ -245,7 +239,6 @@ typedef struct {
 #define CANNA_LIST_Convert	  13
 #define CANNA_LIST_Insert	  14
 
-#endif /* CANNAWC_DEFINED */
 
 #define CANNA_NO_VERBOSE   0
 #define CANNA_HALF_VERBOSE 1
@@ -298,4 +291,3 @@ int wcCloseKanjiContext pro((const int, wcKanjiStatusWithValue *));
 
 
 #endif /* _JR_KANJI_H_ */
-

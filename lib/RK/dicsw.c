@@ -30,7 +30,7 @@ static char rcsid[]="$Id: dicsw.c,v 1.1.1.1 2002/10/19 08:27:45 aida_s Exp $";
 extern int _Rkpopen pro((struct DM *, char *, int, struct RkKxGram *));
 extern int _Rkpclose pro((struct DM *, char *, struct RkKxGram *));
 extern int _Rkpsearch
-  pro((struct RkContext *, struct DM *, Wchar *, int, struct nread *,
+  pro((struct RkContext *, struct DM *, cannawc*, int, struct nread *,
        int, int *));
 extern int _Rkpio pro((struct DM *, struct ncache *, int));
 extern int _Rkpctl
@@ -40,7 +40,7 @@ extern int _Rkpsync pro((struct RkContext *, struct DM *, struct DM *));
 extern int _Rktopen pro((struct DM *, char *, int, struct RkKxGram *));
 extern int _Rktclose pro((struct DM *, char *, struct RkKxGram *));
 extern int _Rktsearch
-  pro((struct RkContext *, struct DM *, Wchar *, int, struct nread *,
+  pro((struct RkContext *, struct DM *, cannawc*, int, struct nread *,
        int, int *));
 extern int _Rktio pro((struct DM *, struct ncache *, int));
 extern int _Rktctl

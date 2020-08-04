@@ -1,4 +1,6 @@
-/* Copyright (c) 2003 Canna Project. All rights reserved.
+/* The Author and Contributors:
+ *   Copyright (c) 2002-2004 Canna Project.
+ *   Copyright (c) 1990-1997 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without
@@ -7,7 +9,7 @@
  * appear in supporting documentation, and that the name of the
  * author and contributors not be used in advertising or publicity
  * pertaining to distribution of the software without specific, written
- * prior permission.  The author and contributors no representations
+ * prior permission.  The author and contributors makes no representations
  * about the suitability of this software for any purpose.  It is
  * provided "as is" without express or implied warranty.
  *
@@ -17,31 +19,8 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-/* Copyright 1992 NEC Corporation, Tokyo, Japan.
- *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for any purpose is hereby granted without
- * fee, provided that the above copyright notice appear in all copies
- * and that both that copyright notice and this permission notice
- * appear in supporting documentation, and that the name of NEC
- * Corporation not be used in advertising or publicity pertaining to
- * distribution of the software without specific, written prior
- * permission.  NEC Corporation makes no representations about the
- * suitability of this software for any purpose.  It is provided "as
- * is" without express or implied warranty.
- *
- * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
- * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
- */
-
 
 #ifdef ENGINE_SWITCH
 #include "RKrename.h"
@@ -108,7 +87,7 @@ typedef struct _Client {
 typedef unsigned int Uint;
 
 static int ServerVersion ;
-static ir_time_t cur_time ;	
+static ir_time_t cur_time ;
 
 static int *TotalReqCount = NULL;
 size_t ProtoCount, ListSize, ContextNum ;
@@ -150,7 +129,7 @@ char **argv ;
 	    strcpy( cannahostname, argv[i] ) ;
 	  } else
 	      usage();
-	} else if( !strcmp( argv[ i ], "-p" ))	
+	} else if( !strcmp( argv[ i ], "-p" ))
 	    argflag = PROTO ;
 	else if( !strcmp( argv[ i ], "-a" ))
 	    argflag = ALL ;
@@ -269,7 +248,7 @@ int flag;
     size_t i, cConnectNum;
     ClientRec client;
 
-    requiredsize = 
+    requiredsize =
 	HEADER_SIZE
 	+ SIZEOFCHAR            /* 終了状態 */
 	+ SIZEOFCHAR            /* メジャーバージョン */
@@ -305,7 +284,7 @@ int flag;
 
     /* プロトコル数 */
     ProtoCount = S2TOS(p), p+= SIZEOFSHORT;
-	
+
     /* プロトコル名リスト長 */
     ListSize = S2TOS(p), p+= SIZEOFSHORT;
 
@@ -379,7 +358,7 @@ int flag;
 		    (Uint)clientinfolen, (Uint)requiredsize));
 	if (len < requiredsize)
 	    goto protoerr;
-	
+
 	bzero( &client, sizeof( ClientRec ) ) ;
 	bzero( ContextFlag, ContextNum ) ;
 	r = CreateData( p, &client, clientinfolen ) ;
@@ -462,13 +441,13 @@ int flag ;
 	  sprintf( ctime,"%s 12:%02dam", ctime, tt->tm_min ) ;
 	else
 	  sprintf( ctime,"%s %2d:%02dam", ctime, tt->tm_hour, tt->tm_min ) ;
-	
+
 	sprintf( utime,"%02u:%02u:%02u", (Uint)udate/3600,
 		(Uint)(udate%3600)/60, (Uint)(udate%3600)%60 ) ;
     }
 
     if (udate < 3600) {
-	if (udate < 60) 
+	if (udate < 60)
 	    sprintf( utime, "      %2u", (Uint)udate);
 	else
 	    sprintf( utime, "   %2u'%02u", (Uint)(udate/60), (Uint)(udate%60));
@@ -487,7 +466,7 @@ int flag ;
     else
 	sprintf( itime,"%2u:%02u",
 		(Uint)(idate/3600), (Uint)((idate%3600)/60)) ;
-				
+
     for( i = 0, u_cx = 0; i < ContextNum ; i++ )
 	if( ContextFlag[ i ] )
 	    u_cx ++ ;
@@ -516,7 +495,7 @@ int flag ;
 	    printf( ADFORMAT, name, id,
 			user_no, u_cx, ctime, utime, itime, host ) ;
 	}
-    }	
+    }
 }
 
 static void
@@ -535,7 +514,7 @@ register ClientPtr client ;
 	protoname += ( strlen( protoname ) + 1 ) ;
 	if( !((i+1)%2) ) putchar('\n') ;
     }
-    putchar('\n') ;			
+    putchar('\n') ;
 }
 
 static int

@@ -4,7 +4,7 @@ bin_PROGRAMS = catdic
 AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib
 
 catdic_SOURCES = can.c rutil.c RKdelline.c
-catdic_LDADD = ../../lib/RKC/libRKC.la
+catdic_LDADD = ../../lib/RKC/libRKC16.la
 
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && \

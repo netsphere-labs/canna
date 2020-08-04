@@ -1,4 +1,6 @@
-/* Copyright (c) 2003 Canna Project. All rights reserved.
+/* The Author and Contributors:
+ *   Copyright (c) 2002-2004 Canna Project.
+ *   Copyright (c) 1990-1997 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without
@@ -7,7 +9,7 @@
  * appear in supporting documentation, and that the name of the
  * author and contributors not be used in advertising or publicity
  * pertaining to distribution of the software without specific, written
- * prior permission.  The author and contributors no representations
+ * prior permission.  The author and contributors makes no representations
  * about the suitability of this software for any purpose.  It is
  * provided "as is" without express or implied warranty.
  *
