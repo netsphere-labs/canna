@@ -12,21 +12,21 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef	lint
 static char rcsid[] = "@(#) 112.1 $Id: splitwd.c,v 1.2.4.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
-    
+
 #include	<stdio.h>
 #include	<signal.h>
-#include	"ccompat.h"
+#include	"canna/ccompat.h"
 
 #if defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -70,7 +70,7 @@ uchar	*Word;
       *Word++ = *p++;
     }
     *Word = '\0';
-    
+
     return(p);
 }
 
@@ -80,16 +80,16 @@ uchar   *hinshi;
 {
     struct tango   *tp;
     uchar   *p;
-	
+
     if( !(tp = (struct tango *)malloc(sizeof(struct tango))) )
-	fprintf(stderr, gettxt("cannacmd:41", 
+	fprintf(stderr, gettxt("cannacmd:41",
 	       "cannnot malloc %lu\n"), (unsigned long)sizeof(struct tango) );
 
     if( !(p = (uchar *)malloc(strlen((char *)tsuduri) + 1)) )
 	fprintf(stderr, gettxt("cannacmd:42",
 	       "cannnot malloc %lu\n"),
 		(unsigned long)strlen((char *)tsuduri)+1 );
-    
+
     tp->tsuduri = p;
     strcpy((char *)p,(char *)tsuduri);
 
@@ -99,18 +99,18 @@ uchar   *hinshi;
 		(unsigned long)strlen((char *)hinshi)+1 );
     tp->hinshi = p;
     strcpy((char *)p, (char *)hinshi);
-    
+
     tp->next = NULL;
-    
+
     return(tp);
-}	
+}
 
 void savetango(tsuduri, hinshi)
 uchar	*tsuduri;
 uchar	*hinshi;
 {
     struct tango	*tp;
-    
+
     if( !word.next ){
 	word.next = newtango(tsuduri,hinshi);
 	return;
@@ -130,9 +130,9 @@ int	nline;
     uchar	*lp;
     uchar	hinshi[SIZE];
     uchar	tsuduri[SIZE];
-    
+
     lp = line;
-    
+
     lp = getword(lp,word.yomi);			/* head に読みを入れる */
     lp = getword(lp,hinshi);			/* hinshi を取り込む */
     if ('#' != word.yomi[0] && '#' != hinshi[0])
@@ -156,7 +156,7 @@ int	nline;
 void disp_factor()
 {
     struct tango	*tp;
-    
+
     tp = word.next;
     while( tp ){
 #ifdef USE_ATMARK
@@ -182,7 +182,7 @@ struct tango *tp;
     free((char *)ftp->hinshi);
     free((char *)ftp);
   }
-}	
+}
 
 void
 catch(sig)
@@ -232,16 +232,16 @@ char	*argv[];
 #if defined(__STDC__) || defined(SVR4)
     (void)setlocale(LC_ALL,"");
 #endif
-    
+
     if( argc == 1 ) {		/* コマンドだけの時 */
       splitword(stdin, argv[0]);
     }
-    
+
     for( i = 1; i < argc ; i++ ){
 	if( !(fp = fopen( argv[i], "r" )) )
-	    fprintf(stderr, gettxt("cannacmd:46", 
+	    fprintf(stderr, gettxt("cannacmd:46",
 		   "cannot open file %s\n"), argv[i] );
-	
+
 	splitword(fp, argv[0]);
 
 	fclose( fp );

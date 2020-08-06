@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -34,7 +34,7 @@ static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.2 2003/02/01 19:34:21 aida_s 
 #if defined(__STDC__) || defined(SVR4)
 #include        <locale.h>
 #endif
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 #ifdef SVR4
 extern char *gettxt();
@@ -45,13 +45,13 @@ extern char *gettxt();
 char	*hd	= "0123456789ABCDEF";
 
 /* #define	ESC	'@'*/
-#define	ESC 033	
+#define	ESC 033
 e2j()
 {
     register unsigned	c;
 
     while ( (c = getchar()) != EOF ) {
-	if ( isspace(c) ) 
+	if ( isspace(c) )
 	    putchar(c);
 	else {
 	    putchar(hd[c>>4]);
@@ -92,7 +92,7 @@ char	*args[];
 	fprintf(stderr, gettxt("cannacmd:21", "Usage: forsort -7 < [file],\n       forsort -8 < [file]\n"));
 	exit( -1 );
     }
-    
+
     if( !strcmp(args[1], "-7"))
 	e2j();
     else if( !strcmp(args[1], "-8"))
@@ -101,5 +101,3 @@ char	*args[];
 	fprintf(stderr, gettxt("cannacmd:22", "Usage: forsort -7 < [file],\n       forsort -8 < [file]\n"));
     exit(0);
 }
-
-

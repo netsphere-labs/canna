@@ -24,7 +24,7 @@
 static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 1.7.2.2 2003/12/27 17:15:22 aida_s Exp $";
 #endif
 
-#include "RKintern.h"
+#include "RK/RKintern.h"
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -33,7 +33,7 @@ static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 1.7.2.2 2003/12/27 17:15:22 aida
 #include	<unistd.h>
 #endif
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #include "RKindep/file.h"
 
 #ifndef HYOUJUN_GRAM

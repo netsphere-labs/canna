@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -80,33 +80,34 @@ static char *default_hinshi[] = {
   ""
 };
 
-ask_default_hinshi_size()
+
+int ask_default_hinshi_size()
 {
   int i;
-  
+
   for (i = 0; strcmp(default_hinshi[i],""); i++);
   return i;
 }
 
-char *salloc(s)
-char *s;
+// copy
+char *salloc(const char* s)
 {
-  char *new;
-  
-  if (new = (char *)malloc(strlen(s) +1))
-    strcpy(new, s);
-  else{
-    fprintf(stderr, gettxt("cannacmd:8", "No more memory\n"));
-    exit(1);
-  }
-  return(new);
+    char* new_;
+
+    if (new_ = (char *)malloc(strlen(s) +1))
+        strcpy(new_, s);
+    else{
+        fprintf(stderr, gettxt("cannacmd:8", "No more memory\n"));
+        exit(1);
+    }
+
+    return new_;
 }
+
 
 /* 品詞対応 */
 char *
-chghinshi(hinshi, size, taiou, fsize)
-char   *hinshi, **taiou;
-int    size, fsize;
+chghinshi( char* hinshi, int size, char** taiou, int fsize)
 {
   int   i;
   char wnn_hinshi[MAXTANGO];
@@ -142,10 +143,9 @@ int    size, fsize;
   return salloc("");
 }
 
+
 /* 品詞ファイル読み込み */
-read_hinshi(fp, taiou)
-FILE  *fp;
-char *taiou[MAXHINSHI];
+int read_hinshi(FILE* fp, char* taiou[MAXHINSHI])
 {
   int  size;
   char H[MAXTANGO], wnn[MAXTANGO], iroha[MAXTANGO];
@@ -162,10 +162,10 @@ char *taiou[MAXHINSHI];
   taiou[size] = '\0';
   return size;
 }
- 
+
+
 char *
-get_hindo(iroha_hinshi)
-char *iroha_hinshi;
+get_hindo( char* iroha_hinshi)
 {
   char *p;
   char *hindo;
@@ -180,16 +180,13 @@ char *iroha_hinshi;
 }
 
 /* 出力 */
-itow_write(fp, yomi, hinshi, kouho, hindo)
-FILE  *fp;
-char *yomi, *hinshi, *kouho, *hindo;
+int itow_write( FILE* fp, char* yomi, char* hinshi, char* kouho, char* hindo)
 {
   fprintf( fp, "%s %s %s %s \n", yomi, kouho, hinshi, hindo);
 }
 
-main(argc, argv)
-int  argc;
-char *argv[]; 
+
+int main( int argc, char* argv[] )
 {
   char *taiou[MAXHINSHI];
   char *nd, *hinshis, hinshi[MAXTANGO], *p;
@@ -203,10 +200,10 @@ char *argv[];
   hinshiSize = ask_default_hinshi_size();
 
   option = 0;
-  if( argc <= 5 ) { /* 引数は正当か？ */ 
+  if( argc <= 5 ) { /* 引数は正当か？ */
     if( argc > 2 && !strcmp(argv[1],"-f") ) { /* 品詞ファイルを読み込むか？ */
       if( (fph = fopen( argv[2], "r" ) ) == NULL) { /* 品詞ファイルをｏｐｅｎ */
-	fprintf(stderr,gettxt("cannacmd:9", "%s: cannot open %s\n"), 
+	fprintf(stderr,gettxt("cannacmd:9", "%s: cannot open %s\n"),
 		argv[0], argv[2] );
 	exit(2);
       }
@@ -218,7 +215,7 @@ char *argv[];
     fpo = stdout;
   }
   else { /* 引数が不正 */
-    fprintf(stderr,gettxt("cannacmd:10", 
+    fprintf(stderr,gettxt("cannacmd:10",
 	  "Usage: ctow [-f parts-of-speech table] [cannadic] [wnndic]\n"));
     exit(2);
   }
@@ -236,7 +233,7 @@ char *argv[];
       }
     }
   }
-  
+
   /* 主処理 */
   while(fgets(S, sizeof(S), fpi)) {
     if( 3 !=  sscanf(S, "%s %s %s ", y, h, k))
@@ -252,9 +249,9 @@ char *argv[];
       p = hinshi;
       hinshis = chghinshi(h, hinshiSize, taiou, fsize);
       if (!strcmp(hinshis,"")) {
-	fprintf(stderr,gettxt("cannacmd:13", 
+	fprintf(stderr,gettxt("cannacmd:13",
 	      "reading:%s nomination:%s a part of speach:%s\n"),y,k,h);
-	fprintf(stderr,gettxt("cannacmd:14", 
+	fprintf(stderr,gettxt("cannacmd:14",
 	      "This part of speach is undefined. Cannot convert.\n"));
       }
       else {

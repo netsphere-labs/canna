@@ -63,8 +63,21 @@ AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF(wchar_t)
 AC_CHECK_MEMBERS([struct hostent.h_addr_list],,,[#include <netdb.h>])
 
-# DEBUG
-test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra"  
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    native_win32=yes
+    ;;
+  *)
+    native_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$native_win32])
+AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
+
+AC_ENABLE_STATIC(no)
+
+test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-declarations -pedantic -Wno-long-long -fstack-protector-strong -fstack-clash-protection"  
 
 AC_CONFIG_FILES([
   Makefile

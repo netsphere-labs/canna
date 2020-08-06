@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -31,7 +31,7 @@ static char rcsid[]="@(#) 112.1 $Id: dpromdic.c,v 1.3.2.2 2003/12/27 17:15:22 ai
 #if defined(__STDC__) || defined(SVR4)
 # include       <locale.h>
 #endif
-#include "ccompat.h"
+#include "canna/ccompat.h"
 #define CANNA_NEW_WCHAR_AWARE
 
 #ifdef SVR4
@@ -44,9 +44,7 @@ extern char *gettxt();
 extern struct RkRxDic  *RkwOpenRoma() ;
 void printch();
 
-main(argc, argv)
-int	argc;
-char	**argv;
+int main( int argc, char* argv[] )
 {
   char *filename;
   struct RkRxDic *rdic;
@@ -70,7 +68,7 @@ char	**argv;
 
   ++argv;
   filename = *argv;
-  
+
   if(access(filename, mode) == -1) {
     fprintf(stderr, gettxt("cannacmd:16", "cannot open %s\n"), filename);
     exit(1);

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -35,7 +35,7 @@ static char rcsid[]="@(#) 112.1 $Id: forcpp.c,v 1.2 2003/02/01 19:34:21 aida_s E
 #if defined(__STDC__) || defined(SVR4)
 #include        <locale.h>
 #endif
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 #ifdef SVR4
 extern char *gettxt();
@@ -46,7 +46,7 @@ extern char *gettxt();
 char	*hd	= "0123456789abcdef";
 
 /* #define	ESC	'@'*/
-#define	ESC 033	
+#define	ESC 033
 e2j()
 {
     unsigned	c;
@@ -88,7 +88,7 @@ j2e()
 		s[1] = getchar();
 		s[2] = 0;
 		sscanf(s, "%x", &c);
-		
+
 
 	    }
 	    putchar(c);

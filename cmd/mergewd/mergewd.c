@@ -24,7 +24,7 @@
 static char rcsid[]="@(#) 112.1 $Id: mergewd.c,v 1.1.1.1.4.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
 
-#include "RKintern.h"
+#include "RK/RKintern.h"
 #include <stdio.h>
 #include <locale.h>
 

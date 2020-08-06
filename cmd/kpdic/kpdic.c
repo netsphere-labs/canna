@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -34,7 +34,7 @@ extern char *gettxt();
 #define	gettxt(x,y)  (y)
 #endif
 
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 #ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
@@ -58,11 +58,11 @@ int chk_dflt pro((int c));
 
 	struct  def_tbl {
 	    int   used  ;
-	    char  *roma ; 
+	    char  *roma ;
 	    char  *kana ;
 	    char  *intr ;
         }    ;
-	static struct def_tbl def [] = { 
+	static struct def_tbl def [] = {
 	    {0,"kk","っ","k"},
 	    {0,"ss","っ","s"},
 	    {0,"tt","っ","t"},
@@ -81,7 +81,7 @@ int chk_dflt pro((int c));
 	    {0,"jj","っ","j"},
 	    {0,"qq","っ","q"},
 	    {0,"vv","っ","v"}
-	}  ; 
+	}  ;
 
 
 /*VARARGS*/
@@ -92,7 +92,7 @@ char	*arg;
 {
     char	msg[256];
     (void)sprintf(msg, fmt, arg);
-    (void)fprintf(stderr, gettxt("cannacmd:23", 
+    (void)fprintf(stderr, gettxt("cannacmd:23",
 		 "#line %d %s: (WARNING) %s\n"), lineNum, fileName, msg);
     ++errCount;
 }
@@ -103,7 +103,7 @@ char	*arg;
 {
     char	msg[256];
     (void)sprintf(msg, fmt, arg);
-    (void)fprintf(stderr, gettxt("cannacmd:24", 
+    (void)fprintf(stderr, gettxt("cannacmd:24",
 		 "#line %d %s: (FATAL) %s\n"), lineNum, fileName, msg);
     exit(1);
 }
@@ -136,7 +136,7 @@ int		maxword;
 		}
 		else {
 		    c = 0;
-		    while ( isdigit(*s) ) 
+		    while ( isdigit(*s) )
 			c = 8*c + (*s++ - '0');
 		};
 		break;
@@ -181,7 +181,7 @@ unsigned char	*s;
     return d;
 }
 
-struct roman { 
+struct roman {
     unsigned char	*roma;
     unsigned char	*kana;
     unsigned char	*temp;
@@ -208,7 +208,7 @@ int nKey;
 int
 compar(p, q)
 struct roman	*p, *q;
-{	
+{
     unsigned char	*s = p->roma;
     unsigned char	*t = q->roma;
 
@@ -222,7 +222,7 @@ struct roman	*p, *q;
 
 main(argc, argv)
   int    argc ;
-  char **argv ; 
+  char **argv ;
 {
   struct roman *roman;
   unsigned char	rule[256], *r;
@@ -245,15 +245,15 @@ main(argc, argv)
 #endif
 
 /* option */
-    flag_old =  0 ; 
-    werr = 0 ; 
+    flag_old =  0 ;
+    werr = 0 ;
     while(--argc) {
     	argv++ ;
         if (!strcmp(*argv,"-m")) {
-    		flag_old = 1 ; 
+    		flag_old = 1 ;
         }
         else if (!strcmp(*argv,"-x")) {
-    		flag_large = 1 ; 
+    		flag_large = 1 ;
         }
     }
 
@@ -268,14 +268,14 @@ main(argc, argv)
 
   roman = (struct roman *)malloc(sizeof(struct roman) * maxkey);
   if (!roman) {
-    fatal(gettxt("cannacmd:8", "No more memory\n"), 0); 
+    fatal(gettxt("cannacmd:8", "No more memory\n"), 0);
   }
 
   nKey = 0;
   size  = 0;
   while (fgets((char *)(r = rule), sizeof(rule), stdin)) {
     unsigned char	roma[256];
-  
+
     lineNum++;
     if ( *r == '#' ) {
       continue;
@@ -296,7 +296,7 @@ main(argc, argv)
       else {
 	  freeallocs(roman, nKey);
 	  free((char *)roman);
-	  fatal(gettxt("cannacmd:26", 
+	  fatal(gettxt("cannacmd:26",
 	       "More than %d romaji rules are given."), maxkey);
       }
       if ( getWORD(r, &r, roma, sizeof(roma)) ) {
@@ -332,7 +332,7 @@ main(argc, argv)
 	    if (p--) {
 	      if (def[p].used == 0) { /* if not used */
 		if (nKey < maxkey) {
-		  nKey++ ; 
+		  nKey++ ;
 		  roman[nKey].roma = allocs(def[p].roma);
 		  roman[nKey].kana = allocs(def[p].kana);
 		  roman[nKey].temp = allocs(def[p].intr);
@@ -378,7 +378,7 @@ main(argc, argv)
     free((char *)roman);
     fatal(gettxt("cannacmd:29", "Romaji dictionary is not produced."), 0);
   }
-  qsort((char *)roman, nKey, sizeof(struct roman), 
+  qsort((char *)roman, nKey, sizeof(struct roman),
         (int (*) pro((const void *, const void *)))compar);
   if (!flag_large) {
     putchar('K'); putchar('P');
@@ -427,7 +427,7 @@ main(argc, argv)
   freeallocs(roman, nKey);
   free((char *)roman);
   fprintf(stderr, gettxt("cannacmd:30", "SIZE %d KEYS %d\n"), size, nKey);
-  if (werr == 1 ) 
+  if (werr == 1 )
     fprintf(stderr,gettxt("cannacmd:31",
 	  "warning: Option -m is specified for new dictionary format.\n")) ;
   exit(0);
@@ -436,9 +436,9 @@ main(argc, argv)
 /* sub */
 int
 chk_dflt(c) int c ; {
-    int  i,n ; 
+    int  i,n ;
     char cc = (char)c;
-    n = sizeof(def) / sizeof(struct def_tbl) ; 
+    n = sizeof(def) / sizeof(struct def_tbl) ;
     for (i=0; i < n ; i++) {
 	if (cc == def[i].intr[0]) {
 	    return(i+1) ;
@@ -446,5 +446,3 @@ chk_dflt(c) int c ; {
     }
     return(0);
 }
-
-

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -29,7 +29,7 @@ static char rcsid[]="@(#) 112.1 $Id: wtoc.c,v 1.2.2.2 2003/12/27 17:15:23 aida_s
 #include	<stdio.h>
 #include        <ctype.h>
 #include	<unistd.h>
-#include "ccompat.h"
+#include "canna/ccompat.h"
 
 #if defined(__STDC__) || defined(SVR4)
 #include <locale.h>
@@ -83,7 +83,7 @@ char *salloc(s)
      char *s;
 {
   char *new;
-  
+
   if ((new = (char *)malloc(strlen( s ) + 1)) != NULL)
     strcpy(new, s);
   else{
@@ -97,11 +97,11 @@ char *salloc(s)
 char *chghinshi( hinshi, taiou, fshurui )
      char   *hinshi;
      struct hin   *taiou;
-     int    fshurui;  
+     int    fshurui;
 {
   int   shurui;
   int   i;
-  
+
   shurui = sizeof(table)/sizeof(struct hin);
   for( i = 0 ; i < shurui ; i++) {
     if( !strcmp( hinshi , table[i].wnn ) )
@@ -123,7 +123,7 @@ int read_hinshi( fp, taiou )
   int     shurui;
   char    H[MAXTANGO];
   char    wnn[MAXTANGO],iroha[MAXTANGO];
-  
+
   shurui = 0;
   while( fgets( H, MAXTANGO, fp ) ){
     if( 2 != sscanf( H, "%s %s", wnn, iroha ) )
@@ -135,7 +135,7 @@ int read_hinshi( fp, taiou )
     }
   }
   return ( shurui );
-} 
+}
 
 /* 出力 */
 wtoi_write( fp, yomi, hinshi, kouho, hindo )
@@ -167,18 +167,18 @@ int suuji(kazu)
 
 main(argc,argv)
      int  argc;
-     char *argv[]; 
+     char *argv[];
 {
   struct hin taiou[MAXHINSHI];
   uchar	S[MAXTANGO],y[MAXTANGO], h[MAXTANGO], k[MAXTANGO],nd[10];
   int	d,option,fshurui = (int)0xdeadbeef; /* for gcc */
   FILE	*fph,*fpi,*fpo;
-  
+
 #if defined(__STDC__) || defined(SVR4)
-  (void)setlocale(LC_ALL,""); 
-#endif 
+  (void)setlocale(LC_ALL,"");
+#endif
   option = 0;
-  if( argc <= 5 ) { /* 引数は正当か？ */ 
+  if( argc <= 5 ) { /* 引数は正当か？ */
     if( argc > 2 && !strcmp(argv[1],"-f") ) { /* 品詞ファイルを読み込むか？ */
       if( (fph = fopen( argv[2], "r" ) ) == NULL) { /* 品詞ファイルをｏｐｅｎ */
 	fprintf(stderr,gettxt("cannacmd:49", "%s: cannot open %s\n"), argv[0], argv[2] );
@@ -210,16 +210,16 @@ main(argc,argv)
       }
     }
   }
-  
+
   /* 主処理 */
   while( fgets( (char *)S, sizeof(S), fpi ) ) {
     if( 4 >  sscanf( (char *)S, "%s %s %s %s", y, k, h, nd ) )
       continue;
-    else      
+    else
       d = suuji(nd);
       wtoi_write( fpo, y, chghinshi( h, taiou, fshurui ), k, d );
-  } 
-  
+  }
+
   fclose( fpi );
   fclose( fpo );
   exit( 0 );

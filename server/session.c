@@ -1,4 +1,4 @@
-/* The Author and Contributors:
+/* The Authors:
  *   Copyright (c) 2002-2004 Canna Project.
  *   Copyright (c) 1990-1997 NEC Corporation, Tokyo, Japan.
  *
@@ -7,15 +7,15 @@
  * fee, provided that the above copyright notice appear in all copies
  * and that both that copyright notice and this permission notice
  * appear in supporting documentation, and that the name of the
- * author and contributors not be used in advertising or publicity
+ * authors and contributors not be used in advertising or publicity
  * pertaining to distribution of the software without specific, written
- * prior permission.  The author and contributors makes no representations
+ * prior permission.  The authors and contributors make no representations
  * about the suitability of this software for any purpose.  It is
  * provided "as is" without express or implied warranty.
  *
- * THE AUTHOR AND CONTRIBUTORS DISCLAIMS ALL WARRANTIES WITH REGARD TO
+ * THE AUTHORS AND CONTRIBUTORS DISCLAIMS ALL WARRANTIES WITH REGARD TO
  * THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS, IN NO EVENT SHALL THE AUTHOR AND CONTRIBUTORS BE LIABLE FOR
+ * FITNESS, IN NO EVENT SHALL THE AUTHORS AND CONTRIBUTORS BE LIABLE FOR
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN

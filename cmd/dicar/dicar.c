@@ -34,7 +34,7 @@ static char rcsid[]="@(#) 102.1 $Id: dicar.c,v 1.4.2.2 2003/12/27 17:15:22 aida_
  *
  */
 
-#include "RKintern.h"
+#include "RK/RKintern.h"
 
 #include <stdio.h>
 #include <time.h>		/* 時間をとってくるため */

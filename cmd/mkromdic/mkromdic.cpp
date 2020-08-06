@@ -22,7 +22,7 @@ XCOMM PERFORMANCE OF THIS SOFTWARE.
 XCOMM
 XCOMM $Id: mkromdic.cpp,v 1.2 2003/06/28 19:36:48 aida_s Exp $
 
-#include "cannaconf.h"
+#include "config.h"
 
 PATH=CANNABINDIR:$PATH:/bin:/usr/bin:/etc:/usr/etc:/usr/nec/bin:/usr/ucb
 export PATH

@@ -21,7 +21,7 @@ XCOMM OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 XCOMM PERFORMANCE OF THIS SOFTWARE. 
 
 XCOMM $Id: mkbindic.cpp,v 1.6 2003/08/24 09:40:27 aida_s Exp $
-#include "cannaconf.h"
+#include "config.h"
 #if defined(SYSV) || defined(SVR4)
 # ifdef nec_ews
 PATH=CANNABINDIR:/bin:/usr/bin:/etc:/usr/etc:/usr/ucb:/usr/nec/bin:$PATH;

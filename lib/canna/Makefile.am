@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libcanna16.la
 
 # current:revision:age
 # => *.so.(current-age).age.revision
-libcanna16_la_LDFLAGS = -version-info 2:1:0
+libcanna16_la_LDFLAGS = -version-info 2:0:0
 libcanna16_la_SOURCES = lisp.c defaultmap.c \
     bushu.c chikuji.c commondata.c empty.c henkan.c hex.c \
     ichiran.c jishu.c kctrl.c keydef.c \
