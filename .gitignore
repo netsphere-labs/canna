@@ -1,0 +1,15 @@
+
+Makefile
+
+*~
+*.bak
+
+
+# autoconf
+accanna.h
+config.log
+config.status
+pubconf.h
+
+*.o
+cwenv.sh
