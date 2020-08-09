@@ -1,0 +1,2 @@
+
+SUBDIRS = pubdic grammar words

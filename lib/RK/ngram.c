@@ -425,6 +425,25 @@ skip_until_space(const cannawc* src, const cannawc** next)
   return len;
 }
 
+
+#ifndef NDEBUG
+static char* buf[1000];
+static char* dump_wcs(const cannawc* src)
+{
+    cannawc wc;
+    char* q = buf;
+    while (wc = *src++) {
+        if (wc >= 0x7f)
+            q += sprintf(q, "\\x%x", wc);
+        else
+            *q++ = (wc & 0xff);
+    }
+    *q = '\0';
+    return buf;
+}
+#endif // !NDEBUG
+
+// @return If failed, 0
 static int
 wstowrec(struct RkKxGram* gram, const cannawc* src, Wrec* dst, unsigned maxdst,
          unsigned* yomilen, unsigned* wlen, unsigned long* lucks)
@@ -432,65 +451,76 @@ wstowrec(struct RkKxGram* gram, const cannawc* src, Wrec* dst, unsigned maxdst,
     Wrec		*odst = dst;
     const cannawc *yomi;
     const cannawc *kanji;
-  int		klen, ylen, ncand, row = 0, step = 0, spec = 0;
-  unsigned	frq;
+    int		klen, ylen, ncand, row = 0, step = 0, spec = 0;
+    unsigned	frq;
 
-  lucks[0] = lucks[1] = 0L;
-  ncand = 0;
-  *yomilen = *wlen = 0;
+    lucks[0] = lucks[1] = 0L;
+    ncand = 0;
+    *yomilen = *wlen = 0;
     yomi = skip_space(src);
-  ylen = skip_until_space(yomi, &src);
-  if (!ylen || ylen > RK_KEY_WMAX)
-    return(0);
-  while (*src) {
-    if (*src == (Wchar)'\n')
-      break;
-    if (*(src = skip_space(src)) == (Wchar)'#') {
-      src = RkParseGramNum(gram, src, &row);
-      if (!is_row_num(gram, row))
-	return(0);
-      if (*src == (Wchar)'#')
-	continue;
-      if (*src == (Wchar)'*') {
-	for (src++, frq = 0; (Wchar)'0' <= *src && *src <= (Wchar)'9'; src++)
-	  frq = 10 * frq + *src - (Wchar)'0';
-	if (step < 2  && frq < 6000)
-	  lucks[step] = _RkGetTick(0) - frq;
-      }
-      src = skip_space(src);
-      spec++;
+    ylen = skip_until_space(yomi, &src);
+    if (!ylen || ylen > RK_KEY_WMAX) {
+        printf("error: 2-1 yomi length\n");
+        return 0;
     }
-    if (!spec)
-      return(0);
-    kanji = src;
-    klen = skip_until_space(src, &src);
-    if (klen == 1 && *kanji == (cannawc)'@') {
-      klen = ylen;
-      kanji = yomi;
-    }
-    if (!klen || klen > RK_LEN_WMAX)
-      return(0);
-    if (dst + 2 + klen * sizeof(Wchar) > odst + maxdst)
-      return(0);
-    step++;
-    *dst++ = (Wrec)(((klen << 1) & 0xfe) | ((row >> 8) & 0x01));
-    *dst++ = (Wrec)(row & 0xff);
-    for (; klen > 0 ; klen--, kanji++) {
-      if (*kanji == RK_ESC_CHAR) {
-	if (!*++kanji) {
+    while (*src) {
+        if (*src == (Wchar)'\n')
+            break;
+        if (*(src = skip_space(src)) == (Wchar)'#') {
+            src = RkParseGramNum(gram, src, &row);
+            if (!is_row_num(gram, row)) {
+                printf("error: 2-2 is_row_num()\n");
+                return 0;
+            }
+            if (*src == (Wchar)'#')
+                continue;
+            if (*src == (Wchar)'*') {
+                for (src++, frq = 0; (Wchar)'0' <= *src && *src <= (Wchar)'9'; src++)
+                    frq = 10 * frq + *src - (Wchar)'0';
+                if (step < 2  && frq < 6000)
+                    lucks[step] = _RkGetTick(0) - frq;
+            }
+            src = skip_space(src);
+            spec++;
+        }
+        if (!spec) {
+            printf("error: 2-3 spec missing: %s\n", dump_wcs(src));
             return 0;
-	}
-      }
-      *dst++ = (Wrec)((*kanji >> 8) & 0xff);
-      *dst++ = (Wrec)(*kanji & 0xff);
+        }
+        kanji = src;
+        klen = skip_until_space(src, &src);
+        if (klen == 1 && *kanji == (cannawc)'@') {
+            klen = ylen;
+            kanji = yomi;
+        }
+        if (!klen || klen > RK_LEN_WMAX) {
+            printf("error: 2-4 klen\n");
+            return 0;
+        }
+        if (dst + 2 + klen * sizeof(Wchar) > odst + maxdst) {
+            printf("error: 2-5 mem size\n");
+            return 0;
+        }
+        step++;
+        *dst++ = (Wrec)(((klen << 1) & 0xfe) | ((row >> 8) & 0x01));
+        *dst++ = (Wrec)(row & 0xff);
+        for (; klen > 0 ; klen--, kanji++) {
+            if (*kanji == RK_ESC_CHAR) {
+                if (!*++kanji) {
+                    printf("error: 2-6 kanji missing\n");
+                    return 0;
+                }
+            }
+            *dst++ = (Wrec)((*kanji >> 8) & 0xff);
+            *dst++ = (Wrec)(*kanji & 0xff);
+        }
+        ncand++;
     }
-    ncand++;
-  }
-  if (ncand) {
-    *wlen = (unsigned)(dst - odst);
-    *yomilen= ylen;
-  }
-  return ncand;
+    if (ncand) {
+        *wlen = (unsigned)(dst - odst);
+        *yomilen= ylen;
+    }
+    return ncand;
 }
 
 
@@ -573,44 +603,48 @@ fil_wrec_flag(Wrec* wrec, unsigned* wreclen, unsigned ncand, Wrec* yomi,
 }
 
 
+// @return If failed, NULL.
 Wrec *
 RkParseWrec(struct RkKxGram* gram, cannawc* src, unsigned left,
             unsigned char* dst, unsigned maxdst)
 {
-  unsigned	wreclen, wlen, ylen, nc;
-  unsigned long	lucks[2];
-  unsigned char *ret = (unsigned char *)0;
+    unsigned	wreclen, wlen, ylen, nc;
+    unsigned long	lucks[2];
+    unsigned char* ret = NULL;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  unsigned char	localbuffer[RK_WREC_BMAX];
+    unsigned char	localbuffer[RK_WREC_BMAX];
 #else
-  unsigned char	*localbuffer = (unsigned char *)malloc(RK_WREC_BMAX);
-  if (!localbuffer) {
-    return ret;
-  }
+    unsigned char	*localbuffer = (unsigned char *)malloc(RK_WREC_BMAX);
+    if (!localbuffer)
+        return NULL;
 #endif
 
-  if (left > RK_LEFT_KEY_WMAX) {
-    ; /* return NULL */
-  }
-  else if (!(nc = wstowrec(gram, src, localbuffer, RK_WREC_BMAX,
+    if (left > RK_LEFT_KEY_WMAX) {
+        printf("error: 1 large left\n");
+        ; /* return NULL */
+    }
+    else if (!(nc = wstowrec(gram, src, localbuffer, RK_WREC_BMAX,
 		      &ylen, &wlen, lucks))) {
-    ; /* return 0 */
-  }
-  else if (2 + (wreclen = 2 + (left * sizeof(Wchar)) + wlen) > maxdst) {
-    ; /* return (unsigned char *)0; */
-  }
-  else if (left > ylen) { /* wrong argument */
-    RK_ASSERT(0);
-  }
-  else {
-    dst = fil_wc2wrec_flag(dst, &wreclen, nc, src, ylen, left);
-    (void)memcpy((char *)dst, (char *)localbuffer, wlen);
-    ret = dst + wlen;
-  }
+        printf("error: 2 wstowrec()\n");
+        ; /* return 0 */
+    }
+    else if (2 + (wreclen = 2 + (left * sizeof(Wchar)) + wlen) > maxdst) {
+        printf("error: 3 mem size\n");
+        ; /* return (unsigned char *)0; */
+    }
+    else if (left > ylen) { /* wrong argument */
+        printf("error: 4 wrong argument\n");
+        RK_ASSERT(0);
+    }
+    else {
+        dst = fil_wc2wrec_flag(dst, &wreclen, nc, src, ylen, left);
+        (void)memcpy((char *)dst, (char *)localbuffer, wlen);
+        ret = dst + wlen;
+    }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free((char *)localbuffer);
+    (void)free((char *)localbuffer);
 #endif
-  return ret;
+    return ret;
 }
 
 

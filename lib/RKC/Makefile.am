@@ -8,3 +8,7 @@ libRKC16_la_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -DCPP='"$(CPP)"'
 # => *.so.(current-age).age.revision
 libRKC16_la_LDFLAGS = -version-info 2:0:0
 libRKC16_la_SOURCES = rkc.c convert.c wconvert.c ../RK/widechar.c conf.c ../RKindep/cfuncs.c ../RKindep/file.c ../RKindep/strops.c ../RK/kana.c
+
+install-exec-hook:
+	cd $(DESTDIR)$(libdir) && \
+	$(LN_S) -f libRKC16.so.2 libRKC.so.2

@@ -15,3 +15,7 @@ libcanna16_la_SOURCES = lisp.c defaultmap.c \
     engine.c RKroma.c jrbind.c ebind.c
 #libcanna_la_LIBADD = ../RK/libRK.a
 libcanna16_la_LIBADD = ../RKC/libRKC16.la
+
+install-exec-hook:
+	cd $(DESTDIR)$(libdir) && \
+	$(LN_S) -f libcanna16.so.2 libcanna.so.2

@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -28,17 +30,17 @@
 // Internal APIs
 #include "canna/sglobal.h"
 
-/* BUNMATU ¥Ş¥¯¥í¤ò define ¤¹¤ë¤È¡¢ËÌÎ¦ÀèÃ¼²Ê³Øµ»½ÑÂç³Ø±¡Âç³Ø¾ğÊó²Ê³Ø
-   ¸¦µæ²Ê¤ÎÆ£»ŞÏÂ¹¨(fujieda@jaist.ac.jp)¤µ¤ó¤¬¡¢¡Ø¤«¤ó¤Ê¡Ù¤Î¤«¤Ê´Á»úÊÑ
-   ´¹¸úÎ¨¸ş¾å¤Î¤¿¤á¤Ë¡¢1994 Åß¤ËÁÈ¤ß¹ş¤ó¤À¡ÖÊ¸¾ÏËöµ­¹æ¡×¤¬Í­¸ú¤Ë¤Ê¤ê¤Ş
-   ¤¹¡£¤³¤ì¤Ë¤è¤êÊ¸¾ÏËö¤Ë¤·¤«¸½¤ì¤Ê¤¤Ê¸»ú¤¬Ê¸Àá¤ÎÅÓÃæ¤Ë½Ğ¤ÆÍè¤ë¤³¤È¤¬
-   ¤Ê¤¯¤Ê¤êÊÑ´¹¸úÎ¨¤¬¸ş¾å¤·¤Ş¤¹¡£¤³¤Î¥³¡¼¥É¤ò¤«¤¤¤Æ²¼¤µ¤¤¤Ş¤·¤¿Æ£»Ş¤µ
-   ¤ó¤Ë´¶¼Õ¤·¤Ş¤¹¡£ */
+/* BUNMATU ãƒã‚¯ãƒ­ã‚’ define ã™ã‚‹ã¨ã€åŒ—é™¸å…ˆç«¯ç§‘å­¦æŠ€è¡“å¤§å­¦é™¢å¤§å­¦æƒ…å ±ç§‘å­¦
+   ç ”ç©¶ç§‘ã®è—¤æå’Œå®(fujieda@jaist.ac.jp)ã•ã‚“ãŒã€ã€ã‹ã‚“ãªã€ã®ã‹ãªæ¼¢å­—å¤‰
+   æ›åŠ¹ç‡å‘ä¸Šã®ãŸã‚ã«ã€1994 å†¬ã«çµ„ã¿è¾¼ã‚“ã ã€Œæ–‡ç« æœ«è¨˜å·ã€ãŒæœ‰åŠ¹ã«ãªã‚Šã¾
+   ã™ã€‚ã“ã‚Œã«ã‚ˆã‚Šæ–‡ç« æœ«ã«ã—ã‹ç¾ã‚Œãªã„æ–‡å­—ãŒæ–‡ç¯€ã®é€”ä¸­ã«å‡ºã¦æ¥ã‚‹ã“ã¨ãŒ
+   ãªããªã‚Šå¤‰æ›åŠ¹ç‡ãŒå‘ä¸Šã—ã¾ã™ã€‚ã“ã®ã‚³ãƒ¼ãƒ‰ã‚’ã‹ã„ã¦ä¸‹ã•ã„ã¾ã—ãŸè—¤æã•
+   ã‚“ã«æ„Ÿè¬ã—ã¾ã™ã€‚ */
 #define BUNMATU
 
 
 #define LOGIC_HACK
-/* Æ£»Ş¡÷£Ê£Á£É£Ó£Ô¤Î¥Ï¥Ã¥¯¤òÍ­¸ú¤Ë¤¹¤ë */
+/* è—¤æï¼ ï¼ªï¼¡ï¼©ï¼³ï¼´ã®ãƒãƒƒã‚¯ã‚’æœ‰åŠ¹ã«ã™ã‚‹ */
 
 #define EXTENSION_NEW
 
@@ -230,11 +232,11 @@ typedef union _rkunion {
 
 #define RkNumber(ary) (sizeof(ary)/sizeof(ary[0]))
 
-#define rk_isdigit  isdigit
-#define rk_isascii  isascii
-#define rk_isspace  isspace
+inline int rk_isdigit(cannawc c) { return c <= 0xff ? isdigit(c) : 0; }
+inline int rk_isascii(cannawc c) { return c <= 0xff ? isascii(c) : 0; }
+inline int rk_isspace(cannawc c) { return c <= 0xff ? isspace(c) : 0; }
 
-/* WARNING: ¤³¤ì¤òÊÂ¤ÙÊÑ¤¨¤ë¤È¤­¤ÏHdrtag¤ËÃí°Õ¤¹¤ë¤³¤È! */
+/* WARNING: ã“ã‚Œã‚’ä¸¦ã¹å¤‰ãˆã‚‹ã¨ãã¯Hdrtagã«æ³¨æ„ã™ã‚‹ã“ã¨! */
 enum {
   /* These must be first 5 tags in this order for new (>=300702L) dic */
   HD_MAG, /* mandatory */
@@ -582,7 +584,7 @@ struct nread {
   int		nk;
 };
 
-/* nword - Ê¸Àá²òÀÏ·ë²Ì
+/* nword - æ–‡ç¯€è§£æçµæœ
  * 	jisho kara no tango yomidasi kekka
  * nword ha, jisho kara search sareta tango record wo kirokusi,
  * bunsetsu kaiseki ni yori sakusei sareru bunsetsu tree wo hyougen suru.
@@ -599,14 +601,14 @@ struct nword {
     unsigned long   nw_csn;
     unsigned char	nw_count;	/* setsuzoku suu */
 
-    /* º¸¤Ë·Ò¤¬¤ë (?) word.
-       nw_next ¤½¤ì¤¾¤ì¤Ë¤Ä¤¤¤Æ, ¤µ¤é¤Ë¥ê¥¹¥È¤Ë¤Ê¤Ã¤Æ¤¤¤ë. ½ªÃ¼¤Ï NULL.
+    /* å·¦ã«ç¹‹ãŒã‚‹ (?) word.
+       nw_next ãã‚Œãã‚Œã«ã¤ã„ã¦, ã•ã‚‰ã«ãƒªã‚¹ãƒˆã«ãªã£ã¦ã„ã‚‹. çµ‚ç«¯ã¯ NULL.
        See util.c: showWord(). */
     struct nword	*nw_left;
 
-    /* Æ±¤¸ nw_len (?) ¤ò»ı¤Ä¥ê¥¹¥È. ½ªÃ¼¤Ï NULL.
-       ¤³¤Á¤é¤¬³°Â¦¤Î¥ê¥¹¥È¹½Â¤¡£¤³¤Î¤Ê¤«¤Ç¡¢¤µ¤é¤Ë, nw_left ¤¬¥ê¥¹¥È¹½Â¤¤Ë¤Ê¤Ã
-       ¤Æ¤¤¤ë*/
+    /* åŒã˜ nw_len (?) ã‚’æŒã¤ãƒªã‚¹ãƒˆ. çµ‚ç«¯ã¯ NULL.
+       ã“ã¡ã‚‰ãŒå¤–å´ã®ãƒªã‚¹ãƒˆæ§‹é€ ã€‚ã“ã®ãªã‹ã§ã€ã•ã‚‰ã«, nw_left ãŒãƒªã‚¹ãƒˆæ§‹é€ ã«ãªã£
+       ã¦ã„ã‚‹*/
     struct nword	*nw_next;
 
     unsigned char	*nw_kanji;	/* kanji kouho ichi/douteki na kouho */
@@ -827,10 +829,10 @@ struct nstore {
 #endif
     unsigned		nyomi;		/* number of yomigana chars */
     unsigned		maxyomi;	/* maximum number of yomigana chars */
-    struct nbun		*bunq;		/* Ê¸Àá¥­¥å¡¼ */
+    struct nbun		*bunq;		/* æ–‡ç¯€ã‚­ãƒ¥ãƒ¼ */
     unsigned		maxbunq;	/* saidai bunnsetu suu */
     unsigned		maxbun;		/* saidai bunsetsu suu */
-    int			curbun;		/* ¥«¥ì¥ó¥ÈÊ¸Àá */
+    int			curbun;		/* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ */
     int			maxxq;		/* saidai queue == bunsetu moji suu */
     struct nqueue	*xq;		/* henkan queue */
     struct nword	**xqh;		/* used in _RkparseBun() */
@@ -1081,7 +1083,7 @@ unsigned long _RkGetOffset(struct ND* dic, unsigned char* pos);
 /* lang dep part */
 #define IS_WC_G1_HYPHEN(wc)	((wc) == 0xa1bc)
 #define IS_HYPHEN(wc)		(IS_WC_G1_HYPHEN(wc) || ((wc) == '-'))
-/* space ¤â¸õÊä¤È¤·¤Æ»È¤¤¤¿¤¤¤¬º£¤Î½ê¤Ï space */
+/* space ã‚‚å€™è£œã¨ã—ã¦ä½¿ã„ãŸã„ãŒä»Šã®æ‰€ã¯ space */
 #define IS_DIC_PUNCT(euc)	isspace(euc)
 
 // dd.c
@@ -1161,11 +1163,11 @@ void _RkRehashCache( struct ncache* cache, long addr );
 /*
  * RK_CAND_WMAX <= RK_LEN_WMAX
  */
-/* ¸õÊä¿ô */
+/* å€™è£œæ•° */
 #define	NW_MAXCAND	0x07	/* 7 */
 #define	EX_NW_MAXCAND	0xfff	/* 4096 */
 
-/* ¸õÊäÄ¹ */
+/* å€™è£œé•· */
 #define	NW_MAXCANDLEN	0x7f
 #define RK_CAND_WMAX	0x7f
 #define RK_CAND_NMAX    0xfff /* 4095 */
@@ -1187,7 +1189,7 @@ void _RkRehashCache( struct ncache* cache, long addr );
 #define	RK_WREC_BMAX	EX_NW_MAXWREC
 #define	RK_MAX_TEXT_LEN	MAX_WREC_BMAX
 
-#define	RK_CONC_NMAX	16	/* ÀÜÂ³¤¹¤ëÉÕÂ°¸ì¤Î¿ô(¸ú¤¤¤Æ¤ë¤Î¤«¤Ê¡©) */
+#define	RK_CONC_NMAX	16	/* æ¥ç¶šã™ã‚‹ä»˜å±èªã®æ•°(åŠ¹ã„ã¦ã‚‹ã®ã‹ãªï¼Ÿ) */
 
 #define RK_OLD_MAX_HDRSIZ	1024
 

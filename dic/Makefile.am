@@ -1,1 +1,3 @@
 
+SUBDIRS = ideo phono
+

@@ -1,3 +1,3 @@
 
-SUBDIRS = canna dic doc lib misc server cmd 
+SUBDIRS = canna lib cmd dic doc misc server 
 
