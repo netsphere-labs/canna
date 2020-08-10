@@ -1,7 +1,6 @@
 
 #include "RKintern.h"
 #include <assert.h>
-#include "canna/sglobal.h"
 
 static int min(int a, int b) { return a <= b ? a : b; }
 

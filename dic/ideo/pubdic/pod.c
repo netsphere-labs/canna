@@ -21,7 +21,9 @@
  */
 
 #include <stdio.h>
-#include "ccompat.h"
+#include "RK/RKintern.h" // Internal APIs
+#include "canna/ccompat.h"
+#include "canna/canna.h"
 
 RCSID("$Id: pod.c,v 1.3.6.1 2004/05/04 22:04:43 aida_s Exp $");
 
@@ -65,17 +67,6 @@ static int hinshi_direction = INORDER; /* see above */
 # define WCG3 0x8000
 # define WCMSK 0x8080
 
-// lib/canna/util.c ¤ÈÅý¹ç
-//size_t
-//CANNA_mbstowcs(cannawc* d, const char* ss, size_t n)
-
-// lib/canna/util.c ¤ÈÅý¹ç
-//int
-//Wcstombs(d, s, n)
-//char *d;
-//Wchar *s;
-//int n;
-
 #define Wscmp WStrcmp
 #define Wscpy WStrcpy
 #define Wslen WStrlen
@@ -101,7 +92,7 @@ FILE *f;
 {
   char buf[READBUFSIZE];
 
-  if (Wcstombs(buf, s, READBUFSIZE)) {
+  if (WCstombs(buf, s, READBUFSIZE)) {
     (void)fputs(buf, f);
   }
 }
@@ -116,7 +107,7 @@ FILE *f;
 
   p = fgets(mbuf, READBUFSIZE, f);
   if (p) {
-    if (Mbstowcs(buf, mbuf, siz)) {
+    if (MBstowcs(buf, mbuf, siz)) {
       return buf;
     }
   }
@@ -132,9 +123,9 @@ Wchar *s;
   static Wchar xa = 0, xke, aa, *p;
 
   if (!xa) {
-    (void)Mbstowcs(&xa,  "\045\041", 1);
-    (void)Mbstowcs(&xke, "\045\166", 1);
-    (void)Mbstowcs(&aa,  "\041\074", 1);
+    (void)MBstowcs(&xa,  "\045\041", 1);
+    (void)MBstowcs(&xke, "\045\166", 1);
+    (void)MBstowcs(&aa,  "\041\074", 1);
   }
 
   for (p = s ; *p ; p++) {
@@ -649,7 +640,7 @@ long kind, flags;
       char foo[64];
 
       (void)fprintf(stderr, "no description rule for ");
-      (void)Wcstombs(foo, dhinshi, 64);
+      (void)WCstombs(foo, dhinshi, 64);
       (void)fprintf(stderr, "%s.\n", foo);
     }
   }
@@ -1169,7 +1160,7 @@ char *argv[];
 	{
 	  Wchar buf[READBUFSIZE];
 
-	  (void)Mbstowcs(buf, argv[i + 1], READBUFSIZE);
+	  (void)MBstowcs(buf, argv[i + 1], READBUFSIZE);
 	  specific_kind |= internkind(buf);
 	}
 	shrinkargs(argv + i, 2, argc - i); argc -= 2;

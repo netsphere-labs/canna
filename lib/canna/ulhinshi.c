@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -202,15 +202,14 @@ wchar_t *to_buf, *x1, *x2, *from_buf;
 }
 #endif /* NO_EXTEND_MENU */
 
-void
-EWStrcat(buf, xxxx)
-wchar_t *buf;
-char *xxxx;
-{
-  wchar_t x[1024];
 
-  MBstowcs(x, xxxx, 1024);
-  WStrcat(buf, x);
+void
+EWStrcat(cannawc* buf, const char* xxxx)
+{
+    cannawc x[1024];
+
+    MBstowcs(x, xxxx, 1024);
+    WStrcat(buf, x);
 }
 
 #ifndef NO_EXTEND_MENU
@@ -277,7 +276,7 @@ mode_context env;
 /* ARGSUSED */
 {
   popCallback(d);
-  
+
   return(dicTourokuHinshi(d));
 }
 
@@ -347,7 +346,7 @@ mode_context env;
 {
   tourokuContext tc;
   coreContext ync;
-  
+
   popCallback(d); /* yesNo をポップ */
 
   tourokuYes(d);   /* 品詞が決まれば tc->hcode にセットする */
@@ -396,7 +395,7 @@ mode_context env;
     if((retval = getYesNoContext(d,
 		 NO_CALLBACK, uuTHinshi2YesCatch,
 		 uuTHinshiYNQuitCatch, uuTHinshi2NoCatch)) == NG) {
-      defineEnd(d); 
+      defineEnd(d);
       return(GLineNGReturnTK(d));
     }
     ync = (coreContext)d->modec;
@@ -503,7 +502,7 @@ uiContext	d;
 
 /*
  * 選択された品詞から次の動作を行う
- * 
+ *
  * tc->hcode	品詞
  * tc->qbuf	質問
  * tc->genbuf	エラー
@@ -534,7 +533,7 @@ uiContext	d;
     EWStrcpy(tc->hcode, "#KK");
     WSprintf(tc->qbuf, message[5], message[8], tc->tango_buffer);
     break;
-    
+
   case DOSHI:
 
     /* 入力が終止形か？ */
@@ -561,7 +560,7 @@ uiContext	d;
     if (tc->katsuyou == RAGYOU) {
       tc->curHinshi = RAGYODOSHI;
       /* 未然形をつくる */
-      WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);  
+      WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);
       tmpbuf[tlen - 1] = gyouA[tc->katsuyou];
       tmpbuf[tlen] = (wchar_t)0;
       WSprintf(tc->qbuf, message[5], message[10], tmpbuf);
@@ -586,7 +585,7 @@ uiContext	d;
     }
 
     EWStrcpy(tc->hcode, "#KY"); /* 詳細の品詞を必要としない場合 */
-    WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);  
+    WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);
     tmpbuf[tlen-1] = 0;
     WSprintf(tc->qbuf, message[5], message[11], tmpbuf);
     break;
@@ -601,8 +600,8 @@ uiContext	d;
       return(0);
     }
     EWStrcpy(tc->hcode, "#T05"); /* 詳細の品詞を必要としない場合 */
-    WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);  
-    tmpbuf[tlen-1] = 0;  
+    WStrncpy(tmpbuf, tc->tango_buffer, tlen-1);
+    tmpbuf[tlen-1] = 0;
     WSprintf(tc->qbuf, message[5], message[6], tmpbuf);
     break;
 
@@ -653,7 +652,7 @@ uiContext	d;
     break;
 
   case KEIYODOSHIY:
-  case KEIYODOSHIN: 
+  case KEIYODOSHIN:
     WStrncpy(tmpbuf, tc->tango_buffer, tlen - 1);
     tmpbuf[tlen - 1] = 0;
     WSprintf(tc->qbuf, message[5], message[11], tmpbuf);
@@ -892,7 +891,7 @@ uiContext	d;
       EWStrcpy( tc->hcode, "#W5" );     /* 言う */
       break;
     }
-}    
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 辞書の一覧                                                                *
@@ -972,13 +971,13 @@ int (*quitfunc)();
 
   fc->curIkouho = 0;
   if (!cannaconf.HexkeySelect)
-    inhibit |= ((unsigned char)NUMBERING | (unsigned char)CHARINSERT); 
+    inhibit |= ((unsigned char)NUMBERING | (unsigned char)CHARINSERT);
   else
     inhibit |= (unsigned char)CHARINSERT;
 
    if((retval = selectOne(d, fc->allkouho, &fc->curIkouho, upnelem,
 		 BANGOMAX, inhibit, 0, WITHOUT_LIST_CALLBACK,
-		 NO_CALLBACK, exitfunc, quitfunc, uiUtilIchiranTooSmall)) 
+		 NO_CALLBACK, exitfunc, quitfunc, uiUtilIchiranTooSmall))
                  == NG) {
     if(fc->allkouho)
       free(fc->allkouho);
