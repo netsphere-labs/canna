@@ -6,24 +6,6 @@
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
-override_dh_auto_clean:
-	[ ! -f Makefile ] || $(MAKE) clean
-	[ ! -f Makefile ] || $(MAKE) distclean
-	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex clean
-	[ ! -f doc/man/guide/tex/Makefile ] || $(MAKE) -C doc/man/guide/tex distclean
-	# remove created symlinks
-	rm -f doc/intern/canna.sty doc/lisp/canna.sty \
-		doc/man/guide/tex/canna.sty doc/misc/canna.sty 
-	# remove generated files 
-	rm -f configure canuum/configure canuum/config.h.in Canna.conf accanna.h.in
-	rm -fr $(CURDIR)/debian/tmpDefCannaSrvDir
-	# restore autotools helper files
-	for i in $(CURDIR)/canuum/config.guess $(CURDIR)/canuum/config.sub; do \
-		[ -e $$i.dh-orig ] || continue; \
-		mv -f $$i.dh-orig $$i; \
-	done
-	dh_auto_clean
-
 override_dh_auto_build:
 	dh_testdir
 	dh_auto_clean
