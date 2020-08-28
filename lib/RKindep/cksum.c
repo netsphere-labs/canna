@@ -46,7 +46,12 @@ static char sccsid[] = "@(#)crc.c	8.1 (Berkeley) 6/17/93";
 
 #include <sys/types.h>
 #include <stdint.h>
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+#else
+  typedef unsigned char u_char;
+#endif
+
 
 //#include "extern.h"
 
@@ -105,6 +110,7 @@ static const uint32_t crctab[] = {
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
+#if 0
 /*
  * Compute a POSIX 1003.2 checksum.  This routine has been broken out so that
  * other programs can use it.  It takes a file descriptor to read from and
@@ -144,8 +150,9 @@ crc(int fd, uint32_t *cval, off_t *clen)
 
 	*cval = ~lcrc;
 	crc_total = ~crc_total;
-	return (0);
+	return 0;
 }
+#endif
 
 
 /////////////////////////////////////////////////////////

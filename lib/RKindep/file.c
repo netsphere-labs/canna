@@ -1,3 +1,5 @@
+﻿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright (c) 2003 Canna Project. All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -29,12 +31,18 @@
 #include "canna/net.h"
 #include <stdio.h>
 #include <assert.h>
+#ifdef _WIN32
+  #include <winsock2.h>
+  #include <ws2tcpip.h>
+#endif
 
 RCSID("$Id: file.c,v 1.3 2003/09/24 14:50:40 aida_s Exp $");
 
+// lib/RKC/wconvert.c:try_connect() から呼び出される.
+// @return If error, -1
 int
-RkiConnect(int fd, struct sockaddr* addrp, size_t len,
-           const struct timeval* timeout)
+RkiConnect( SOCKET fd, struct sockaddr* addrp, size_t len,
+            const struct timeval* timeout)
 {
     int flags;
     int res = -1, r;
@@ -42,9 +50,16 @@ RkiConnect(int fd, struct sockaddr* addrp, size_t len,
   struct timeval tval = *timeout;
   rki_fd_set wfds;
 
-  flags = fcntl(fd, F_GETFL, 0);
-  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK))
-    return -1;
+#ifndef _WIN32
+    flags = fcntl(fd, F_GETFL, 0);
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK))
+        return -1;
+#else
+    u_long iMode = 1; // non-blocking
+    int iResult = ioctlsocket( fd, FIONBIO, &iMode);
+    if ( iResult != NO_ERROR )
+        return -1;
+#endif
 
   if (!connect(fd, addrp, len)) {
     res = 0; /* succeeded at once */
@@ -66,7 +81,9 @@ RkiConnect(int fd, struct sockaddr* addrp, size_t len,
     res = 0;
 
 finish:
-  fcntl(fd, F_SETFL, flags);
+#ifndef _WIN32
+    fcntl(fd, F_SETFL, flags);
+#endif
   return res;
 }
 
@@ -77,7 +94,7 @@ finish:
  *   ferror() != 0: some error happened in stdio
  *   !feof() && !ferror(): out-of-memory (errno == ENOMEM)
  */
-/* stdio��feof()�Υ��ޥ�ƥ������Ϥɤ��عԤäƤⶦ�̤ʤΤ��������� */
+/* stdioのfeof()のセマンティクスはどこへ行っても共通なのだろうか？ */
 char *
 RkiGetLine(FILE* fp)
 {

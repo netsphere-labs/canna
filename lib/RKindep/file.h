@@ -30,14 +30,19 @@
 #endif
 
 /* NFD and FD_SET macros are based on canuum/wnn_os.h */
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+  #include <sys/select.h>
+  #include <sys/socket.h>
+#else
+  #include <winsock2.h>
+  #define fd_set FD_SET
+#endif // !_WIN32
 #include <sys/types.h>
-#include <sys/select.h>
 #include <limits.h>
 #ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
-#include <sys/socket.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -73,7 +78,7 @@ typedef fd_set rki_fd_set;
 extern "C" {
 #endif
 
-extern int RkiConnect pro((int fd, struct sockaddr *addrp, size_t len,
+extern int RkiConnect pro((SOCKET fd, struct sockaddr *addrp, size_t len,
       const struct timeval *timeout));
 extern char *RkiGetLine pro((FILE *src));
 extern void *RkiReadWholeFile pro((FILE *src, size_t *retsize));

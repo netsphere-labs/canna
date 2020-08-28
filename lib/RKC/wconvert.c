@@ -114,7 +114,7 @@ DoSomething( int sig)
 
 
 static int
-try_connect( int fd, struct sockaddr* addrp, size_t len )
+try_connect( SOCKET fd, struct sockaddr* addrp, size_t len )
 {
     struct timeval timeout;
     if( !ServerTimeout )
@@ -230,9 +230,8 @@ connect_stream_pipe( int number )
 #endif /* STREAMCONN */
 
 
-#ifdef INET6
 static int
-connect_inet( char* hostname, int number )
+connect_inet( const char* hostname, int number )
 {
     struct addrinfo hints, *infolist, *info;
     struct servent *sp ;
@@ -268,70 +267,7 @@ connect_inet( char* hostname, int number )
     freeaddrinfo( infolist );
     return( -1 );
 }
-#else /* !INET6 */
-static int
-connect_inet( char* hostname, int number )
-{
-    struct sockaddr_in inaddr;	    /* INET socket address. */
-    canna_in_addr_t hostinetaddr;   /* result of inet_addr of arpa addr */
-    struct hostent *host_ptr, workhostbuf ;
-    struct servent *sp ;
-    int addrlen ;
-    char *h_addr_ptr;
 
-    /* インターネットドメインで接続する。 */
-    if( (host_ptr = gethostbyname( hostname ) )
-	                                 == (struct hostent *)NULL) {
-	hostinetaddr = inet_addr( hostname );
-	if( hostinetaddr == (canna_in_addr_t)-1 ) {
-	    /* インターネットアドレス表記が間違っている */
-	    errno = EINVAL;
-	    return( -1 );
-	}
-
-	if( !(host_ptr = gethostbyaddr( (char *)&hostinetaddr,
-				 sizeof( hostinetaddr ), AF_INET )) ) {
-	    host_ptr = &workhostbuf ;
-	    host_ptr->h_addrtype = AF_INET ;
-# ifdef HAVE_STRUCT_HOSTENT_H_ADDR_LIST
-	    host_ptr->h_addr_list = &h_addr_ptr;
-#else
-	    host_ptr->h_addr = (char *)&hostinetaddr ;
-# endif
-	    host_ptr->h_length = sizeof( hostinetaddr ) ;
-	}
-    } else {
-	/* アドレスタイプをチェックする */
-	if (host_ptr->h_addrtype != AF_INET) {
-	    /* Not an Internet host! */
-	    errno = EPROTOTYPE;
-	    return( -1 );
-	}
-    }
-
-    if( (ServerFD = socket( AF_INET, SOCK_STREAM, 0 )) < 0 )
-	return( -1 ) ;
-
-    errno = 0;
-    /* /etc/servicesからポート番号を取得する */
-    sp = getservbyname( IR_SERVICE_NAME, "tcp");
-    /* データセット */
-    inaddr.sin_family = host_ptr->h_addrtype;
-    inaddr.sin_port = (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + number;
-    inaddr.sin_port = htons(inaddr.sin_port);
-    bcopy( host_ptr->h_addr, &inaddr.sin_addr, sizeof(inaddr.sin_addr) ) ;
-    addrlen = sizeof( struct sockaddr_in ) ;
-    errno = 0 ;
-    if ( try_connect( ServerFD, (struct sockaddr *)&inaddr, addrlen ) < 0 ) {
-#ifdef nodef
-	perror("connect") ;
-#endif
-	close( ServerFD ) ;
-	return( -1 ) ;
-    }
-    return( ServerFD ) ;
-}
-#endif /* !INET6 */
 
 #define MAX_LIST	128
 
@@ -414,15 +350,15 @@ rkc_build_cannaserver_list( char** list )
 
 /* 引数に NULL ポインタを渡してはいけません。*/
 /* それどころか、十分おおきな配列を渡さなければならないのだ */
-rkc_Connect_Iroha_Server( char* hostname )
+int rkc_Connect_Iroha_Server( char* hostname )
 {
     char *serverlist[ MAX_LIST ], **listp ;
     int num ;
     char *number ;
 #ifdef UNIXCONN
-    char *localhost = "unix";
+    const char* localhost = "unix";
 #else
-    char *localhost = "localhost";
+    const char* localhost = "localhost";
 #endif
 
     listp = serverlist ;
