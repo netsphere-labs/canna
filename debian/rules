@@ -65,7 +65,7 @@ override_dh_install:
 		$(CURDIR)/debian/manpages/canlisp.1 \
 		$(CURDIR)/debian/manpages/forsort.1 \
 		$(CURDIR)/debian/manpages/mergeword.1
-	dh_installman -pcanna-utils $(CURDIR)/debian/manpages/chkconc.1 
+	dh_installman -pcanna-utils $(CURDIR)/debian/manpages/chkconc.1
 
 %:
 	dh $@
