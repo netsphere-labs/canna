@@ -570,7 +570,7 @@ struct ncache	{
     struct DM		*nc_dic;	/* yomikomareta jisho */
     unsigned short	nc_flags;
     unsigned long	nc_count;	/* word karano sanshou dosuu */
-    long		nc_address;	/* word record no file address */
+    intptr_t		nc_address;	/* word record no file address */
 };
 /* flags */
 #define	NC_DIRTY	1	/* word no naiyou ga henkou sareta */
@@ -1002,8 +1002,11 @@ void RkCloseGram(struct RkKxGram* gram);
 
 int _RkInitializeCache( int size );
 void _RkFinalizeCache();
-struct ncache* _RkFindCache( struct DM* dm, long addr );
-struct ncache* _RkReadCache( struct DM* dm, long addr );
+
+struct ncache* _RkFindCache( struct DM* dm, void* addr );
+
+struct ncache* _RkReadCache( struct DM* dm, void* addr );
+
 void			_RkFreeCache();
 void _RkKillCache(struct DM* dm);
 void _RkPurgeCache(struct ncache* cache);
@@ -1122,7 +1125,8 @@ char* _RkMakePath(struct DF* df);
 unsigned char		*_RkCreateHeader pro((struct HD *, size_t *size));
 int			_RkReadHeader pro((int, struct HD *, off_t));
 void			_RkClearHeader pro((struct HD *));
-void _RkRehashCache( struct ncache* cache, long addr );
+
+void _RkRehashCache( struct ncache* cache, void* addr );
 
 /*
  * limits

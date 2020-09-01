@@ -27,7 +27,7 @@ static char rcsid[]="$Id: ncache.c,v 1.2 2003/09/17 08:50:52 aida_s Exp $";
 #include	"RKintern.h"
 
 #define	NCHASH		101
-#define	hash(x)		((int)((x)%NCHASH))
+#define	hash(x)		( ((uintptr_t)(x)) % NCHASH )
 
 static struct ncache	Nchash[NCHASH];
 static struct ncache	Ncfree;
@@ -240,20 +240,21 @@ _RkDoInvalidateCache( long addr, unsigned long size)
 #endif
 
 struct ncache*
-_RkFindCache(struct DM* dm, long addr)
+_RkFindCache(struct DM* dm, void* addr)
 {
-  register struct ncache	*head, *cache;
+    register struct ncache	*head, *cache;
 
-  head = &Nchash[hash(addr)];
-  for (cache = head->nc_hnext; cache != head; cache = cache->nc_hnext)
-    if (cache->nc_dic == dm && cache->nc_address == addr)
-      return cache;
-  return (struct ncache *)0;
+    head = &Nchash[hash(addr)];
+    for (cache = head->nc_hnext; cache != head; cache = cache->nc_hnext) {
+        if (cache->nc_dic == dm && cache->nc_address == addr)
+            return cache;
+    }
+    return NULL;
 }
 
 
 void
-_RkRehashCache(struct ncache* cache, long addr)
+_RkRehashCache(struct ncache* cache, void* addr)
 {
   struct ncache	*head;
 
@@ -269,7 +270,7 @@ _RkRehashCache(struct ncache* cache, long addr)
 
 
 struct ncache*
-_RkReadCache(struct DM* dm, long addr)
+_RkReadCache(struct DM* dm, void* addr)
 {
     struct ncache	*head, *cache;
 
@@ -288,20 +289,19 @@ _RkReadCache(struct DM* dm, long addr)
       return(cache);
     };
   };
-  cache = newCache(dm, addr);
-  if (cache) {
-    if (DST_READ(dm, cache)) {
-      ainserttop(cache);
-      return (struct ncache *)0;
-    } else {
-      cache->nc_hnext = head->nc_hnext;
-      cache->nc_hprev = head;
-      head->nc_hnext->nc_hprev = cache;
-      head->nc_hnext = cache;
-      _RkEnrefCache(cache);
-      return(cache);
-    };
-  } else {
-    return (struct ncache *)0;
-  };
+
+    cache = newCache(dm, addr);
+    if (cache) {
+        if (DST_READ(dm, cache)) {
+            ainserttop(cache);
+            return NULL;
+        }
+        cache->nc_hnext = head->nc_hnext;
+        cache->nc_hprev = head;
+        head->nc_hnext->nc_hprev = cache;
+        head->nc_hnext = cache;
+        _RkEnrefCache(cache);
+        return cache;
+    }
+    return NULL;
 }
