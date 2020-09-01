@@ -1,3 +1,5 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
+
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -26,7 +28,9 @@ static char rcs_id[] = "$Id: permdic.c,v 1.8 2003/09/17 08:50:52 aida_s Exp $";
 
 #include "RKintern.h"
 
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+#endif
 #include <fcntl.h> /* for O_BINARY */
 
 #define dm_xdm	dm_extdata.ptr
@@ -331,6 +335,7 @@ assurep(struct ND* dic, int id)
   }
 }
 
+
 int
 _RkEql(cannawc* a, unsigned char* b, int n)
 {
@@ -343,6 +348,7 @@ _RkEql(cannawc* a, unsigned char* b, int n)
   }
   return(1);
 }
+
 
 static
 int readThisCache(struct DM* dm, struct ND* xdm, long pgno, unsigned long val,
@@ -361,7 +367,7 @@ int readThisCache(struct DM* dm, struct ND* xdm, long pgno, unsigned long val,
       if (remlen + cur > ylen)
 	(*cf)++;
       else if (nc < mc) {
-	nread[nc].cache = _RkReadCache(dm, (long)wrec);
+	nread[nc].cache = _RkReadCache(dm, wrec);
 	if (nread[nc].cache) {
 	  if (_RkGetLink(xdm, pgno, val, &nread[nc].offset, &nread[nc].csn) < 0) {
 	    _RkDerefCache(nread[nc].cache);
@@ -377,6 +383,7 @@ int readThisCache(struct DM* dm, struct ND* xdm, long pgno, unsigned long val,
   }
   return(nc);
 }
+
 
 static int
 SearchInPage(struct DM* dm, struct ND* xdm, long pgno, unsigned char* buf,
@@ -413,6 +420,7 @@ SearchInPage(struct DM* dm, struct ND* xdm, long pgno, unsigned char* buf,
 		      cur, ylen, nread, mc, nc, cf);
   return(nc);
 }
+
 
 static int
 SearchInDir(struct DM* dm, struct ND* xdm, unsigned char* pos, cannawc* key,
@@ -473,6 +481,7 @@ SearchInDir(struct DM* dm, struct ND* xdm, unsigned char* pos, cannawc* key,
   return(nc);
 }
 
+
 int
 _Rkpsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
            struct nread* nread, int mc, int* cf)
@@ -498,74 +507,59 @@ _Rkpio(struct DM* dm, struct ncache* cp, int io)
   return 0;
 }
 
-#if 0 /* »È¤ï¤ì¤Æ¤¤¤Ê¤¤¤Î¤Ç¤È¤ê¤¢¤¨¤º¥³¥á¥ó¥È¤Ë¤¹¤ë */
-static void
-ch_perm(qm, offset, size, num)
-     struct DM  *qm;
-     unsigned   offset;
-     int        size, num;
-{
-  unsigned char	tmp[8192];
-  /* I leave this stack located array because of it is not used */
-
-  if (num > 0) {
-    _RkCopyBits(tmp, 0, size, qm->dm_qbits, offset, num);
-    _RkCopyBits(qm->dm_qbits, offset + 0, size,
-		qm->dm_qbits, offset + num*size, 1);
-    _RkCopyBits(qm->dm_qbits, offset + size, size, tmp, 0, num);
-  }
-}
-#endif
 
 #define PERM_WRECSIZE 2048
 #define PERM_NREADSIZE 128
 
+// @return If error, -1.
 int
 _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
         struct RkKxGram* gram)
 {
-  int		nc, cf = 0, ret = -1;
-  struct ND	*xdm;
-  unsigned long	lucks[2];
+    int		nc, cf = 0, ret = -1;
+    struct ND	*xdm;
+    unsigned long	lucks[2];
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  Wrec		wrec[PERM_WRECSIZE];
+    Wrec		wrec[PERM_WRECSIZE];
     cannawc        key[64];
-  struct nread  nread[PERM_NREADSIZE];
-  unsigned	permutation[RK_CAND_NMAX];
+    struct nread  nread[PERM_NREADSIZE];
+    unsigned	permutation[RK_CAND_NMAX];
 #else
-  Wrec *wrec;
+    Wrec *wrec;
     cannawc* key;
-  struct nread *nread;
-  unsigned *permutation;
-  wrec = (Wrec *)malloc(sizeof(Wrec) * PERM_WRECSIZE);
-  key = (cannawc*) malloc(sizeof(cannawc) * 64);
-  nread = (struct nread *)malloc(sizeof(struct nread) * PERM_NREADSIZE);
-  permutation = (unsigned *)malloc(sizeof(unsigned) * RK_CAND_NMAX);
-  if (!wrec || !key || !nread || !permutation) {
-    if (wrec) (void)free((char *)wrec);
-    if (key) (void)free((char *)key);
-    if (nread) (void)free((char *)nread);
-    if (permutation) (void)free((char *)permutation);
-    return ret;
-  }
+    struct nread *nread;
+    unsigned *permutation;
+    wrec = (Wrec *)malloc(sizeof(Wrec) * PERM_WRECSIZE);
+    key = (cannawc*) malloc(sizeof(cannawc) * 64);
+    nread = (struct nread *)malloc(sizeof(struct nread) * PERM_NREADSIZE);
+    permutation = (unsigned *)malloc(sizeof(unsigned) * RK_CAND_NMAX);
+    if (!wrec || !key || !nread || !permutation) {
+        free( wrec);
+        free( key);
+        free( nread);
+        free( permutation);
+        return -1;
+    }
 #endif
 
-  if (!dm  || !qm || (qm && !qm->dm_qbits)) {
-    goto done;
-  }
+    Wrec	    *p, *q, *kanji;
+    cannawc* wkey;
+    int	    maxcache = PERM_NREADSIZE;
+    int           ylen, klen, cnum, y_off = 2, k_off;
 
-  if ((qm->dm_flags & (DM_WRITABLE | DM_WRITEOK)) ==
-      (DM_WRITABLE | DM_WRITEOK)) {
+    if (!dm  || !qm || (qm && !qm->dm_qbits)) {
+        goto done;
+    }
+
+    if ( (qm->dm_flags & (DM_WRITABLE | DM_WRITEOK)) !=
+         (DM_WRITABLE | DM_WRITEOK) )
+        goto done;
+
     /* (writable and write ok) */
+    if ( !RkParseOWrec(gram, arg, wrec, PERM_WRECSIZE, lucks))
+        goto done;
 
-    if (RkParseOWrec(gram, arg, wrec, PERM_WRECSIZE, lucks)) {
-      Wrec	    *p, *q, *kanji;
-       cannawc* wkey;
-      int	    maxcache = PERM_NREADSIZE;
-      int           ylen, klen, cnum, y_off = 2, k_off;
-
-
-      ylen = (wrec[0] >> 1) & 0x3f;
+    ylen = (wrec[0] >> 1) & 0x3f;
       if (wrec[0] & 0x80)
 	y_off += 2;
       p = wrec + y_off;
@@ -576,7 +570,7 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
       }
       *(key+ylen) = 0;
 
-      /* ÉÊ»ì¡¢´Á»ú¾ğÊó¤Î¼è¤ê½Ğ¤· */
+      /* å“è©ã€æ¼¢å­—æƒ…å ±ã®å–ã‚Šå‡ºã— */
       k_off = y_off + ylen * 2;
       klen = (wrec[k_off] >> 1) & 0x7f;
       cnum = ((wrec[k_off] & 0x01) << 8) | wrec[k_off+1];
@@ -603,7 +597,7 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
 	    break;
 	  }
 	}
-	/* »È¤ï¤Ê¤¤Ã±¸ì¸õÊä¤Ï¤¢¤é¤«¤¸¤á _RkDerefCache ¤¹¤ë */
+	/* ä½¿ã‚ãªã„å˜èªå€™è£œã¯ã‚ã‚‰ã‹ã˜ã‚ _RkDerefCache ã™ã‚‹ */
 	for (pre = 0 ; pre < nc ; pre++) {
 	  if (pre != i) {
 	    thisRead = nread + pre;
@@ -623,12 +617,12 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
 	    wp += 2;
 	  wp += 2 + nl *2;
 
-	/* ¤³¤³¤ÎÉôÊ¬¤Ç¼­½ñ¤Î²¿ÈÖÌÜ¤Ë¤Ç¤Æ¤¯¤ë¤« (fnum) ¤òÃµ¤¹ */
+	/* ã“ã“ã®éƒ¨åˆ†ã§è¾æ›¸ã®ä½•ç•ªç›®ã«ã§ã¦ãã‚‹ã‹ (fnum) ã‚’æ¢ã™ */
 	  for (i = 0; i < nk; i++) {
 	    unsigned char	*kp;
 
-	    nl = (*wp >> 1) & 0x7f;               /* ¸õÊäÄ¹ */
-	    nnum = ((*wp & 0x01) << 8) | *(wp+1); /* ÉÊ»ìÈÖ¹æ */
+	    nl = (*wp >> 1) & 0x7f;               /* å€™è£œé•· */
+	    nnum = ((*wp & 0x01) << 8) | *(wp+1); /* å“è©ç•ªå· */
 	    if (nl == klen && nnum == cnum) {
 	      int lc;
 
@@ -689,7 +683,7 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
 		  switch (what) {
 		  case DST_DoDefine:
 		    _RkSetBitNum(qm->dm_qbits, offset, bitSize, dn, fnum*2);
-/*		  ¤³¤³¤ÏÊÂ¤Ó½ç¤òÊÑ¹¹¤¹¤ë´Ø¿ô¤À¤¬¤È¤ê¤¢¤¨¤º¥³¥á¥ó¥È¤Ë¤¹¤ë¡£
+/*		  ã“ã“ã¯ä¸¦ã³é †ã‚’å¤‰æ›´ã™ã‚‹é–¢æ•°ã ãŒã¨ã‚Šã‚ãˆãšã‚³ãƒ¡ãƒ³ãƒˆã«ã™ã‚‹ã€‚
                  ch_perm(qm, offset, bitSize, dn);
 */
 		    break;
@@ -708,17 +702,17 @@ _Rkpctl(struct DM* dm, struct DM* qm, int what, const cannawc* arg,
 	  _RkDerefCache(thisCache);
 	}
       }
-    }
-  }
- done:
+
+done:
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free((char *)wrec);
-  (void)free((char *)key);
-  (void)free((char *)nread);
-  (void)free((char *)permutation);
+    free( wrec);
+    free( key);
+    free( nread);
+    free( permutation);
 #endif
-  return ret;
+    return ret;
 }
+
 
 int
 _Rkpsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
@@ -764,4 +758,3 @@ _Rkpsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
   }
   return (0);
 }
-/* vim: set sw=2: */

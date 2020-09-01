@@ -179,7 +179,7 @@ defineTD(struct DM* dm, struct TD* tab, int n, struct TW* newTW, int nlen)
 	oldTW = tn->tn_word;
 	oldW = oldTW->word;
 	if (!key|| yomi_equal(newW, oldW, n)) {
-	  if ((cache = _RkFindCache(dm, (long)oldTW)) && cache->nc_count > 0)
+	  if ((cache = _RkFindCache(dm, oldTW)) && cache->nc_count > 0)
 	    return((struct TN *)0);
 	  if (!(mergeTW = RkUnionWrec(newTW, oldTW)))
 	    return((struct TN *)0);
@@ -188,7 +188,7 @@ defineTD(struct DM* dm, struct TD* tab, int n, struct TW* newTW, int nlen)
 	  (void)free((char *)oldTW);
 	  tn->tn_flags |= TN_WDEF;
 	  if (cache) {
-	    _RkRehashCache(cache, (long)tn->tn_word);
+	    _RkRehashCache(cache, tn->tn_word);
 	    cache->nc_word = mergeTW->word;
 	  }
 	  return tn;
@@ -287,7 +287,7 @@ deleteTD(struct DM* dm, struct TD** tab, int n, Wrec* newW)
 	Wrec		*oldW = oldTW->word;
 
 	if (!key || yomi_equal(newW, oldW, n)) {
-	  struct ncache	*cache = _RkFindCache(dm, (long)oldTW);
+	  struct ncache	*cache = _RkFindCache(dm, oldTW);
 
 	  if (!cache || cache->nc_count <= 0) {
 	    struct TW	*subW, newTW;
@@ -300,7 +300,7 @@ deleteTD(struct DM* dm, struct TD** tab, int n, Wrec* newW)
 	      tn->tn_word = subW;
 	      tn->tn_flags |= TN_WDEL;
 	      if (cache) {
-		_RkRehashCache(cache, (long)subW);
+		_RkRehashCache(cache, subW);
 		cache->nc_word = subW->word;
 	      }
 	      return(0);
@@ -584,7 +584,7 @@ _Rktsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
 	    if (l > n)
 	      (*cf)++;
 	    else if (nc < maxcache) {
-	      nread[nc].cache = _RkReadCache(dm, (long)tn->tn_word);
+	      nread[nc].cache = _RkReadCache(dm, tn->tn_word);
 	      if (nread[nc].cache) {
 		nread[nc].nk = l;
 		nread[nc].csn = 0L;
@@ -612,7 +612,7 @@ _Rktsearch(struct RkContext* cx, struct DM* dm, cannawc* key, int n,
 	      if (l > n)
 		(*cf)++;
 	      else if (nc < maxcache) {
-		nread[nc].cache = _RkReadCache(dm, (long)n0->tn_word);
+		nread[nc].cache = _RkReadCache(dm, n0->tn_word);
 		if (nread[nc].cache) {
 		  nread[nc].nk = l;
 		  nread[nc].csn = 0L;
