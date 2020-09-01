@@ -1,4 +1,3 @@
-canna: spelling-error-in-binary usr/sbin/cannaserver userA users
 canna: no-manual-page usr/bin/crfreq
 canna: no-manual-page usr/bin/crxdic
 canna: no-manual-page usr/bin/crxgram
