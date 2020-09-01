@@ -1,3 +1,35 @@
+canna (3.7p3-16) unstable; urgency=medium
+
+  * QA upload.
+  * Configured git-buildpackage for Debian.
+  * Ran wrap-and-sort -a.
+  * debian/canna.lintian-overrides:
+      - Removed unused override 'spelling-error-in-binary'.
+      - Renamed tag binary-without-manpage to no-manual-page.
+  * debian/canna-utils.lintian-overrides: renamed tag binary-without-manpage to
+    no-manual-page.
+  * debian/control: added 'Pre-Depends: ${misc:Pre-Depends}' as per lintian
+    warning.
+  * debian/libcanna1g.symbols: added 'Build-Depends-Package' field.
+  * debian/patches:
+      - 05_hppabuild.patch: removed patch applied by upstream.
+      - 06_fix_spelling_error.patch renamed to 05_fix_spelling_error.patch.
+      - 07_fix_manpages_error.patch renamed to 06_fix_manpages_error.patch.
+      - 08_fix_ftbfs_on_hurd-i386.patch renamed to
+        07_fix_ftbfs_on_hurd-i386.patch.
+      - 09_fix_format_security.patch renamed to 08_fix_format_security.patch.
+      - 10_fix_manpages_error.patch renamed to 09_fix_manpages_error.patch.
+      - 11_fix_configure.ac.patch renamed to 10_fix_configure.ac.patch.
+      - 11_fix_spelling_error_in_binary.patch: added.
+      - 12_make_the_output_of_mkbindic_reproducible.patch: added.
+        Thanks to Chris Lamb <lamby@debian.org>. (Closes: #861955)
+  * debian/po/pt_BR.po: converted from ISO-8859-1 to UTF-8.
+  * debian/rules:
+      - Removed 'override_dh_auto_clean'.
+      - Removed trailing whitespaces.
+
+ -- Francisco Vilmar Cardoso Ruviaro <francisco.ruviaro@riseup.net>  Tue, 01 Sep 2020 03:14:05 +0000
+
 canna (3.7p3-15) unstable; urgency=medium
 
   * QA upload.
