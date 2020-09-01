@@ -77,7 +77,7 @@ AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 
 AC_ENABLE_STATIC(no)
 
-test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-declarations -pedantic -Wno-long-long -fstack-protector-strong -fstack-clash-protection"  
+test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong -fstack-clash-protection"  
 
 AC_CONFIG_FILES([
   Makefile
