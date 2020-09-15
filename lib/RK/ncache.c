@@ -102,11 +102,13 @@ flushCache(struct DM* dm, struct ncache* cache)
 }
 
 static
-struct ncache* newCache(struct DM* ndm, long address)
+struct ncache* newCache(struct DM* ndm, void* address)
 {
     struct ncache* new_;
 
-  if ((new_ = Ncfree.nc_anext) != &Ncfree) {
+    if ((new_ = Ncfree.nc_anext) == &Ncfree)
+        return NULL;
+
     (void)flushCache(new_->nc_dic, new_);
     aremove(new_);
     hremove(new_);
@@ -115,9 +117,8 @@ struct ncache* newCache(struct DM* ndm, long address)
     new_->nc_flags  = 0;
     new_->nc_address = address;
     new_->nc_count = 0;
-    return(new_);
-  };
-  return (struct ncache *)0;
+
+    return new_;
 }
 
 int

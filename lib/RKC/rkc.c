@@ -60,10 +60,12 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #include "RKindep/ecfuncs.h"
 
 #include    <sys/types.h>
-#include    <pwd.h>
-#include    <grp.h>
+#ifndef _WIN32
+  #include    <pwd.h>
+  #include    <grp.h>
+  #include    <unistd.h>
+#endif
 #include    <signal.h>
-#include    <unistd.h>
 #include <assert.h>
 
 static int min(int a, int b) { return a <= b ? a : b; }

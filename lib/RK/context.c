@@ -51,7 +51,11 @@ static struct RkContext	*CX;
 /* If you compile with Visual C++, then please comment out the next 3 lines. */
 #include <sys/types.h>  /* mmap */
 #include <sys/stat.h>
-#include <sys/mman.h>   /* mmap */
+#ifndef _WIN32
+  #include <sys/mman.h>   /* mmap */
+#else
+  #include <direct.h> // _mkdir()
+#endif
 #include <fcntl.h>      /* mmap */
 int fd_dic = -1;        /* mmap */
 
@@ -73,20 +77,17 @@ _RkInitialize(const char* ddhome, int numCache)
     char			*gramdic, *path;
     int con;
 #ifdef __EMX__
-  struct stat		statbuf;
+    struct stat		statbuf;
 #endif
 
 #ifdef MMAP
-  if((fd_dic == -1) && (fd_dic = open("/dev/zero", O_RDWR)) < 0) {
-    con = -1;
-    goto return_con;
-  }
+    if((fd_dic == -1) && (fd_dic = open("/dev/zero", O_RDWR)) < 0) {
+        return -1;
+    }
 #endif
 
-  if (sx->flag & SX_INITED) {
-    con = -1;
-    goto return_con;
-  }
+    if (sx->flag & SX_INITED)
+        return -1;
 
     gramdic = (char*) malloc(strlen(DEFAULTGRAMDIC) + i + 1);
     if (!gramdic) {
@@ -113,7 +114,12 @@ _RkInitialize(const char* ddhome, int numCache)
     strcpy(path, ddhome);
     strcat(path, "/");
     strcat(path, USER_DIC_DIR);
-    if (mkdir(path, MKDIR_MODE) < 0 && errno != EEXIST) {
+#ifndef _WIN32
+    int r = mkdir(path, MKDIR_MODE);
+#else
+    int r = _mkdir(path);
+#endif
+    if ( r < 0 && errno != EEXIST) {
         fprintf(stderr, "mkdir() failed: %s\n", path);
         free(path);
         RkCloseGram(SG.gramdic);
@@ -129,7 +135,12 @@ _RkInitialize(const char* ddhome, int numCache)
     strcpy(path, ddhome);
     strcat(path, "/");
     strcat(path, GROUP_DIC_DIR);
-    if (mkdir(path, MKDIR_MODE) < 0 && errno != EEXIST) {
+#ifndef _WIN32
+    r = mkdir(path, MKDIR_MODE);
+#else
+    r = _mkdir(path);
+#endif
+    if ( r < 0 && errno != EEXIST) {
         fprintf(stderr, "mkdir() failed: %s\n", path);
         free(path);
         RkCloseGram(SG.gramdic);
