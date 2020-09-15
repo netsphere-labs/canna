@@ -427,7 +427,7 @@ skip_until_space(const cannawc* src, const cannawc** next)
 
 
 #ifndef NDEBUG
-static char* buf[1000];
+static char buf[1000];
 static char* dump_wcs(const cannawc* src)
 {
     cannawc wc;

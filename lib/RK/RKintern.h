@@ -570,7 +570,7 @@ struct ncache	{
     struct DM		*nc_dic;	/* yomikomareta jisho */
     unsigned short	nc_flags;
     unsigned long	nc_count;	/* word karano sanshou dosuu */
-    intptr_t		nc_address;	/* word record no file address */
+    void*	nc_address;	/* word record no file address */
 };
 /* flags */
 #define	NC_DIRTY	1	/* word no naiyou ga henkou sareta */

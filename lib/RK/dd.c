@@ -27,10 +27,7 @@ static char rcsid[]="$Id: dd.c,v 1.5 2003/09/17 08:50:52 aida_s Exp $";
 
 #include	"RKintern.h"
 
-#ifdef __CYGWIN32__
 #include <fcntl.h> /* for O_BINARY */
-#endif
-
 #include <errno.h>
 
 #include	<stdio.h>
@@ -41,6 +38,9 @@ static char rcsid[]="$Id: dd.c,v 1.5 2003/09/17 08:50:52 aida_s Exp $";
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef _WIN32
+  #include <direct.h>
+#endif
 
 #define	Calloc		calloc
 #define cx_gwt		cx_extdata.ptr
@@ -691,6 +691,7 @@ _RkMakePath(struct DF* df)
 }
 
 
+// @return If failed, -1.
 int
 _RkRealizeDD( struct DD* dd)
 {
@@ -700,77 +701,67 @@ _RkRealizeDD( struct DD* dd)
   int ret = -1;
   int tmpres;
   int			fdes;
-  long		tloc;
+    time_t		tloc;
 #ifdef __EMX__
   struct stat		statbuf;
 #endif
 
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char		whattime[RK_LINE_BMAX];
-  char		header[RK_LINE_BMAX];
-  char		dicsdir[RK_PATH_BMAX];
-  char		backup[RK_PATH_BMAX];
+    char		whattime[RK_LINE_BMAX];
+    char		header[RK_LINE_BMAX];
+    char		dicsdir[RK_PATH_BMAX];
+    char		backup[RK_PATH_BMAX];
 #else
-  char *whattime, *header, *dicsdir, *backup;
-  whattime = malloc(RK_LINE_BMAX);
-  header = malloc(RK_LINE_BMAX);
-  dicsdir = malloc(RK_PATH_BMAX);
-  backup = malloc(RK_PATH_BMAX);
-  if (!whattime || !header || !dicsdir || !backup) {
-    if (whattime) (void)free(whattime);
-    if (header) (void)free(header);
-    if (dicsdir) (void)free(dicsdir);
-    if (backup) (void)free(backup);
-    return ret;
-  }
+    char *whattime, *header, *dicsdir, *backup;
+    whattime = malloc(RK_LINE_BMAX);
+    header = malloc(RK_LINE_BMAX);
+    dicsdir = malloc(RK_PATH_BMAX);
+    backup = malloc(RK_PATH_BMAX);
+    if (!whattime || !header || !dicsdir || !backup) {
+        free(whattime);
+        free(header);
+        free(dicsdir);
+        free(backup);
+        return -1;
+    }
 #endif
 
-  /* create directory if needed */
-  if (mkdir(dd->dd_path, MKDIR_MODE) < 0 &&
-      errno != EEXIST) {
-    goto return_ret;
-  }
+    /* create directory if needed */
+#ifndef _WIN32
+    int r = mkdir(dd->dd_path, MKDIR_MODE);
+#else
+    int r = _mkdir(dd->dd_path);
+#endif
+    if ( r < 0 && errno != EEXIST) {
+        goto return_ret;
+    }
   /* dics.dir */
   (void)strcpy(dicsdir, dd->dd_path);
   (void)strcat(dicsdir, "/dics.dir");
   backup[0] = 0;
   tmpres = close(open(dicsdir, 0));
-  if (tmpres >= 0) {
-    (void)strcpy(backup, dd->dd_path);
-    (void)strcat(backup, "/#dics.dir");
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-    unlink(backup);
+    if (tmpres >= 0) {
+        (void)strcpy(backup, dd->dd_path);
+        (void)strcat(backup, "/#dics.dir");
+
+#ifdef _WIN32
+        remove(backup);
 #endif
-    if (rename(dicsdir, backup)) {
-      goto return_ret;
+        if (rename(dicsdir, backup)) {
+            goto return_ret;
+        }
     }
-#else
-    unlink(backup);
-    if (link(dicsdir, backup) < 0) {
-      goto return_ret;
-    }
-    unlink(dicsdir);
-#endif /* !HAVE_RENAME */
-  };
   /* create dics.dir */
 
-  if ((fdes = creat(dicsdir, CREAT_MODE)) < 0) {
-    if (backup[0]) {
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-      unlink(dicsdir);
+    if ((fdes = creat(dicsdir, CREAT_MODE)) < 0) {
+        if (backup[0]) {
+#ifdef _WIN32
+            remove(dicsdir);
 #endif
-      rename(backup, dicsdir);
-#else
-      unlink(dicsdir);
-      if (link(backup, dicsdir) == 0) {
-	unlink(backup);
-      }
-#endif
+            rename(backup, dicsdir);
+        }
+        goto return_ret;
     }
-    goto return_ret;
-  };
 #ifdef _WIN32
   setmode(fdes, O_BINARY);
 #endif
@@ -785,22 +776,16 @@ _RkRealizeDD( struct DD* dd)
   (void)strcat(header, "\n");
   n = strlen(header);
   tmpres = write(fdes, header, n);
-  if (tmpres != n) {
-    if (backup[0]) {
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-      unlink(dicsdir);
+    if (tmpres != n) {
+        if (backup[0]) {
+#ifdef _WIN32
+            remove(dicsdir);
 #endif
-      rename(backup, dicsdir);
-#else
-      unlink(dicsdir);
-      if (link(backup, dicsdir) == 0) {
-	unlink(backup);
-      }
-#endif
-    }
-    else
-      unlink(dicsdir);
+            rename(backup, dicsdir);
+        }
+        else {
+            remove(dicsdir);
+        }
     close(fdes);
     goto return_ret;
   };
@@ -818,22 +803,16 @@ _RkRealizeDD( struct DD* dd)
 
       ddt->ddt_spec[n] = '\0';
 
-      if (tmpres != n) {
-	if (backup[0]) {
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-	  unlink(dicsdir);
+        if (tmpres != n) {
+            if (backup[0]) {
+#ifdef _WIN32
+                remove(dicsdir);
 #endif
-	  rename(backup, dicsdir);
-#else
-	  unlink(dicsdir);
-	  if (link(backup, dicsdir) == 0) {
-	    unlink(backup);
-	  }
-#endif
-	}
-	else
-	  unlink(dicsdir);
+                rename(backup, dicsdir);
+            }
+            else {
+                remove(dicsdir);
+            }
 	close(fdes);
 	goto return_ret;
       };

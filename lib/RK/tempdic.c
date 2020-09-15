@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -150,14 +151,14 @@ nthKey(Wrec* w, int n)
 }
 
 /*
- * defineTD -- ¥Æ¥­¥¹¥È¼­½ñ¤ËÄêµÁ¤¹¤ë
+ * defineTD -- ãƒ†ã‚­ã‚¹ãƒˆè¾žæ›¸ã«å®šç¾©ã™ã‚‹
  *
- * °ú¿ô
- *    dm    ¼­½ñ
- *    tab   ¥Æ¥­¥¹¥È¼­½ñ¥Ý¥¤¥ó¥¿
- *    n     ²¿Ê¸»úÌÜ¤«(Ã±°Ì:Ê¸»ú)
- *    newW  ÅÐÏ¿¤¹¤ë¥ï¡¼¥É¥ì¥³¡¼¥É
- *    nlen  ÉÔÌÀ
+ * å¼•æ•°
+ *    dm    è¾žæ›¸
+ *    tab   ãƒ†ã‚­ã‚¹ãƒˆè¾žæ›¸ãƒã‚¤ãƒ³ã‚¿
+ *    n     ä½•æ–‡å­—ç›®ã‹(å˜ä½:æ–‡å­—)
+ *    newW  ç™»éŒ²ã™ã‚‹ãƒ¯ãƒ¼ãƒ‰ãƒ¬ã‚³ãƒ¼ãƒ‰
+ *    nlen  ä¸æ˜Ž
  */
 static TN *
 defineTD(struct DM* dm, struct TD* tab, int n, struct TW* newTW, int nlen)
@@ -262,13 +263,13 @@ shrinkTD(struct TD* td, cannawc key)
 }
 
 /*
- * deleteTD -- ¥Æ¥­¥¹¥È¼­½ñ¤«¤éÃ±¸ìÄêµÁ¤ò¼è¤ê½ü¤¯
+ * deleteTD -- ãƒ†ã‚­ã‚¹ãƒˆè¾žæ›¸ã‹ã‚‰å˜èªžå®šç¾©ã‚’å–ã‚Šé™¤ã
  *
- * °ú¿ô
- *    dm    ¼­½ñ
- *    tab   ¥Æ¥­¥¹¥È¼­½ñ
- *    n     ²¿Ê¸»úÌÜ¤«
- *    newW  ÄêµÁ¤¹¤ë¥ï¡¼¥É¥ì¥³¡¼¥É
+ * å¼•æ•°
+ *    dm    è¾žæ›¸
+ *    tab   ãƒ†ã‚­ã‚¹ãƒˆè¾žæ›¸
+ *    n     ä½•æ–‡å­—ç›®ã‹
+ *    newW  å®šç¾©ã™ã‚‹ãƒ¯ãƒ¼ãƒ‰ãƒ¬ã‚³ãƒ¼ãƒ‰
  */
 static int
 deleteTD(struct DM* dm, struct TD** tab, int n, Wrec* newW)
@@ -529,17 +530,10 @@ _Rktclose(struct DM* dm, char* file, struct RkKxGram* gram)
       ecount++;
 
     if (!ecount) {
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-      unlink(file);
+#ifdef _WIN32
+        remove(file); // Windows ã¯ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚‹ã¨å¤±æ•—ã™ã‚‹
 #endif
-      rename(backup, file);
-#else
-      unlink(file);
-      if (link(backup, file) == 0) {
-	unlink(backup);
-      }
-#endif
+        rename(backup, file); // old, new
     }
     dm->dm_flags &= ~DM_UPDATED;
   };
@@ -784,20 +778,14 @@ _Rktsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
       } else
 	ecount++;
 
-      if (!ecount) {
-#ifdef HAVE_RENAME
-#ifdef __EMX__
-	unlink(file);
+        if (!ecount) {
+#ifdef _WIN32
+            remove(file);
 #endif
-	rename(backup, file);
-#else
-	unlink(file);
-	if (link(backup, file) == 0) {
-	  unlink(backup);
-	}
-#endif
-	dm->dm_flags &= ~DM_UPDATED;
-      } else {
+            rename(backup, file);
+            dm->dm_flags &= ~DM_UPDATED;
+        }
+        else {
 	(void)free(file);
 	ret = -1;
 	goto return_ret;
