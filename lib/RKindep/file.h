@@ -34,6 +34,7 @@
   #include <unistd.h>
   #include <sys/select.h>
   #include <sys/socket.h>
+  typedef int SOCKET;
 #else
   #include <winsock2.h>
   #define fd_set FD_SET
