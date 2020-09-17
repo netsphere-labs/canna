@@ -12,21 +12,18 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
 static char rcs[] = "@(#) 112.1 $Id: can.c,v 1.4 2003/02/01 19:34:20 aida_s Exp $";
 #endif
 
-#ifdef ENGINE_SWITCH
-#include "RKrename.h"
-#endif
 #include "config.h"
 #define CANNA_NEW_WCHAR_AWARE
 
@@ -106,16 +103,16 @@ static   int opt_u  ;
 static   int opt_s  ;
 static   int opt_fq ;
 static   int opt_std;
-static   int opt_myg , opt_g , opt_rw , opt_v , opt_a ; 
+static   int opt_myg , opt_g , opt_rw , opt_v , opt_a ;
 
 static   char *opt_dic1 ;
 static   char *opt_dic2 ;
-static   char *opt_lfile ; 
-static   char *opt_user , *opt_grp ; 
+static   char *opt_lfile ;
+static   char *opt_user , *opt_grp ;
 
 /*-------------------------------------------------------------*/
 
-static int      cmd_code ; 
+static int      cmd_code ;
 #define    ADD    1
 #define    CAT    2
 #define    CP     3
@@ -143,53 +140,53 @@ usage()
     (void) fprintf(stderr, gettxt("cannacmd:53",
 			  "Usage: %s [options]  remote-dic\n"),Progname);
     (void) fprintf(stderr, gettxt("cannacmd:54", " options include:\n"));
-    (void) fprintf(stderr, gettxt("cannacmd:55", 
+    (void) fprintf(stderr, gettxt("cannacmd:55",
 			  "\t{-cs | -cannaserver} canna-server\n"));
     (void) fprintf(stderr, gettxt("cannacmd:56", "\t-l local-file\n"));
-    break ; 
+    break ;
 
        case    CAT :
 
     (void)fprintf(stderr,gettxt("cannacmd:71",
    			"Usage: %s [options]  remote-dic\n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:72", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:73", 
+    (void)fprintf(stderr,gettxt("cannacmd:73",
 			"        {-cs | -cannaserver} canna-server\n"));
     (void)fprintf(stderr,gettxt("cannacmd:74", "        -i | -u user-name\n"));
     (void)fprintf(stderr,gettxt("cannacmd:75", "        -l local-file\n"));
     (void)fprintf(stderr,gettxt("cannacmd:234","        -G \n"));
     (void)fprintf(stderr,gettxt("cannacmd:235","        -g group-name\n"));
-    break ; 
+    break ;
 
        case    CP :
 
-    (void)fprintf(stderr,gettxt("cannacmd:85", 
+    (void)fprintf(stderr,gettxt("cannacmd:85",
 			"Usage: %s [options]  from-dic to-dic\n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:86", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:87", 
+    (void)fprintf(stderr,gettxt("cannacmd:87",
 			"        {-cs | -cannaserver} canna-server\n"));
     (void)fprintf(stderr,gettxt("cannacmd:88", "        -s\n"));
     (void)fprintf(stderr,gettxt("cannacmd:89", "        -i | -u user-name\n"));
     (void)fprintf(stderr,gettxt("cannacmd:236","        -G \n"));
     (void)fprintf(stderr,gettxt("cannacmd:237","        -g group-name\n"));
-    break ; 
+    break ;
 
        case    DEL :
 
-    (void) fprintf(stderr, gettxt("cannacmd:102", 
+    (void) fprintf(stderr, gettxt("cannacmd:102",
 			  "Usage: %s [options]  remote-dic\n"),Progname);
     (void) fprintf(stderr, gettxt("cannacmd:103", " options:\n"));
-    (void) fprintf(stderr, gettxt("cannacmd:104", 
+    (void) fprintf(stderr, gettxt("cannacmd:104",
 			  "\t{-cs | -cannaserver} canna-server\n"));
     (void) fprintf(stderr, gettxt("cannacmd:105", "\t-l local-file\n"));
-    break ; 
+    break ;
 
        case    LS :
 
-    (void)fprintf(stderr,gettxt("cannacmd:121", 
+    (void)fprintf(stderr,gettxt("cannacmd:121",
 			"Usage: %s [options]\n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:122", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:123", 
+    (void)fprintf(stderr,gettxt("cannacmd:123",
 			"        {-cs | -cannaserver} canna-server\n"));
     (void)fprintf(stderr,gettxt("cannacmd:124", "        -i\n"));
     (void)fprintf(stderr,gettxt("cannacmd:125", "        -u user-name\n"));
@@ -197,67 +194,67 @@ usage()
     (void)fprintf(stderr,gettxt("cannacmd:239", "        -g group-name\n"));
     (void)fprintf(stderr,gettxt("cannacmd:240", "        -a \n"));
     (void)fprintf(stderr,gettxt("cannacmd:241", "        -l \n"));
-    break ; 
+    break ;
 
        case     MK :
 
-    (void) fprintf(stderr, gettxt("cannacmd:134", 
+    (void) fprintf(stderr, gettxt("cannacmd:134",
 			  "Usage: %s [options]  remote-dic\n"),Progname);
     (void) fprintf(stderr, gettxt("cannacmd:135", " options:\n"));
-    (void) fprintf(stderr, gettxt("cannacmd:136", 
+    (void) fprintf(stderr, gettxt("cannacmd:136",
 			  "\t{-cs | -cannaserver} canna-server\n"));
     (void) fprintf(stderr, gettxt("cannacmd:137", "\t-s\n"));
     (void) fprintf(stderr, gettxt("cannacmd:138", "\t{- | -l local-file}\n"));
     (void) fprintf(stderr, gettxt("cannacmd:139", "\t-fq\n"));
     (void) fprintf(stderr, gettxt("cannacmd:242", "\t-G  \n"));
-    break ; 
+    break ;
 
        case     MV :
 
-    (void)fprintf(stderr,gettxt("cannacmd:155", 
+    (void)fprintf(stderr,gettxt("cannacmd:155",
 			"Usage: %s [options]  from-dic to-dic\n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:156", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:157", 
+    (void)fprintf(stderr,gettxt("cannacmd:157",
 			"        {-cs | -cannaserver} canna-server\n"));
     (void)fprintf(stderr,gettxt("cannacmd:243", "        -G \n"));
     (void)fflush(stderr);
-    break ; 
+    break ;
 
        case     RM :
 
-    (void)fprintf(stderr,gettxt("cannacmd:177", 
+    (void)fprintf(stderr,gettxt("cannacmd:177",
 		"Usage: %s [options]  dicname1 [dicname2...]\n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:178", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:179", 
+    (void)fprintf(stderr,gettxt("cannacmd:179",
 			"        {-cs | -cannaserver} canna-server\n"));
     (void)fprintf(stderr,gettxt("cannacmd:180", "         -fq \n"));
     (void)fprintf(stderr,gettxt("cannacmd:244", "         -G \n"));
-    break ; 
+    break ;
 
        case     CHMOD :
 
-    (void)fprintf(stderr,gettxt("cannacmd:245", 
+    (void)fprintf(stderr,gettxt("cannacmd:245",
 		"Usage: %s [options]  dicname \n"), Progname);
     (void)fprintf(stderr,gettxt("cannacmd:246", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:247", 
+    (void)fprintf(stderr,gettxt("cannacmd:247",
 			"        {-cs | -cannaserver} canna-server\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:248", 
+    (void)fprintf(stderr,gettxt("cannacmd:248",
                         "        {+|-}{r|w|rw|wr}... \n"));
     (void)fprintf(stderr,gettxt("cannacmd:249", "        -G \n"));
-    break ; 
+    break ;
 
        case     SY :
 
-    (void)fprintf(stderr,gettxt("cannacmd:999", 
+    (void)fprintf(stderr,gettxt("cannacmd:999",
 		"Usage: %s [options]   \n"),Progname);
     (void)fprintf(stderr,gettxt("cannacmd:999", " options:\n"));
-    (void)fprintf(stderr,gettxt("cannacmd:999", 
+    (void)fprintf(stderr,gettxt("cannacmd:999",
 			"        {-cs | -cannaserver} canna-server\n"));
-    break ; 
+    break ;
 
        case     KILL :
     (void)fprintf(stderr,gettxt("cannacmd:257","Usage: %s    \n"),Progname);
-    break ; 
+    break ;
 
     }
     (void)fflush(stderr);
@@ -322,7 +319,7 @@ int sig;
 	}
 	(void) RkFinalize();
     }
-    
+
     Message(gettxt("cannacmd:232", "Process was intrrupted."));
     exit(ERR_VALUE);
 }
@@ -333,11 +330,11 @@ rk_init()
 {
     if ((cx_num = RkInitialize(init)) < 0 ) {
 	if (init[0] != '/') {
-	    (void)fprintf(stderr,gettxt("cannacmd:67", 
+	    (void)fprintf(stderr,gettxt("cannacmd:67",
 		"Cannot connect with cannaserver \"%s\".\n"), init);
 	}
 	else {
-	    (void)fprintf(stderr, gettxt("cannacmd:68", 
+	    (void)fprintf(stderr, gettxt("cannacmd:68",
 		 "Cannot connect with cannaserver.\n"));
 	}
 	exit(ERR_VALUE);
@@ -345,20 +342,20 @@ rk_init()
     return(0);
 }
 
-int 
+int
 nwcheck()
 {
-    int   bak ; 
+    int   bak ;
     RkwGetProtocolVersion(&majv, &minv);
     protover = canna_protocol_version(majv, minv);
     bak = RkwGetServerVersion(&majv, &minv);
     if ( bak < 0 ) { /* サーバの状態が異常 */
 	if (init[0] != '/') {
-	    (void)fprintf(stderr,gettxt("cannacmd:80", 
+	    (void)fprintf(stderr,gettxt("cannacmd:80",
 		   "Cannaserver \"%s\" is in an abnormal state.\n"), init);
 	}
 	else {
-	    (void)fprintf(stderr, 
+	    (void)fprintf(stderr,
 	      gettxt("cannacmd:81", "Cannaserver is in an abnormal state.\n"));
 	}
 	RkFinalize();
@@ -366,12 +363,12 @@ nwcheck()
     }
     if ( majv < 2 && minv < 2 ) { /* irohaserver && R7.1より前 */
 	    if (init[0] != '/') {
-		(void)fprintf(stderr, gettxt("cannacmd:82", 
+		(void)fprintf(stderr, gettxt("cannacmd:82",
 	     "Cannaserver \"%s\" does not support dictionary maintenance.\n")
 		      , init);
 	    }
 	    else {
-	    (void)fprintf(stderr, gettxt("cannacmd:83", 
+	    (void)fprintf(stderr, gettxt("cannacmd:83",
 	   "Cannaserver does not support dictionary maintenance.\n"));
 	    }
 	    RkFinalize();
@@ -384,36 +381,36 @@ static int
 ParseFile(fp)
   FILE	*fp;
 {
-    char line[BUFLEN], *whinp ; 
-    int ret = -1 ; 
+    char line[BUFLEN], *whinp ;
+    int ret = -1 ;
     int werr , i , hflg , hlen , lineno ;
 
     hflg = 0 ;
-    werr = 0 ; 
-    lineno = 0 ; 
+    werr = 0 ;
+    lineno = 0 ;
     if (is_display != TRUE) {
 	(void) fprintf(stderr, "\n");
     }
     if ( hinshi != NULL ) {
-      hflg = 1 ; 
+      hflg = 1 ;
       hlen = strlen(hinshi);
     }
     while (fgets((char *)line, sizeof(line), fp)) {
-        if (line[strlen(line) - 1] == '\n') 
+        if (line[strlen(line) - 1] == '\n')
 	  line[strlen(line)-1] = '\0';
-	lineno++ ; 
+	lineno++ ;
 	if ( hflg ) {     /* 92.12.21 */
-	    whinp = index(line,'#') ; 
+	    whinp = index(line,'#') ;
 	    if (whinp == NULL) continue ;
-	    if (strncmp(whinp,hinshi,hlen) != 0 || 
-	        (whinp[hlen] != ' ' && whinp[hlen] != '\t' && 
+	    if (strncmp(whinp,hinshi,hlen) != 0 ||
+	        (whinp[hlen] != ' ' && whinp[hlen] != '\t' &&
 		 whinp[hlen] != '*' ) ) continue ;
 	}
 
 	if (strlen(line) == (BUFLEN-1) ) {
-	    werr = 1; 
+	    werr = 1;
 	}
-	else {	
+	else {
 	  if (cmd_code == DEL) {
 	    i = RkDeleteLine(cx_num, r_dic, line) ;
 	  }
@@ -445,9 +442,9 @@ ParseFile(fp)
     return (0);
 }
 
-void 
+void
 dicname_chk(dic)
-char  *dic ; 
+char  *dic ;
 {
     if ((unsigned char *)index(dic, '-' )) {
 	Message(gettxt("cannacmd:64",
@@ -455,7 +452,7 @@ char  *dic ;
 	exit(ERR_VALUE);
     }
     if ((int)strlen((char *)dic) >= RECSZ) {
-	Message(gettxt("cannacmd:65", 
+	Message(gettxt("cannacmd:65",
 	       "Dictionary name \"%s\" is too long."), dic);
 	exit(ERR_VALUE);
     }
@@ -466,7 +463,7 @@ char *
 searchgroup()
 {
     char *groupname = NULL ;
-    
+
     struct passwd *pass = getpwuid( getuid() );
     if ( pass ) {
 	struct group *grp = getgrgid(pass -> pw_gid);
@@ -489,7 +486,7 @@ static char *
 searchuname()
 {
     char *username = NULL, *getenv(), *getlogin() ;
-    
+
     struct passwd *pass = getpwuid( getuid() ) ;
     if ( pass ) username = pass->pw_name ;
 
@@ -516,15 +513,15 @@ write_chk()
     mode = 0 ;
  grp:
     ret = RkChmodDic(cx_num,opt_dic1,mode) ;
-    if (ret < 0) { 
+    if (ret < 0) {
 	switch (ret) {
           case NOENT:
 	            /* ユーザ辞書になければグループ辞書を試してみる*/
-	    if (mode == 0) {   
+	    if (mode == 0) {
 		mode = RK_GRP_DIC ;
 		goto grp ;
 	    }
-	    fprintf(stderr,gettxt("cannacmd:169", 
+	    fprintf(stderr,gettxt("cannacmd:169",
 		  "Dictionary \"%s\" does not exist.\n"), opt_dic1);
 	    break;
           case BADCONT:
@@ -564,7 +561,7 @@ int mode;
 {
     int ret;
     ret = RkChmodDic(cx_num,dicname,mode) ;
-    if (ret < 0) { 
+    if (ret < 0) {
 	switch (ret) {
           case NOENT:
 	            /* 辞書がないならOK */
@@ -605,9 +602,9 @@ static int
 Addwords(fp)
   FILE	*fp;
 {
-    int  ret ; 
+    int  ret ;
     if (RkMountDic(cx_num, (char *)r_dic, 0) < 0 ) {
-	(void) Message(gettxt("cannacmd:63", 
+	(void) Message(gettxt("cannacmd:63",
 		      "Cannot mount dictionary \"%s\"."), r_dic);
 	return (-1);
     }
@@ -632,8 +629,8 @@ char  **argv;
     if (opt_i || opt_u || opt_s || opt_fq||opt_std||opt_myg||opt_g) usage();
     if (opt_dic2 != NULL) usage();
 
-    if (opt_l)  l_file = opt_lfile ; 
-    r_dic = (unsigned char *)opt_dic1 ; 
+    if (opt_l)  l_file = opt_lfile ;
+    r_dic = (unsigned char *)opt_dic1 ;
 
     if (isatty(fileno(stdout)) == 0) {
       is_display = TRUE;
@@ -641,7 +638,7 @@ char  **argv;
     if (!l_file) {
 	fp = stdin;
     } else {
-        is_display = TRUE ; 
+        is_display = TRUE ;
 	fp = (FILE *)fopen(l_file, "r");
 	if (!fp) {
 	    Message(gettxt("cannacmd:66",
@@ -762,27 +759,27 @@ char  **argv;
 		    exit(ERR_VALUE);
 		}
 		else {
-		    break  ; 
+		    break  ;
 		}
 	    }
 	}
-    }  
+    }
 
     (void) signal(SIGTERM, RefreshAll);
     (void) signal(SIGINT, RefreshAll);
 
 
-    errflg = 0 ; 
+    errflg = 0 ;
     for ( i = 1 ; i < argc ; i++) {
 	strncpy((char *)dicname,(char *)argv[i],RECSZ-1);
 	/* 辞書に書いて */
 	if(DownLoadDic(fp, dirnamep) < 0) {
-	    errflg = 1 ; 
+	    errflg = 1 ;
 	}
     }
     (void)fclose(fp);
     RkFinalize();
-    if (errflg == 1) { 
+    if (errflg == 1) {
 	exit(ERR_VALUE);
     }
     exit(0);
@@ -792,29 +789,29 @@ DownLoadDic(fp, dirname)
 FILE          *fp;
 unsigned char *dirname;
 {
-    int           ret , hlen , hflg , blen ; 
-    unsigned char buf[BUFLEN] ; 
+    int           ret , hlen , hflg , blen ;
+    unsigned char buf[BUFLEN] ;
     unsigned char dicname_bk[RECSZ];
-    char *whinp ; 
+    char *whinp ;
 
-    hflg = 0 ; 
+    hflg = 0 ;
     strcpy((char *)dicname_bk, (char *)dicname);
 
     if ( hinshi != NULL ) {
-      hflg = 1 ; 
+      hflg = 1 ;
       hlen = strlen(hinshi);
     }
     do {
 	if ((ret = RkGetWordTextDic(cx_num,dirname,dicname_bk,buf,
 				BUFLEN)) >= 0) {
-	    dicname_bk[0] = '\0' ; 
+	    dicname_bk[0] = '\0' ;
 	    if (!ret) {
 		break;
 	    }
 	    if ( hflg ) {
-		whinp = index((char *)buf,'#') ; 
-		if (whinp == NULL) continue ; 
-		if (strncmp(whinp,hinshi,hlen) != 0  || 
+		whinp = index((char *)buf,'#') ;
+		if (whinp == NULL) continue ;
+		if (strncmp(whinp,hinshi,hlen) != 0  ||
 		    (whinp[hlen] != ' ' && whinp[hlen] != '\t'  &&
 	             whinp[hlen] != '*' ))  continue ;
 	    }
@@ -822,7 +819,7 @@ unsigned char *dirname;
 	    buf[blen+1] = '\0' ;
 	    buf[blen  ] = '\n' ;
 	    if (!fwrite(buf,1,blen+1,fp)) {
-		(void)fprintf(stderr, gettxt("cannacmd:84", 
+		(void)fprintf(stderr, gettxt("cannacmd:84",
 			   "write error \n"));
 		return -1;
 	    }
@@ -844,24 +841,24 @@ int   argc  ;
 char  **argv;
 {
   unsigned char dirname[RECSZ*2];      /* ユーザ名または"iroha"またはNULL*/
-  int  dirname_offset = 0 , mode_cp  , ret ; 
-  unsigned char *dirnamep; 
+  int  dirname_offset = 0 , mode_cp  , ret ;
+  unsigned char *dirnamep;
   char ans[20];
-  
+
   mode = Rk_MWD;              /* 辞書の種類 */
   mode_cp = 0 ;
 
   if(argc < 3 || argc > 8) usage();
-  
+
   (void)strcpy((char *)dirname, "");
   (void)strcpy((char *)dicname1, "");
   (void)strcpy((char *)dicname2, "");
-  
+
   scan_opt(argc,argv,&argc);
   if ( opt_l || opt_r || opt_fq || opt_std ) usage();
   if ( opt_dic2 == NULL ) usage();
   if ( argc >= 4 ) usage();  /* 辞書が３つ以上ある */
-  
+
   if ( opt_u ) {
       if (opt_i) usage();
       (void)strcpy((char *)dirname,"user/");
@@ -876,7 +873,7 @@ char  **argv;
       (void)strcat((char *)dirname,opt_grp);
   }
   if ( opt_myg ) {
-      mode_cp |= RK_GRP_DIC ; 
+      mode_cp |= RK_GRP_DIC ;
   }
 
   (void)strcpy((char *)dicname1,opt_dic1);
@@ -888,7 +885,7 @@ char  **argv;
 
   /*  server  new/old check  */
   nwcheck() ;
-  
+
 
   if ( opt_i == 1 ) {
       if ( majv == 1 ) {         /* old server */
@@ -901,7 +898,7 @@ char  **argv;
   }
 
   dirnamep = dirname + dirname_offset;
-  
+
   if (protover > canna_protocol_version(3, 1)) {
 
       if ( dirname[0] == '\0' ) {
@@ -913,12 +910,12 @@ char  **argv;
       ret = RkCopyDic(cx_num,dirnamep,dicname1,dicname2,mode_cp);
       if (ret == EXIST ) {     /* コピー先に辞書がある */
 	  if (isatty(fileno(stdin)) != 0) {
-	      (void)fprintf(stderr,gettxt("cannacmd:205", 
+	      (void)fprintf(stderr,gettxt("cannacmd:205",
     "Specified dictionary \"%s\" already exists. Do you overwrite it ? (y/n)"),
 		      dicname2);
-	      ans[0]=getchar();     
+	      ans[0]=getchar();
 	  } else {
-	      (void)fprintf(stderr,gettxt("cannacmd:206", 
+	      (void)fprintf(stderr,gettxt("cannacmd:206",
 	    "Specified dictionary \"%s\" already exists."),dicname);
 	      (void)strcpy(ans,"n");
 	  }
@@ -928,7 +925,7 @@ char  **argv;
 		  mode_cp |= KYOUSEI;
 		  ret = RkCopyDic(cx_num,dirnamep,dicname1,dicname2,mode_cp);
  		  if ( ret == 0) {
-		      (void)fprintf(stderr, gettxt("cannacmd:201", 
+		      (void)fprintf(stderr, gettxt("cannacmd:201",
 		       "Dictionary \"%s\" is overwritten."), dicname2);
 		  }
 	      }
@@ -938,13 +935,13 @@ char  **argv;
 		  exit(1);
 	      }
 	  } else {                    /* 上書きしない */
-	      (void)fprintf(stderr, gettxt("cannacmd:207", 
+	      (void)fprintf(stderr, gettxt("cannacmd:207",
 	     "Dictionary \"%s\" is not created.\n"), dicname2);
 	      RkFinalize();
 	      exit(1);
 	  }
       }
-      else {                          /* コピー先に辞書がない */ 
+      else {                          /* コピー先に辞書がない */
 	  if (ret <0) {
 	      if (ret == TXTBSY ) {
 		  PrintMessage(ret,dicname2);
@@ -955,9 +952,9 @@ char  **argv;
 	      RkFinalize();
 	      exit(1);
 	  }
-	  (void)fprintf(stderr, gettxt("cannacmd:199", 
+	  (void)fprintf(stderr, gettxt("cannacmd:199",
 	       "New dictionary \"%s\" is created.\n"), dicname2);
-	  (void)fprintf(stderr, gettxt("cannacmd:200", 
+	  (void)fprintf(stderr, gettxt("cannacmd:200",
 	       "Please change customize file."));
       }
   }
@@ -986,7 +983,7 @@ char  **argv;
 	  RkFinalize();
 	  exit(ERR_VALUE);
       }
-  }  
+  }
 
   /* finalizeする */
   RkFinalize();
@@ -1009,7 +1006,7 @@ char  **argv;
 
     mode = Rk_MWD;
     is_display = FALSE;
-    hinshi = NULL ; 
+    hinshi = NULL ;
 
     scan_opt(argc,argv,&argc);
     if ( opt_i || opt_u || opt_s ||opt_fq||opt_std||opt_myg||opt_g) usage();
@@ -1060,7 +1057,7 @@ char  **argv;
 {
     unsigned char *p;
     int i, arg, j;
-    int bufcnt , ret;  
+    int bufcnt , ret;
     char  user[RECSZ*2] ;
     unsigned char  buf[BUFLEN];
     int user_offset = 0;
@@ -1068,17 +1065,17 @@ char  **argv;
 
     strcpy(msg_abnls,gettxt("cannacmd:119",
 	    "Cannaserver \"%s\" is in an abnormal state.\n"));
-    strcpy(msg_abnl, gettxt("cannacmd:120", 
+    strcpy(msg_abnl, gettxt("cannacmd:120",
 	    "Cannaserver is in an abnormal state.\n"));
 
     /*
      * ユーザ名が指定されていない時は
      * 自分の名前を探してその名前でRKを呼びます。
      */
-    
+
     user[0] = '\0';
     mode = 0 ;
-    
+
     scan_opt(argc,argv,&argc);
     if (opt_u) {
       strcpy(user, ":user/");
@@ -1097,23 +1094,23 @@ char  **argv;
       user_offset = strlen(user);
       (void)strcpy(user + user_offset, searchuname());
     }
-    
+
     if (opt_l) {
 	if (opt_i || opt_u || opt_g || opt_a ) usage();
     }
     if (opt_a) {
 	if (opt_i || opt_g || opt_myg || opt_u || opt_l ) usage();
-	opt_i = 1 ; 
-	opt_myg = 1 ; 
+	opt_i = 1 ;
+	opt_myg = 1 ;
     }
-    /* 辞書リスト作成 */    
+    /* 辞書リスト作成 */
 
     /* まずInitializeして */
     rk_init() ;
 
     /*  server  new/old check  */
     nwcheck() ;
-  
+
      if ( opt_i == 1 ) {
 	    if ( majv == 1 ) {    /* old server */
 	      if(*user == '\0') {
@@ -1142,7 +1139,7 @@ char  **argv;
       user_offset = 0;
     }
     else {
-	if ( opt_l || opt_g || opt_myg ) { 
+	if ( opt_l || opt_g || opt_myg ) {
 	    fprintf(stderr, gettxt("cannacmd:253",
 	   "This options or command are not supported by canna-server\n"));
 	    RkFinalize();
@@ -1175,11 +1172,11 @@ char  **argv;
     (void) signal(SIGTERM, StopAll);
     bufcnt = RkListDic(cx_num, user + user_offset, buf, BUFLEN );
 
-    
+
     /*
      *    辞書一覧をプリントアウトして終わりです。
      */
-    
+
     if (bufcnt >= 0) {
       for (p = buf, i = 0 ; i < bufcnt && *p ; i++) {
 	if ( opt_l ) {
@@ -1193,16 +1190,16 @@ char  **argv;
 	    switch (ret) {
 	      case RK_ENABLE_READ | RK_DISABLE_WRITE :
 		j = 0;
-		break ; 
+		break ;
 	      case RK_ENABLE_WRITE | RK_DISABLE_READ :
 		j = 1 ;
-		break ; 
+		break ;
 	      case RK_ENABLE_WRITE | RK_ENABLE_READ :
 		j = 2 ;
-		break ; 
+		break ;
 	      default :
 		j = 3 ;
-		break ; 
+		break ;
 	    }
 	    (void)fprintf(stdout, "%s  %s\n", p,accsbuf[j]);
 	}
@@ -1255,7 +1252,7 @@ Upload(fp, flag)
   FILE	*fp;
   int   flag;
 {
-    int ret=0 ; 
+    int ret=0 ;
     (void) signal(SIGINT,  StopAll);
     (void) signal(SIGQUIT, StopAll);
     (void) signal(SIGTERM, StopAll);
@@ -1293,24 +1290,24 @@ char  **argv;
     scan_opt(argc,argv,&argc);
     if ( opt_i || opt_u || opt_g ) usage();
     if ( opt_l && opt_std ) usage();
-    if ( (opt_l || opt_std) && opt_dic2 != NULL ) usage(); 
+    if ( (opt_l || opt_std) && opt_dic2 != NULL ) usage();
 
     if ( opt_fq ) {
       if ( opt_s ) {
         (void) fprintf(stderr,"%s", msg_sfq);
         exit(ERR_VALUE) ;
-      }  
+      }
       if ( opt_l || opt_std ) {
         (void) fprintf(stderr,"%s", msg_l);
         exit(ERR_VALUE) ;
       }
       mode = mode | PL_DIC ;
-      mode2 = PL_ALLOW ; 
+      mode2 = PL_ALLOW ;
     }
     if ( opt_s ) mode = Rk_SWD;
     if ( opt_l || opt_std ) {
-      upld++ ; 
-      l_file = opt_lfile ; 
+      upld++ ;
+      l_file = opt_lfile ;
     }
     if ( opt_myg ) { mode = mode | RK_GRP_DIC ;
     }
@@ -1321,10 +1318,10 @@ char  **argv;
       if (!l_file) {
 	fp = stdin;
       } else {
-	is_display = TRUE ; 
+	is_display = TRUE ;
 	fp = (FILE *)fopen(l_file, "r");
 	if (!fp) {
-	  Message(gettxt("cannacmd:149", 
+	  Message(gettxt("cannacmd:149",
 			 "%s: cannot open \"%s\""), Progname, l_file);
 	  exit(ERR_VALUE);
 	}
@@ -1338,7 +1335,7 @@ char  **argv;
 	opt_dic1 = argv[i] ;
 	if (ovwrite_chk(opt_dic1,mode) == 0 ) {
 	    if (Upload(fp, (int)upld) == -1) {
-		errflg = 1 ; 
+		errflg = 1 ;
 	    }
 	    else {
 		if (!upld) {
@@ -1347,7 +1344,7 @@ char  **argv;
 	    }
 	}
 	else {
-	    errflg = 1 ; 
+	    errflg = 1 ;
 	}
     }
     (void) RkFinalize();
@@ -1384,18 +1381,18 @@ char  **argv;
   scan_opt(argc,argv,&argc);
   if (opt_l || opt_r || opt_i ||opt_u||opt_s||opt_fq||opt_std||opt_g) usage();
   if (opt_dic2 == NULL) usage();
-  if ( opt_myg ) mode = mode | RK_GRP_DIC ; 
+  if ( opt_myg ) mode = mode | RK_GRP_DIC ;
 
-  
-  dicname1 = opt_dic1 ; 
-  dicname2 = opt_dic2 ; 
+
+  dicname1 = opt_dic1 ;
+  dicname2 = opt_dic2 ;
 
   strncpy(dic1, dicname1, RECSZ - 1);
   strncpy(dic2, dicname2, RECSZ - 1);
 
   /* 辞書名が同じならエラー */
   if(!strcmp(dic1,dic2)) {
-    fprintf(stderr, gettxt("cannacmd:161", 
+    fprintf(stderr, gettxt("cannacmd:161",
 	   "%s: %s, Dictionary name is same.\n"),Progname, dic1);
     exit(ERR_VALUE);
   }
@@ -1415,7 +1412,7 @@ char  **argv;
       ret = ERR_VALUE ;
   }
   RkFinalize();
-  exit(ret);    
+  exit(ret);
 }
 
 renameDictionary(cn, dicname1, dicname2, force)
@@ -1437,7 +1434,7 @@ int force;
     ret = 0;
     break;
   case 1 :
-    fprintf(stderr,gettxt("cannacmd:167", 
+    fprintf(stderr,gettxt("cannacmd:167",
 	  "Overwrite dictionary \"%s\" to \"%s\".\n"),dicname1, dicname2);
     ret = 0;
     break;
@@ -1445,7 +1442,7 @@ int force;
     (void)fprintf(stderr, gettxt("cannacmd:168", "No more memory.\n"));
     break;
   case NOENT :
-    fprintf(stderr,gettxt("cannacmd:169", 
+    fprintf(stderr,gettxt("cannacmd:169",
 	  "Dictionary \"%s\" does not exist.\n"), dicname1);
     ret = 1;
     break;
@@ -1459,13 +1456,13 @@ int force;
     ret = 1;
     break;
   case BADDR :
-    (void)fprintf(stderr,gettxt("cannacmd:172", 
+    (void)fprintf(stderr,gettxt("cannacmd:172",
 	"dics.dir is abnormal. Cannot create dictionary file.\n"));
     ret = -1;
     break;
   case MOUNT :
   case EXIST :
-    fprintf(stderr,gettxt("cannacmd:173", 
+    fprintf(stderr,gettxt("cannacmd:173",
 "Specified dictionary \"%s\" already exists. Do you overwrite it ? (y/n)"),
 	    dicname2);
     ans[0]=getchar();          /* 92.10.28 */
@@ -1480,7 +1477,7 @@ int force;
     }
     break;
   case TXTBSY :
-    fprintf(stderr,gettxt("cannacmd:175", 
+    fprintf(stderr,gettxt("cannacmd:175",
 	  "Dictionary \"%s\" or \"%s\" is in use. Cannot overwrite it.\n"),
 	    dicname1, dicname2);
     ret = 1;
@@ -1522,7 +1519,7 @@ char  **argv;
   scan_opt(argc,argv,&argc);
   if ( opt_l || opt_r || opt_i ||opt_u||opt_s||opt_std||opt_g) usage();
 
-  if ( opt_fq ) mode = PL_DIC ; 
+  if ( opt_fq ) mode = PL_DIC ;
   if ( opt_myg ) mode = mode | RK_GRP_DIC ;
 
   /* まずInitializeして */
@@ -1533,19 +1530,19 @@ char  **argv;
   (void) signal(SIGTERM, StopAll);
 
   /* 辞書削除 */
-  undel = 0 ; 
+  undel = 0 ;
   for(j = 1; j < argc; j++) {
 
       strncpy((char *)rm_dic, (char *)argv[j], RECSZ - 1);
       rm_dic[RECSZ - 1] = (unsigned char)0;
 
-      ret = rmDictionary(cx_num, rm_dic, mode) ; 
+      ret = rmDictionary(cx_num, rm_dic, mode) ;
       if (  ret == -1 ) {
 	RkFinalize();
 	exit(ERR_VALUE);
       }
       if (  ret == -2 ) {  /* 辞書を消せなかった */
-	  undel = 1 ; 
+	  undel = 1 ;
       }
       rmdone = 1; /* 実際に rm が行われた */
     }
@@ -1571,10 +1568,10 @@ ch_main(argc,argv)
 int   argc  ;
 char  **argv;
 {
-    int  ret ,mode ; 
+    int  ret ,mode ;
     scan_opt(argc,argv,&argc);
     if (opt_l||opt_r||opt_s||opt_fq||opt_std||opt_g||opt_u||opt_a) usage();
-    mode = opt_rw ; 
+    mode = opt_rw ;
     if ( mode == 0 ) usage();
     if ( opt_dic2 != NULL ) usage();
     if ( opt_myg ) mode = mode | RK_GRP_DIC;
@@ -1585,10 +1582,10 @@ char  **argv;
     (void) signal(SIGTERM, StopAll);
 
     ret = RkChmodDic(cx_num,opt_dic1,mode);
-    if (ret < 0) { 
+    if (ret < 0) {
 	switch (ret) {
           case NOENT:
-	    fprintf(stderr,gettxt("cannacmd:169", 
+	    fprintf(stderr,gettxt("cannacmd:169",
 		  "Dictionary \"%s\" does not exist.\n"), opt_dic1);
 	    break;
           case BADCONT:
@@ -1625,7 +1622,7 @@ sy_main(argc,argv)
 int   argc  ;
 char  **argv;
 {
-    int  ret ,mode ; 
+    int  ret ,mode ;
     scan_opt(argc,argv,&argc);
     if (opt_l||opt_r||opt_s||opt_fq||opt_std||opt_g||opt_u||opt_a||opt_myg)
       usage();
@@ -1644,7 +1641,7 @@ char  **argv;
     (void) signal(SIGTERM, StopAll);
 
     ret = RkSync(cx_num,NULL);
-    if (ret < 0) { 
+    if (ret < 0) {
 	fprintf(stderr,
 	   "invalid return code rksync  code=%d \n",ret);
 	RkFinalize();
@@ -1663,8 +1660,8 @@ int   argc  ;
 char  **argv;
 {
 
-    int  ret ; 
-    char *p ; 
+    int  ret ;
+    char *p ;
 
 #ifndef __EMX__
     if ( argc > 2 ) {
@@ -1707,10 +1704,10 @@ char  **argv;
     (void) signal(SIGTERM, StopAll);
 
     ret = RkKillServer();
-    if (ret < 0) { 
+    if (ret < 0) {
 	switch (ret) {
           case OLDSRV:
-	    fprintf(stderr,gettxt("cannacmd:258", 
+	    fprintf(stderr,gettxt("cannacmd:258",
 		"Cannot kill server,because server version is old.\n"));
 	    break;
           case NOTUXSRV:
@@ -1741,7 +1738,7 @@ can_ver()
     printf("canna version is %d.%d \n",
 	   protover/1024 , protover % 1024 );
     RkFinalize();
-    exit(0) ; 
+    exit(0) ;
 }
 
 /************************************************************************/
@@ -1775,14 +1772,14 @@ static struct  command {
 
 main(argc,argv)
 int argc ;
-char **argv ; 
+char **argv ;
 {
-    int     i ; 
+    int     i ;
     char *p ;
 
 #if defined(__STDC__) || defined(SVR4)
     (void)setlocale(LC_ALL,"");
-#endif 
+#endif
 
 #ifdef __EMX__
      Progname = _getname (argv[0]);
@@ -1802,19 +1799,19 @@ char **argv ;
 	 if (strcmp(Progname,commands[i].name) == 0) {
 	     cmd_code = commands[i].cmd_code ;
 	     (*commands[i].func)(argc,argv);
-	     break ; 
+	     break ;
          }
      }
      return (0);
 }
 
-/*  オプションのチェック 
+/*  オプションのチェック
     辞書名以外のオプションはチェック後 argv から取り除く   */
 scan_opt(argc,argv,argcp)
-int  argc ,*argcp; 
-char **argv ; 
-{ 
-/* この関数でチェックするもの 
+int  argc ,*argcp;
+char **argv ;
+{
+/* この関数でチェックするもの
        オプションの重複指定がないか
        引数を指定するオプションの引数があるか
        辞書が指定されているか(lsdicを除く)
@@ -1847,56 +1844,56 @@ static  char *options[]={"-cs","-cannaserver","-l","-hi","-h","-i","-u","-s",
 #define OPT_V   20
 #define OPT_A   21
 
-int 	opt_code , i ; 
-char    **p ; 
+int 	opt_code , i ;
+char    **p ;
 
     opt_cs = opt_l = opt_r = opt_h = opt_i = opt_u = opt_s = opt_fq = 0 ;
     opt_std = opt_myg = opt_g = opt_v = opt_a = 0 ;
-    opt_rw  = 0 ; 
+    opt_rw  = 0 ;
     opt_lfile = opt_dic1 = opt_dic2 = opt_user = opt_grp = NULL ;
 
     p = argv + 1 ;   /* コマンド部分を除く */
     while( *p != NULL ) {
 /*    printf(" argc= %d opt= %s\n",argc,*p);*/
       for (opt_code = 0 ; opt_code  < NOPTIONS ; opt_code++ ){
-	if (strcmp( *p ,options[opt_code]) == 0 )  break ; 
+	if (strcmp( *p ,options[opt_code]) == 0 )  break ;
       }
       switch(opt_code) {
         case OPT_CS :
         case OPT_CANNASAVER :
 	  if (opt_cs)  usage();			/* 重複チェック */
 	  if ( *(p + 1) == NULL ) usage();
-	  opt_cs = 1 ; 
+	  opt_cs = 1 ;
 	  (void) strcpy(init,*(p+1));
-	  shrink_opt(argc,p,2);		
-	  argc -= 2 ; 
-	  break ; 
+	  shrink_opt(argc,p,2);
+	  argc -= 2 ;
+	  break ;
         case OPT_FQ :
 	  if (opt_fq) usage();
-	  opt_fq = 1 ; 
+	  opt_fq = 1 ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
+	  argc-- ;
 	  break  ;
         case OPT_S :
 	  if (opt_s) usage();
-	  opt_s = 1 ; 
+	  opt_s = 1 ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
+	  argc-- ;
 	  break  ;
         case OPT_L :
 	  if (opt_l) usage();
 	  opt_l = 1 ;
 	  if (cmd_code == LS ) {
 	      shrink_opt(argc,p,1);
-	      argc-- ; 
+	      argc-- ;
 	  }
 	  else {
 	      if ( *(p + 1) == NULL ) usage();
 	      opt_lfile = *(p+1);
 	      shrink_opt(argc,p,2);
-	      argc -= 2 ; 
+	      argc -= 2 ;
 	  }
-	  break ; 
+	  break ;
         case OPT_H :
 	  usage();
         case OPT_R :
@@ -1904,99 +1901,99 @@ char    **p ;
 	  if ( *(p + 1) == NULL ) usage();
 	  hinshi = *(p+1);
 	  shrink_opt(argc,p,2);
-	  argc -= 2 ; 
-	  break ; 
+	  argc -= 2 ;
+	  break ;
         case OPT_I :
 	  if (opt_i) usage();
-	  opt_i = 1 ; 
+	  opt_i = 1 ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
+	  argc-- ;
 	  break  ;
         case OPT_U :
 	  if (opt_u) usage();
 	  if ( *(p + 1) == NULL ) usage();
-	  opt_u = 1 ; 
+	  opt_u = 1 ;
 	  opt_user = *(p+1);
 	  shrink_opt(argc,p,2);
-	  argc -= 2 ; 
-	  break ; 
+	  argc -= 2 ;
+	  break ;
         case OPT_STD :
 	  if (opt_std) usage();
-	  opt_std = 1 ; 
+	  opt_std = 1 ;
 	  opt_lfile = NULL;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
+	  argc-- ;
 	  break  ;
         case OPT_MYG :    /* -G */
 	  if ( opt_myg ) usage();
-	  opt_myg = 1 ; 
+	  opt_myg = 1 ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_G :      /* -g */
 	  if ( opt_g ) usage();
 	  if ( *(p+1) == NULL ) usage();
-	  opt_g = 1 ; 
+	  opt_g = 1 ;
 	  opt_grp = *(p+1);
 	  shrink_opt(argc,p,2);
-	  argc-=2 ; 
-	  break ; 
+	  argc-=2 ;
+	  break ;
         case OPT_WADD :      /* +w */
 	  if ((opt_rw & RK_DISABLE_WRITE) == RK_DISABLE_WRITE ) usage();
-	  opt_rw = opt_rw | RK_ENABLE_WRITE ; 
+	  opt_rw = opt_rw | RK_ENABLE_WRITE ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_WDEL :      /* -w */
 	  if ((opt_rw & RK_ENABLE_WRITE) == RK_ENABLE_WRITE ) usage();
-	  opt_rw = opt_rw | RK_DISABLE_WRITE ; 
+	  opt_rw = opt_rw | RK_DISABLE_WRITE ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_RADD :      /* +r */
 	  if ((opt_rw & RK_DISABLE_READ) == RK_DISABLE_READ ) usage();
-	  opt_rw = opt_rw | RK_ENABLE_READ ; 
+	  opt_rw = opt_rw | RK_ENABLE_READ ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_RDEL :      /* -r */
 	  if ((opt_rw & RK_ENABLE_READ) == RK_ENABLE_READ ) usage();
-	  opt_rw = opt_rw | RK_DISABLE_READ ; 
+	  opt_rw = opt_rw | RK_DISABLE_READ ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_WRADD :     /* +wr */
         case OPT_RWADD :     /* +rw */
 	  if ((opt_rw & RK_DISABLE_READ) == RK_DISABLE_READ ) usage();
 	  if ((opt_rw & RK_DISABLE_WRITE) == RK_DISABLE_WRITE ) usage();
-	  opt_rw = opt_rw | RK_ENABLE_WRITE | RK_ENABLE_READ ; 
+	  opt_rw = opt_rw | RK_ENABLE_WRITE | RK_ENABLE_READ ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_WRDEL :     /* -wr */
         case OPT_RWDEL :     /* -rw */
 	  if ((opt_rw & RK_ENABLE_READ) == RK_ENABLE_READ ) usage();
 	  if ((opt_rw & RK_ENABLE_WRITE) == RK_ENABLE_WRITE ) usage();
-	  opt_rw = opt_rw | RK_DISABLE_WRITE | RK_DISABLE_READ ; 
+	  opt_rw = opt_rw | RK_DISABLE_WRITE | RK_DISABLE_READ ;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         case OPT_V :
 	  can_ver() ;
         case OPT_A :
 	  opt_a = 1;
 	  shrink_opt(argc,p,1);
-	  argc-- ; 
-	  break ; 
+	  argc-- ;
+	  break ;
         default :
 	  dicname_chk(*p);
 	  if ( opt_dic1 == NULL ) {
-	    opt_dic1 = *p ; 
+	    opt_dic1 = *p ;
 	  }
 	  else {
-	    opt_dic2 = *p ; 
+	    opt_dic2 = *p ;
 	  }
-	  p++ ; 
+	  p++ ;
       }       /* case end */
     }         /* for  end */
     if (cmd_code == LS || cmd_code == SY){
@@ -2008,16 +2005,16 @@ char    **p ;
 
     if (cmd_code != CHMOD && opt_rw != 0) usage();
 
-    *argcp = argc ; 
+    *argcp = argc ;
     return(0);
 }
 
 /*  argv のオプションを n 個分前に詰める */
 shrink_opt(argc,argv,n)
-int  argc, n ; 
+int  argc, n ;
 char  *argv[] ;
 {
-    int  i ; 
+    int  i ;
     for ( i = n ; i < argc ; i++ ) {
       argv[i-n] = argv[i];
     }

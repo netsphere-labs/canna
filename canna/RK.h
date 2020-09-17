@@ -294,63 +294,6 @@ int	RkQueryDic pro((int, char *, char *, struct DicInfo *));
 }
 #endif
 
-#if defined(ENGINE_SWITCH)
-struct rkfuncs {
-  int (*GetProtocolVersion) pro((int *, int *));
-  char *(*GetServerName) pro((void));
-  int (*GetServerVersion) pro((int *, int *));
-  int (*Initialize) pro((char *));
-  void (*Finalize) pro((void));
-  int (*CreateContext) pro((void));
-  int (*DuplicateContext) pro((int));
-  int (*CloseContext) pro((int));
-  int (*SetDicPath) pro((int, char *));
-  int (*CreateDic) pro((int, unsigned char *, int));
-  int (*SyncDic) pro((int, char *));
-  int (*GetDicList) pro((int, char *, int));
-  int (*GetMountList) pro((int, char *, int));
-  int (*MountDic) pro((int, char *, int));
-  int (*RemountDic) pro((int, char *, int));
-  int (*UnmountDic) pro((int, char *));
-  int (*DefineDic) pro((int, char *, cannawc *));
-  int (*DeleteDic) pro((int, char *, cannawc *));
-  int (*GetHinshi) pro((int, cannawc *, int));
-  int (*GetKanji) pro((int, cannawc *, int));
-  int (*GetYomi) pro((int, cannawc *, int));
-  int (*GetLex) pro((int, RkLex *, int));
-  int (*GetStat) pro((int, RkStat *));
-  int (*GetKanjiList) pro((int, cannawc *, int));
-  int (*FlushYomi) pro((int));
-  int (*GetLastYomi) pro((int, cannawc *, int));
-  int (*RemoveBun) pro((int, int));
-  int (*SubstYomi) pro((int, int, int, cannawc *, int));
-  int (*BgnBun) pro((int, cannawc *, int, int));
-  int (*EndBun) pro((int, int));
-  int (*GoTo) pro((int, int));
-  int (*Left) pro((int));
-  int (*Right) pro((int));
-  int (*Next) pro((int));
-  int (*Prev) pro((int));
-  int (*Nfer) pro((int));
-  int (*Xfer) pro((int, int));
-  int (*Resize) pro((int, int));
-  int (*Enlarge) pro((int));
-  int (*Shorten) pro((int));
-  int (*StoreYomi) pro((int, cannawc *, int));
-  int (*SetAppName) pro((int, char *));
-  int (*SetUserInfo) pro((char *, char *, char *));
-  int (*QueryDic) pro((int, char *, char *, struct DicInfo *));
-  int (*CopyDic) pro((int, char *, char *, char *, int));
-  int (*ListDic) pro((int, char *, char *, int));
-  int (*RemoveDic) pro((int, char *, int));
-  int (*RenameDic) pro((int, char *, char *, int));
-  int (*ChmodDic) pro((int, char *, int));
-  int (*GetWordTextDic) pro((int, unsigned char	*, unsigned char *,
-			     cannawc *, int));
-  int (*GetSimpleKanji) pro((int, char *, cannawc *, int, cannawc *, int,
-			     cannawc *, int));
-};
-#endif /* ENGINE_SWITCH */
 
 #ifdef CANNA_EXP_PREDEFINED
 #undef CANNA_EXP_PREDEFINED

@@ -6,25 +6,21 @@
  * both that copyright notice and this permission notice appear in
  * supporting documentation, and that the name of NEC Corporation
  * not be used in advertising or publicity pertaining to distribution
- * of the software without specific, written prior permission.  NEC 
+ * of the software without specific, written prior permission.  NEC
  * Corporation makes no representations about the suitability of this
  * software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 static	char	rcs_id[] = "@(#) 112.1 $Id: RKdelline.c,v 1.3 2003/10/02 07:40:30 aida_s Exp $";
-
-#ifdef ENGINE_SWITCH
-#include "RKrename.h"
-#endif
 
 #define CANNA_NEW_WCHAR_AWARE
 #include <canna/RK.h>
@@ -40,7 +36,7 @@ char *line;
   char *buf = (char *)malloc(linelen + 1), *sp, *dp;
   int res = 0;
 
-  
+
   if ( !buf ) {
     return -1;
   }
@@ -54,7 +50,7 @@ char *line;
   dp = buf;
   while (*sp && (*sp != ' ' && *sp != '\t')) { /* 読みのとりだし */
       if (*sp == '\\' && *(sp+1) ) { /* エスエープされた文字 */
-	  *dp++ = *sp++ ; 
+	  *dp++ = *sp++ ;
       }
       *dp++ = *sp++;
   }
@@ -84,7 +80,7 @@ char *line;
 	dp = buf + yomihinshilen;
 	while (*sp && (*sp != ' ' && *sp != '\t')) { /* 候補のコピー */
 	    if (*sp == '\\' && *(sp+1)) { /* エスエープされた文字 */
-		*dp++ = *sp++ ; 
+		*dp++ = *sp++ ;
 	    }
 	    *dp++ = *sp++;
 	}
