@@ -67,6 +67,7 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #endif
 #include    <signal.h>
 #include <assert.h>
+#include <string.h> // memmove()
 
 static int min(int a, int b) { return a <= b ? a : b; }
 
@@ -1344,7 +1345,7 @@ _RkwGetYomi( RkcContext* cx, cannawc* yomi, int maxyomi)
 	if( (len = ushortstrlen(src_yomi )) > maxyomi )
 	    retval = 0;
 
-	bcopy( src_yomi, yomi, (len + 1) * sizeof(cannawc) );
+	memmove( yomi, src_yomi, (len + 1) * sizeof(cannawc) );
 	retval = len;
     }
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -1414,14 +1415,14 @@ RkwGetStat(int cxnum, RkStat* stat)
 	    register int tmp1, tmp2 ;
 	    int i ;
 
-	    bcopy( stat, p, sizeof( RkStat ) ) ;
+	    memmove( p, stat, sizeof( RkStat ) ) ;
 	    tmp1 = p[ 5 ];
 	    tmp2 = p[ 6 ] ;
 	    for( i = 4; i > 1; i-- )
 		p[ i + 2 ] = p[ i ] ;
 	    p[ 2 ] = tmp1 ;
 	    p[ 3 ] = tmp2 ;
-	    bcopy( p, stat, sizeof( RkStat ) ) ;
+	    memmove( stat, p, sizeof( RkStat ) ) ;
 	}
     } else {
 	ret = -1 ;
@@ -2682,62 +2683,6 @@ RkChmodDic( int cxnum, char* dicname, int mode)
     return RkwChmodDic(cxnum, (char *)dicname, mode);
 }
 #endif /* OMIT_EUC_FUNCS */
-
-#ifdef ENGINE_SWITCH
-exp(struct rkfuncs) RkFuncs = {
-  RkwGetProtocolVersion,
-  RkwGetServerName,
-  RkwGetServerVersion,
-  RkwInitialize,
-  RkwFinalize,
-  RkwCreateContext,
-  RkwDuplicateContext,
-  RkwCloseContext,
-  RkwSetDicPath,
-  RkwCreateDic,
-  RkwSync,
-  RkwGetDicList,
-  RkwGetMountList,
-  RkwMountDic,
-  RkwRemountDic,
-  RkwUnmountDic,
-  RkwDefineDic,
-  RkwDeleteDic,
-  RkwGetHinshi,
-  RkwGetKanji,
-  RkwGetYomi,
-  RkwGetLex,
-  RkwGetStat,
-  RkwGetKanjiList,
-  RkwFlushYomi,
-  RkwGetLastYomi,
-  RkwRemoveBun,
-  RkwSubstYomi,
-  RkwBgnBun,
-  RkwEndBun,
-  RkwGoTo,
-  RkwLeft,
-  RkwRight,
-  RkwNext,
-  RkwPrev,
-  RkwNfer,
-  RkwXfer,
-  RkwResize,
-  RkwEnlarge,
-  RkwShorten,
-  RkwStoreYomi,
-  RkwSetAppName,
-  RkwSetUserInfo,
-  RkwQueryDic,
-  RkwCopyDic,
-  RkwListDic,
-  RkwRemoveDic,
-  RkwRenameDic,
-  RkwChmodDic,
-  RkwGetWordTextDic,
-  RkwGetSimpleKanji,
-};
-#endif /* ENGINE_SWITCH */
 
 
 /**

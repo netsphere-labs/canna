@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -25,10 +25,6 @@
  */
 #ifndef lint
 static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 1.3.2.2 2003/12/27 17:15:21 aida_s Exp $";
-#endif
-
-#ifdef ENGINE_SWITCH
-#include "RKrename.h"
 #endif
 
 #include <stdio.h>
@@ -55,7 +51,7 @@ extern  char *gettxt();
 #define	gettxt(x,y)  (y)
 #endif
 
-#define  BUFLEN  1024        /* add 91.11.21. */ 
+#define  BUFLEN  1024        /* add 91.11.21. */
 #define  ERR_VALUE  1
 
 extern int RkGetWordTextDic();
@@ -68,26 +64,26 @@ static char  msg_mnts[80];
 static char  msg_mnt[80];
 static char  msg_fq[80];
 static char  msg_cnt[80];
-static int   msg_flg = 0 ; 
+static int   msg_flg = 0 ;
 
 static void
 msg_set(){
-    
-    if (msg_flg == 1 ) return ; 
+
+    if (msg_flg == 1 ) return ;
     (void)strcpy(msg_mem,gettxt("cannacmd:186", "No more memory.\n"));
     (void)strcpy(msg_abnls,gettxt("cannacmd:187",
          "Cannaserver \"%s\" is in an abnormal state.\n"));
     (void)strcpy(msg_abnl,gettxt("cannacmd:188",
 	 "Cannaserver is in an abnormal state.\n"));
-    (void)strcpy(msg_mnts,gettxt("cannacmd:189", 
+    (void)strcpy(msg_mnts,gettxt("cannacmd:189",
 	 "Cannaserver \"%s\" does not support dictionary maintenance.\n"));
-    (void)strcpy(msg_mnt,gettxt("cannacmd:190", 
+    (void)strcpy(msg_mnt,gettxt("cannacmd:190",
  	 "Cannaserver does not support dictionary maintenance.\n"));
     (void)strcpy(msg_fq,gettxt("cannacmd:191",
          "Cannot use option -fq in irohaserver.\n"));
-    (void)strcpy(msg_cnt,gettxt("cannacmd:192", 
+    (void)strcpy(msg_cnt,gettxt("cannacmd:192",
          "Illegal context value was used.\n"));
-    msg_flg = 1 ; 
+    msg_flg = 1 ;
 
 }
 
@@ -101,7 +97,7 @@ char *line;
   char *buf = (char *)malloc(linelen + 1), *sp, *dp;
   int res = 0;
 
-  
+
   if ( !buf ) {
     return -1;
   }
@@ -115,7 +111,7 @@ char *line;
   dp = buf;
   while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* 読みのとりだし */
       if (*sp == '\\' && *(sp+1) ) { /* エスエープされた文字 */
-	  *dp++ = *sp++ ; 
+	  *dp++ = *sp++ ;
       }
       *dp++ = *sp++;
   }
@@ -145,7 +141,7 @@ char *line;
 	dp = buf + yomihinshilen;
 	while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* 候補のコピー */
 	    if (*sp == '\\' && *(sp+1) ) { /* エスエープされた文字 */
-		*dp++ = *sp++ ; 
+		*dp++ = *sp++ ;
 	    }
 	    *dp++ = *sp++;
 	}
@@ -214,7 +210,7 @@ int            mode ;
 	break;
       if(dic1_bk[0] != '\0') { /* １回目はマウントする */
 	if(RkMountDic(cx_num, (char *)dicname2, 0)) {
-	  
+
 #ifdef DEBUG
 	  (void)fprintf(stderr, "\nmode=%d\n", mode);
 #endif
@@ -224,14 +220,14 @@ int            mode ;
 	  } else {
 	    (void)rmDictionary(cx_num, dicname2 ,mode);
 	  }
-	  (void)fprintf(stderr, gettxt("cannacmd:193", 
+	  (void)fprintf(stderr, gettxt("cannacmd:193",
 	       "Cannot mount dictionary \"%s\".\n"),dicname2);
 	  return -1;
 	}
       }
       /* １行登録する */
       if (RkDefineLine(cx_num, dicname2, (char *)buf) == -1) {
-	(void)fprintf(stderr,gettxt("cannacmd:194", 
+	(void)fprintf(stderr,gettxt("cannacmd:194",
 	    "write error: \"%s\"\n"), buf);
 	continue;
       }
@@ -251,11 +247,11 @@ int            mode ;
       } else {
 	(void)rmDictionary(cx_num,dicname2, mode);
       }
-      return -1; 
+      return -1;
     }
   } while(ret >= 0);
   RkUnmountDic(cx_num,(char *)dicname2);
-  return 0; 
+  return 0;
 }
 
 PrintMessage(ret, dicname)
@@ -267,7 +263,7 @@ unsigned char  *dicname;
   case 0 :
     break;
   case NOENT :
-    (void)fprintf(stderr, gettxt("cannacmd:195", 
+    (void)fprintf(stderr, gettxt("cannacmd:195",
 	 "Dictionary \"%s\" does not exist.\n"), dicname);
     break;
   case NOTALC :
@@ -281,7 +277,7 @@ unsigned char  *dicname;
     (void)fprintf(stderr, gettxt("cannacmd:197", "dics.dir is abnormal.\n"));
     break;
   case NOMOUNT :
-    (void)fprintf(stderr, gettxt("cannacmd:198", 
+    (void)fprintf(stderr, gettxt("cannacmd:198",
 	 "Cannot mount dictionary \"%s\".\n"), dicname);
     break;
   case ACCES :
@@ -289,7 +285,7 @@ unsigned char  *dicname;
 	"Cannot access to dictionary.\n"));
     break;
   case TXTBSY :
-    (void)fprintf(stderr,gettxt("cannacmd:209", 
+    (void)fprintf(stderr,gettxt("cannacmd:209",
 	"Dictionary \"%s\" is in use. Cannot overwrite it.\n"),dicname);
     break;
   default:
@@ -347,14 +343,14 @@ int mode ;
   if (( mode & PL_DIC ) != PL_DIC ) {
   switch ( RkCreateDic( cn, dicname, mode) ) {
   case 0 :
-    (void)fprintf(stderr, gettxt("cannacmd:199", 
+    (void)fprintf(stderr, gettxt("cannacmd:199",
 	 "New dictionary \"%s\" is created.\n"), dicname);
-    (void)fprintf(stderr, gettxt("cannacmd:200", 
+    (void)fprintf(stderr, gettxt("cannacmd:200",
 	 "Please change customize file."));
     ret = 0;
     break;
   case 1 :
-    (void)fprintf(stderr, gettxt("cannacmd:201", 
+    (void)fprintf(stderr, gettxt("cannacmd:201",
 	 "Dictionary \"%s\" is overwritten."), dicname);
     ret = 0;
     break;
@@ -363,12 +359,12 @@ int mode ;
     ret = -1;
     break;
   case BADF :
-    (void)fprintf(stderr, gettxt("cannacmd:202", 
+    (void)fprintf(stderr, gettxt("cannacmd:202",
 	 "\"%s\" is binary dictionary. Cannot overwrite it.\n"),dicname);
     ret = -1;
     break;
   case BADDR :
-    (void)fprintf(stderr,gettxt("cannacmd:203", 
+    (void)fprintf(stderr,gettxt("cannacmd:203",
 	"dics.dir is abnormal. Cannot create dictionary.\n"));
     ret = -1;
     break;
@@ -381,12 +377,12 @@ int mode ;
     * check 'stdin' for uploaddic.
     */
     if (isatty(fileno(stdin)) != 0) {
-	(void)fprintf(stderr,gettxt("cannacmd:205", 
+	(void)fprintf(stderr,gettxt("cannacmd:205",
     "Specified dictionary \"%s\" already exists. Do you overwrite it ? (y/n)"),
 		      dicname);
 	fgets(ans,80,stdin);
     } else {
-	(void)fprintf(stderr,gettxt("cannacmd:206", 
+	(void)fprintf(stderr,gettxt("cannacmd:206",
 	    "Specified dictionary \"%s\" already exists."),dicname);
 	(void)strcpy(ans,"n");
     }
@@ -399,20 +395,20 @@ int mode ;
 #endif
 	}
     } else {
-	(void)fprintf(stderr, gettxt("cannacmd:207", 
+	(void)fprintf(stderr, gettxt("cannacmd:207",
 	     "Dictionary \"%s\" is not created.\n"), dicname);
 	ret = -1;
     }
     break;
   case INVAL :
-    (void)fprintf(stderr,gettxt("cannacmd:208", 
+    (void)fprintf(stderr,gettxt("cannacmd:208",
 "Dictionary \"%s\" is different from current dic. Cannot overwrite it.\n"),
 		  dicname);
     ret = -1;
     break;
   case MOUNT :
   case TXTBSY :
-    (void)fprintf(stderr,gettxt("cannacmd:209", 
+    (void)fprintf(stderr,gettxt("cannacmd:209",
 	"Dictionary \"%s\" is in use. Cannot overwrite it.\n"),dicname);
     ret = -1;
     break;
@@ -438,12 +434,12 @@ int mode ;
   else {    /*  PL_DIC  */
   switch ( RkCreateDic( cn, dicname, mode) ) {
   case 0 :
-    (void)fprintf(stderr, gettxt("cannacmd:211", 
+    (void)fprintf(stderr, gettxt("cannacmd:211",
   "Personal learning file of system dictionary \"%s\" is created."), dicname);
     ret = 0;
     break;
   case 1 :
-    (void)fprintf(stderr, gettxt("cannacmd:212", 
+    (void)fprintf(stderr, gettxt("cannacmd:212",
 "Personal learning file of system dictionary \"%s\" is overwritten."),dicname);
     ret = 0;
     break;
@@ -452,18 +448,18 @@ int mode ;
     ret = -1;
     break;
   case BADF :
-    (void)fprintf(stderr,gettxt("cannacmd:213", 
+    (void)fprintf(stderr,gettxt("cannacmd:213",
 	"\"%s\" is text dictionary. Cannot create personal learning file.\n"),
 		  dicname);
     ret = -1;
     break;
   case BADDR :
-    (void)fprintf(stderr,gettxt("cannacmd:214", 
+    (void)fprintf(stderr,gettxt("cannacmd:214",
 	"dics.dir is abnormal. Personal learning file is not created. \n"));
     ret = -1;
     break;
   case ACCES :
-    (void)fprintf(stderr, gettxt("cannacmd:215", 
+    (void)fprintf(stderr, gettxt("cannacmd:215",
 	 "Personal learning file is not created.\n"));
     ret = -1;
     break;
@@ -472,11 +468,11 @@ int mode ;
     * check 'stdin' for uploaddic.
     */
     if (isatty(fileno(stdin)) != 0) {
-	(void)fprintf(stderr,gettxt("cannacmd:216", 
+	(void)fprintf(stderr,gettxt("cannacmd:216",
 "Personal learning file of dictionary \"%s\" exists. Do you overwrite it ? (y/n)"),dicname);
 	fgets(ans,80,stdin);
     } else {
-	(void)fprintf(stderr,gettxt("cannacmd:217", 
+	(void)fprintf(stderr,gettxt("cannacmd:217",
     "Personal learning file of system dictionary \"%s\" already exists."),
 		      dicname);
 	(void)strcpy(ans,"n");
@@ -490,21 +486,21 @@ int mode ;
 #endif
 	}
     } else {
-	(void)fprintf(stderr, gettxt("cannacmd:218", 
+	(void)fprintf(stderr, gettxt("cannacmd:218",
      "Personal learning file of system dictionary \"%s\" is not created.\n"),
 		      dicname);
 	ret = -1;
     }
     break;
   case INVAL :
-    (void)fprintf(stderr,gettxt("cannacmd:219", 
+    (void)fprintf(stderr,gettxt("cannacmd:219",
 "Learning file \"%s\" is different from current dic. Cannot overwrite it.\n"),
 		  dicname);
     ret = -1;
     break;
   case MOUNT :
   case TXTBSY :
-    (void)fprintf(stderr,gettxt("cannacmd:220", 
+    (void)fprintf(stderr,gettxt("cannacmd:220",
       "\"%s\" is in use. Cannot overwrite personal learing file.\n"),dicname);
     ret = -1;
     break;
@@ -517,10 +513,10 @@ int mode ;
     ret = -1;
     break;
   case NOENT  :   /* 91.12.03 */
-    (void)fprintf(stderr, gettxt("cannacmd:221", 
+    (void)fprintf(stderr, gettxt("cannacmd:221",
 	 "System dictionary \"%s\" does not exist.\n"), dicname);
-    ret = -1 ; 
-    break ; 
+    ret = -1 ;
+    break ;
   default:
     if(init[0] != '/') {
       (void)fprintf(stderr, msg_abnls, init);
@@ -544,7 +540,7 @@ int  mode ;
   int ret = 0;
   static int  majv , minv ,bak ;     /* add 91.11.21 */
 
-  msg_set() ; 
+  msg_set() ;
 #ifdef DEBUG
   (void)fprintf(stderr,"RkRemoveDic(cn=%d,dicname=%s)\n", cn, dicname);
 #endif
@@ -582,28 +578,28 @@ int  mode ;
   if (( mode & PL_DIC ) != PL_DIC ) {
   switch (RkRemoveDic(cn, dicname, mode)) {
   case 0:
-    (void)fprintf(stderr, gettxt("cannacmd:222", 
+    (void)fprintf(stderr, gettxt("cannacmd:222",
 	 "Dictionary \"%s\" is deleted.\n"), dicname );
     ret = 0;
     break;
   case NOENT :
-    (void)fprintf(stderr, gettxt("cannacmd:223", 
+    (void)fprintf(stderr, gettxt("cannacmd:223",
 	 "Dictionary \"%s\" does not exist.\n"), dicname );
     ret = -2 ;  /* 93.03.03 */
     break;
   case BADF :
-    (void)fprintf(stderr,gettxt("cannacmd:224", 
+    (void)fprintf(stderr,gettxt("cannacmd:224",
 	"\"%s\" is binary dictionary. Cannot detele it.\n"),dicname);
     ret = -2;   /* 93.03.03 */
     break;
   case ACCES :
-    (void)fprintf(stderr,gettxt("cannacmd:225", 
+    (void)fprintf(stderr,gettxt("cannacmd:225",
 	"Cannot delete dictionary \"%s\".\n"), dicname );
     ret = -2;   /* 93.03.03 */
     break;
   case MOUNT:
   case TXTBSY:
-    (void)fprintf(stderr,gettxt("cannacmd:226", 
+    (void)fprintf(stderr,gettxt("cannacmd:226",
 	"Dictinary \"%s\" is in use. Cannot delete it.\n"),dicname );
     ret = -2;   /* 93.03.03 */
     break;
@@ -625,12 +621,12 @@ int  mode ;
   else {     /*  PL_DIC  */
   switch (RkRemoveDic(cn, dicname, mode)) {
   case 0:
-    (void)fprintf(stderr, gettxt("cannacmd:227", 
+    (void)fprintf(stderr, gettxt("cannacmd:227",
 	 "Personal learning file \"%s\" is deleted.\n"),dicname );
     ret = 0;
     break;
   case NOENT :
-    (void)fprintf(stderr, gettxt("cannacmd:228", 
+    (void)fprintf(stderr, gettxt("cannacmd:228",
 	 "Personal learning file \"%s\" does not exist.\n"),dicname );
     ret = -2;   /* 93.03.03 */
     break;
@@ -640,13 +636,13 @@ int  mode ;
     ret = -2;   /* 93.03.03 */
     break;
   case ACCES :
-    (void)fprintf(stderr,gettxt("cannacmd:230", 
+    (void)fprintf(stderr,gettxt("cannacmd:230",
         "Cannot delete personal learning file \"%s\".\n"),dicname );
     ret = -2;   /* 93.03.03 */
     break;
   case MOUNT:
   case TXTBSY:
-    (void)fprintf(stderr,gettxt("cannacmd:231", 
+    (void)fprintf(stderr,gettxt("cannacmd:231",
      "Personal learning file \"%s\" is in use. Cannot delete it.\n"),dicname );
     ret = -2;   /* 93.03.03 */
     break;

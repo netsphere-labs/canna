@@ -22,9 +22,6 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifdef ENGINE_SWITCH
-#include "RKrename.h"
-#endif
 #include "canna/ccompat.h"
 RCSID("$Id: cannastat.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $");
 
