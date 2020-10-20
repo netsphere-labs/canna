@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: confP.h,v 1.7 2003/10/05 09:27:02 aida_s Exp $ */
@@ -32,7 +32,7 @@
 /*#define CONF_EVAL_DEBUG*/
 
 struct tagRkcErrorBuf {
-  char **buf;
+    char **buf;
   size_t bufsize;
   size_t curr;
   int nomem;
@@ -235,9 +235,8 @@ static int syn_host pro((Parser *cx));
 #define DECL_CALCPROC(x) static unsigned int x \
 pro((unsigned int, unsigned int))
 #define DEF_CALCPROC(x) static unsigned int \
-x(arg1, arg2) \
-unsigned int arg1; \
-unsigned int arg2;
+x(unsigned int arg1, unsigned int arg2)
+
 #define DEF_CALCPROC_OP1(x, op) DEF_CALCPROC(x) \
 /* ARGUSED */ \
 { return op arg1; }

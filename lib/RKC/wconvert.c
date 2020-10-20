@@ -293,7 +293,7 @@ rkc_build_cannaserver_list( char** list )
 {
     char work[ MAX_HOSTNAME ];
     const char *hostp ;
-    char **listp = list, *getenv();
+    char **listp = list;
     exp(char *) RkwGetServerName();
     FILE *hostfp ;
 
@@ -463,11 +463,8 @@ int rkc_Connect_Iroha_Server( char* hostname )
 /*
  * サーバから返された第一候補列を、第一候補列バッファに格納する。
  */
-
-static firstKouhoStore pro((int, BYTE *, int, BYTE *));
-
 static
-firstKouhoStore( int n, BYTE* data, int len, BYTE* dest)
+int firstKouhoStore( int n, BYTE* data, int len, BYTE* dest)
 {
     RkcContext *cx = (RkcContext *)dest;
     register Ushort *return_kouho, *wp ;
@@ -976,7 +973,8 @@ int SendType11Request( int majo, int mino, int con, int bun, cannawc* wstr, int 
 }
 
 static
-int SendType12Request( int majo, int mino, int con, cannawc* wstr, char* str) /* DefineWord */
+int SendType12Request( int majo, int mino, int con, cannawc* wstr,
+                       const char* str) /* DefineWord */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int slen = strlen(str) + 1, wlen = ushortstrlen(wstr) + 1, i;
@@ -1082,7 +1080,7 @@ int SendType14Request( int majo, int mino, int mod, int con, cannawc* wstr, int 
 
 
 static
-int SendType15Request( int majo, int mino, int mod, int con, char* str) /* MountDictionary */
+int SendType15Request( int majo, int mino, int mod, int con, const char* str) /* MountDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int slen = strlen(str) + 1;
@@ -1142,7 +1140,7 @@ int SendType16Request( int majo, int mino, int mod, int con, char* ostr, char* n
 
 
 static
-int SendType17Request( int majo, int mino, char* str, int slen) /* QueryExtension */
+int SendType17Request( int majo, int mino, const char* str, int slen) /* QueryExtension */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + slen, res;
@@ -1167,7 +1165,8 @@ int SendType17Request( int majo, int mino, char* str, int slen) /* QueryExtensio
 
 #ifdef EXTENSION
 static
-int SendType18Request( int majo, int mino, int con, char* str1, int s1len, char* str2, int s2len, int val) /* ListDictionary */
+int SendType18Request( int majo, int mino, int con, const char* str1, int s1len,
+                       const char* str2, int s2len, int val) /* ListDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + SIZEOFSHORT + s1len + s2len + SIZEOFSHORT;
@@ -1198,7 +1197,8 @@ int SendType18Request( int majo, int mino, int con, char* str1, int s1len, char*
 #endif /* EXTENSION */
 
 static
-int SendType19Request( int majo, int mino, int mod, int con, char* ustr, char* dstr) /* QueryDictionary */
+int SendType19Request( int majo, int mino, int mod, int con, const char* ustr,
+                       char* dstr) /* QueryDictionary */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int uslen = strlen(ustr) + 1, dslen = strlen(dstr) + 1;
@@ -1228,7 +1228,8 @@ int SendType19Request( int majo, int mino, int mod, int con, char* ustr, char* d
 }
 
 static
-SendType20Request( int majo, int mino, int con, int cmd, int dsz, char* data, int bsz) /* Through */
+int SendType20Request( int majo, int mino, int con, int cmd, int dsz,
+                       char* data, int bsz) /* Through */
 {
   BYTE lbuf[SENDBUFSIZE], *bufp = lbuf, *p;
   int sz = HEADER_SIZE + SIZEOFSHORT + SIZEOFLONG * 2 + dsz;
@@ -1634,7 +1635,7 @@ int rkcw_dictionary_list( RkcContext* cx, char* dicnames, int mxi)
 
 
 static
-int define_dic( int proto, RkcContext* cx, char* dicname, cannawc* wordrec)
+int define_dic( int proto, RkcContext* cx, const char* dicname, cannawc* wordrec)
 {
   int reply;
 
@@ -1647,7 +1648,7 @@ int define_dic( int proto, RkcContext* cx, char* dicname, cannawc* wordrec)
 
 
 static
-int rkcw_define_dic( RkcContext* cx, char* dicname, cannawc* wordrec)
+int rkcw_define_dic( RkcContext* cx, const char* dicname, cannawc* wordrec)
 {
   return define_dic(wDefineWord, cx, dicname, wordrec);
 }
@@ -1661,7 +1662,8 @@ int rkcw_delete_dic( RkcContext* cx, char* dicname, cannawc* wordrec)
 
 
 static
-int mount_dictionary( int majo, int mino, int context, char* data, int mode)
+int mount_dictionary( int majo, int mino, int context, const char* data,
+                      int mode)
 {
   int reply;
 
@@ -1674,7 +1676,7 @@ int mount_dictionary( int majo, int mino, int context, char* data, int mode)
 
 
 static
-int rkcw_mount_dictionary( RkcContext* cx, char* dicname, int mode )
+int rkcw_mount_dictionary( RkcContext* cx, const char* dicname, int mode )
 {
   return mount_dictionary(wMountDictionary, 0, (int)cx->server, dicname, mode);
 }
@@ -1836,12 +1838,9 @@ int rkcw_get_kanji_list( RkcContext* cx )
 		    kanjilistStore, (BYTE *)&bun->kanji);
 }
 
-static rkcw_resize pro((RkcContext *, int));
 
 static
-rkcw_resize( cx, yomi_length )
-register RkcContext *cx ;
-int yomi_length ;
+int rkcw_resize( RkcContext* cx, int yomi_length )
 {
   int n;
 
@@ -1854,11 +1853,9 @@ int yomi_length ;
   return -1;
 }
 
+
 static
-store_yomi(proto, cx, yomi, maxyomi)
-int proto, maxyomi;
-RkcContext *cx;
-Ushort *yomi ;
+int store_yomi( int proto, RkcContext* cx, Ushort* yomi, int maxyomi)
 {
   int wlen = ushortstrlen(yomi) + 1, n;
 
@@ -1872,19 +1869,16 @@ Ushort *yomi ;
   return -1;
 }
 
-static rkcw_store_yomi pro((RkcContext *, Ushort *, int));
 
 static
-rkcw_store_yomi(cx, yomi, maxyomi)
-register RkcContext *cx ;
-Ushort *yomi ;
-int maxyomi;
+int rkcw_store_yomi(RkcContext* cx, Ushort* yomi, int maxyomi)
 {
   return store_yomi(wStoreYomi, cx, (Ushort *)yomi, maxyomi);
 }
 
+
 static
-char *BasicExtension = {
+const char* BasicExtension = {
 #ifdef EXTENSION
     /* Request Name */
     "GetServerInfo\0GetAccessControlList\0CreateDictioinary\0\
@@ -1896,8 +1890,7 @@ ListDictioinary\0\0"
 } ;
 
 static int
-Query_Extension_Ex(reqnames)
-char *reqnames;
+Query_Extension_Ex(const char* reqnames)
 {
     int datalen = 0, reply;
 
@@ -1925,13 +1918,10 @@ Query_Extension()
 #ifdef EXTENSION
 /* ARGSUSED */
 
-static rkcw_list_dictionary pro((RkcContext *, char *, char *, int));
 
 static
-rkcw_list_dictionary( cx, dirname, dicnames_return, size )
-register RkcContext *cx ;
-char *dirname, *dicnames_return ;
-int size ;
+int rkcw_list_dictionary( RkcContext* cx, char* dirname, char* dicnames_return,
+                          int size )
 {
     int extension_base = Query_Extension(), n;
     int slen = strlen((char *)dirname) + 1;
@@ -1949,13 +1939,9 @@ int size ;
     return -1;
 }
 
-static rkcw_create_dictionary pro((RkcContext *, char *, int));
 
 static
-rkcw_create_dictionary( cx, dicname, mode )
-register RkcContext *cx ;
-char *dicname ;
-int mode ;
+int rkcw_create_dictionary( RkcContext* cx, char* dicname, int mode )
 {
     int extension_base = Query_Extension() ;
 
@@ -1965,13 +1951,9 @@ int mode ;
 			    (int)cx->server, dicname, mode);
 }
 
-static rkcw_delete_dictionary pro((RkcContext *, char *, int));
 
 static
-rkcw_delete_dictionary( cx, dicname, mode )
-register RkcContext *cx ;
-char *dicname ;
-int mode;
+int rkcw_delete_dictionary( RkcContext* cx, char* dicname, int mode )
 {
     int extension_base = Query_Extension() ;
 
@@ -1982,13 +1964,9 @@ int mode;
 			    dicname, mode);
 }
 
-static rkcw_rename_dictionary pro((RkcContext *, char *, char *, int));
 
 static
-rkcw_rename_dictionary( cx, dic, newdic, mode )
-register RkcContext *cx;
-char *dic, *newdic;
-int mode;
+int rkcw_rename_dictionary( RkcContext* cx, char* dic, char* newdic, int mode )
 {
   int reply;
   int extension_base = Query_Extension() ;
@@ -2011,14 +1989,9 @@ int mode;
   Protocol Version 3.2 からサポート。それ以前のサーバへは送ってはいけない。
   このチェックは rkc.c で行なうこと。
  */
-
-static rkcw_copy_dictionary pro((RkcContext *, char *, char *, char *, int));
-
 static
-rkcw_copy_dictionary(cx, dir, dic, newdic, mode)
-register RkcContext *cx;
-char *dir, *dic, *newdic;
-int mode;
+int rkcw_copy_dictionary( RkcContext* cx, char* dir, char* dic, char* newdic,
+                          int mode)
 {
   int reply;
   int extension_base = Query_Extension() ;
@@ -2036,15 +2009,11 @@ int mode;
 /* ここまで */
 /* ARGSUSED */
 
-static rkcw_get_text_dictionary
-  pro((RkcContext *, char *, char *, Ushort *, int));
 
 static
-rkcw_get_text_dictionary( cx, dirname, dicname, info, infolen )
-register RkcContext *cx ;
-char *dirname, *dicname ;
-Ushort *info ;
-int infolen ;
+int rkcw_get_text_dictionary( RkcContext* cx, const char* dirname,
+                              const char* dicname,
+                              Ushort* info, int infolen )
 {
     int extension_base = Query_Extension() ;
     int dirlen = strlen((char *)dirname) + 1;
@@ -2064,9 +2033,9 @@ int infolen ;
     return retval;
 }
 
+
 int
-rkcw_get_server_info( majorp, minorp )
-int *majorp, *minorp;
+rkcw_get_server_info( int* majorp, int* minorp )
 {
   int reply, vmajp, vminp;
   int extension_base = Query_Extension() ;
@@ -2084,11 +2053,9 @@ int *majorp, *minorp;
 }
 #endif /* EXTENSION */
 
+
 static
-statusStore(n, data, dest)
-int n;
-BYTE *data;
-RkStat *dest;
+int statusStore( int n, BYTE* data, RkStat* dest)
 {
   if (!(n < 0)) {
     dest->bunnum = (int)L4TOL(data);	/* bunsetsu bangou */
@@ -2108,12 +2075,9 @@ RkStat *dest;
   return 0;
 }
 
-static rkcw_get_stat pro((RkcContext *, RkStat *));
 
 static
-rkcw_get_stat( cx, stat )
-register RkcContext *cx ;
-RkStat *stat ;
+int rkcw_get_stat( RkcContext* cx, RkStat* stat )
 {
     RkcBun *bun = &cx->bun[cx->curbun];
     int n, retval = -1;
@@ -2127,12 +2091,9 @@ RkStat *stat ;
     return retval;
 }
 
+
 static
-lexStore(n, data, dlen, dest)
-int n, dlen;
-BYTE *data;
-RkLex *dest;
-/* ARGSUSED */
+int lexStore( int n, BYTE* data, int dlen, RkLex* dest)
 {
   int i;
 
@@ -2151,13 +2112,9 @@ RkLex *dest;
   return 0;
 }
 
-static rkcw_get_lex pro((RkcContext *, int, RkLex *));
 
 static
-rkcw_get_lex( cx, mxi, info )
-register RkcContext *cx;
-int mxi;
-RkLex *info;
+int rkcw_get_lex( RkcContext* cx, int mxi, RkLex* info )
 {
     RkcBun *bun = &cx->bun[cx->curbun];
     int n, retval = -1;
@@ -2171,14 +2128,10 @@ RkLex *info;
     return retval;
 }
 
+
 /* 逐次変換に必要な関数 */
-
-static rkcw_autoconv pro((RkcContext *, int, int));
-
 static
-rkcw_autoconv( cx, length, mode )
-RkcContext *cx;
-int length, mode;
+int rkcw_autoconv( RkcContext* cx, int length, int mode )
 {
   int reply;
 
@@ -2189,14 +2142,10 @@ int length, mode;
   return -1;
 }
 
-static rkcw_subst_yomi pro((RkcContext *, int, int, int, Ushort *, int));
 
 static
-rkcw_subst_yomi( cx, nbun, y_start, y_end, yomi, y_len )
-register RkcContext *cx ;
-int nbun, y_start, y_end, y_len ;
-Ushort *yomi ;
-/* ARGSUSED */
+int rkcw_subst_yomi( RkcContext* cx, int nbun, int y_start, int y_end,
+                     Ushort* yomi, int y_len )
 {
   int n;
 
@@ -2208,11 +2157,9 @@ Ushort *yomi ;
   return -1;
 }
 
-static rkcw_flush_yomi pro((RkcContext *));
 
 static
-rkcw_flush_yomi( cx )
-register RkcContext *cx ;
+int rkcw_flush_yomi( RkcContext* cx )
 {
   int n;
 
@@ -2223,13 +2170,9 @@ register RkcContext *cx ;
   return -1;
 }
 
-static rkcw_get_last_yomi pro((RkcContext *, Ushort *, int));
 
 static
-rkcw_get_last_yomi( cx, yomi, maxyomi )
-register RkcContext *cx ;
-Ushort *yomi ;
-int maxyomi ;
+int rkcw_get_last_yomi( RkcContext* cx, Ushort* yomi, int maxyomi )
 {
   int n;
 
@@ -2240,12 +2183,9 @@ int maxyomi ;
   return -1;
 }
 
-static rkcw_remove_bun pro((RkcContext *, int));
 
 static
-rkcw_remove_bun( cx, mode )
-RkcContext *cx ;
-int mode ;
+int rkcw_remove_bun( RkcContext* cx, int mode )
 {
     register Ushort *return_kouho;
     register int i, len, stat, curbun;
@@ -2279,11 +2219,9 @@ int mode ;
     return( stat );
 }
 
+
 static
-simpleKanjiStore(n, data, kdest, hdest)
-int n;
-BYTE *data;
-Ushort *kdest, *hdest;
+int simpleKanjiStore( int n, BYTE* data, Ushort* kdest, Ushort* hdest)
 {
   if (!(n < 0)) {
     int i;
@@ -2310,15 +2248,10 @@ Ushort *kdest, *hdest;
   return 0;
 }
 
-static rkcw_get_simple_kanji
-  pro((RkcContext *, char *, Ushort *, int, Ushort *, int, Ushort *, int));
 
 static
-rkcw_get_simple_kanji( cx, dic, yomi, mxy, kan, mxk, hin, mxh )
-register RkcContext *cx ;
-char *dic;
-Ushort *yomi, *kan, *hin;
-int mxy, mxk, mxh ;
+int rkcw_get_simple_kanji( RkcContext* cx, char* dic, Ushort* yomi, int mxy,
+                           Ushort* kan, int mxk, Ushort* hin, int mxh )
 {
   int n;
 
@@ -2331,10 +2264,9 @@ int mxy, mxk, mxh ;
   return -1;
 }
 
+
 BYTE *
-copyS8(src, des, maxlen)
-BYTE *src, *des;
-int maxlen;
+copyS8(BYTE* src, BYTE* des, int maxlen)
 {
   BYTE *p = src, *q = des, *r = des + maxlen - 1; /* 1 for EOS */
 
@@ -2352,11 +2284,9 @@ int maxlen;
   return p + 1;
 }
 
+
 static
-dicinfoStore(n, data, dest)
-int n;
-BYTE *data;
-struct DicInfo *dest;
+int dicinfoStore( int n, BYTE* data, struct DicInfo* dest)
 {
   int mlen = dest->di_count;
 
@@ -2376,13 +2306,10 @@ struct DicInfo *dest;
   return 0;
 }
 
-static rkcw_query_dic pro((RkcContext *, char *, char *, struct DicInfo *));
 
 static
-rkcw_query_dic(cx, usrname, dicname, info)
-RkcContext *cx;
-char *usrname, *dicname;
-struct DicInfo *info;
+int rkcw_query_dic( RkcContext* cx, const char* usrname, char* dicname,
+                    struct DicInfo* info)
 {
   int reply;
 
@@ -2395,13 +2322,9 @@ struct DicInfo *info;
   return -1;
 }
 
-static rkcw_get_hinshi pro((RkcContext *, Ushort *, int));
 
 static
-rkcw_get_hinshi( cx, dst, mxd )
-register RkcContext *cx;
-Ushort *dst;
-int mxd;
+int rkcw_get_hinshi( RkcContext* cx, Ushort* dst, int mxd )
 {
   RkcBun *bun = &cx->bun[cx->curbun];
   int reply;
@@ -2414,74 +2337,52 @@ int mxd;
   return -1;
 }
 
-static rkcw_store_range pro((RkcContext *, Ushort *, int));
 
 static
-rkcw_store_range(cx, yomi, maxyomi)
-register RkcContext *cx ;
-Ushort *yomi ;
-int maxyomi;
+int rkcw_store_range( RkcContext* cx, Ushort* yomi, int maxyomi)
 {
   return store_yomi(wStoreRange, cx, yomi, maxyomi);
 }
 
-static rkcw_set_locale pro((RkcContext *, char *));
 
 static
-rkcw_set_locale( cx, locale )
-register RkcContext *cx ;
-char *locale ;
+int rkcw_set_locale( RkcContext* cx, char* locale )
 {
   return mount_dictionary(wSetLocale, 0, (int)cx->server, locale, 0);
 }
 
-static rkcw_sync pro((RkcContext *, char *));
 
 static
-rkcw_sync(cx, dicname)
-register RkcContext *cx;
-char *dicname;
+int rkcw_sync(RkcContext* cx, const char* dicname)
 {
   return mount_dictionary(wSync, 1, (int)cx->server, dicname, 0);
 }
 
-static rkcw_set_app_name pro((RkcContext *, char *));
 
 static
-rkcw_set_app_name( cx, apname )
-register RkcContext *cx;
-char *apname;
+int rkcw_set_app_name( RkcContext* cx, char* apname )
 {
   return mount_dictionary(wSetApplicationName, 0, (int)cx->server, apname, 0);
 }
 
+
 /*
   Protocol Version 3.2 からサポート。それ以前のサーバへは送ってはいけない。
   このチェックは rkc.c で行なうこと。
  */
-
-static rkcw_notice_group_name pro((RkcContext *, char *));
-
 static
-rkcw_notice_group_name(cx, groupname)
-RkcContext *cx;
-char *groupname;
+int rkcw_notice_group_name( RkcContext* cx, char* groupname)
 {
   return mount_dictionary(wNoticeGroupName, 0, (int)cx->server, groupname, 0);
 }
 
+
 /*
   Protocol Version 3.2 からサポート。それ以前のサーバへは送ってはいけない。
   このチェックは rkc.c で行なうこと。
  */
-
-static rkcw_chmod_dic pro((RkcContext *, char *, int));
-
 static
-rkcw_chmod_dic(cx, dicname, mode)
-register RkcContext *cx;
-char *dicname;
-int mode;
+int rkcw_chmod_dic( RkcContext* cx, char* dicname, int mode)
 {
   int reply;
 
@@ -2492,13 +2393,9 @@ int mode;
   return -1;
 }
 
-static rkcw_through pro((RkcContext *, int, char *, int, int));
 
 static
-rkcw_through( cx, cmd, data, datasz, bufsz )
-register RkcContext *cx;
-int cmd, datasz, bufsz;
-char *data;
+int rkcw_through( RkcContext* cx, int cmd, char* data, int datasz, int bufsz )
 {
   int reply;
 

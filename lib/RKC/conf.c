@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "canna/sglobal.h"
@@ -45,8 +45,7 @@ RkcErrorBuf rkc_errors;
 RkcConfMgr rkc_config;
 
 static char *
-config_path(name)
-const char *name;
+config_path(const char* name)
 {
   const char *home;
   RkiStrbuf buf;
@@ -71,11 +70,9 @@ nomem:
   return NULL;
 }
 
+
 static char *
-read_pipe_with_errors(cmd, errors, size)
-const char *cmd;
-RkcErrorBuf *errors;
-size_t *size;
+read_pipe_with_errors(const char* cmd, RkcErrorBuf* errors, size_t* size)
 {
   int pipefds[4];
   pid_t pid;
@@ -89,7 +86,7 @@ size_t *size;
     pipefds[i] = -1;
   RkiStrbuf_init(&outbuf);
   RkiStrbuf_init(&errbuf);
-  
+
   if (pipe(pipefds) || pipe(pipefds + 2)) {
     RkcErrorBuf_add(errors, "Cannot open pipe");
     goto fail;
@@ -257,7 +254,7 @@ rkc_configure()
     } else
       goto input_error;
   }
-  if (!(cmd = malloc(strlen(preproc) + strlen(path) + 2))) {
+  if (!(cmd = (char*) malloc(strlen(preproc) + strlen(path) + 2))) {
     RkcErrorBuf_nomem(&rkc_errors);
     goto last;
   }
@@ -288,93 +285,98 @@ rkc_config_fin()
   RkcErrorBuf_destroy(&rkc_errors);
 }
 
+
 static void
-RkcErrorBuf_init(cx)
-RkcErrorBuf *cx;
+RkcErrorBuf_init(RkcErrorBuf* cx)
 {
   bzero(cx, sizeof(RkcErrorBuf));
 }
 
+
 static void
-RkcErrorBuf_destroy(cx)
-RkcErrorBuf *cx;
+RkcErrorBuf_destroy(RkcErrorBuf* cx)
 {
-  if (cx->buf) {
-    char **p = cx->buf, **endp = p + cx->curr;
-    for (; p < endp; ++p)
-      free(*p);
-    free(cx->buf);
-  }
+    assert(cx);
+    if (cx->buf) {
+        char **p = cx->buf;
+        char **endp = p + cx->curr;
+        for (; p < endp; ++p)
+            free(*p);
+        free(cx->buf);
+    }
 }
 
-static void
-RkcErrorBuf_add(cx, msg)
-RkcErrorBuf *cx;
-const char *msg;
-{
-  char *newmsg;
-  if (cx->nomem)
-    return;
-  if (!(newmsg = strdup(msg)))
-    goto fail;
 
-  /* reserve last 2 spaces for out-of-memory msg and NULL terminater */
-  assert((cx->bufsize == 0 && cx->buf == NULL)
+static void
+RkcErrorBuf_add(RkcErrorBuf* cx, const char* msg)
+{
+    assert(cx);
+
+    char *newmsg;
+    if (cx->nomem)
+        return;
+    if (!(newmsg = strdup(msg)))
+        goto fail;
+
+    /* reserve last 2 spaces for out-of-memory msg and NULL terminater */
+    assert((cx->bufsize == 0 && cx->buf == NULL)
       || (cx->bufsize >= 10 && cx->curr + 2 <= cx->bufsize));
-  if (cx->curr + 2 >= cx->bufsize) {
-    size_t bufsize = cx->bufsize * 2 + 10;
-    char **newbuf;
-    newbuf = realloc(cx->buf, bufsize * sizeof(char *));
-    if (!newbuf)
-      goto fail;
-    cx->buf = newbuf;
-    cx->bufsize = bufsize;
-  }
-  cx->buf[cx->curr] = newmsg;
-  ++cx->curr;
-  return;
+    if (cx->curr + 2 >= cx->bufsize) {
+        size_t bufsize = cx->bufsize * 2 + 10;
+        char **newbuf;
+        newbuf = (char**) realloc(cx->buf, bufsize * sizeof(char *));
+        if (!newbuf)
+            goto fail;
+        cx->buf = newbuf;
+        cx->bufsize = bufsize;
+    }
+    cx->buf[cx->curr] = newmsg;
+    ++cx->curr;
+    return;
 fail:
-  free(newmsg);
-  cx->nomem = 1;
+    free(newmsg);
+    cx->nomem = 1;
 }
+
 
 const char *const *
-RkcErrorBuf_get(cx)
-RkcErrorBuf *cx;
+RkcErrorBuf_get(RkcErrorBuf* cx)
 {
-  static const char *const altres1[] = { NULL };
-  static const char *const altres2[] = { NOMEM_MSG, NULL };
-  assert((cx->bufsize == 0 && cx->buf == NULL)
+    assert(cx);
+
+    static const char *const altres1[] = { NULL };
+    static const char *const altres2[] = { NOMEM_MSG, NULL };
+    assert((cx->bufsize == 0 && cx->buf == NULL)
       || (cx->bufsize >= 10 && cx->curr + 2 <= cx->bufsize));
-  if (cx->nomem) {
-    if (cx->buf == NULL)
-      return altres2;
-    cx->buf[cx->curr] = NOMEM_MSG;
-    cx->buf[cx->curr + 1] = NULL;
-  } else {
-    if (cx->buf == NULL)
-      return altres1;
-    cx->buf[cx->curr] = NULL;
-  }
-  return (const char **)cx->buf;
+    if (cx->nomem) {
+        if (cx->buf == NULL)
+            return altres2;
+        cx->buf[cx->curr] = strdup(NOMEM_MSG);
+        cx->buf[cx->curr + 1] = NULL;
+    }
+    else {
+        if (cx->buf == NULL)
+            return altres1;
+        cx->buf[cx->curr] = NULL;
+    }
+    return cx->buf;
 }
 
+
+// @return If malloc() failed, -1.
 static int
-Token_assignstr(tp, str, len, type)
-TokenRec *tp;
-const char *str;
-size_t len;
-int type;
+Token_assignstr(TokenRec* tp, const char* str, size_t len, TokenType type)
 {
-  size_t *hdrp = malloc(sizeof(size_t) + len + 1);
-  char *bodyp;
-  assert(type >= TOK_STRING);
-  if (!hdrp)
-    return -1;
-  *hdrp = 1;
-  bodyp = (char *)hdrp + sizeof(size_t);
-  memcpy(bodyp, str, len);
-  bodyp[len] = '\0';
+    assert(type >= TOK_STRING);
+
+    size_t *hdrp = (size_t*) malloc(sizeof(size_t) + len + 1);
+    char *bodyp;
+    if (!hdrp)
+        return -1;
+    *hdrp = 1;
+    bodyp = (char*)(hdrp + 1);
+    memcpy(bodyp, str, len);
+    bodyp[len] = '\0';
   assert(strlen(bodyp) == len);
   TOKEN_UNREF(tp);
   tp->type = type;
@@ -382,15 +384,13 @@ int type;
   return 0;
 }
 
+
 static Lexer *
-Lexer_new(srcdata, srcsize, errorbuf)
-const char *srcdata;
-size_t srcsize;
-RkcErrorBuf *errorbuf;
+Lexer_new(const char* srcdata, size_t srcsize, RkcErrorBuf* errorbuf)
 {
   Lexer *cx;
   const char *p;
-  cx = malloc(sizeof(Lexer));
+  cx = (Lexer*) malloc(sizeof(Lexer));
   if (!cx) {
     RkcErrorBuf_nomem(errorbuf);
     return NULL;
@@ -414,20 +414,18 @@ fail:
   return NULL;
 }
 
+
 static void
-Lexer_delete(cx)
-Lexer *cx;
+Lexer_delete(Lexer* cx)
 {
   if (!cx)
     return;
   free(cx);
 }
 
+
 static int
-match_operator1(resp, postfix_op, ch)
-TokenRec *resp;
-int postfix_op;
-int ch;
+match_operator1(TokenRec* resp, int postfix_op, int ch)
 {
   static const struct {
     int op_char;
@@ -464,17 +462,14 @@ int ch;
   return 0;
 }
 
+
 static int
-match_operator2(resp, postfix_op, ch1, ch2)
-TokenRec *resp;
-int postfix_op;
-int ch1;
-int ch2;
+match_operator2(TokenRec* resp, int postfix_op, int ch1, int ch2)
 {
-  static const struct {
-    char op_expr[2];
-    Operator op_code;
-  } oplist2[] = {
+    static const struct {
+        const char* op_expr;
+        Operator op_code;
+    } oplist2[] = {
     { "<<", OP_LSHIFT },
     { ">>", OP_RSHIFT },
     { "==", OP_EQUAL },
@@ -494,11 +489,9 @@ int ch2;
   return 0;
 }
 
+
 static int
-Lexer_next(cx, resp, postfix_op)
-Lexer *cx;
-TokenRec *resp;
-int postfix_op;
+Lexer_next(Lexer* cx, TokenRec* resp, int postfix_op)
 {
   int ch = 0; /* stop gcc's warning */
 
@@ -542,7 +535,7 @@ restart:
     }
     goto not_a_directive;
 skiptoeol:
-    p = memchr(p, '\n', cx->rdend - p);
+    p = (char*) memchr(p, '\n', cx->rdend - p);
     if (!p) {
       cx->curr = cx->rdend;
       goto eof;
@@ -701,19 +694,18 @@ tokinval:
   return 0;
 }
 
+
 static void
-Lexer_error(cx, msg)
-const Lexer *cx;
-const char *msg;
+Lexer_error(const Lexer* cx, const char* msg)
 {
-  char *newmsg;
-  unsigned int lineno;
-  
-  newmsg = malloc(sizeof("line X(10col)XX: ") + strlen(msg));
-  if (!newmsg) {
-    RkcErrorBuf_nomem(cx->errorbuf);
-    return;
-  }
+    char *newmsg;
+    unsigned int lineno;
+
+    newmsg = (char*) malloc(sizeof("line X(10col)XX: ") + strlen(msg));
+    if (!newmsg) {
+        RkcErrorBuf_nomem(cx->errorbuf);
+        return;
+    }
   lineno = cx->lineno;
   if (lineno > MY_UINT32MAX)
     lineno = MY_UINT32MAX;
@@ -767,14 +759,12 @@ const TokenRec *tp;
 }
 #endif /* CONF_LEXER_DEBUG */
 
+
 static Parser *
-Parser_new(confmgr, lexer, errorbuf)
-RkcConfMgr *confmgr;
-Lexer *lexer;
-RkcErrorBuf *errorbuf;
+Parser_new(RkcConfMgr* confmgr, Lexer* lexer, RkcErrorBuf* errorbuf)
 {
   Parser *cx;
-  cx = malloc(sizeof(Parser));
+  cx = (Parser*) malloc(sizeof(Parser));
   if (!cx) {
     RkcErrorBuf_nomem(errorbuf);
     return NULL;
@@ -787,9 +777,9 @@ RkcErrorBuf *errorbuf;
   return cx;
 }
 
+
 static void
-Parser_delete(cx)
-Parser *cx;
+Parser_delete(Parser* cx)
 {
   if (!cx)
     return;
@@ -797,9 +787,9 @@ Parser *cx;
   free(cx);
 }
 
+
 static void
-Parser_run(cx)
-Parser *cx;
+Parser_run(Parser* cx)
 {
   if (Parser_next(cx))
     goto fail;
@@ -811,9 +801,9 @@ fail:
   return;
 }
 
+
 static int
-Parser_next(cx)
-Parser *cx;
+Parser_next(Parser* cx)
 {
   int r = Lexer_next(cx->lexer, &cx->currtok, 0);
 #ifdef CONF_LEXER_DEBUG
@@ -822,9 +812,9 @@ Parser *cx;
   return r;
 }
 
+
 static int
-Parser_next_postfixop(cx)
-Parser *cx;
+Parser_next_postfixop(Parser* cx)
 {
   int r;
   r = Lexer_next(cx->lexer, &cx->currtok, 1);
@@ -834,23 +824,20 @@ Parser *cx;
   return r;
 }
 
+
 static void
-Parser_error(cx, msg)
-Parser *cx;
-const char *msg;
+Parser_error(Parser* cx, const char* msg)
 {
   if (!cx->discard)
     Lexer_error(cx->lexer, msg);
 }
 
+
 static int
-Parser_stmt(cx, stmttab, nstmt)
-Parser *cx;
-const StmtRec *stmttab;
-size_t nstmt;
+Parser_stmt( Parser* cx, const StmtRec* stmttab, size_t nstmt)
 {
   size_t i;
-  
+
   assert(cx->currtok.type != TOK_EOF);
   if (cx->currtok.type != TOK_WORD) {
     Parser_error(cx, "Syntax error");
@@ -927,7 +914,7 @@ size_t nstmt;
     goto skip;
   }
   return Parser_next(cx);
-  
+
 skip:
   while (cx->currtok.type != TOK_SEMICOLON && cx->currtok.type != TOK_EOF)
     if (Parser_next(cx))
@@ -942,7 +929,7 @@ static const OperatorRec operators[] = {
   { DUMMY_PRIO,	0,		(CalcProc)NULL },	/* OP_RPAREN */
   { 20,		21,		(CalcProc)NULL },	/* OP_QUESTION */
   { 20,		20,		(CalcProc)NULL },	/* OP_COLON */
-  
+
   { 150,	DUMMY_PRIO,	&calc_uplus },		/* OP_UPLUS */
   { 150,	DUMMY_PRIO,	&calc_uminus },		/* OP_UMINUS */
   { 121,	120,		&calc_bplus },		/* OP_BPLUS */
@@ -968,17 +955,16 @@ static const OperatorRec operators[] = {
   { 150,	DUMMY_PRIO,	&calc_lnot },		/* OP_LNOT */
 };
 
+
 static void
-Parser_eval_error(cx)
-Parser *cx;
+Parser_eval_error(Parser* cx)
 {
   Parser_error(cx, "Syntax error in an expression");
 }
 
+
 static int
-Parser_eval(cx, lprio)
-Parser *cx;
-int lprio;
+Parser_eval(Parser* cx, int lprio)
 {
   int r;
   unsigned int val1;
@@ -1116,9 +1102,9 @@ checkpostfixop:
   return 0;
 }
 
+
 static char *
-Parser_getstr(cx)
-Parser *cx;
+Parser_getstr(Parser* cx)
 {
   RkiStrbuf sb;
 
@@ -1167,12 +1153,12 @@ DEF_CALCPROC_OP1(calc_lnot,	!)
 
 static const StmtRec top_statements[] = {
   { "cannahost", CONF_CANNAHOST, (StmtProc)NULL},
-  { "host", CONF_SPECIAL, (StmtProc)&syn_host},
+  { "host", (ConfItem) CONF_SPECIAL, (StmtProc)&syn_host},
 };
 
+
 static int
-syn_top(cx)
-Parser *cx;
+syn_top(Parser* cx)
 {
   while (cx->currtok.type != TOK_EOF) {
     if (cx->currtok.type == TOK_SEMICOLON) {
@@ -1190,9 +1176,9 @@ static const StmtRec host_statements[] = {
   { "server_timeout", CONF_SERVER_TIMEOUT, (StmtProc)NULL },
 };
 
+
 static int
-syn_host(cx)
-Parser *cx;
+syn_host(Parser* cx)
 {
   int res;
   int old_discard = cx->discard;
@@ -1264,18 +1250,17 @@ allend:
   return res;
 }
 
+
 static void
-RkcConfMgr_init(cx, errors)
-RkcConfMgr *cx;
-RkcErrorBuf *errors;
+RkcConfMgr_init(RkcConfMgr* cx, RkcErrorBuf* errors)
 {
   bzero(cx, sizeof(RkcConfMgr));
   cx->errors = errors;
 }
 
+
 static void
-RkcConfMgr_destroy(cx)
-RkcConfMgr *cx;
+RkcConfMgr_destroy(RkcConfMgr* cx)
 {
   size_t pos;
   HostRec *currhost = cx->hosts, *nexthost;
@@ -1296,16 +1281,15 @@ RkcConfMgr *cx;
   }
 }
 
+
 static int
-RkcConfMgr_openhost(cx, hostname)
-RkcConfMgr *cx;
-const char *hostname;
+RkcConfMgr_openhost( RkcConfMgr* cx, const char* hostname)
 {
   HostRec *hostrec;
 
   assert(!cx->currhost);
 
-  hostrec = calloc(1, sizeof(HostRec));
+  hostrec = (HostRec*) calloc(1, sizeof(HostRec));
   if (!hostrec)
     goto nomem;
   hostrec->hostname = strdup(hostname);
@@ -1324,18 +1308,17 @@ nomem:
   return -1;
 }
 
+
 static void
-RkcConfMgr_closehost(cx)
-RkcConfMgr *cx;
+RkcConfMgr_closehost(RkcConfMgr* cx)
 {
   assert(cx->currhost);
   cx->currhost = NULL;
 }
 
+
 static ConfRec *
-RkcConfMgr_get_target(cx, item)
-RkcConfMgr *cx;
-ConfItem item;
+RkcConfMgr_get_target(RkcConfMgr* cx, ConfItem item)
 {
   ConfRec *rec, *endrec;
   ConfRec **conf;
@@ -1359,7 +1342,7 @@ ConfItem item;
     size_t newsize = *conf_size * 2 + 2;
     ConfRec *tmp;
 
-    tmp = realloc(*conf, newsize * sizeof(ConfRec));
+    tmp = (ConfRec*) realloc(*conf, newsize * sizeof(ConfRec));
     if (!tmp) {
       RkcErrorBuf_nomem(cx->errors);
       return NULL;
@@ -1373,11 +1356,9 @@ ConfItem item;
   return rec;
 }
 
+
 static int
-RkcConfMgr_set_string(cx, item, val)
-RkcConfMgr *cx;
-ConfItem item;
-const char *val;
+RkcConfMgr_set_string( RkcConfMgr* cx, ConfItem item, const char* val)
 {
   char *newval;
   ConfRec *target;
@@ -1394,11 +1375,9 @@ nomem:
   return -1;
 }
 
+
 int
-RkcConfMgr_set_number(cx, item, val)
-RkcConfMgr *cx;
-ConfItem item;
-unsigned int val;
+RkcConfMgr_set_number( RkcConfMgr* cx, ConfItem item, unsigned int val)
 {
   ConfRec *target;
 
@@ -1409,11 +1388,9 @@ unsigned int val;
   return 0;
 }
 
+
 int
-RkcConfMgr_set_yesno(cx, item, val)
-RkcConfMgr *cx;
-ConfItem item;
-int val;
+RkcConfMgr_set_yesno( RkcConfMgr* cx, ConfItem item, int val)
 {
   ConfRec *target;
 
@@ -1424,10 +1401,9 @@ int val;
   return 0;
 }
 
+
 static int
-hostname_match(pattern, name)
-const char *pattern;
-const char *name;
+hostname_match( const char* pattern, const char* name)
 {
   const char *p, *endp;
   size_t namelen = strlen(name);
@@ -1445,11 +1421,9 @@ const char *name;
   return !strcmp(p, "*") || !strcmp(p, name);
 }
 
+
 static const ConfRec *
-RkcConfMgr_find(cx, item, hostname)
-const RkcConfMgr *cx;
-ConfItem item;
-const char *hostname;
+RkcConfMgr_find( const RkcConfMgr* cx, ConfItem item, const char* hostname)
 {
   ConfRec *confrec, *confend;
   if (hostname) {
@@ -1498,11 +1472,9 @@ const NumberDefaultRec host_num_defaults[] = {
   { CONF_SERVER_TIMEOUT, 0u },
 };
 
+
 const char *
-RkcConfMgr_get_string(cx, item, hostname)
-const RkcConfMgr *cx;
-ConfItem item;
-const char *hostname;
+RkcConfMgr_get_string( const RkcConfMgr* cx, ConfItem item, const char* hostname)
 {
   const ConfRec *confrec;
   const StrDefaultRec *defrec, *endrec;
@@ -1526,11 +1498,9 @@ const char *hostname;
   return (char *)defrec->val;
 }
 
+
 unsigned int
-RkcConfMgr_get_number(cx, item, hostname)
-const RkcConfMgr *cx;
-ConfItem item;
-const char *hostname;
+RkcConfMgr_get_number(const RkcConfMgr* cx, ConfItem item, const char* hostname)
 {
   const ConfRec *confrec;
   const NumberDefaultRec *defrec, *endrec;
@@ -1554,11 +1524,9 @@ const char *hostname;
   return defrec->val;
 }
 
+
 int
-RkcConfMgr_get_yesno(cx, item, hostname)
-const RkcConfMgr *cx;
-ConfItem item;
-const char *hostname;
+RkcConfMgr_get_yesno( const RkcConfMgr* cx, ConfItem item, const char* hostname)
 {
   const ConfRec *confrec;
   const NumberDefaultRec *defrec, *endrec;
