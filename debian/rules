@@ -6,15 +6,19 @@ export DH_VERBOSE=1
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+
+export DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
 override_dh_auto_build:
 	dh_testdir
 	./mkrelease.sh && xmkmf
 	cd doc/man/guide/tex && xmkmf
 	$(MAKE) canna \
 		CDEBUGFLAGS="-g -Wall" \
-		CCOPTIONS="$$(dpkg-buildflags --get CFLAGS) $$(dpkg-buildflags --get CPPFLAGS)" \
-		LOCAL_LDFLAGS="$$(dpkg-buildflags --get LDFLAGS)" \
-		SHLIBGLOBALSFLAGS="$$(dpkg-buildflags --get LDFLAGS)"
+		CCOPTIONS="$(CFLAGS) $(CPPFLAGS)" \
+		LOCAL_LDFLAGS="$(LDFLAGS)" \
+		SHLIBGLOBALSFLAGS="$(LDFLAGS)"
 	$(MAKE) -C doc/man/guide/tex
 
 override_dh_install:
