@@ -2,8 +2,7 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: autoconf,
-               debhelper-compat (=12),
+Build-Depends: debhelper-compat (=12),
                libx11-dev,
                po-debconf,
                texlive-lang-cjk,
