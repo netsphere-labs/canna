@@ -8,12 +8,6 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 override_dh_auto_build:
 	dh_testdir
-	# update autotools helper files
-	for i in config.guess config.sub; do \
-		[ ! -e $(CURDIR)/canuum/$$i.dh-orig ] || continue; \
-		mv -f $(CURDIR)/canuum/$$i $(CURDIR)/canuum/$$i.dh-orig; \
-		cp -f /usr/share/misc/$$i $(CURDIR)/canuum/$$i; \
-	done
 	./mkrelease.sh && xmkmf
 	cd doc/man/guide/tex && xmkmf
 	$(MAKE) canna \
