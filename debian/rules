@@ -8,7 +8,6 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 override_dh_auto_build:
 	dh_testdir
-	dh_auto_clean
 	# update autotools helper files
 	for i in config.guess config.sub; do \
 		[ ! -e $(CURDIR)/canuum/$$i.dh-orig ] || continue; \
