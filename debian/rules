@@ -14,6 +14,10 @@ override_dh_auto_build:
 	dh_testdir
 	./mkrelease.sh && xmkmf
 	cd doc/man/guide/tex && xmkmf
+	# Workaround "ar clq" problem with binutils 2.37+
+	# See: https://bugs.debian.org/981072
+	find . -name 'Makefile' -exec sed -i 's/ar clq/ar cq/g' {} +
+	# Actually do build
 	$(MAKE) canna \
 		CDEBUGFLAGS="-g -Wall" \
 		CCOPTIONS="$(CFLAGS) $(CPPFLAGS)" \
