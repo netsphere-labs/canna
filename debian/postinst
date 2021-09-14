@@ -60,7 +60,7 @@ CANNA_ENABLE_INET=${CANNA_ENABLE_INET}
 EOF
 
     if [ "${CANNA_MANAGE_CANNAHOST}" = "yes" ] ; then
-	    TMPFILE=`tempfile`
+	    TMPFILE=`mktemp`
 	    for HOST in ${CANNA_ALLOW_HOSTS}
 	      do
 	      echo $HOST >> ${TMPFILE}
