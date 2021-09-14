@@ -60,12 +60,6 @@ override_dh_install:
 		$(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
 	chown -R root:root $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
 	dh_install --sourcedir=debian/tmp
-	dh_installman -pcanna $(CURDIR)/cmd/catdic/chmoddic.man  \
-		$(CURDIR)/debian/manpages/update-canna-dics_dir.8 \
-		$(CURDIR)/debian/manpages/canlisp.1 \
-		$(CURDIR)/debian/manpages/forsort.1 \
-		$(CURDIR)/debian/manpages/mergeword.1
-	dh_installman -pcanna-utils $(CURDIR)/debian/manpages/chkconc.1
 
 %:
 	dh $@
