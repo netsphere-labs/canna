@@ -10,3 +10,4 @@
 10_fix_configure.ac.patch
 11_fix_spelling_error_in_binary.patch
 12_make_the_output_of_mkbindic_reproducible.patch
+13_fix-ar-clq.patch
