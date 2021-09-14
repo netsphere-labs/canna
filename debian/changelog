@@ -1,3 +1,25 @@
+canna (3.7p3-17) unstable; urgency=high
+
+  [ Jenkins ]
+  * Remove constraints unnecessary since stretch.
+
+  [ Boyuan Yang ]
+  * debian/control:
+    + Remove useless build-dep autoconf.
+    + Bump Standards-Version to 4.6.0.
+  * debian/rules:
+    + Split dh_installman invocations to debian/*.manpages files.
+    + Do not call dh_auto_clean in dh_auto_build target.
+    + Enable verbose build.
+    + Use buildflags.mk to provide build flags.
+  * debian/autoreconf: Specify autoreconf directories.
+  * debian/dirs: Rename to debian/canna.dirs to avoid confusion.
+  * debian/patches/13_fix-ar-clq.patch: Workaround "ar clq" problem with
+    binutils 2.37+ (see #981072). (Closes: #978778)
+  * debian/postinst: Use mktemp instead of tempfile (Closes: #992455).
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 14 Sep 2021 02:17:31 -0400
+
 canna (3.7p3-16) unstable; urgency=medium
 
   * QA upload.
