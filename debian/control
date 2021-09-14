@@ -2,14 +2,14 @@ Source: canna
 Section: utils
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper-compat (=12),
+Build-Depends: debhelper-compat (= 12),
                libx11-dev,
                po-debconf,
                texlive-lang-cjk,
                texlive-lang-japanese,
                texlive-latex-recommended,
                xutils-dev
-Standards-Version: 4.5.0
+Standards-Version: 4.6.0
 Rules-Requires-Root: binary-targets
 Homepage: http://canna.sourceforge.jp/
 Vcs-Browser: https://salsa.debian.org/debian/canna
