@@ -6,6 +6,8 @@ export DH_VERBOSE=1
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+# Ensure texlive respects SOURCE_DATE_EPOCH
+export FORCE_SOURCE_DATE=1
 
 export DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/default.mk
