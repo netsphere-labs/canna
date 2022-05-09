@@ -60,5 +60,8 @@ override_dh_install:
 	chown -R root:root $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
 	dh_install --sourcedir=debian/tmp
 
+override_dh_missing:
+	dh_missing --list-missing
+
 %:
 	dh $@
