@@ -9,9 +9,9 @@ case "$1" in
     db_version 2.0
 
     adduser --quiet --system --group --no-create-home  --home /var/lib/canna --gecos "Canna server" --disabled-password --disabled-login canna
-    chown -R canna:canna /var/lib/canna
+    chown canna:canna /var/lib/canna /var/lib/canna/dic /var/lib/canna/dic/canna /var/lib/canna/dic/canna/*.ctd
     mkdir -p /var/log/canna
-    chown -R canna:canna /var/log/canna
+    chown canna:canna /var/log/canna
     update-canna-dics_dir
 
     # debconf processing for running cannaserver
