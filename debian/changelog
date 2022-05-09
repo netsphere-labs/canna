@@ -1,3 +1,16 @@
+canna (3.7p3-18) unstable; urgency=medium
+
+  * QA upload.
+  * debian/rules: Set FORCE_SOURCE_DATE=1 in order for texlive to respect
+    SOURCE_DATE_EPOCH when generating .dvi file. (Closes: #995401)
+  * libcann1g: Remove explicit calls to ldconfig from postinst and postrm,
+    now handled by dpkg triggers.
+  * Update to debhelper-compat 13.
+  * canna: Avoid recursive chown to /var/lib/canna and /var/log/canna by
+    explicitly calling the files to be chowned.
+
+ -- Vagrant Cascadian <vagrant@debian.org>  Mon, 09 May 2022 13:25:00 -0700
+
 canna (3.7p3-17) unstable; urgency=high
 
   * QA upload.
