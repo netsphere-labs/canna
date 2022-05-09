@@ -10,7 +10,6 @@ case "$1" in
     configure)
 	db_get canna/default_style
 	cp /usr/share/canna/${RET}.canna /etc/canna/default.canna
-    ldconfig
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
