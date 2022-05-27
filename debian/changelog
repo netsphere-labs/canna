@@ -986,4 +986,4 @@ canna (32p2+uf1+gp3-0) unstable; urgency=low
   * Apply unofficail patch 1 and grammer patch 1,2,3,
     but grammer-patch patch.228 doesn't apply to sources.
 
- -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Tue, 28 Aug 1996 01:30:00 +0900
+ -- Yoshiaki Yanagihara <yochi@linux.or.jp>  Wed, 28 Aug 1996 01:30:00 +0900
