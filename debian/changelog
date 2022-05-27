@@ -1,3 +1,13 @@
+canna (3.7p3-19) UNRELEASED; urgency=medium
+
+  * QA upload.
+
+  [ Debian Janitor ]
+  * Drop fields with obsolete URLs.
+  * Fix day-of-week for changelog entry 32p2+uf1+gp3-0.
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Fri, 27 May 2022 17:59:53 +0100
+
 canna (3.7p3-18) unstable; urgency=medium
 
   * QA upload.
