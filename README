@@ -1,9 +1,18 @@
+
+Canna 3.7p3 をベースに fork した。https://www.nslabs.jp/patch.rhtml
+目標:
+ - `canuum/` を削除  -- すみ
+ - `wchar_t` は環境によって幅が違ってポータブルではない。`_WCHAR_T`, `CANNA_NEW_WCHAR_AWARE`, `CANNA_WCHAR16` は無視して, `uint16_t` 決め打ち. 内部コードはEUC-JP. -- すみ
+ - `lib/RKindep/cksum.c` に4条項BSDライセンス (宣伝条項付き) が適用されていた。ファイルを FreeBSD 由来に入れ替え, 3条項BSDライセンス (MITライセンスと同等) に変更. -- すみ
+ - imake から autoconf & automake に変更.
+ - Windows にポーティング
+
+
+
+
               CANNA Version 3.6, a Japanese input system
 
-Forked version: https://www.nslabs.jp/patch.rhtml
-
-
-                            Canna Project
+                             Canna Project
 		https://ja.osdn.net/projects/canna/
 
 0. Preface
