@@ -207,7 +207,7 @@ static void RkcErrorBuf_add pro((RkcErrorBuf *cx, const char *msg));
   TOKEN_INIT(tp); \
 } while(0)
 static int Token_assignstr pro((
-      TokenRec *tp, const char *str, size_t len, int type));
+      TokenRec *tp, const char *str, size_t len, TokenType type));
 #ifdef CONF_DEBUG
 static void Token_dump pro((const TokenRec *tp));
 #endif
