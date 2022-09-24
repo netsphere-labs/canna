@@ -1,0 +1,67 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# Ensure texlive respects SOURCE_DATE_EPOCH
+export FORCE_SOURCE_DATE=1
+
+export DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+override_dh_auto_build:
+	dh_testdir
+	./mkrelease.sh && xmkmf
+	cd doc/man/guide/tex && xmkmf
+	$(MAKE) canna \
+		CDEBUGFLAGS="-g -Wall" \
+		CCOPTIONS="$(CFLAGS) $(CPPFLAGS)" \
+		LOCAL_LDFLAGS="$(LDFLAGS)" \
+		SHLIBGLOBALSFLAGS="$(LDFLAGS)"
+	$(MAKE) -C doc/man/guide/tex
+
+override_dh_install:
+	make install \
+		cannaBinDir=$(CURDIR)/debian/tmp/usr/bin \
+		cannaSrvDir=$(CURDIR)/debian/tmp/usr/sbin \
+		cannaLibDir=$(CURDIR)/debian/tmp/var/lib/canna \
+		cannaEtcDir=$(CURDIR)/debian/tmp/etc/canna \
+		cannaShareDir=$(CURDIR)/debian/tmp/usr/share/canna \
+		cannaManDir=$(CURDIR)/debian/tmp/usr/share/man \
+		cannaIncDir=$(CURDIR)/debian/tmp/usr/include/canna \
+		libCannaDir=$(CURDIR)/debian/tmp/usr/lib \
+		cannaDocDir=$(CURDIR)/debian/tmp/usr/share/doc/libcanna1g \
+		DicDir=$(CURDIR)/debian/tmp/var/lib/canna/dic \
+		ErrDir=$(CURDIR)/debian/tmp/var/log/canna
+	make install.man \
+		cannaManDir=$(CURDIR)/debian/tmp/usr/share/man \
+		MANSUFFIX=1 LIBMANSUFFIX=3
+	(cd $(CURDIR)/debian/tmp/usr/bin/ && \
+		rm -f cpdic lsdic mkdic mvdic rmdic syncdic \
+			addwords delwords cannakill)
+	install -d -m 755 $(CURDIR)/debian/tmp/etc/canna/dics.dir.d
+	install -m 644 $(CURDIR)/debian/tmp/var/lib/canna/dic/canna/dics.dir \
+		$(CURDIR)/debian/tmp/etc/canna/dics.dir.d/00canna.dics.dir
+	rm -f $(CURDIR)/debian/tmp/var/lib/canna/dic/canna/dics.dir
+	# 3.7 tries to install symlink to cannakill here, ignore it.
+	rm -f $(CURDIR)/debian/tmp/usr/sbin/cannakill
+	install -m 755 $(CURDIR)/debian/update-canna-dics_dir \
+		$(CURDIR)/debian/tmp/usr/sbin
+	# move /var/lib/canna/dic/*.cld and related file to template dir
+	install -d -m 755 $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	mv \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/*.cld \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/iroha.cbd \
+		$(CURDIR)/debian/tmp/var/lib/canna/dic/canna/fuzokugo.cbd \
+		$(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	chown -R root:root $(CURDIR)/debian/tmp/usr/lib/canna/debian-template/
+	dh_install --sourcedir=debian/tmp
+
+override_dh_missing:
+	dh_missing --list-missing
+
+%:
+	dh $@

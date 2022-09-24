@@ -1,0 +1,195 @@
+# Portuguese translation for canna debconf messages
+# Copyright (C) 2006 THE canna's COPYRIGHT HOLDER
+# This file is distributed under the same license as the canna package.
+# Ricardo Silva <ardoric@gmail.com>, 2006
+# António Moreira <antoniocostamoreira@gmail.com>, 2009
+msgid ""
+msgstr ""
+"Project-Id-Version: canna 3.7p3-5\n"
+"Report-Msgid-Bugs-To: canna@packages.debian.org\n"
+"POT-Creation-Date: 2009-04-19 20:24+0200\n"
+"PO-Revision-Date: 2007-03-06 22:33+0000\n"
+"Last-Translator: António Moreira <antoniocostamoreira@gmail.com>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Should the Canna server run automatically?"
+msgstr "Deverá o servidor Canna correr automaticamente?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server now."
+msgstr ""
+"Este pacote contém o servidor Canna e utilitários relacionados. Se está só "
+"interessado nos utilitários, pode desactivar o servidor Canna agora."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Should the Canna server run in network mode?"
+msgstr "Deverá o servidor Canna correr em modo de rede?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default the Canna server will run without support for network "
+"connections, and will only accept connections on UNIX domain sockets, from "
+"clients running on the same host."
+msgstr ""
+"Por predefinição, o servidor Canna correrá sem suporte para ligações de "
+"rede, e irá somente aceitar ligações de 'sockets' de domínio UNIX, a partir "
+"de clientes que corram na mesma máquina."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"If you choose this option, network support will be activated, and the Canna "
+"server will accept connections on TCP sockets from clients that may be on "
+"remote hosts. Some clients (such as egg and yc-el) require this mode even if "
+"they run on the local host."
+msgstr ""
+"Se escolher esta opção, o suporte de rede será activado, e o servidor "
+"Cannairá aceitar ligações nas 'sockets' TCP a partir de clientes que possam  "
+"estar em máquinas remotas. Alguns clientes (tais como egg e yc-el) "
+"necessitam deste modo mesmo que corram na máquina local."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid "Manage /etc/hosts.canna automatically?"
+msgstr "Gerir o /etc/hosts.canna automaticamente?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
+msgstr ""
+"O ficheiro /etc/hosts.canna enumera as máquinas com permissão para se "
+"ligarem ao servidor Canna."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"You should not accept this option if you prefer managing the file's contents "
+"manually."
+msgstr ""
+"Não deve aceitar esta opção se preferir gerir os conteúdos do "
+"ficheiromanualmente."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "Hosts allowed to connect to this Canna server:"
+msgstr "Máquinas com permissão para se ligarem a este servidor Canna:"
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Por favor introduza os nomes das máquinas com permissão para se ligarem a "
+"este servidor Canna, separados por espaços."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "You can use \"unix\" to allow access via UNIX domain sockets."
+msgstr ""
+"Pode usar \"unix\" para permitir o acesso via 'sockets' de domínio UNIX."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid "Canna input style:"
+msgstr "Estilo de entrada do Canna:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid ""
+"Please choose the default Canna input style:\n"
+" verbose: Canna3.5 default style with verbose comments;\n"
+" 1.1    : old Canna style (ver. 1.1);\n"
+" 1.2    : old Canna style (ver. 1.2);\n"
+" jdaemon: jdaemon style;\n"
+" just   : JustSystems ATOK style;\n"
+" lan5   : LAN5 style;\n"
+" matsu  : Matsu word processor style;\n"
+" skk    : SKK style;\n"
+" tut    : TUT-Code style;\n"
+" unix   : UNIX style;\n"
+" vje    : vje style;\n"
+" wx2+   : WX2+ style."
+msgstr ""
+"Por favor escolha o estilo de entrada por omissão do Canna:\n"
+" verbose - estilo Canna3.5 predefinido com comentários excessivos;\n"
+" 1.1     - estilo antigo Canna (ver. 1.1);\n"
+" 1.2     - estilo antigo Canna (ver. 1.2);\n"
+" jdaemon - estilo jdaemon;\n"
+" just    - estilo JustSystems ATOK;\n"
+" lan5    - estilo LAN5;\n"
+" matsu   - estilo processador de texto MATSU;\n"
+" skk     - estilo SKK;\n"
+" tut     - estilo TUT-Code;\n"
+" unix    - estilo UNIX;\n"
+" vje     - estilo vje;\n"
+" wx2+    - estilo WX2+."
+
+#~ msgid "Do you want to run the Canna server ?"
+#~ msgstr "Deseja correr o servidor Canna?"
+
+#~ msgid "Do you want to connect to the Canna server from a remote host?"
+#~ msgstr ""
+#~ "Deseja conectar-se ao servidor Canna a partir de um anfitrião remoto?"
+
+#~ msgid ""
+#~ "The Canna server only allows connections via UNIX domain sockets when the "
+#~ "`-inet' option is not specified.  This means that when the Canna server "
+#~ "is started without the `-inet' option, only clients which run on the same "
+#~ "host can connect to the server. Some clients such as, `egg' and `yc-el', "
+#~ "do not support UNIX domain socket and require the `-inet' option, even if "
+#~ "they run on the same host."
+#~ msgstr ""
+#~ "O servidor Canna apenas permite ligações a partir de sockets UNIX quando "
+#~ "a opção `-inet' não é especificada. Isto significa que quando o servidor "
+#~ "Canna é iniciado sem a opção `-inet', só clientes a correr no mesmo "
+#~ "anfitrião se podem ligar ao servidor. Alguns clientes, tais como o `egg' "
+#~ "e o `yc-el' não suportam sockets UNIX e necessitam a opção `-inet' mesmo "
+#~ "estando a correr no mesmo anfitrião."
+
+#~ msgid ""
+#~ "If you want to connect to this Canna server from remote hosts, or if you "
+#~ "want to use INET-domain-only software, you should run the server with the "
+#~ "`-inet' option."
+#~ msgstr ""
+#~ "Se deseja poder ligar-se a este servidor Canna a partir de anfitriões "
+#~ "remotos ou se quer usar sofware que só conhece o domínio INET, deve "
+#~ "correr o servidor com a opção `-inet'."
+
+#~ msgid ""
+#~ "By default /etc/hosts.canna will be managed with debconf. Refuse here if "
+#~ "you want to manage /etc/hosts.canna yourself."
+#~ msgstr ""
+#~ "Por omissão o /etc/hosts.canna vai ser gerido com o debconf. Recuse se "
+#~ "quiser gerir o /etc/hosts.canna por si."
+
+#~ msgid ""
+#~ "Please choose the default canna input style below, which will be "
+#~ "installed if there is no previous configuration:"
+#~ msgstr ""
+#~ "Por favor escolha o estilo de input do canna das opções em baixo que irá "
+#~ "ser instalado se não houver configuração prévia:"

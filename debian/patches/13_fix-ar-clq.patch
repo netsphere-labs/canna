@@ -1,0 +1,72 @@
+From: Boyuan Yang <byang@debian.org>
+Date: Tue, 14 Sep 2021 01:57:42 -0400
+Subject: fix ar clq
+
+Binutils 2.37+ no longer ignores l option for ar tool.
+Explicitly remove this option to prevent FTBFS.
+
+See https://bugs.debian.org/981072 for details.
+
+---
+ lib/RK/Imakefile      | 3 +++
+ lib/RKC/Imakefile     | 3 +++
+ lib/RKindep/Imakefile | 3 +++
+ lib/canna/Imakefile   | 3 +++
+ 4 files changed, 12 insertions(+)
+
+diff --git a/lib/RK/Imakefile b/lib/RK/Imakefile
+index b229dc3..a4d042e 100644
+--- a/lib/RK/Imakefile
++++ b/lib/RK/Imakefile
+@@ -8,6 +8,9 @@
+           DEBUGFLAGS = -DDebug
+ #endif
+ 
++AR = ar cq
++MODAR = ar cq
++
+              OBJS = tempdic.o permdic.o dicsw.o ngram.o \
+ 			bun.o context.o nword.o ncache.o \
+ 			dic.o util.o kana.o \
+diff --git a/lib/RKC/Imakefile b/lib/RKC/Imakefile
+index ae923d0..b880ebc 100644
+--- a/lib/RKC/Imakefile
++++ b/lib/RKC/Imakefile
+@@ -14,6 +14,9 @@
+ #define DoNormalLib NO
+ #endif
+ 
++AR = ar cq
++MODAR = ar cq
++
+         CANNAROOT = ../..
+              OPTS =
+          LINTLIBS = ../RK/llib-lRK.ln
+diff --git a/lib/RKindep/Imakefile b/lib/RKindep/Imakefile
+index fc1b114..004688c 100644
+--- a/lib/RKindep/Imakefile
++++ b/lib/RKindep/Imakefile
+@@ -4,6 +4,9 @@ CANNAROOT = ../..
+ DEFINES = 
+ INCLUDES = -I$(CANNAROOT)/include
+ 
++AR = ar cq
++MODAR = ar cq
++
+ OBJS = cfuncs.o basename.o cksum.o file.o strops.o
+ SRCS = cfuncs.c basename.c cksum.c file.c strops.c
+ HEADER = cfuncs.h file.h cksum.h ecfuncs.h strops.h
+diff --git a/lib/canna/Imakefile b/lib/canna/Imakefile
+index 766f6f9..c9de174 100644
+--- a/lib/canna/Imakefile
++++ b/lib/canna/Imakefile
+@@ -10,6 +10,9 @@
+ # define RkcName RKC
+ #endif
+ 
++AR = ar cq
++MODAR = ar cq
++
+          CANNAROOT = ../..
+           SOLIBREV = 1
+ 

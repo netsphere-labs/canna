@@ -1,0 +1,79 @@
+Source: canna
+Section: utils
+Priority: optional
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Build-Depends: debhelper-compat (= 13),
+               libx11-dev,
+               po-debconf,
+               texlive-lang-cjk,
+               texlive-lang-japanese,
+               texlive-latex-recommended,
+               xutils-dev
+Standards-Version: 4.6.0
+Rules-Requires-Root: binary-targets
+Vcs-Browser: https://salsa.debian.org/debian/canna
+Vcs-Git: https://salsa.debian.org/debian/canna.git
+
+Package: canna
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: adduser,
+         canna-utils,
+         lsb-base,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Suggests: canna-shion
+Description: input system for Japanese - server and dictionary
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides the Canna server program and dictionary files.
+
+Package: canna-utils
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: input system for Japanese - utilities
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides client programs for Canna.
+
+Package: libcanna1g
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: input system for Japanese - runtime library
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides shared libraries for Canna.
+
+Package: libcanna1g-dev
+Section: libdevel
+Architecture: any
+Depends: libcanna1g (= ${binary:Version}),
+         ${misc:Depends}
+Description: input system for Japanese - development files
+ Canna provides a unified user interface for Japanese input. It is based
+ on a client-server model and supports automatic kana-to-kanji conversion.
+ .
+ It supports multiple clients (including kinput2 and canuum), and allows
+ them all to work in the same way, sharing customization files,
+ romaji-to-kana conversion rules and conversion dictionaries.
+ .
+ This package provides the headers and static libraries needed to develop
+ software based on Canna.

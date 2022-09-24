@@ -1,0 +1,94 @@
+.\" This manpage is copyright (C) 2001 ISHIKAWA Mutsumi <ishikawa@linux.or.jp>.
+.\"
+.\" This is free software; you can redistribute it and/or modify it under
+.\" the terms of the GNU General Public License as published by the Free
+.\" Software Foundation, version 2.
+.\"
+.\" This is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License with
+.\" your Debian GNU/Linux system, in /usr/share/common-licenses/GPL, or
+.\" with the dpkg source package as the file COPYING.  If not, write to the
+.\" Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.TH update-canna-dics_dir 8 "25 August 2001" "Debian GNU/Linux"
+.SH NAME
+update-canna-dics_dir \- compile dics.dir file
+.SH SYNOPSIS
+.B 
+.SH DESCRIPTION
+.B update-canna-dics_dir
+assembles a
+.I dics.dir
+file in the Canna dictionary using one or more alias files found in a
+subdirectory of
+.IR /etc/X11/fonts/ .
+It is typically invoked only from the post-installation and post-removal
+scripts of a
+.I  package
+containing fonts (that provide aliases for their names) for the X Window
+System, but may be invoked at any time to reconstruct
+.I fonts.alias
+files.  For each
+.IR directory ,
+which is either an absolute path to an X font directory or (preferably)
+simply the last component of its path (such as "75dpi" or "misc"),
+.B update-canna-dics_dir
+will assemble
+.IR /usr/lib/X11/fonts/ directory /fonts.alias
+from the files found in
+.IR /etc/X11/fonts/ directory / package .alias .
+.PP
+This enables multiple packages to provide aliases for fonts in the same
+directory.  No font package actually provides the
+.I fonts.alias
+file in the X font directory itself, so there is no danger of overwriting
+one package's aliases with those of another.
+.PP
+For instance, the two packages "xfonts-base" and "xfonts-cjk" may both
+install fonts into the directory
+.IR /usr/lib/X11/fonts/misc .
+They each place their
+.I fonts.alias
+files in
+.I /etc/X11/fonts/misc/xfonts-base.alias
+and
+.I /etc/X11/fonts/misc/xfonts-cjk.alias
+(respectively).
+.B update-canna-dics_dir
+concatenates these two files (as well as any others that match
+.IR /etc/X11/fonts/misc/*.alias )
+into
+.IR /usr/lib/X11/fonts/misc/fonts.alias .
+.PP
+The format for
+.I fonts.alias
+files is given in the
+.BR mkfontdir (1)
+manual page.
+.PP
+An example of how to use
+.B update-canna-dics_dir
+in package maintainer scripts is provided in the Debian Policy Manual.
+.SH SEE ALSO
+.BR mkfontdir (1)
+.SH DIAGNOSTICS
+.B update-canna-dics_dir
+exits with status 1 if its arguments are absent or invalid.
+.SH BUGS
+See <http://bugs.debian.org/canna>.  If you wish to
+report a bug in
+.BR update-canna-dics_dir ,
+please see
+.IR /usr/share/doc/debian/bug-reporting.txt ,
+the
+.BR bug (1)
+command, or the
+.BR reportbug (1)
+command.
+.SH AUTHOR
+.B update-canna-dics_dir
+is written and copyrighted by ISHIKAWA Mutsumi.  It is licensed under the
+GNU GPL, version 2.

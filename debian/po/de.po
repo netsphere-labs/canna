@@ -1,0 +1,150 @@
+# translation of canna_3.7p3-6.2_de.po to German
+#
+# Erik Schanze <eriks@debian.org>, 2004-2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: canna_3.7p3-6.2_de\n"
+"Report-Msgid-Bugs-To: canna@packages.debian.org\n"
+"POT-Creation-Date: 2009-05-03 07:53+0200\n"
+"PO-Revision-Date: 2009-04-28 21:41+0200\n"
+"Last-Translator: Erik Schanze <eriks@debian.org>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Should the Canna server run automatically?"
+msgstr "Canna-Server automatisch starten?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server now."
+msgstr ""
+"Dieses Paket enthält den Canna-Server und Server-Werkzeuge. Wenn Sie nur an "
+"diesen Werkzeugen interessiert sind, können Sie den Canna-Server jetzt "
+"deaktivieren."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Should the Canna server run in network mode?"
+msgstr "Canna-Server im Netzwerkmodus betreiben? "
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default the Canna server will run without support for network "
+"connections, and will only accept connections on UNIX domain sockets, from "
+"clients running on the same host."
+msgstr ""
+"Normalerweise wird der Canna-Server ohne Unterstützung für "
+"Netzwerkverbindungen betrieben und nimmt Verbindungen nur über UNIX-Domain-"
+"Sockets von Clients an, die auf dem selben Rechner laufen."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"If you choose this option, network support will be activated, and the Canna "
+"server will accept connections on TCP sockets from clients that may be on "
+"remote hosts. Some clients (such as egg and yc-el) require this mode even if "
+"they run on the local host."
+msgstr ""
+"Wenn Sie hier zustimmen, wird die Netzwerkunterstützung eingeschaltet und "
+"der Canna-Server nimmt Verbindungen über TCP-Sockets auch von Clients an, "
+"die auf entfernten Rechnern laufen. Einige Clients (wie Egg und Yc-el) "
+"benötigen diesen Modus, auch wenn sie auf dem selben Rechner laufen."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid "Manage /etc/hosts.canna automatically?"
+msgstr "Die Datei /etc/hosts.canna automatisch verwalten?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
+msgstr ""
+"In der Datei /etc/hosts.canna werden Rechner aufgelistet, die sich mit dem "
+"Canna-Server verbinden dürfen."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"You should not accept this option if you prefer managing the file's contents "
+"manually."
+msgstr ""
+"Lehnen Sie hier ab, wenn Sie den Inhalt der Datei selbst bestimmen wollen."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "Hosts allowed to connect to this Canna server:"
+msgstr "Rechner, die sich mit diesem Canna-Server verbinden dürfen:"
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Bitte geben Sie durch Leerzeichen getrennt die Namen der Rechner ein, die "
+"sich mit diesem Canna-Server verbinden dürfen."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "You can use \"unix\" to allow access via UNIX domain sockets."
+msgstr ""
+"Benutzen Sie »unix«, um den Zugriff über UNIX-Domain-Sockets zu gestatten."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid "Canna input style:"
+msgstr "Eingabestil von Canna:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid ""
+"Please choose the default Canna input style:\n"
+" verbose: Canna3.5 default style with verbose comments;\n"
+" 1.1    : old Canna style (ver. 1.1);\n"
+" 1.2    : old Canna style (ver. 1.2);\n"
+" jdaemon: jdaemon style;\n"
+" just   : JustSystems ATOK style;\n"
+" lan5   : LAN5 style;\n"
+" matsu  : Matsu word processor style;\n"
+" skk    : SKK style;\n"
+" tut    : TUT-Code style;\n"
+" unix   : UNIX style;\n"
+" vje    : vje style;\n"
+" wx2+   : WX2+ style."
+msgstr ""
+"Bitte wählen Sie den Standard-Eingabestil aus:\n"
+" verbose: Canna3.5-Standard-Stil mit ausführlichen Kommentaren;\n"
+" 1.1    : alter Canna-Stil (Ver. 1.1);\n"
+" 1.2    : alter Canna-Stil (Ver. 1.2);\n"
+" jdaemon: Jdaemon-Stil;\n"
+" just   : Justsystem-ATOK-Stil;\n"
+" lan5   : LAN5-Stil;\n"
+" matsu  : MATSU-Word-Processor-Stil;\n"
+" skk    : SKK-Stil;\n"
+" tut    : TUT-Code-Stil;\n"
+" unix   : UNIX-Stil;\n"
+" vje    : Vje-Stil;\n"
+" wx2+   : WX2+-Stil."

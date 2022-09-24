@@ -1,0 +1,51 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
+Template: canna/run_cannaserver
+Type: boolean
+Default: true
+_Description: Should the Canna server run automatically?
+ This package contains the Canna server and server-related
+ utilities. If you are only interested in these utilities,
+ you can disable the Canna server now.
+
+
+Template: canna/run_with_inet
+Type: boolean
+Default: false
+_Description: Should the Canna server run in network mode?
+ By default the Canna server will run without support for network
+ connections, and will only accept connections on UNIX domain sockets,
+ from clients running on the same host.
+ .
+ If you choose this option, network support will be activated, and the
+ Canna server will accept connections on TCP sockets from clients that
+ may be on remote hosts. Some clients (such as egg and yc-el) require
+ this mode even if they run on the local host.
+
+
+Template: canna/manage_allow_hosts_with_debconf
+Type: boolean
+Default: true
+_Description: Manage /etc/hosts.canna automatically?
+ The /etc/hosts.canna file lists hosts allowed to connect to the
+ Canna server.
+ .
+ You should not accept this option if you prefer managing the
+ file's contents manually.
+
+
+Template: canna/allow_hosts
+Type: string
+Default: unix localhost
+_Description: Hosts allowed to connect to this Canna server:
+ Please enter the names of the hosts allowed to connect to this Canna server,
+ separated by spaces.
+ .
+ You can use "unix" to allow access via UNIX domain sockets.

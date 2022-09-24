@@ -1,0 +1,163 @@
+# translation of canna_debconf_ru.po to Russian
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+#
+# Yuri Kozlov <kozlov.y@gmail.com>, 2006.
+# Sergey Alyoshin <alyoshin.s@gmail.com>, 2009. 
+msgid ""
+msgstr ""
+"Project-Id-Version: canna_3.7p3-6.2_ru\n"
+"Report-Msgid-Bugs-To: canna@packages.debian.org\n"
+"POT-Creation-Date: 2009-05-03 07:53+0200\n"
+"PO-Revision-Date: 2009-04-22 23:11+0400\n"
+"Last-Translator: Sergey Alyoshin <alyoshin.s@gmail.com>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.2\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Should the Canna server run automatically?"
+msgstr "Запускать сервер Canna автоматически?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server now."
+msgstr ""
+"Данный пакет содержит сервер Canna и серверные утилиты. Если вам требуются "
+"только утилиты, то вы можете сейчас отключить сервер Canna."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Should the Canna server run in network mode?"
+msgstr "Запускать сервер Canna в сетевом режиме?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default the Canna server will run without support for network "
+"connections, and will only accept connections on UNIX domain sockets, from "
+"clients running on the same host."
+msgstr ""
+"По умолчанию сервер Canna будет запущен без поддержки сетевых соединений и "
+"будет позволять соединения только через доменные сокеты UNIX от клиентов "
+"работающих на этом же хосте."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"If you choose this option, network support will be activated, and the Canna "
+"server will accept connections on TCP sockets from clients that may be on "
+"remote hosts. Some clients (such as egg and yc-el) require this mode even if "
+"they run on the local host."
+msgstr ""
+"Если вы ответите утвердительно, будет включена поддержка сети и сервер Canna "
+"будет позволять соединения через TCP сокеты от клиентов, которые могут быть "
+"на удалённых хостах. Для некоторых клиентов (таких как egg и yc-el) "
+"требуется этот режим даже при работе на локальном хосте."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid "Manage /etc/hosts.canna automatically?"
+msgstr "Управлять файлом /etc/hosts.canna автоматически?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
+msgstr ""
+"В файле /etc/hosts.canna указываются хосты, которые могут подключаться к "
+"серверу Canna."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"You should not accept this option if you prefer managing the file's contents "
+"manually."
+msgstr ""
+"Вы не должны разрешать этот параметр, если предпочитаете редактировать файл "
+"вручную."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "Hosts allowed to connect to this Canna server:"
+msgstr "Хосты которым разрешено подключаться к этому серверу Canna:"
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Введите через пробел имена хостов, с которых разрешено подключаться к "
+"серверу Canna."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "You can use \"unix\" to allow access via UNIX domain sockets."
+msgstr ""
+"Вы можете использовать \"unix\" для разрешения доступа через доменные сокеты "
+"UNIX."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid "Canna input style:"
+msgstr "Стиль ввода Canna:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid ""
+"Please choose the default Canna input style:\n"
+" verbose: Canna3.5 default style with verbose comments;\n"
+" 1.1    : old Canna style (ver. 1.1);\n"
+" 1.2    : old Canna style (ver. 1.2);\n"
+" jdaemon: jdaemon style;\n"
+" just   : JustSystems ATOK style;\n"
+" lan5   : LAN5 style;\n"
+" matsu  : Matsu word processor style;\n"
+" skk    : SKK style;\n"
+" tut    : TUT-Code style;\n"
+" unix   : UNIX style;\n"
+" vje    : vje style;\n"
+" wx2+   : WX2+ style."
+msgstr ""
+"Выберите стиль ввода Canna по умолчани:\n"
+" verbose - стиль Canna3.5 по умолчанию с подробными комментариями;\n"
+" 1.1     - старый стиль Canna (вер. 1.1);\n"
+" 1.2     - старый стиль Canna (вер. 1.2);\n"
+" jdaemon - стиль jdaemon;\n"
+" just    - стиль JustSystem ATOK;\n"
+" lan5    - стиль LAN5;\n"
+" matsu   - стиль текстового процессора Matsu;\n"
+" skk     - стиль SKK;\n"
+" tut     - стиль TUT-Code;\n"
+" unix    - стиль UNIX;\n"
+" vje     - стиль vje;\n"
+" wx2+    - стиль WX2+."

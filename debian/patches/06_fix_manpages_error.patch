@@ -1,0 +1,37 @@
+## 07_fix_manpage_error by HIGUCHI Daisuke (VDR dai) <dai@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: eliminate lintian warning: manpage-has-errors-from-man
+
+--- canna-3.7p3/cmd/dpromdic/dpromdic.man.orig	2002-10-19 17:27:34.000000000 +0900
++++ canna-3.7p3/cmd/dpromdic/dpromdic.man	2012-01-25 16:25:54.000000000 +0900
+@@ -1,7 +1,7 @@
+ .TH DPROMDIC 1 
+-.S HNAME
++.SH NAME
+ dpromdic \- Convert the binary-form Romaji-to-Kana conversion table into the text-form table
+-.SHSYNOPSYS
++.SH SYNOPSYS
+ .B dpromdic
+ [
+ .I file
+--- canna-3.7p3/cmd/dicar/dicar.man.orig	2003-01-13 14:29:15.000000000 +0900
++++ canna-3.7p3/cmd/dicar/dicar.man	2012-01-25 16:30:11.000000000 +0900
+@@ -28,7 +28,7 @@ dicar \- Archive Binary Dictionary
+ archives binary dictionary
+ .I bindic1.
+ The hyphen of each option may be omitted.
+-.OPTIONS
++.SH OPTIONS
+ .TP
+ .B \-t
+ Displays the dictionaries contained in binary dictionary file
+--- canna-3.7p3/cmd/cshost/cshost.man.orig	2002-10-19 17:27:34.000000000 +0900
++++ canna-3.7p3/cmd/cshost/cshost.man	2012-01-25 16:40:38.000000000 +0900
+@@ -1,5 +1,5 @@
+ .TH CSHOST 1
+-.SH "NAMES"
++.SH "NAME"
+ cshost \- Server access control program for canna
+ .SH "SYNOPSIS"
+ .B "cshost [{\-cs|\-cannaserver} \fIcannaserver\fP]"
