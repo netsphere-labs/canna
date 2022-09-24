@@ -19,3 +19,6 @@ libcanna16_la_LIBADD = ../RKC/libRKC16.la
 install-exec-hook:
 	cd $(DESTDIR)$(libdir) && \
 	$(LN_S) -f libcanna16.so.2 libcanna.so.2
+
+man3_MANS = RkCloseRoma.man RkCvtEuc.man RkCvtHan.man RkCvtHira.man \
+    RkCvtKana.man RkCvtRoma.man RkCvtZen.man RkMapPhonogram.man RkOpenRoma.man
