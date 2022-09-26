@@ -78,7 +78,44 @@ AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 AC_ENABLE_STATIC(no)
 
 # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
-test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong "  
+test -z "$GCC" || CFLAGS="$CFLAGS -x c++ -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong "  
+
+
+dnl ----------------------------------------------------------------------------
+dnl setup various package/compilation settings
+dnl ----------------------------------------------------------------------------
+
+# <kbd>autoheader</kbd> uses `AH_TEMPLATE` to generate `config.h.in`. In older releases, <kbd>autoheader</kbd> copied from `acconfig.h`.
+AH_TEMPLATE(PACKAGE_LOCALSTATE_DIR, [Package localstate directory.])
+# $ac_default_prefix=/usr/local; $prefix=NONE; $localstatedir='${prefix}/var'
+#  => 単に $prefix を使えない. うーむ.
+if test "x${localstatedir}" = 'x${prefix}/var'; then
+  if test "x${prefix}" = "xNONE"; then
+    PACKAGE_LOCALSTATE_DIR="${ac_default_prefix}/var"
+  else
+    PACKAGE_LOCALSTATE_DIR="${prefix}/var"
+  fi
+else
+  PACKAGE_LOCALSTATE_DIR="${localstatedir}"
+fi
+# `config.h` に値を埋め込むには, `AC_DEFINE()`.
+AC_DEFINE_UNQUOTED(PACKAGE_LOCALSTATE_DIR, "${PACKAGE_LOCALSTATE_DIR}")
+
+dnl Set PACKAGE_SYSCONF_DIR in config.h.
+AH_TEMPLATE(PACKAGE_SYSCONF_DIR, [Configuration directory of the package.])
+# --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+#   => 実際に保存するのは /etc/canna 以下.
+if test "x${sysconfdir}" = 'x${prefix}/etc'; then
+  if test "x${prefix}" = "xNONE"; then
+    PACKAGE_SYSCONF_DIR="${ac_default_prefix}/etc"
+  else
+    PACKAGE_SYSCONF_DIR="${prefix}/etc"
+  fi
+else
+  PACKAGE_SYSCONF_DIR="${sysconfdir}"
+fi
+AC_DEFINE_UNQUOTED(PACKAGE_SYSCONF_DIR, "${PACKAGE_SYSCONF_DIR}")
+
 
 AC_CONFIG_FILES([
   Makefile
