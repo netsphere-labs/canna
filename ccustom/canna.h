@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -36,7 +37,7 @@
 
 #define	WCHARSIZE	sizeof(wchar_t)
 
-/* #include "sglobal.h" ¤³¤ì¤Ï¥ê¥ê¡¼¥¹»ş¤Ë¤Ï¥³¥á¥ó¥È¤ò¤Ï¤º¤¹¤³¤È */
+/* #include "sglobal.h" ã“ã‚Œã¯ãƒªãƒªãƒ¼ã‚¹æ™‚ã«ã¯ã‚³ãƒ¡ãƒ³ãƒˆã‚’ã¯ãšã™ã“ã¨ */
 #define necKanjiError jrKanjiError
 
 /*#include "jrkanji.h"*/
@@ -44,26 +45,27 @@
 typedef unsigned char BYTE;
 
 /*
- * LIBDIR  -- ¥·¥¹¥Æ¥à¤Î¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ë¤ä¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤¬
- *            ÃÖ¤«¤ì¤ë¥Ç¥£¥ì¥¯¥È¥ê¡£
+ * LIBDIR  -- ã‚·ã‚¹ãƒ†ãƒ ã®ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã‚„ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ãŒ
+ *            ç½®ã‹ã‚Œã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã€‚
  */
 
-#ifndef CANNALIBDIR
-#define CANNALIBDIR "/usr/lib/canna"
-#endif
+// Use lib/canna/canna.h
+//#ifndef CANNALIBDIR
+//#define CANNALIBDIR "/usr/lib/canna"
+//#endif
 
 #define XKanjiStatus          jrKanjiStatus
 #define XKanjiStatusWithValue jrKanjiStatusWithValue
 
-/* 
- * ¥«¥Ê´Á»úÊÑ´¹¤Î¤¿¤á¤ÎÍÍ¡¹¤Ê¥­¡¼¥Ş¥Ã¥×¥Æ¡¼¥Ö¥ë 
- * ¥­¡¼¥Ş¥Ã¥×¥Æ¡¼¥Ö¥ë¤Ï½èÍı´Ø¿ô¤Ø¤Î¥İ¥¤¥ó¥¿¤ÎÇÛÎó¤È¤Ê¤Ã¤Æ¤¤¤ë¡£
+/*
+ * ã‚«ãƒŠæ¼¢å­—å¤‰æ›ã®ãŸã‚ã®æ§˜ã€…ãªã‚­ãƒ¼ãƒãƒƒãƒ—ãƒ†ãƒ¼ãƒ–ãƒ«
+ * ã‚­ãƒ¼ãƒãƒƒãƒ—ãƒ†ãƒ¼ãƒ–ãƒ«ã¯å‡¦ç†é–¢æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã®é…åˆ—ã¨ãªã£ã¦ã„ã‚‹ã€‚
  */
 
 typedef struct {
   int (*func)();
   unsigned char *keytbl;
-  int flags;			/* ²¼¤ò¸«¤è */
+  int flags;			/* ä¸‹ã‚’è¦‹ã‚ˆ */
   int (**ftbl)();
 } *KanjiMode, KanjiModeRec;
 
@@ -72,11 +74,11 @@ struct funccfunc {
   int (*cfunc)();
 };
 
-/* flags ¤Î¾ğÊó */
+/* flags ã®æƒ…å ± */
 #define CANNA_KANJIMODE_TABLE_SHARED	01
 #define CANNA_KANJIMODE_EMPTY_MODE	02
 
-/* func ¤ÎÂè»°°ú¿ô */
+/* func ã®ç¬¬ä¸‰å¼•æ•° */
 #define KEY_CALL  0
 #define KEY_CHECK 1
 #define KEY_SET   2
@@ -85,7 +87,7 @@ extern BYTE default_kmap[];
 
 #define CANNA_FULL_VERBOSE 2
 
-/* menuitem -- ¥á¥Ë¥å¡¼É½¼¨¤Î¹àÌÜ¤òÄêµÁ¤¹¤ë¥Æ¡¼¥Ö¥ë */
+/* menuitem -- ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤ºã®é …ç›®ã‚’å®šç¾©ã™ã‚‹ãƒ†ãƒ¼ãƒ–ãƒ« */
 
 typedef struct _menuitem {
   wchar_t *title;
@@ -95,16 +97,16 @@ typedef struct _menuitem {
   int minorMode;
 } menuitem;
 
-#define NEXT_MENU (int (*)())0 /* menuitem ¤Î func ¥Õ¥£¡¼¥ë¥É¤ËÆş¤ë */
+#define NEXT_MENU (int (*)())0 /* menuitem ã® func ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å…¥ã‚‹ */
 
 /*
- * glineinfo -- ¸õÊä°ìÍ÷É½¼¨¤Î¤¿¤á¤ÎÆâÉô¾ğÊó¤ò³ÊÇ¼¤·¤Æ¤ª¤¯¤¿¤á¤Î¹½Â¤ÂÎ¡£
- * ¤½¤ì¤¾¤ì¤Î¥á¥ó¥Ğ¤Ï°Ê²¼¤Î°ÕÌ£¤ò»ı¤Ä¡£
+ * glineinfo -- å€™è£œä¸€è¦§è¡¨ç¤ºã®ãŸã‚ã®å†…éƒ¨æƒ…å ±ã‚’æ ¼ç´ã—ã¦ãŠããŸã‚ã®æ§‹é€ ä½“ã€‚
+ * ãã‚Œãã‚Œã®ãƒ¡ãƒ³ãƒã¯ä»¥ä¸‹ã®æ„å‘³ã‚’æŒã¤ã€‚
  *
- * glkosu -- ¤½¤Î¹Ô¤Ë¤¢¤ë¸õÊä¤Î¿ô
- * glhead -- ¤½¤Î¹Ô¤ÎÀèÆ¬¸õÊä¤¬¡¢kouhoinfo¤Î²¿ÈÖÌÜ¤«(0¤«¤é¿ô¤¨¤ë)
- * gllen  -- ¤½¤Î¹Ô¤òÉ½¼¨¤¹¤ë¤¿¤á¤ÎÊ¸»úÎó¤ÎÄ¹¤µ
- * gldata -- ¤½¤Î¹Ô¤òÉ½¼¨¤¹¤ë¤¿¤á¤ÎÊ¸»úÎó¤Ø¤Î¥İ¥¤¥ó¥¿
+ * glkosu -- ãã®è¡Œã«ã‚ã‚‹å€™è£œã®æ•°
+ * glhead -- ãã®è¡Œã®å…ˆé ­å€™è£œãŒã€kouhoinfoã®ä½•ç•ªç›®ã‹(0ã‹ã‚‰æ•°ãˆã‚‹)
+ * gllen  -- ãã®è¡Œã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã®æ–‡å­—åˆ—ã®é•·ã•
+ * gldata -- ãã®è¡Œã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã®æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 
 typedef struct {
@@ -115,12 +117,12 @@ typedef struct {
 } glineinfo;
 
 /*
- * kouhoinfo -- ¸õÊä°ìÍ÷¤Î¤¿¤á¤ÎÆâÉô¾ğÊó¤ò³ÊÇ¼¤·¤Æ¤ª¤¯¤¿¤á¤Î¹½Â¤ÂÎ
- * ¤½¤ì¤¾¤ì¤Î¥á¥ó¥Ğ¤Ï°Ê²¼¤Î°ÕÌ£¤ò»ı¤Ä¡£
+ * kouhoinfo -- å€™è£œä¸€è¦§ã®ãŸã‚ã®å†…éƒ¨æƒ…å ±ã‚’æ ¼ç´ã—ã¦ãŠããŸã‚ã®æ§‹é€ ä½“
+ * ãã‚Œãã‚Œã®ãƒ¡ãƒ³ãƒã¯ä»¥ä¸‹ã®æ„å‘³ã‚’æŒã¤ã€‚
  *
- * khretsu -- ¤½¤Î¸õÊä¤¬¤¢¤ë¹Ô
- * khpoint -- ¤½¤Î¸õÊä¤Î¹Ô¤Î¤Ê¤«¤Ç¤Î°ÌÃÖ
- * khdata -- ¤½¤Î¸õÊä¤ÎÊ¸»úÎó¤Ø¤Î¥İ¥¤¥ó¥¿
+ * khretsu -- ãã®å€™è£œãŒã‚ã‚‹è¡Œ
+ * khpoint -- ãã®å€™è£œã®è¡Œã®ãªã‹ã§ã®ä½ç½®
+ * khdata -- ãã®å€™è£œã®æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 
 typedef struct {
@@ -130,15 +132,15 @@ typedef struct {
 } kouhoinfo;
 
 #define ROMEBUFSIZE 	1024
-#define	BANGOSIZE	2	/* ¸õÊä¹ÔÃæ¤Î³Æ¸õÊä¤ÎÈÖ¹æ¤Î¥Ğ¥¤¥È¿ô */
-#define	REVSIZE		2	/* ¸õÊä¹ÔÃæ¤ÎÈÖ¹æ¤Î¥ê¥Ğ¡¼¥¹¤Î¥Ğ¥¤¥È¿ô */
-#define	BANGOMAX   	9	/* £±¸õÊä¹ÔÃæ¤ÎºÇÂç¸õÊä¿ô */
-#define KIGOSIZE	1	/* µ­¹æ¸õÊä¤Î¥Ğ¥¤¥È¿ô */
-#define GL_KUHAKUSIZE	1	/* ¸õÊäÈÖ¹æ¤Î¶õÇòÊ¸»ú¤Î¥Ğ¥¤¥È¿ô */
-#define KG_KUHAKUSIZE	1	/* µ­¹æ¤Î´Ö¤Î¶õÇòÊ¸»ú¤Î¥Ğ¥¤¥È¿ô */
+#define	BANGOSIZE	2	/* å€™è£œè¡Œä¸­ã®å„å€™è£œã®ç•ªå·ã®ãƒã‚¤ãƒˆæ•° */
+#define	REVSIZE		2	/* å€™è£œè¡Œä¸­ã®ç•ªå·ã®ãƒªãƒãƒ¼ã‚¹ã®ãƒã‚¤ãƒˆæ•° */
+#define	BANGOMAX   	9	/* ï¼‘å€™è£œè¡Œä¸­ã®æœ€å¤§å€™è£œæ•° */
+#define KIGOSIZE	1	/* è¨˜å·å€™è£œã®ãƒã‚¤ãƒˆæ•° */
+#define GL_KUHAKUSIZE	1	/* å€™è£œç•ªå·ã®ç©ºç™½æ–‡å­—ã®ãƒã‚¤ãƒˆæ•° */
+#define KG_KUHAKUSIZE	1	/* è¨˜å·ã®é–“ã®ç©ºç™½æ–‡å­—ã®ãƒã‚¤ãƒˆæ•° */
 #define KIGOCOL		(KIGOSIZE + KG_KUHAKUSIZE)
-					/* bangomax¤ò·×»»¤¹¤ë¤¿¤á¤Î¿ô */
-#define	KIGOBANGOMAX   	16	/* £±¸õÊä¹ÔÃæ¤ÎºÇÂç¸õÊä¿ô */
+					/* bangomaxã‚’è¨ˆç®—ã™ã‚‹ãŸã‚ã®æ•° */
+#define	KIGOBANGOMAX   	16	/* ï¼‘å€™è£œè¡Œä¸­ã®æœ€å¤§å€™è£œæ•° */
 #define HINSHISUU	14
 #define HINSHIBUF	256
 #define GOBISUU		9
@@ -189,51 +191,51 @@ typedef struct _coreContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode; /* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode; /* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 } coreContextRec, *coreContext;
 
 typedef struct  _yomiContextRec {
-  /* core ¾ğÊó¤ÈÆ±¤¸¾ğÊó */
+  /* core æƒ…å ±ã¨åŒã˜æƒ…å ± */
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
-  /* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹´Ø·¸ */
-  struct RkwRxDic *romdic;	/* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¼­½ñ */
+  /* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›é–¢ä¿‚ */
+  struct RkwRxDic *romdic;	/* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›è¾æ›¸ */
   wchar_t   romaji_buffer[ROMEBUFSIZE];
-  /* ¥í¡¼¥Ş»ú¥Ğ¥Ã¥Õ¥¡¤Ï rStartp, rEndp ¤Î£²¤Ä¤Î¥¤¥ó¥Ç¥Ã¥¯¥¹¤Ë¤è¤Ã¤Æ´ÉÍı¤µ¤ì
-   * ¤ë¡£rStartp ¤Ï¥«¥Ê¤ËÊÑ´¹¤Ç¤­¤Ê¤«¤Ã¤¿¥í¡¼¥Ş»ú¤ÎºÇ½é¤ÎÊ¸»ú¤Ø¤Î¥¤¥ó¥Ç¥Ã
-   * ¥¯¥¹¤Ç¤¢¤ê¡¢rEndp ¤Ï¿·¤¿¤Ë¥í¡¼¥Ş»ú¤òÆşÎÏ¤¹¤ë»ş¤Ë¡¢³ÊÇ¼¤¹¤Ù¤­ 
-   * romaji_buffer Æâ¤Î¥¤¥ó¥Ç¥Ã¥¯¥¹¤Ç¤¢¤ë¡£¿·¤¿¤ËÆşÎÏ¤µ¤ì¤ë¥í¡¼¥Ş»ú¤Ï¡¢
-   * romaji_buffer + rEndp ¤è¤êÀè¤Ë³ÊÇ¼¤µ¤ì¡¢¤½¤Î¥í¡¼¥Ş»ú¤ò¥«¥Ê¤ËÊÑ´¹¤¹
-   * ¤ë»ş¤Ï¡¢romaji_buffer + rStartp ¤«¤é rEndp - rStartp ¥Ğ¥¤¥È¤ÎÊ¸»ú¤¬
-   * ÂĞ¾İ¤È¤Ê¤ë¡£ */
-  int		  rEndp, rStartp, rCurs; /* ¥í¡¼¥Ş»ú¥Ğ¥Ã¥Õ¥¡¤Î¥İ¥¤¥ó¥¿ */
+  /* ãƒ­ãƒ¼ãƒå­—ãƒãƒƒãƒ•ã‚¡ã¯ rStartp, rEndp ã®ï¼’ã¤ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã«ã‚ˆã£ã¦ç®¡ç†ã•ã‚Œ
+   * ã‚‹ã€‚rStartp ã¯ã‚«ãƒŠã«å¤‰æ›ã§ããªã‹ã£ãŸãƒ­ãƒ¼ãƒå­—ã®æœ€åˆã®æ–‡å­—ã¸ã®ã‚¤ãƒ³ãƒ‡ãƒƒ
+   * ã‚¯ã‚¹ã§ã‚ã‚Šã€rEndp ã¯æ–°ãŸã«ãƒ­ãƒ¼ãƒå­—ã‚’å…¥åŠ›ã™ã‚‹æ™‚ã«ã€æ ¼ç´ã™ã¹ã
+   * romaji_buffer å†…ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã§ã‚ã‚‹ã€‚æ–°ãŸã«å…¥åŠ›ã•ã‚Œã‚‹ãƒ­ãƒ¼ãƒå­—ã¯ã€
+   * romaji_buffer + rEndp ã‚ˆã‚Šå…ˆã«æ ¼ç´ã•ã‚Œã€ãã®ãƒ­ãƒ¼ãƒå­—ã‚’ã‚«ãƒŠã«å¤‰æ›ã™
+   * ã‚‹æ™‚ã¯ã€romaji_buffer + rStartp ã‹ã‚‰ rEndp - rStartp ãƒã‚¤ãƒˆã®æ–‡å­—ãŒ
+   * å¯¾è±¡ã¨ãªã‚‹ã€‚ */
+  int		  rEndp, rStartp, rCurs; /* ãƒ­ãƒ¼ãƒå­—ãƒãƒƒãƒ•ã‚¡ã®ãƒã‚¤ãƒ³ã‚¿ */
   wchar_t         kana_buffer[ROMEBUFSIZE];
   BYTE            rAttr[ROMEBUFSIZE], kAttr[ROMEBUFSIZE];
-  int		  kEndp; /* ¤«¤Ê¥Ğ¥Ã¥Õ¥¡¤ÎºÇ¸å¤ò²¡¤¨¤ë¥İ¥¤¥ó¥¿ */
+  int		  kEndp; /* ã‹ãªãƒãƒƒãƒ•ã‚¡ã®æœ€å¾Œã‚’æŠ¼ãˆã‚‹ãƒã‚¤ãƒ³ã‚¿ */
   int             kRStartp, kCurs;
 
-  /* ¤½¤ÎÂ¾¤Î¥ª¥×¥·¥ç¥ó */
-  KanjiMode       myEmptyMode;		/* empty ¥â¡¼¥É¤Ï¤É¤ì¤« */
+  /* ãã®ä»–ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ */
+  KanjiMode       myEmptyMode;		/* empty ãƒ¢ãƒ¼ãƒ‰ã¯ã©ã‚Œã‹ */
   long		  generalFlags;		/* see below */
   char		  allowedChars;		/* see jrkanji.h */
   char		  henkanInhibition;	/* see below */
-  int		  (*henkanCallback)();	/* ÊÑ´¹¤ò¹Ô¤¦»ş¤Ë¤³¤ÎÊÑ¿ô¤Ë¥¢¥É¥ì¥¹
-             ¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤ë¤Ê¤é¤Ğ¤½¤Î¥¢¥É¥ì¥¹¤Î´Ø¿ô¤òÄÌ¾ï¤Î´Ø¿ô¤ÎÂå¤ï¤ê¤Ë
-             ¸Æ¤Ö¡£ÀßÄê¤µ¤ì¤Æ¤¤¤Ê¤¤»ş¤ÏÄÌ¾ï¤Î´Ø¿ô¤ò¸Æ¤Ö¡£
-               Éô¼óÊÑ´¹¤Ê¤É¤ÇÊÑ´¹¥­¡¼¤¬²¡¤µ¤ì¤¿»ş¤ËÆÃ¼ì¤Ê½èÍı¤¬¹Ô¤ï¤ì¤ë¤Î¤Ë
-             ÂĞ±ş¤¹¤ë¤¿¤á¤ËÉÕ¤±¤¿¡£
-	       ÊÑ´¹¥³¡¼¥ë¥Ğ¥Ã¥¯¤Ï°ú¿ô¤È¤·¤Æ¤É¤ÎÊÑ´¹´Ø¿ô¤¬¸Æ¤Ğ¤ì¤¿¤Î¤«¤ò¼¨¤¹
-	     ÈÖ¹æ¤òÈ¼¤¦¡£*/
-  int             cursup;		/* ¥í¤«¤Ê¤ÎÊäÄÉ¤Î»ş¤Ë»È¤¦ */
+  int		  (*henkanCallback)();	/* å¤‰æ›ã‚’è¡Œã†æ™‚ã«ã“ã®å¤‰æ•°ã«ã‚¢ãƒ‰ãƒ¬ã‚¹
+             ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ãªã‚‰ã°ãã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã®é–¢æ•°ã‚’é€šå¸¸ã®é–¢æ•°ã®ä»£ã‚ã‚Šã«
+             å‘¼ã¶ã€‚è¨­å®šã•ã‚Œã¦ã„ãªã„æ™‚ã¯é€šå¸¸ã®é–¢æ•°ã‚’å‘¼ã¶ã€‚
+               éƒ¨é¦–å¤‰æ›ãªã©ã§å¤‰æ›ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã«ç‰¹æ®Šãªå‡¦ç†ãŒè¡Œã‚ã‚Œã‚‹ã®ã«
+             å¯¾å¿œã™ã‚‹ãŸã‚ã«ä»˜ã‘ãŸã€‚
+	       å¤‰æ›ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã¯å¼•æ•°ã¨ã—ã¦ã©ã®å¤‰æ›é–¢æ•°ãŒå‘¼ã°ã‚ŒãŸã®ã‹ã‚’ç¤ºã™
+	     ç•ªå·ã‚’ä¼´ã†ã€‚*/
+  int             cursup;		/* ãƒ­ã‹ãªã®è£œè¿½ã®æ™‚ã«ä½¿ã† */
 #define SUSPCHARBIAS 100
   int             n_susp_chars;
 
-  /* ºî¶ÈÍÑÊÑ¿ô */
+  /* ä½œæ¥­ç”¨å¤‰æ•° */
   wchar_t	  *retbuf, *retbufp;
   int		  retbufsize;
 } yomiContextRec, *yomiContext;
@@ -265,7 +267,7 @@ typedef struct  _yomiContextRec {
 #define CANNA_YOMI_INHIBIT_ASBUSHU	8
 #define CANNA_YOMI_INHIBIT_ALL		15
 
-/* ¸õÊä°ìÍ÷¤Î¤¿¤á¤Î¥Õ¥é¥° */
+/* å€™è£œä¸€è¦§ã®ãŸã‚ã®ãƒ•ãƒ©ã‚° */
 #define NUMBERING 			1
 #define CHARINSERT			2
 
@@ -276,30 +278,30 @@ typedef struct _henkanContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
-  /* ¥«¥Ê´Á»úÊÑ´¹´Ø·¸ */
+  /* ã‚«ãƒŠæ¼¢å­—å¤‰æ›é–¢ä¿‚ */
   int            context;
   int            check;
-  int		 kouhoCount;	/* ²¿²ó henkanNext ¤¬Ï¢Â³¤·¤Æ²¡¤µ¤ì¤¿¤« */
+  int		 kouhoCount;	/* ä½•å› henkanNext ãŒé€£ç¶šã—ã¦æŠ¼ã•ã‚ŒãŸã‹ */
   wchar_t        yomi_buffer[ROMEBUFSIZE];
   wchar_t        echo_buffer[ROMEBUFSIZE];
-  wchar_t        **allkouho; /* RkGetKanjiList¤ÇÆÀ¤é¤ì¤ëÊ¸»úÎó¤òÇÛÎó¤Ë¤·¤Æ
-				¤È¤Ã¤Æ¤ª¤¯¤È¤³¤í */
-  int            yomilen;    /* ÆÉ¤ß¤ÎÄ¹¤µ¡¢ÆÉ¤ß¼«¿È¤Ï kana_buffer ¤ËÆş¤ì
-			        ¤é¤ì¤ë */
-  int            curbun;     /* ¥«¥ì¥ó¥ÈÊ¸Àá */
-  int		 curIkouho;  /* ¥«¥ì¥ó¥È¸õÊä */
-  int            nbunsetsu;  /* Ê¸Àá¤Î¿ô */
+  wchar_t        **allkouho; /* RkGetKanjiListã§å¾—ã‚‰ã‚Œã‚‹æ–‡å­—åˆ—ã‚’é…åˆ—ã«ã—ã¦
+				ã¨ã£ã¦ãŠãã¨ã“ã‚ */
+  int            yomilen;    /* èª­ã¿ã®é•·ã•ã€èª­ã¿è‡ªèº«ã¯ kana_buffer ã«å…¥ã‚Œ
+			        ã‚‰ã‚Œã‚‹ */
+  int            curbun;     /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ */
+  int		 curIkouho;  /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œ */
+  int            nbunsetsu;  /* æ–‡ç¯€ã®æ•° */
 #define MAXNBUNSETSU	256
-  int            kugiri[MAXNBUNSETSU]; /* Ê¸ÀáÊ¬¤±¤ò¹Ô¤¦»ş¤ÎÊ¸Àá¤¯¤®
-					  ¤ê¤Î¾ğÊó¡£ */
+  int            kugiri[MAXNBUNSETSU]; /* æ–‡ç¯€åˆ†ã‘ã‚’è¡Œã†æ™‚ã®æ–‡ç¯€ãã
+					  ã‚Šã®æƒ…å ±ã€‚ */
   int		 *kanaKugiri, *romajiKugiri, *jishubun;
   yomiContext    ycx;
 /* ifdef MEASURE_TIME */
-  long		 proctime;   /* ½èÍı»ş´Ö(ÊÑ´¹¤Ç·×Â¬¤¹¤ë) */
-  long		 rktime;     /* ½èÍı»ş´Ö(RK¤Ë¤«¤«¤ë»ş´Ö) */
+  long		 proctime;   /* å‡¦ç†æ™‚é–“(å¤‰æ›ã§è¨ˆæ¸¬ã™ã‚‹) */
+  long		 rktime;     /* å‡¦ç†æ™‚é–“(RKã«ã‹ã‹ã‚‹æ™‚é–“) */
 /* endif MEASURE_TIME */
 } henkanContextRec, *henkanContext;
 
@@ -307,7 +309,7 @@ typedef struct _jishuContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* Á°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
   unsigned char	 inhibition;
@@ -322,92 +324,92 @@ typedef struct _ichiranContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
-  int            svIkouho;   /* ¥«¥ì¥ó¥È¸õÊä¤ò°ì»ş¤È¤Ã¤Æ¤ª¤¯(°ìÍ÷É½¼¨¹Ô) */
-  int            *curIkouho; /* ¥«¥ì¥ó¥È¸õÊä */
-  int            nIkouho;    /* ¸õÊä¤Î¿ô(°ìÍ÷É½¼¨¹Ô) */
-  int		 tooSmall;   /* ¥«¥é¥à¿ô¤¬¶¹¤¯¤Æ¸õÊä°ìÍ÷¤¬½Ğ¤»¤Ê¤¤¤è¥Õ¥é¥° */
-  int            curIchar;   /* Ì¤³ÎÄêÊ¸»úÎó¤¢¤ê¤ÎÃ±¸ìÅĞÏ¿¤ÎÃ±¸ìÆşÎÏ¤Î
-    							ÀèÆ¬Ê¸»ú¤Î°ÌÃÖ */
+  int            svIkouho;   /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã‚’ä¸€æ™‚ã¨ã£ã¦ãŠã(ä¸€è¦§è¡¨ç¤ºè¡Œ) */
+  int            *curIkouho; /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œ */
+  int            nIkouho;    /* å€™è£œã®æ•°(ä¸€è¦§è¡¨ç¤ºè¡Œ) */
+  int		 tooSmall;   /* ã‚«ãƒ©ãƒ æ•°ãŒç‹­ãã¦å€™è£œä¸€è¦§ãŒå‡ºã›ãªã„ã‚ˆãƒ•ãƒ©ã‚° */
+  int            curIchar;   /* æœªç¢ºå®šæ–‡å­—åˆ—ã‚ã‚Šã®å˜èªç™»éŒ²ã®å˜èªå…¥åŠ›ã®
+    							å…ˆé ­æ–‡å­—ã®ä½ç½® */
   unsigned char  inhibit;
-  unsigned char  flags;	     /* ²¼¤ò¸«¤Æ¤Í */
-  wchar_t        **allkouho; /* RkGetKanjiList¤ÇÆÀ¤é¤ì¤ëÊ¸»úÎó¤òÇÛÎó¤Ë¤·¤Æ
-				¤È¤Ã¤Æ¤ª¤¯¤È¤³¤í */
-  wchar_t        *glinebufp; /* ¸õÊä°ìÍ÷¤Î¤¢¤ë°ì¹Ô¤òÉ½¼¨¤¹¤ë¤¿¤á¤ÎÊ¸»ú
-				Îó¤Ø¤Î¥İ¥¤¥ó¥¿ */
-  kouhoinfo      *kouhoifp;  /* ¸õÊä°ìÍ÷´Ø·¸¤Î¾ğÊó¤ò³ÊÇ¼¤·¤Æ¤ª¤¯¹½Â¤ÂÎ
-				¤Ø¤Î¥İ¥¤¥ó¥¿ */
-  glineinfo      *glineifp;  /* ¸õÊä°ìÍ÷´Ø·¸¤Î¾ğÊó¤ò³ÊÇ¼¤·¤Æ¤ª¤¯¹½Â¤ÂÎ
-				¤Ø¤Î¥İ¥¤¥ó¥¿ */
+  unsigned char  flags;	     /* ä¸‹ã‚’è¦‹ã¦ã­ */
+  wchar_t        **allkouho; /* RkGetKanjiListã§å¾—ã‚‰ã‚Œã‚‹æ–‡å­—åˆ—ã‚’é…åˆ—ã«ã—ã¦
+				ã¨ã£ã¦ãŠãã¨ã“ã‚ */
+  wchar_t        *glinebufp; /* å€™è£œä¸€è¦§ã®ã‚ã‚‹ä¸€è¡Œã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã®æ–‡å­—
+				åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+  kouhoinfo      *kouhoifp;  /* å€™è£œä¸€è¦§é–¢ä¿‚ã®æƒ…å ±ã‚’æ ¼ç´ã—ã¦ãŠãæ§‹é€ ä½“
+				ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+  glineinfo      *glineifp;  /* å€™è£œä¸€è¦§é–¢ä¿‚ã®æƒ…å ±ã‚’æ ¼ç´ã—ã¦ãŠãæ§‹é€ ä½“
+				ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
 } ichiranContextRec, *ichiranContext;
 
-/* ¥Õ¥é¥°¤Î°ÕÌ£ */
-#define ICHIRAN_ALLOW_CALLBACK 1 /* ¥³¡¼¥ë¥Ğ¥Ã¥¯¤ò¤·¤Æ¤âÎÉ¤¤ */
+/* ãƒ•ãƒ©ã‚°ã®æ„å‘³ */
+#define ICHIRAN_ALLOW_CALLBACK 1 /* ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’ã—ã¦ã‚‚è‰¯ã„ */
 
 
 typedef struct _foirchiranContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
-  int            curIkouho;  /* ¥«¥ì¥ó¥È¸õÊä */
-  wchar_t        **allkouho; /* RkGetKanjiList¤ÇÆÀ¤é¤ì¤ëÊ¸»úÎó¤òÇÛÎó¤Ë¤·¤Æ
-				¤È¤Ã¤Æ¤ª¤¯¤È¤³¤í */
-  menuitem       *table;  /* Ê¸»úÎó¤È´Ø¿ô¤Î¥Æ¡¼¥Ö¥ë */
-  int            *prevcurp;  /* Á°¤Î¥«¥ì¥ó¥È¸õÊä */
-  int            (*prevfunc)();  /* Á°¤Î´Ø¿ô */
-  int            (*curfunc)();  /* ¥«¥ì¥ó¥È´Ø¿ô */
+  int            curIkouho;  /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œ */
+  wchar_t        **allkouho; /* RkGetKanjiListã§å¾—ã‚‰ã‚Œã‚‹æ–‡å­—åˆ—ã‚’é…åˆ—ã«ã—ã¦
+				ã¨ã£ã¦ãŠãã¨ã“ã‚ */
+  menuitem       *table;  /* æ–‡å­—åˆ—ã¨é–¢æ•°ã®ãƒ†ãƒ¼ãƒ–ãƒ« */
+  int            *prevcurp;  /* å‰ã®ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œ */
+  int            (*prevfunc)();  /* å‰ã®é–¢æ•° */
+  int            (*curfunc)();  /* ã‚«ãƒ¬ãƒ³ãƒˆé–¢æ•° */
 } forichiranContextRec, *forichiranContext;
 
 typedef struct _mountContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
-  unsigned char        *mountOldStatus; /* ¥Ş¥¦¥ó¥È¤µ¤ì¤Æ¤¤¤ë¤«¤¤¤Ê¤¤¤« */
-  unsigned char        *mountNewStatus; /* ¥Ş¥¦¥ó¥È¤µ¤ì¤Æ¤¤¤ë¤«¤¤¤Ê¤¤¤« */
-  unsigned char        **mountList;   /* ¥Ş¥¦¥ó¥È²ÄÇ½¤Ê¼­½ñ¤Î°ìÍ÷ */
-  int            curIkouho;     /* ¥«¥ì¥ó¥È¸õÊä */
+  unsigned char        *mountOldStatus; /* ãƒã‚¦ãƒ³ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã„ãªã„ã‹ */
+  unsigned char        *mountNewStatus; /* ãƒã‚¦ãƒ³ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã„ãªã„ã‹ */
+  unsigned char        **mountList;   /* ãƒã‚¦ãƒ³ãƒˆå¯èƒ½ãªè¾æ›¸ã®ä¸€è¦§ */
+  int            curIkouho;     /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œ */
 } mountContextRec, *mountContext;
 
 typedef struct _tourokuContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
   wchar_t        genbuf[ROMEBUFSIZE];
   wchar_t        qbuf[ROMEBUFSIZE];
   wchar_t        tango_buffer[ROMEBUFSIZE];
-  int            tango_len;  /* Ã±¸ìÅĞÏ¿¤ÎÃ±¸ì¤ÎÊ¸»úÎó¤ÎÄ¹¤µ */
+  int            tango_len;  /* å˜èªç™»éŒ²ã®å˜èªã®æ–‡å­—åˆ—ã®é•·ã• */
   wchar_t        yomi_buffer[ROMEBUFSIZE];
-  int            yomi_len;   /* Ã±¸ìÅĞÏ¿¤ÎÆÉ¤ß¤ÎÊ¸»úÎó¤ÎÄ¹¤µ */
-  int            curHinshi;  /* ÉÊ»ì¤ÎÁªÂò */
-  wchar_t	 hcode[16];   /* Ã±¸ìÅĞÏ¿¤ÎÉÊ»ì */
-  int		 katsuyou;   /* Ã±¸ìÅĞÏ¿¤ÎÆ°»ì¤Î³èÍÑ·Á */
-  wchar_t        **udic;     /* Ã±¸ìÅĞÏ¿¤Ç¤­¤ë¼­½ñ (¼­½ñÌ¾) */
-  int            delContext; /* Ã±¸ìºï½ü¤Ç£±¤Ä¤Î¼­½ñ¤ò¥Ş¥¦¥ó¥È¤¹¤ë */
+  int            yomi_len;   /* å˜èªç™»éŒ²ã®èª­ã¿ã®æ–‡å­—åˆ—ã®é•·ã• */
+  int            curHinshi;  /* å“è©ã®é¸æŠ */
+  wchar_t	 hcode[16];   /* å˜èªç™»éŒ²ã®å“è© */
+  int		 katsuyou;   /* å˜èªç™»éŒ²ã®å‹•è©ã®æ´»ç”¨å½¢ */
+  wchar_t        **udic;     /* å˜èªç™»éŒ²ã§ãã‚‹è¾æ›¸ (è¾æ›¸å) */
+  int            delContext; /* å˜èªå‰Šé™¤ã§ï¼‘ã¤ã®è¾æ›¸ã‚’ãƒã‚¦ãƒ³ãƒˆã™ã‚‹ */
 } tourokuContextRec, *tourokuContext;
 
 typedef struct _adjustContextRec {
   char id;
   char majorMode, minorMode;
   struct callback c;
-  KanjiMode	  prevMode;	/* £±¤ÄÁ°¤Î¥â¡¼¥É */
+  KanjiMode	  prevMode;	/* ï¼‘ã¤å‰ã®ãƒ¢ãƒ¼ãƒ‰ */
   mode_context    next;
 
   yomiContext    ycx;
   henkanContext  hcx;
 
   wchar_t        genbuf[ROMEBUFSIZE];
-  int            kanjilen, strlen, bunlen; /* ´Á»úÉôÊ¬¡¢Á´ÂÎ¡¢Ê¸Àá¤ÎÄ¹¤µ */
+  int            kanjilen, strlen, bunlen; /* æ¼¢å­—éƒ¨åˆ†ã€å…¨ä½“ã€æ–‡ç¯€ã®é•·ã• */
 } adjustContextRec, *adjustContext;
 
 typedef struct _chikujiContextRec {
@@ -434,12 +436,12 @@ typedef struct _chikujiContextRec {
 #define	CHIKUJI_NULL_STATUS		0x0000
 
 struct moreTodo {
-  char          todo; /* ¤â¤Ã¤È¤¢¤ë¤Î¡©¤ò¼¨¤¹ */
-  char          fnum; /* ´Ø¿ôÈÖ¹æ¡££°¤Ê¤é¼¡¤ÎÊ¸»ú¤Ç¼¨¤µ¤ì¤ë¤³¤È¤ò¤¹¤ë */
-  unsigned char ch;   /* Ê¸»ú */
+  char          todo; /* ã‚‚ã£ã¨ã‚ã‚‹ã®ï¼Ÿã‚’ç¤ºã™ */
+  char          fnum; /* é–¢æ•°ç•ªå·ã€‚ï¼ãªã‚‰æ¬¡ã®æ–‡å­—ã§ç¤ºã•ã‚Œã‚‹ã“ã¨ã‚’ã™ã‚‹ */
+  unsigned char ch;   /* æ–‡å­— */
 };
 
-/* ¥â¡¼¥ÉÌ¾¤ò³ÊÇ¼¤¹¤ë¥Ç¡¼¥¿¤Î·¿ÄêµÁ */
+/* ãƒ¢ãƒ¼ãƒ‰åã‚’æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã®å‹å®šç¾© */
 
 struct ModeNameRecs {
   int           alloc;
@@ -448,15 +450,15 @@ struct ModeNameRecs {
 
 
 /*
- * ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤Ï£±¸Ä¤¢¤ì¤ĞÎÉ¤¤¤Ç¤·¤ç¤¦¡£Ê£¿ô¸ÄÉ¬Í×¤Ê¤Î¤Ç
- * ¤¢¤ì¤Ğ RomeStruct ¤Î¥á¥ó¥Ğ¤È¤·¤ÆÆş¤ì¤Æ¤ª¤¯É¬Í×¤â¤¢¤ê¤Ş¤·¤ç¤¦¤¬...¤½
- * ¤Î»ş¤Ï¤½¤Î»ş¤Ç¹Í¤¨¤Ş¤·¤ç¤¦¡£
+ * ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã¯ï¼‘å€‹ã‚ã‚Œã°è‰¯ã„ã§ã—ã‚‡ã†ã€‚è¤‡æ•°å€‹å¿…è¦ãªã®ã§
+ * ã‚ã‚Œã° RomeStruct ã®ãƒ¡ãƒ³ãƒã¨ã—ã¦å…¥ã‚Œã¦ãŠãå¿…è¦ã‚‚ã‚ã‚Šã¾ã—ã‚‡ã†ãŒ...ã
+ * ã®æ™‚ã¯ãã®æ™‚ã§è€ƒãˆã¾ã—ã‚‡ã†ã€‚
  */
-     
+
 extern struct RkwRxDic *romajidic, *RkwOpenRoma();
 
 /*
- * ¼­½ñ¤ÎÌ¾Á°¤òÆş¤ì¤Æ¤ª¤¯ÊÑ¿ô
+ * è¾æ›¸ã®åå‰ã‚’å…¥ã‚Œã¦ãŠãå¤‰æ•°
  */
 
 #define MAX_DICS 16
@@ -475,25 +477,25 @@ extern char *localdicname[];
 extern int nlocaldics;
 
 /*
- * ¥¨¥é¡¼¤Î¥á¥Ã¥»¡¼¥¸¤òÆş¤ì¤Æ¤ª¤¯ÊÑ¿ô
+ * ã‚¨ãƒ©ãƒ¼ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å…¥ã‚Œã¦ãŠãå¤‰æ•°
  */
 
 extern char *necKanjiError;
 
 /*
- * ¥Ç¥Ğ¥°Ê¸¤òÉ½¼¨¤¹¤ë¤«¤É¤¦¤«¤Î¥Õ¥é¥°
+ * ãƒ‡ãƒã‚°æ–‡ã‚’è¡¨ç¤ºã™ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
  */
 
 extern iroha_debug;
 
 /*
- * 16¿Ê¥³¡¼¥ÉÆşÎÏ¤ò°ìÍ÷¹Ô¤ËÉ½¼¨¤¹¤ë¤«¤É¤¦¤«¤òÄ´¤Ù¤ë¾ò·ï¡£
+ * 16é€²ã‚³ãƒ¼ãƒ‰å…¥åŠ›ã‚’ä¸€è¦§è¡Œã«è¡¨ç¤ºã™ã‚‹ã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹æ¡ä»¶ã€‚
  */
 
 #define hexGLine(plen) (d->ncolumns /2 >= plen + 4)
 
 /*
- * ¥­¡¼¥·¡¼¥±¥ó¥¹¤òÈ¯À¸¤¹¤ë¤è¤¦¤Ê¥­¡¼
+ * ã‚­ãƒ¼ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã‚’ç™ºç”Ÿã™ã‚‹ã‚ˆã†ãªã‚­ãƒ¼
  */
 
 #define IrohaFunctionKey(key) \
@@ -504,13 +506,13 @@ extern iroha_debug;
    (0xe0 <= (int)(unsigned char)(key) &&  \
     (int)(unsigned char)(key) <= 0xff) )
 
-/* selectOne ¤Ç¥³¡¼¥ë¥Ğ¥Ã¥¯¤òÈ¼¤¦¤«¤É¤¦¤«¤òÉ½¤¹¥Ş¥¯¥í */
+/* selectOne ã§ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’ä¼´ã†ã‹ã©ã†ã‹ã‚’è¡¨ã™ãƒã‚¯ãƒ­ */
 
 #define WITHOUT_LIST_CALLBACK 0
 #define WITH_LIST_CALLBACK    1
 
 /*
- * Rk ´Ø¿ô¤ò¥È¥ì¡¼¥¹¤¹¤ë¤¿¤á¤ÎÌ¾Á°¤Î½ñ¤­´¹¤¨¡£
+ * Rk é–¢æ•°ã‚’ãƒˆãƒ¬ãƒ¼ã‚¹ã™ã‚‹ãŸã‚ã®åå‰ã®æ›¸ãæ›ãˆã€‚
  */
 
 #ifdef DEBUG
@@ -518,7 +520,7 @@ extern iroha_debug;
 #endif /* DEBUG */
 
 /*
- * ¥Ç¥Ğ¥°¥á¥Ã¥»¡¼¥¸½ĞÎÏÍÑ¤Î¥Ş¥¯¥í
+ * ãƒ‡ãƒã‚°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›ç”¨ã®ãƒã‚¯ãƒ­
  */
 
 #ifdef DEBUG
@@ -528,7 +530,7 @@ extern iroha_debug;
 #endif /* !DEBUG */
 
 /*
- * malloc ¤Î¥Ç¥Ğ¥°
+ * malloc ã®ãƒ‡ãƒã‚°
  */
 
 #ifdef DEBUG_ALLOC
@@ -554,28 +556,28 @@ extern wchar_t *WString();
 #endif	/* _UTIL_FUNCTIONS_DEF_ */
 
 /*
- * ¿·¤·¤¤¥â¡¼¥É¤òÄêµÁ¤¹¤ë¹½Â¤ÂÎ
+ * æ–°ã—ã„ãƒ¢ãƒ¼ãƒ‰ã‚’å®šç¾©ã™ã‚‹æ§‹é€ ä½“
  */
 
 typedef struct {
-  wchar_t         *display_name; /* ¥â¡¼¥ÉÉ½¼¨Ì¾ */
-  unsigned char   *romaji_table; /* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë(EUC) */
-  struct RkwRxDic *romdic;	 /* ¥í¡¼¥Ş»ú¼­½ñ¹½Â¤ÂÎ */
-  long            romdic_owner;  /* ¥í¡¼¥Ş»ú¼­½ñ¤ò¼«Ê¬¤ÇOpen¤·¤¿¤« */
+  wchar_t         *display_name; /* ãƒ¢ãƒ¼ãƒ‰è¡¨ç¤ºå */
+  unsigned char   *romaji_table; /* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«(EUC) */
+  struct RkwRxDic *romdic;	 /* ãƒ­ãƒ¼ãƒå­—è¾æ›¸æ§‹é€ ä½“ */
+  long            romdic_owner;  /* ãƒ­ãƒ¼ãƒå­—è¾æ›¸ã‚’è‡ªåˆ†ã§Openã—ãŸã‹ */
   long            flags;	 /* flags for yomiContext->generalFlags */
-  KanjiMode       emode;	 /* current_mode ¤ËÆş¤ë¹½Â¤ÂÎ */
+  KanjiMode       emode;	 /* current_mode ã«å…¥ã‚‹æ§‹é€ ä½“ */
 } newmode;
 
 #define MAX_OTHER_MODES 16
 
-/* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¤òÊäÂ­¤¹¤ë¥­¡¼¤ÈÊ¸»ú¤ÎÊÑ´¹¥Æ¡¼¥Ö¥ë */
+/* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ã‚’è£œè¶³ã™ã‚‹ã‚­ãƒ¼ã¨æ–‡å­—ã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
 
 typedef struct {
-  wchar_t	key;		/* ¥­¡¼ */
-  int		groupid;	/* ¥°¥ë¡¼¥×id */
-  int           ncand;          /* ¸õÊä¤Î¿ô */
-  wchar_t       **cand;         /* ¸õÊä¤ÎÇÛÎó */
-  wchar_t	*fullword;	/* ¸õÊäÎó (¸õÊä1@¸õÊä2@...¸õÊän@@) */
+  wchar_t	key;		/* ã‚­ãƒ¼ */
+  int		groupid;	/* ã‚°ãƒ«ãƒ¼ãƒ—id */
+  int           ncand;          /* å€™è£œã®æ•° */
+  wchar_t       **cand;         /* å€™è£œã®é…åˆ— */
+  wchar_t	*fullword;	/* å€™è£œåˆ— (å€™è£œ1@å€™è£œ2@...å€™è£œn@@) */
 } keySupplement;
 
 #define MAX_KEY_SUP 64

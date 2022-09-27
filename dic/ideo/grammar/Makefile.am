@@ -1,5 +1,5 @@
 
-# localstatedir = ${prefix}/var
+# default localstatedir = ${prefix}/var
 dicdir = ${localstatedir}/canna/dic
 dist_dic_DATA = fuzokugo.cbd
 

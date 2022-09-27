@@ -4,13 +4,6 @@
 #include "canna/ccompat.h"
 #include "RKindep/file.h"
 
-#if !defined( HYOUJUN_GRAM )
-#ifdef USE_OBSOLETE_STYLE_FILENAME
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.d"
-#else
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.cbd"
-#endif
-#endif
 
 char	*program;
 
@@ -60,7 +53,7 @@ main(ac, av)
     }
     RkEndGram(&end, gram);
 
-    fprintf(stdout, "before %s:\n", av[i]); 
+    fprintf(stdout, "before %s:\n", av[i]);
     for (RkFirstGram(&curr, gram);
 	curr.rowcol < end.rowcol; RkNextGram(&curr)) {
 	if (RkTestGram(gram, curr.rowcol, row))
@@ -68,7 +61,7 @@ main(ac, av)
     }
     fprintf(stdout, "\n");
 
-    fprintf(stdout, "after %s:\n", av[i]); 
+    fprintf(stdout, "after %s:\n", av[i]);
     for (RkFirstGram(&curr, gram);
 	curr.rowcol < end.rowcol; RkNextGram(&curr)) {
 	if (RkTestGram(gram, row, curr.rowcol))

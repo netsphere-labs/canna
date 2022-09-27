@@ -1,3 +1,4 @@
+я╗┐// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 static	char	rcs_id[] = "@(#) 102.1 $Id: parse.c,v 1.1.1.1 2002/10/19 08:27:32 aida_s Exp $";
@@ -258,7 +259,7 @@ before_parse()
 #ifndef NEWGEN
 /* cfuncdef
 
-   parse_string -- ╩╕╗·╬єдЄе╤б╝е╣д╣дыбг
+   parse_string -- цЦЗхнЧхИЧуВТуГСуГ╝уВ╣уБЩуВЛуАВ
 
 */
 
@@ -275,9 +276,9 @@ char *str;
 
 /* cfuncdef
 
-   YYparse -- еле╣е┐е▐еде║е╒ебедеыдЄ╞╔дрбг
+   YYparse -- уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТшкнуВАуАВ
 
-   е╒ебедеые╟еге╣епеъе╫е┐д╟╗╪─ъд╡дьд┐е╒ебедеыдЄ╞╔д▀╣■дрбг
+   уГХуВбуВдуГлуГЗуВгуВ╣уВпуГкуГЧуВ┐уБзцМЗхоЪуБХуВМуБЯуГХуВбуВдуГлуВТшкнуБ┐ш╛╝уВАуАВ
 
 */
 
@@ -293,16 +294,16 @@ FILE *f;
 
 /* cfuncdef
 
-  YYparse_by_rcfilename -- еле╣е┐е▐еде║е╒ебедеыдЄ╞╔д▀╣■дрбг
+  YYparse_by_rcfilename -- уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТшкнуБ┐ш╛╝уВАуАВ
 
-  IROHA_rcfilename д╦д╞╗╪─ъд╡дьд╞дддыеле╣е┐е▐еде║е╒ебедеыдЄекб╝е╫еєд╖
-  ╞╔д▀╣■дрбг
+  IROHA_rcfilename уБлуБжцМЗхоЪуБХуВМуБжуБДуВЛуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТуВкуГ╝уГЧуГ│уБЧ
+  шкнуБ┐ш╛╝уВАуАВ
 
-  ╠сдъ├═	г▒ ╞╔д▀╣■дсд┐бвг░ ╞╔д▀╣■дсд╩длд├д┐
+  цИ╗уВКхАд	я╝С шкнуБ┐ш╛╝уВБуБЯуАБя╝Р шкнуБ┐ш╛╝уВБуБкуБЛуБгуБЯ
 
 */
 
-static 
+static
 YYparse_by_rcfilename()
 {
   FILE *f;
@@ -324,20 +325,20 @@ YYparse_by_rcfilename()
 
 /* cfuncdef
 
-  parse -- .iroha е╒ебедеыдЄ├╡д╖д╞днд╞╞╔д▀╣■дрбг
+  parse -- .iroha уГХуВбуВдуГлуВТцОвуБЧуБжуБНуБжшкнуБ┐ш╛╝уВАуАВ
 
-  parse д╧еле╣е┐е▐еде║е╒ебедеыдЄ├╡д╖бвд╜д╬е╒ебедеыдЄекб╝е╫еєд╖е╤б╝е╣д╣
-  дыбг
+  parse уБпуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТцОвуБЧуАБуБЭуБоуГХуВбуВдуГлуВТуВкуГ╝уГЧуГ│уБЧуГСуГ╝уВ╣уБЩ
+  уВЛуАВ
 
-  е╤б╝е╣├цд╬е╒ебедеыд╬╠╛┴░дЄ IROHA_rcfilename д╦╞■дьд╞дкдпбг
+  уГСуГ╝уВ╣ф╕нуБоуГХуВбуВдуГлуБохРНхЙНуВТ IROHA_rcfilename уБлхЕеуВМуБжуБКуБПуАВ
 
   */
 
-#define RCFILENAME  ".iroha"
-#define SYSRCDIR    "/usr/lib/iroha/"
+#define RCFILENAME  ".iroha"      хПдуБД
+#define SYSRCDIR    "/usr/lib/iroha/"   тЧПтЧПуБУуВМуБпуГАуГб
 #define FILEENVNAME "IROHAFILE"
 
-parse()
+void parse()
 {
   char *p, *getenv();
   int n;
@@ -356,7 +357,7 @@ parse()
   }
   if (p = getenv(FILEENVNAME)) {
     strcpy(IROHA_rcfilename, p);
-    if (YYparse_by_rcfilename()) 
+    if (YYparse_by_rcfilename())
       return;
   }
   if (p = getenv("HOME")) {
@@ -368,7 +369,7 @@ parse()
     /* $HOME/.iroha */
 
     home_iroha_exist = YYparse_by_rcfilename();
-    
+
 
     if (home_iroha_exist) {
 
@@ -376,17 +377,17 @@ parse()
 
       if (p = getenv("DISPLAY")) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
-	
+
 	IROHA_rcfilename[n] = '-';
 	strcpy(IROHA_rcfilename + n + 1, display);
-	
+
 	YYparse_by_rcfilename();
       }
-      
+
       /* $HOME/.iroha-TERM */
-      
+
       if (p = getenv("TERM")) {
 	IROHA_rcfilename[n] = '-';
 	strcpy(IROHA_rcfilename + n + 1, p);
@@ -396,16 +397,16 @@ parse()
   }
 
   if ( !home_iroha_exist ) {
-    /* ║╟╕хд╧е╖е╣е╞ере╟е╒ейеые╚д╬е╒ебедеыдЄ╞╔др */
+    /* цЬАх╛МуБпуВ╖уВ╣уГЖуГауГЗуГХуВйуГлуГИуБоуГХуВбуВдуГлуВТшкнуВА */
     strcpy(IROHA_rcfilename, SYSRCDIR);
     n = strlen(IROHA_rcfilename);
-  
+
     strcpy(IROHA_rcfilename + n, "default");
     strcat(IROHA_rcfilename + n, RCFILENAME);
     if (YYparse_by_rcfilename()) {
       if (p = getenv("DISPLAY")) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
 
 	strcpy(IROHA_rcfilename + n, display);
@@ -422,7 +423,7 @@ parse()
     else {
       char buf[256];
 
-      sprintf(buf, "е╖е╣е╞ерд╬╜щ┤№▓╜е╒ебедеы %s дм┬╕║▀д╖д▐д╗дєбг",
+      sprintf(buf, "уВ╖уВ╣уГЖуГауБохИЭцЬЯхМЦуГХуВбуВдуГл %s уБМхнШхЬиуБЧуБ╛уБЫуВУуАВ",
 	      IROHA_rcfilename);
     }
   }
@@ -431,12 +432,12 @@ parse()
 
 /* cfuncdef
 
-  cparse -- .canna е╒ебедеыдЄ├╡д╖д╞днд╞╞╔д▀╣■дрбг
+  cparse -- .canna уГХуВбуВдуГлуВТцОвуБЧуБжуБНуБжшкнуБ┐ш╛╝уВАуАВ
 
-  parse д╧еле╣е┐е▐еде║е╒ебедеыдЄ├╡д╖бвд╜д╬е╒ебедеыдЄекб╝е╫еєд╖е╤б╝е╣д╣
-  дыбг
+  parse уБпуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТцОвуБЧуАБуБЭуБоуГХуВбуВдуГлуВТуВкуГ╝уГЧуГ│уБЧуГСуГ╝уВ╣уБЩ
+  уВЛуАВ
 
-  е╤б╝е╣├цд╬е╒ебедеыд╬╠╛┴░дЄ CANNA_rcfilename д╦╞■дьд╞дкдпбг
+  уГСуГ╝уВ╣ф╕нуБоуГХуВбуВдуГлуБохРНхЙНуВТ CANNA_rcfilename уБлхЕеуВМуБжуБКуБПуАВ
 
   */
 
@@ -485,7 +486,7 @@ cparse()
     /* $HOME/.canna */
 
     if(home_canna_exist = LLparse_by_rcfilename(CANNA_rcfilename));
-    
+
 
     if (home_canna_exist) {
 #ifdef NEWGEN
@@ -495,38 +496,39 @@ cparse()
 
       if (p = getenv("DISPLAY")) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
-	
+
 	CANNA_rcfilename[n] = '-';
 	strcpy(CANNA_rcfilename + n + 1, display);
-	
+
 	if(LLparse_by_rcfilename(CANNA_rcfilename)) {
 	}
       }
-      
+
       /* $HOME/.canna-TERM */
-      
+
       if (p = getenv("TERM")) {
 	CANNA_rcfilename[n] = '-';
 	strcpy(CANNA_rcfilename + n + 1, p);
 	if(LLparse_by_rcfilename(CANNA_rcfilename)) {
-	}	  
+	}
       }
     }
   }
 
-  if ( !home_canna_exist ) {
-    /* ║╟╕хд╧е╖е╣е╞ере╟е╒ейеые╚д╬е╒ебедеыдЄ╞╔др */
-    strcpy(CANNA_rcfilename, CANNALIBDIR);
-    n = strlen(CANNA_rcfilename);
-  
+    if ( !home_canna_exist ) {
+        /* цЬАх╛МуБпуВ╖уВ╣уГЖуГауГЗуГХуВйуГлуГИуБоуГХуВбуВдуГлуВТшкнуВА */
+        // Debian чЙИуГЗуГХуВйуГлуГИ = /usr/share/doc/libcanna1g/default.canna
+        strcpy(CANNA_rcfilename, CANNALIBDIR);
+        n = strlen(CANNA_rcfilename);
+
     strcpy(CANNA_rcfilename + n, "/default");
     strcat(CANNA_rcfilename + n, CRCFILENAME);
     if (LLparse_by_rcfilename(CANNA_rcfilename)) {
       if (p = getenv("DISPLAY")) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
 
 	CANNA_rcfilename[n] = '/';
@@ -561,14 +563,14 @@ int
       if (rcfile == (FILE *)NULL
 	  || fgets(buff, BUF_LEN, rcfile) == (char *)NULL)
 	return (int)NULL;
-      
+
       yylineno++;
-      
+
       ptr = 0;
       len = strlen(buff);
     }
 #ifdef KANJI
-  return ((buff[ptr] == -1) ? 
+  return ((buff[ptr] == -1) ?
 	  (ptr++, -1) : (int)(unsigned char)buff[ptr++]);
 #else /* not KANJI */
   return ((int)buff[ptr++]);

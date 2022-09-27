@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef lint
@@ -36,13 +36,6 @@ static char rcsid[]="@(#) 102.1 $Id: crxdic.c,v 1.11.2.2 2003/12/27 17:15:21 aid
 #include "RKindep/file.h"
 #include "RKindep/cksum.h"
 
-#if !defined( HYOUJUN_GRAM )
-#ifndef WINDOWS_STYLE_FILENAME
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.d"
-#else
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.cbd"
-#endif
-#endif
 
 #define PAGE_HDR_SIZ		14
 #define MAX_PAGE_OFF		0x7fffff
@@ -243,7 +236,7 @@ open_wfile(filename, nel)
   int		i;
   unsigned char	aline[2*MAXLINE];
   unsigned	maxline;
-    
+
   if (!(fp = fopen(filename, "r"))) {
     fprintf(stderr, "%s: cannot open %s\n", program, filename);
     exit(1);
@@ -272,7 +265,7 @@ open_wfile(filename, nel)
     if (aline[0] == (unsigned char)'#') {
       continue;
     }
-    
+
     while (aline[len - 1] != '\n') {
       fprintf(stderr, "%s: too long line:%s\n", program, aline);
       if (!fgets((char *)aline, RkNumber(aline), fp)) {
@@ -390,7 +383,7 @@ fil_dic(nd, dic)
   unsigned	nid;
   unsigned long	val, cval;
   int		i, j;
-    
+
   P = &dic->Page[nd->page_num];
   D = dic->Dir;
   if (is_word_node(nd)) {
@@ -417,7 +410,7 @@ fil_dic(nd, dic)
       }
       for (i = 0; i < nd->count; i++) {
 	struct node	*child = &nd->ptr.n[i];
-	
+
 	cval = fil_dic(child, dic);
 	fil_dnd(tmp, child, cval, nid, dic->DirNodeSize);
       }
@@ -430,7 +423,7 @@ fil_dic(nd, dic)
       for (i = 0; i < nd->count; i++) {
 	struct node	*child = &nd->ptr.n[i];
 	int		lflag = 0;
-	
+
 	cval = fil_dic(child, dic);
 	cval -= dic->PageSize * nd->page_num + D->dirsiz;
 	assert(cval < dic->PageSize);
@@ -452,12 +445,12 @@ alloc_page(dic, pn)
     struct page	*P;
     int		i;
     unsigned	psize;
-    
+
     P = dic->Page;
     psize = dic->PageSize;
     for (i = 0; i < pn; i++) {
 	unsigned char	*ptr;
-	
+
 	if (!(ptr = (unsigned char *)calloc(1, psize))) {
 	    fprintf(stderr, "no space\n");
 	    exit(1);
@@ -493,7 +486,7 @@ append_wlist(dic, tail, nd)
   struct node		*nd;
 {
     struct wlist	*w;
-    
+
     if (!tail)
 	tail = dic->Wlist;
     while (tail->next)
@@ -517,7 +510,7 @@ is_overflow_page(dic, pg, pn, size)
   unsigned		pn, size;
 {
     unsigned	total;
-    
+
     if (pn != -1) {
       total = pg[pn].dirsiz + pg[pn].lnksiz + pg[pn].wrdsiz + size;
       if (dic->PageSize <= total)
@@ -539,7 +532,7 @@ assign_to_page(dic, nd, page_num, is_pn_indir)
     struct direc	*D;
     int			i, nid;
     unsigned		pn;
-    
+
     P = dic->Page;
     D = dic->Dir;
 
@@ -574,7 +567,7 @@ assign_to_page(dic, nd, page_num, is_pn_indir)
 	    dic->empty += (nid - nd->count) * dic->DirNodeSize;
 	    for (i = 0; i < nd->count; i++) {
 		struct node	*child = &nd->ptr.n[i];
-		
+
 		page_num = assign_to_page(dic,
 					  child,
 					  page_num,
@@ -597,7 +590,7 @@ assign_to_page(dic, nd, page_num, is_pn_indir)
 		dic->empty += (nid - nd->count) * dic->DirNodeSize;
 		for (i = 0; i < nd->count; i++) {
 		  struct node	*child = &nd->ptr.n[i];
-		  
+
 		  page_num = assign_to_page(dic,
 					    child,
 					    page_num,
@@ -624,10 +617,10 @@ calculate_dic_status(dic)
   struct dictionary	*dic;
 {
     int		i, totalcand = 0, snd = 0;
-    
+
     for (i = 0; i < dic->TotalPage; i++) {
 	struct page	*P = &dic->Page[i];
-	
+
 	if (P->dirsiz == PAGE_HDR_SIZ && !P->lnksiz && !P->wrdsiz)
 	    break;
 	P->first_csn = totalcand;
@@ -659,7 +652,7 @@ fil_ltab(gram, dic)
     unsigned char	*wrec;
     unsigned		wlen;
     unsigned char	*ptr;
-    
+
     P = &dic->Page[pn];
     ptr = dst =  P->buf + P->dirsiz;
     wrec = dst + P->lnksiz;
@@ -694,10 +687,10 @@ fil_page_header(dic)
 {
   int		pn;
   unsigned char	*dst;
-  
+
   for (pn = 0; pn < dic->TotalPage; pn++) {
     struct page	*P = &dic->Page[pn];
-    
+
     dst = P->buf;
     s_to_bst2(pn, dst); dst += 2;
     s_to_bst2(P->nnode, dst); dst += 2;
@@ -724,7 +717,7 @@ build_tree(parent, dic, gram, wrec_ptr, d, top, bot, dir_nodes)
     int			i, k;
     int			left;
     int			size;
-    
+
     *dir_nodes = 0;
     while (top < bot) {
 	if (!wrec_ptr[top].yomi) {
@@ -762,12 +755,12 @@ build_tree(parent, dic, gram, wrec_ptr, d, top, bot, dir_nodes)
 	if (top + 1 == f) {
 	    unsigned char	*wrec, *dst, localbuf[RK_WREC_BMAX];
 	    unsigned		sz;
-	    
+
 	    dir[k].count = 0;
 	    dir[k].ptr.w = 0;
 	    {
 		int	j;
-		
+
 		for (j = d, left = 0 ; wrec_ptr[top].yomi[j]; j++, left++)
 		    ;
 		if (left > 0)
@@ -808,7 +801,7 @@ build_tree(parent, dic, gram, wrec_ptr, d, top, bot, dir_nodes)
 	    size = dic->PagNodeSize * dir[k].count;
 	    for (i = 0; i < dir[k].count; i++) {
 		struct node	*child = &dir[k].ptr.n[i];
-		
+
 		size += child->size;
 	    }
 	}
@@ -832,7 +825,7 @@ creat_tree(dic, gram)
   struct TextDic	*top;
   unsigned		nnodes, nel;
   struct node		*dir, *topnode;
-    
+
   if (!(topnode = (struct node *)calloc(1, sizeof(struct node)))) {
     fprintf(stderr, "no space\n");
     exit(1);
@@ -876,7 +869,7 @@ init_dic(name, dictype, maxpage)
 {
   struct dictionary	*dic;
   int			i;
-  
+
   if (!(dic = (struct dictionary *)malloc(sizeof(struct dictionary)))
        || !(dic->Dir = (struct direc *)malloc(sizeof(struct direc)))
        || !(dic->Wlist = (struct wlist *)malloc(sizeof(struct wlist)))
@@ -932,7 +925,7 @@ makeHeader(dic)
   unsigned		i;
   RkiCksumCalc		calc;
   unsigned		off;
-    
+
   if (RkiCksumCRCInit(&calc)
       || RkiCksumAdd(&calc, dic->Dir->buf, dic->Dir->dirsiz)) {
     fprintf(stderr, "no space\n");
@@ -940,7 +933,7 @@ makeHeader(dic)
   }
   for (i = 0; i < dic->TotalPage; i++) {
     const struct page *P = &dic->Page[i];
-    
+
     if (RkiCksumAdd(&calc, P->buf, dic->PageSize)) {
       fprintf(stderr, "no space\n");
       exit(1);
@@ -982,7 +975,7 @@ makeHeader(dic)
 
   hd.data[HD_DROF].var = 0; /* dummy */
   hd.flag[HD_DROF] = -1;
-    
+
   hd.data[HD_PGOF].var = 0; /* dummy */
   hd.flag[HD_PGOF] = -1;
 
@@ -991,22 +984,22 @@ makeHeader(dic)
 
   hd.data[HD_L2C].var = 11;
   hd.flag[HD_L2C] = -1;
-    
+
   hd.data[HD_REC].var = dic->TotalRec;
   hd.flag[HD_REC] = -1;
-    
+
   hd.data[HD_CAN].var = dic->TotalCand;
   hd.flag[HD_CAN] = -1;
-    
+
   hd.data[HD_PAG].var = dic->TotalPage;
   hd.flag[HD_PAG] = -1;
-    
+
   hd.data[HD_LND].var = dic->Lnd;
   hd.flag[HD_LND] = -1;
-    
+
   hd.data[HD_SND].var = dic->Snd;
   hd.flag[HD_SND] = -1;
-    
+
   if (!compat) {
     hd.data[HD_CRC].var = crc;
     hd.flag[HD_CRC] = -1;
@@ -1018,7 +1011,7 @@ makeHeader(dic)
     hd.data[HD_GRSZ].var = dic->gramsz;
     hd.flag[HD_GRSZ] = -1;
   }
-  
+
   if (!(buf = _RkCreateHeader(&hd, &size))) {
     fprintf(stderr, "no space\n");
     exit(1);
@@ -1030,7 +1023,7 @@ makeHeader(dic)
   hd.flag[HD_HSZ] = -1;
   hd.data[HD_DROF].var = off;
   hd.flag[HD_DROF] = -1;
-    
+
   off += dic->Dir->dirsiz;
   hd.data[HD_PGOF].var = off;
   hd.flag[HD_PGOF] = -1;
@@ -1043,7 +1036,7 @@ makeHeader(dic)
 
   hd.data[HD_SIZ].var = off; /* exclude grammar size if 3.0 compatible mode */
   hd.flag[HD_SIZ] = -1;
-  
+
   if (!(buf = _RkCreateHeader(&hd, &size))) {
     fprintf(stderr, "no space.\n");
     exit(1);
@@ -1060,25 +1053,25 @@ write_file(out, dic)
      struct dictionary	*dic;
 {
   int	i, fd;
-    
+
   unlink(out);
   if ((fd = open(out, (O_CREAT | O_RDWR | O_APPEND), 0644)) < 0) {
     fprintf(stderr, "can't create %s\n", out);
     exit(1);
   }
 #ifdef __CYGWIN32__
-  setmode(fd, O_BINARY); 
+  setmode(fd, O_BINARY);
 #endif
-  
+
   makeHeader(dic);
-  
+
   if (dic->hdr)
     if (write(fd, (char *)dic->hdr, dic->hdrsiz) != dic->hdrsiz) {
       fprintf(stderr, "%s: cannot write\n", program);
       close(fd);
       exit(1);
     }
-  
+
   if (write(fd, (char *)dic->Dir->buf, dic->Dir->dirsiz) != dic->Dir->dirsiz) {
     fprintf(stderr, "%s: cannot write\n", program);
     close(fd);
@@ -1086,7 +1079,7 @@ write_file(out, dic)
   }
   for (i = 0; i < dic->TotalPage; i++) {
     struct page	*P = &dic->Page[i];
-    
+
     if (write(fd, (char *)P->buf, dic->PageSize) != dic->PageSize) {
       fprintf(stderr, "%s: cannot write\n", program);
       close(fd);
@@ -1124,7 +1117,7 @@ parse_arg(argc, argv)
      char *argv [];
 {
   int		i;
-  
+
   for (i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "-D")) {
       if (++i < argc) {
@@ -1177,7 +1170,7 @@ getp(nd)
      struct node	*nd;
 {
   int	n, k;
-  
+
   if ((n = nd->count * 1.2) == 1)
     return(2);
   n += (n % 2) ? 2 : 1;
@@ -1199,7 +1192,7 @@ main (argc, argv)
   int			fd, i;
   struct RkKxGram	*gram;
   char			date[26], tempfile[1024];
-  
+
   program = RkiBasename(argv[0]);
   textfile[0] = dicname[0] = outfile[0] = 0;
   parse_arg(argc, argv);

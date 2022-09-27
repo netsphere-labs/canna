@@ -78,7 +78,7 @@ AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 AC_ENABLE_STATIC(no)
 
 # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
-test -z "$GCC" || CFLAGS="$CFLAGS -x c++ -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong "  
+test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong "  
 
 
 dnl ----------------------------------------------------------------------------

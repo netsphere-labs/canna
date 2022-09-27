@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -126,7 +127,7 @@ static int      cmd_code ;
 #define    KILL   11
 
 /**************************************************************/
-/*                         ¶¦ÄÌ´Ø¿ô                           */
+/*                         å…±é€šé–¢æ•°                           */
 /**************************************************************/
 
 void
@@ -349,7 +350,7 @@ nwcheck()
     RkwGetProtocolVersion(&majv, &minv);
     protover = canna_protocol_version(majv, minv);
     bak = RkwGetServerVersion(&majv, &minv);
-    if ( bak < 0 ) { /* ¥µ¡¼¥Ğ¤Î¾õÂÖ¤¬°Û¾ï */
+    if ( bak < 0 ) { /* ã‚µãƒ¼ãƒã®çŠ¶æ…‹ãŒç•°å¸¸ */
 	if (init[0] != '/') {
 	    (void)fprintf(stderr,gettxt("cannacmd:80",
 		   "Cannaserver \"%s\" is in an abnormal state.\n"), init);
@@ -361,7 +362,7 @@ nwcheck()
 	RkFinalize();
 	exit(ERR_VALUE);
     }
-    if ( majv < 2 && minv < 2 ) { /* irohaserver && R7.1¤è¤êÁ° */
+    if ( majv < 2 && minv < 2 ) { /* irohaserver && R7.1ã‚ˆã‚Šå‰ */
 	    if (init[0] != '/') {
 		(void)fprintf(stderr, gettxt("cannacmd:82",
 	     "Cannaserver \"%s\" does not support dictionary maintenance.\n")
@@ -458,7 +459,7 @@ char  *dic ;
     }
 }
 
-/*  ¥°¥ë¡¼¥×Ì¾ ¸¡º÷   */
+/*  ã‚°ãƒ«ãƒ¼ãƒ—å æ¤œç´¢   */
 char *
 searchgroup()
 {
@@ -480,7 +481,7 @@ searchgroup()
 
 
 /*
- * ¥æ¡¼¥¶Ì¾¸¡º÷ µ¢¤êÃÍ=Ì¾Á°¤Ø¤Î¥İ¥¤¥ó¥¿
+ * ãƒ¦ãƒ¼ã‚¶åæ¤œç´¢ å¸°ã‚Šå€¤=åå‰ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  */
 static char *
 searchuname()
@@ -505,7 +506,7 @@ searchuname()
 }
 
 
-/* addwords delwords ¤Ç¼­½ñ¤Ë write¸¢¤¬¤¢¤ë¤«¤ò¥Á¥§¥Ã¥¯¤¹¤ë */
+/* addwords delwords ã§è¾æ›¸ã« writeæ¨©ãŒã‚ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 static void
 write_chk()
 {
@@ -516,7 +517,7 @@ write_chk()
     if (ret < 0) {
 	switch (ret) {
           case NOENT:
-	            /* ¥æ¡¼¥¶¼­½ñ¤Ë¤Ê¤±¤ì¤Ğ¥°¥ë¡¼¥×¼­½ñ¤ò»î¤·¤Æ¤ß¤ë*/
+	            /* ãƒ¦ãƒ¼ã‚¶è¾æ›¸ã«ãªã‘ã‚Œã°ã‚°ãƒ«ãƒ¼ãƒ—è¾æ›¸ã‚’è©¦ã—ã¦ã¿ã‚‹*/
 	    if (mode == 0) {
 		mode = RK_GRP_DIC ;
 		goto grp ;
@@ -536,7 +537,7 @@ write_chk()
 	    fprintf(stderr, gettxt("cannacmd:168", "No more memory.\n"));
 	    break;
           case -1:
-	    return;   /* µì¥µ¡¼¥Ğ¤Ï¥Á¥§¥Ã¥¯¤»¤ºOK */
+	    return;   /* æ—§ã‚µãƒ¼ãƒã¯ãƒã‚§ãƒƒã‚¯ã›ãšOK */
           default:
 	    fprintf(stderr, gettxt("cannacmd:252",
 		   "Invalid return code RkChmoddic  code=%d \n"),ret);
@@ -554,7 +555,7 @@ write_chk()
     exit(ERR_VALUE);
 }
 
-/* mkdic mvdic  ¤Ç¥ª¡¼¥Ğ¥é¥¤¥È¤¹¤ë»ş write¸¢¤¬¤¢¤ë¤«¤ò¥Á¥§¥Ã¥¯¤¹¤ë */
+/* mkdic mvdic  ã§ã‚ªãƒ¼ãƒãƒ©ã‚¤ãƒˆã™ã‚‹æ™‚ writeæ¨©ãŒã‚ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 ovwrite_chk(dicname,mode)
 char *dicname;
 int mode;
@@ -564,7 +565,7 @@ int mode;
     if (ret < 0) {
 	switch (ret) {
           case NOENT:
-	            /* ¼­½ñ¤¬¤Ê¤¤¤Ê¤éOK */
+	            /* è¾æ›¸ãŒãªã„ãªã‚‰OK */
 	    return(0);
           case BADCONT:
 	    fprintf(stderr,gettxt(
@@ -578,7 +579,7 @@ int mode;
 	    fprintf(stderr, gettxt("cannacmd:168", "No more memory.\n"));
 	    break;
           case -1:
-	    return(0);   /* µì¥µ¡¼¥Ğ¤Ï¥Á¥§¥Ã¥¯¤»¤ºOK */
+	    return(0);   /* æ—§ã‚µãƒ¼ãƒã¯ãƒã‚§ãƒƒã‚¯ã›ãšOK */
           default:
 	    fprintf(stderr, gettxt("cannacmd:252",
 		   "Invalid return code RkChmoddic  code=%d \n"),ret);
@@ -671,8 +672,8 @@ int   argc  ;
 char  **argv;
 {
     FILE *fopen(), *fp = stdout;
-    unsigned char dirname[RECSZ*2];  /* ¥æ¡¼¥¶Ì¾¤Ş¤¿¤Ï"iroha"¤Ş¤¿¤ÏNULL*/
-    unsigned char filename[RECSZ*2]; /* ¥Õ¥¡¥¤¥ëÌ¾¤Ş¤¿¤ÏNULL */
+    unsigned char dirname[RECSZ*2];  /* ãƒ¦ãƒ¼ã‚¶åã¾ãŸã¯"iroha"ã¾ãŸã¯NULL*/
+    unsigned char filename[RECSZ*2]; /* ãƒ•ã‚¡ã‚¤ãƒ«åã¾ãŸã¯NULL */
     static int  i , errflg ;
     unsigned char buf[BUFLEN],dicname_bk[RECSZ];  /* 92.12.15 */
     unsigned char *dirnamep;
@@ -710,7 +711,7 @@ char  **argv;
     r_dic = (unsigned char *)opt_dic1 ;     /* 93.03.01 */
     r_file = (char *)filename;
 
-    /* ¤Ş¤ºInitialize¤·¤Æ */
+    /* ã¾ãšInitializeã—ã¦ */
     rk_init() ;
 
     /*  server  new/old check  */
@@ -731,9 +732,9 @@ char  **argv;
 	dirname_offset = 0;
     }
     if (protover > canna_protocol_version(3, 1)) {
-      /* ¢¨Ãí: ¼Â¤Ï protocol version 3.1 ¤Ï·çÈÖ */
+      /* â€»æ³¨: å®Ÿã¯ protocol version 3.1 ã¯æ¬ ç•ª */
       dirname_offset = 0;
-      if ( dirname[0] == '\0' ) {   /* ¥ª¥×¥·¥ç¥ó¤Ê¤·¤Ç¤âdir¤ÏÀßÄê¤¹¤ë */
+      if ( dirname[0] == '\0' ) {   /* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãªã—ã§ã‚‚dirã¯è¨­å®šã™ã‚‹ */
 	  (void)strcpy((char *)dirname,":user/");
 	  (void)strcat((char *)dirname,searchuname());
       }
@@ -748,7 +749,7 @@ char  **argv;
     dirnamep = dirname + dirname_offset;
 
     /* 92.12.15 */
-    if( filename[0] != '\0' ) { /* ¥Õ¥¡¥¤¥ëÌ¾¤¬»ØÄê¤µ¤ì¤Ê¤±¤ì¤ĞÉ¸½à½ĞÎÏ */
+    if( filename[0] != '\0' ) { /* ãƒ•ã‚¡ã‚¤ãƒ«åãŒæŒ‡å®šã•ã‚Œãªã‘ã‚Œã°æ¨™æº–å‡ºåŠ› */
 	for ( i = 1; i < argc ; i++) {
 	    strncpy((char *)dicname,(char *)argv[i],RECSZ-1);
 	    strcpy((char *)dicname_bk, (char *)dicname);
@@ -772,7 +773,7 @@ char  **argv;
     errflg = 0 ;
     for ( i = 1 ; i < argc ; i++) {
 	strncpy((char *)dicname,(char *)argv[i],RECSZ-1);
-	/* ¼­½ñ¤Ë½ñ¤¤¤Æ */
+	/* è¾æ›¸ã«æ›¸ã„ã¦ */
 	if(DownLoadDic(fp, dirnamep) < 0) {
 	    errflg = 1 ;
 	}
@@ -840,12 +841,12 @@ cp_main(argc,argv)
 int   argc  ;
 char  **argv;
 {
-  unsigned char dirname[RECSZ*2];      /* ¥æ¡¼¥¶Ì¾¤Ş¤¿¤Ï"iroha"¤Ş¤¿¤ÏNULL*/
+  unsigned char dirname[RECSZ*2];      /* ãƒ¦ãƒ¼ã‚¶åã¾ãŸã¯"iroha"ã¾ãŸã¯NULL*/
   int  dirname_offset = 0 , mode_cp  , ret ;
   unsigned char *dirnamep;
   char ans[20];
 
-  mode = Rk_MWD;              /* ¼­½ñ¤Î¼ïÎà */
+  mode = Rk_MWD;              /* è¾æ›¸ã®ç¨®é¡ */
   mode_cp = 0 ;
 
   if(argc < 3 || argc > 8) usage();
@@ -857,7 +858,7 @@ char  **argv;
   scan_opt(argc,argv,&argc);
   if ( opt_l || opt_r || opt_fq || opt_std ) usage();
   if ( opt_dic2 == NULL ) usage();
-  if ( argc >= 4 ) usage();  /* ¼­½ñ¤¬£³¤Ä°Ê¾å¤¢¤ë */
+  if ( argc >= 4 ) usage();  /* è¾æ›¸ãŒï¼“ã¤ä»¥ä¸Šã‚ã‚‹ */
 
   if ( opt_u ) {
       if (opt_i) usage();
@@ -880,7 +881,7 @@ char  **argv;
   (void)strcpy((char *)dicname2,opt_dic2);
   r_dic = (unsigned char *)opt_dic2 ;     /* 93.03.01 */
 
-  /* ¤Ş¤ºInitialize¤·¤Æ */
+  /* ã¾ãšInitializeã—ã¦ */
   rk_init() ;
 
   /*  server  new/old check  */
@@ -908,7 +909,7 @@ char  **argv;
       dirname_offset = 0;
       dirnamep = dirname + dirname_offset;
       ret = RkCopyDic(cx_num,dirnamep,dicname1,dicname2,mode_cp);
-      if (ret == EXIST ) {     /* ¥³¥Ô¡¼Àè¤Ë¼­½ñ¤¬¤¢¤ë */
+      if (ret == EXIST ) {     /* ã‚³ãƒ”ãƒ¼å…ˆã«è¾æ›¸ãŒã‚ã‚‹ */
 	  if (isatty(fileno(stdin)) != 0) {
 	      (void)fprintf(stderr,gettxt("cannacmd:205",
     "Specified dictionary \"%s\" already exists. Do you overwrite it ? (y/n)"),
@@ -919,7 +920,7 @@ char  **argv;
 	    "Specified dictionary \"%s\" already exists."),dicname);
 	      (void)strcpy(ans,"n");
 	  }
-	  if ( ans[0] == 'y' ) {     /* ¾å½ñ¤­¤¹¤ë */
+	  if ( ans[0] == 'y' ) {     /* ä¸Šæ›¸ãã™ã‚‹ */
 	      ret = RkRemoveDic(cx_num,dicname2,mode_cp);
 	      if ( ret == 0) {
 		  mode_cp |= KYOUSEI;
@@ -934,14 +935,14 @@ char  **argv;
 		  RkFinalize();
 		  exit(1);
 	      }
-	  } else {                    /* ¾å½ñ¤­¤·¤Ê¤¤ */
+	  } else {                    /* ä¸Šæ›¸ãã—ãªã„ */
 	      (void)fprintf(stderr, gettxt("cannacmd:207",
 	     "Dictionary \"%s\" is not created.\n"), dicname2);
 	      RkFinalize();
 	      exit(1);
 	  }
       }
-      else {                          /* ¥³¥Ô¡¼Àè¤Ë¼­½ñ¤¬¤Ê¤¤ */
+      else {                          /* ã‚³ãƒ”ãƒ¼å…ˆã«è¾æ›¸ãŒãªã„ */
 	  if (ret <0) {
 	      if (ret == TXTBSY ) {
 		  PrintMessage(ret,dicname2);
@@ -958,14 +959,14 @@ char  **argv;
 	       "Please change customize file."));
       }
   }
-  else {                 /* ¸Å¤¤ canna ¤Î½èÍı */
+  else {                 /* å¤ã„ canna ã®å‡¦ç† */
       if ( opt_g || opt_myg ) {
 	    fprintf(stderr, gettxt("cannacmd:253",
 	   "This options or command are not supported by canna-server\n"));
 	    exit(ERR_VALUE);
 	}
 
-      /* ¼­½ñºîÀ® */
+      /* è¾æ›¸ä½œæˆ */
       (void) signal(SIGINT, StopAll);
       (void) signal(SIGQUIT, StopAll);
       (void) signal(SIGTERM, StopAll);
@@ -985,7 +986,7 @@ char  **argv;
       }
   }
 
-  /* finalize¤¹¤ë */
+  /* finalizeã™ã‚‹ */
   RkFinalize();
   (void)fprintf(stderr,	gettxt("cannacmd:101",
 	       "\n\"%s\" was copied to \"%s\".\n"), dicname1, dicname2);
@@ -1030,7 +1031,7 @@ char  **argv;
 	}
     }
 
-    /* ¤Ş¤ºInitialize¤·¤Æ */
+    /* ã¾ãšInitializeã—ã¦ */
     rk_init() ;
     write_chk();
 
@@ -1050,7 +1051,7 @@ char  **argv;
 /*                        lsdic                               */
 /**************************************************************/
 
-/* ¼­½ñ¥ê¥¹¥È¤òºîÀ®¤·¤Ş¤¹¡£ */
+/* è¾æ›¸ãƒªã‚¹ãƒˆã‚’ä½œæˆã—ã¾ã™ã€‚ */
 ls_main(argc,argv)
 int   argc  ;
 char  **argv;
@@ -1069,8 +1070,8 @@ char  **argv;
 	    "Cannaserver is in an abnormal state.\n"));
 
     /*
-     * ¥æ¡¼¥¶Ì¾¤¬»ØÄê¤µ¤ì¤Æ¤¤¤Ê¤¤»ş¤Ï
-     * ¼«Ê¬¤ÎÌ¾Á°¤òÃµ¤·¤Æ¤½¤ÎÌ¾Á°¤ÇRK¤ò¸Æ¤Ó¤Ş¤¹¡£
+     * ãƒ¦ãƒ¼ã‚¶åãŒæŒ‡å®šã•ã‚Œã¦ã„ãªã„æ™‚ã¯
+     * è‡ªåˆ†ã®åå‰ã‚’æ¢ã—ã¦ãã®åå‰ã§RKã‚’å‘¼ã³ã¾ã™ã€‚
      */
 
     user[0] = '\0';
@@ -1085,9 +1086,9 @@ char  **argv;
     if ( opt_r || opt_s || opt_fq || opt_std) usage();
     if (opt_dic1 != NULL) usage();
 
-    /* °ú¿ô¤Ç¥æ¡¼¥¶¤¬»ØÄê¤µ¤ì¤Ê¤±¤ì¤Ğ¼«Ê¬¤Î¼­½ñ¤ò¥×¥ê¥ó¥È¥¢¥¦¥È¤·¤Ş¤¹ */
+    /* å¼•æ•°ã§ãƒ¦ãƒ¼ã‚¶ãŒæŒ‡å®šã•ã‚Œãªã‘ã‚Œã°è‡ªåˆ†ã®è¾æ›¸ã‚’ãƒ—ãƒªãƒ³ãƒˆã‚¢ã‚¦ãƒˆã—ã¾ã™ */
     if ((*user == '\0') && (opt_i == 0) && (opt_g == 0) && (opt_myg == 0)) {
-      if (opt_u) { /* ¥æ¡¼¥¶Ì¾¤ËNULL¤¬ÅÏ¤Ã¤Æ¤­¤¿¤é¥¨¥é¡¼ */
+      if (opt_u) { /* ãƒ¦ãƒ¼ã‚¶åã«NULLãŒæ¸¡ã£ã¦ããŸã‚‰ã‚¨ãƒ©ãƒ¼ */
 	usage();
       }
       (void)strcpy(user, ":user/");
@@ -1103,9 +1104,9 @@ char  **argv;
 	opt_i = 1 ;
 	opt_myg = 1 ;
     }
-    /* ¼­½ñ¥ê¥¹¥ÈºîÀ® */
+    /* è¾æ›¸ãƒªã‚¹ãƒˆä½œæˆ */
 
-    /* ¤Ş¤ºInitialize¤·¤Æ */
+    /* ã¾ãšInitializeã—ã¦ */
     rk_init() ;
 
     /*  server  new/old check  */
@@ -1135,7 +1136,7 @@ char  **argv;
 	    }
      }
     if (protover > canna_protocol_version(3, 1)) {
-      /* ¢¨Ãí: ¼Â¤Ï protocol version 3.1 ¤Ï·çÈÖ */
+      /* â€»æ³¨: å®Ÿã¯ protocol version 3.1 ã¯æ¬ ç•ª */
       user_offset = 0;
     }
     else {
@@ -1174,7 +1175,7 @@ char  **argv;
 
 
     /*
-     *    ¼­½ñ°ìÍ÷¤ò¥×¥ê¥ó¥È¥¢¥¦¥È¤·¤Æ½ª¤ï¤ê¤Ç¤¹¡£
+     *    è¾æ›¸ä¸€è¦§ã‚’ãƒ—ãƒªãƒ³ãƒˆã‚¢ã‚¦ãƒˆã—ã¦çµ‚ã‚ã‚Šã§ã™ã€‚
      */
 
     if (bufcnt >= 0) {
@@ -1328,7 +1329,7 @@ char  **argv;
       }
     }
 
-    /* ¤Ş¤ºInitialize¤·¤Æ */
+    /* ã¾ãšInitializeã—ã¦ */
     rk_init() ;
     for ( i = 1 ; i < argc ; i++) {
 	r_dic = (unsigned char *)argv[i];
@@ -1390,7 +1391,7 @@ char  **argv;
   strncpy(dic1, dicname1, RECSZ - 1);
   strncpy(dic2, dicname2, RECSZ - 1);
 
-  /* ¼­½ñÌ¾¤¬Æ±¤¸¤Ê¤é¥¨¥é¡¼ */
+  /* è¾æ›¸åãŒåŒã˜ãªã‚‰ã‚¨ãƒ©ãƒ¼ */
   if(!strcmp(dic1,dic2)) {
     fprintf(stderr, gettxt("cannacmd:161",
 	   "%s: %s, Dictionary name is same.\n"),Progname, dic1);
@@ -1402,7 +1403,7 @@ char  **argv;
   (void) signal(SIGTERM, StopAll);
 
 
-  /* ¤Ş¤ºInitialize¤·¤Æ */
+  /* ã¾ãšInitializeã—ã¦ */
   rk_init() ;
 
   if (ovwrite_chk(dic2,mode) == 0 ){
@@ -1510,7 +1511,7 @@ char  **argv;
 {
   int  i, j , ret , undel ;
   int isflag = 0;
-  int rmdone = 0; /* rm ¤¬¤Ş¤À¤Ê¤µ¤ì¤Æ¤¤¤Ê¤¤ */
+  int rmdone = 0; /* rm ãŒã¾ã ãªã•ã‚Œã¦ã„ãªã„ */
 
 
   mode = 0  ;
@@ -1522,14 +1523,14 @@ char  **argv;
   if ( opt_fq ) mode = PL_DIC ;
   if ( opt_myg ) mode = mode | RK_GRP_DIC ;
 
-  /* ¤Ş¤ºInitialize¤·¤Æ */
+  /* ã¾ãšInitializeã—ã¦ */
   rk_init() ;
 
   (void) signal(SIGINT, StopAll);
   (void) signal(SIGQUIT, StopAll);
   (void) signal(SIGTERM, StopAll);
 
-  /* ¼­½ñºï½ü */
+  /* è¾æ›¸å‰Šé™¤ */
   undel = 0 ;
   for(j = 1; j < argc; j++) {
 
@@ -1541,14 +1542,14 @@ char  **argv;
 	RkFinalize();
 	exit(ERR_VALUE);
       }
-      if (  ret == -2 ) {  /* ¼­½ñ¤ò¾Ã¤»¤Ê¤«¤Ã¤¿ */
+      if (  ret == -2 ) {  /* è¾æ›¸ã‚’æ¶ˆã›ãªã‹ã£ãŸ */
 	  undel = 1 ;
       }
-      rmdone = 1; /* ¼Âºİ¤Ë rm ¤¬¹Ô¤ï¤ì¤¿ */
+      rmdone = 1; /* å®Ÿéš›ã« rm ãŒè¡Œã‚ã‚ŒãŸ */
     }
 
   RkFinalize();
-  if (rmdone == 0) { /* Á´Á³ rm ¤¬¤Ê¤µ¤ì¤Ê¤«¤Ã¤¿¤Ê¤é¤Ğ */
+  if (rmdone == 0) { /* å…¨ç„¶ rm ãŒãªã•ã‚Œãªã‹ã£ãŸãªã‚‰ã° */
     (void)fprintf(stderr, gettxt("cannacmd:185",
 	 "Dictionary is not specified.\n"));
   }
@@ -1793,8 +1794,7 @@ char **argv ;
 	 Progname = p + 1 ;
      }
 #endif
-
-     (void)strcpy(init, "/usr/lib/canna/dic");  /* ¥µ¡¼¥ĞÊı¼°¤Ç¤ÏÌµ°ÕÌ£ */
+    strcpy(init, PACKAGE_LOCALSTATE_DIR "/canna/dic");  /* ã‚µãƒ¼ãƒæ–¹å¼ã§ã¯ç„¡æ„å‘³ */
      for ( i = 0; i < NCOMMANDS ; i++) {
 	 if (strcmp(Progname,commands[i].name) == 0) {
 	     cmd_code = commands[i].cmd_code ;
@@ -1805,17 +1805,18 @@ char **argv ;
      return (0);
 }
 
-/*  ¥ª¥×¥·¥ç¥ó¤Î¥Á¥§¥Ã¥¯
-    ¼­½ñÌ¾°Ê³°¤Î¥ª¥×¥·¥ç¥ó¤Ï¥Á¥§¥Ã¥¯¸å argv ¤«¤é¼è¤ê½ü¤¯   */
-scan_opt(argc,argv,argcp)
-int  argc ,*argcp;
-char **argv ;
+
+/*  ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®ãƒã‚§ãƒƒã‚¯
+    è¾æ›¸åä»¥å¤–ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯ãƒã‚§ãƒƒã‚¯å¾Œ argv ã‹ã‚‰å–ã‚Šé™¤ã   */
+scan_opt(int argc,
+         char **argv,
+         int *argcp)
 {
-/* ¤³¤Î´Ø¿ô¤Ç¥Á¥§¥Ã¥¯¤¹¤ë¤â¤Î
-       ¥ª¥×¥·¥ç¥ó¤Î½ÅÊ£»ØÄê¤¬¤Ê¤¤¤«
-       °ú¿ô¤ò»ØÄê¤¹¤ë¥ª¥×¥·¥ç¥ó¤Î°ú¿ô¤¬¤¢¤ë¤«
-       ¼­½ñ¤¬»ØÄê¤µ¤ì¤Æ¤¤¤ë¤«(lsdic¤ò½ü¤¯)
-       £³¤Ä°Ê¾å¼­½ñ¤¬¤Ê¤¤¤«(rmdic¤ò½ü¤¯)
+/* ã“ã®é–¢æ•°ã§ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã‚‚ã®
+       ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®é‡è¤‡æŒ‡å®šãŒãªã„ã‹
+       å¼•æ•°ã‚’æŒ‡å®šã™ã‚‹ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®å¼•æ•°ãŒã‚ã‚‹ã‹
+       è¾æ›¸ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã‹(lsdicã‚’é™¤ã)
+       ï¼“ã¤ä»¥ä¸Šè¾æ›¸ãŒãªã„ã‹(rmdicã‚’é™¤ã)
 */
 
 static  char *options[]={"-cs","-cannaserver","-l","-hi","-h","-i","-u","-s",
@@ -1852,7 +1853,7 @@ char    **p ;
     opt_rw  = 0 ;
     opt_lfile = opt_dic1 = opt_dic2 = opt_user = opt_grp = NULL ;
 
-    p = argv + 1 ;   /* ¥³¥Ş¥ó¥ÉÉôÊ¬¤ò½ü¤¯ */
+    p = argv + 1 ;   /* ã‚³ãƒãƒ³ãƒ‰éƒ¨åˆ†ã‚’é™¤ã */
     while( *p != NULL ) {
 /*    printf(" argc= %d opt= %s\n",argc,*p);*/
       for (opt_code = 0 ; opt_code  < NOPTIONS ; opt_code++ ){
@@ -1861,7 +1862,7 @@ char    **p ;
       switch(opt_code) {
         case OPT_CS :
         case OPT_CANNASAVER :
-	  if (opt_cs)  usage();			/* ½ÅÊ£¥Á¥§¥Ã¥¯ */
+	  if (opt_cs)  usage();			/* é‡è¤‡ãƒã‚§ãƒƒã‚¯ */
 	  if ( *(p + 1) == NULL ) usage();
 	  opt_cs = 1 ;
 	  (void) strcpy(init,*(p+1));
@@ -2009,7 +2010,7 @@ char    **p ;
     return(0);
 }
 
-/*  argv ¤Î¥ª¥×¥·¥ç¥ó¤ò n ¸ÄÊ¬Á°¤ËµÍ¤á¤ë */
+/*  argv ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’ n å€‹åˆ†å‰ã«è©°ã‚ã‚‹ */
 shrink_opt(argc,argv,n)
 int  argc, n ;
 char  *argv[] ;

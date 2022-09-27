@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -46,11 +47,12 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #include <sys/ioctl.h>
 
 #ifndef DICHOME
-#define DICHOME     "/usr/lib/canna/dic"
+#define DICHOME  PACKAGE_LOCALSTATE_DIR "/canna/dic"
 #endif
 
+// TODO: „Åì„Çå„ÅØ„Ç¢„Ç´„É≥. Ë®≠ÂÆöÂèØËÉΩ„Å´„Åô„Çã„Åì„Å®.
 #ifndef ERRDIR
-#define ERRDIR      "/usr/spool/canna"
+#define ERRDIR      "/var/spool/canna"
 #endif
 
 #define ERRFILE     "CANNA"
@@ -72,10 +74,10 @@ static FILE *Fp;
 static int DebugMode = 0;
 static int LogLevel = 0;
 #endif
-static int Syslog = 0; /* syslog §ÚƒÃ§π§´§…§¶§´§Œ•’•È•∞ */
+static int Syslog = 0; /* syslog „ÇíÈÄö„Åô„Åã„Å©„ÅÜ„Åã„ÅÆ„Éï„É©„Ç∞ */
 
 int PortNumberPlus = 0;
-int MMountFlag = 0; /* •·•‚•Í§Àº≠ΩÒ§Ú•Ì°º•…§π§Î§´§∑§ §§§´§Œ•’•È•∞ */
+int MMountFlag = 0; /* „É°„É¢„É™„Å´ËæûÊõ∏„Çí„É≠„Éº„Éâ„Åô„Çã„Åã„Åó„Å™„ÅÑ„Åã„ÅÆ„Éï„É©„Ç∞ */
 static char Name[64];
 
 static char *userID=NULL; /* canna server's user id */
@@ -186,11 +188,11 @@ EarlyInit ( int argc, char* argv[] )
     if (Syslog) {
       openlog("cannaserver", LOG_PID, LOG_DAEMON);
       openlog_done = 1;
-    } /* -syslog §¿§√§ø§È°¢•Ì•∞•’•°•§•Î§ÚΩÈ¥¸≤Ω§π§Î */
+    } /* -syslog „Å†„Å£„Åü„Çâ„ÄÅ„É≠„Ç∞„Éï„Ç°„Ç§„É´„ÇíÂàùÊúüÂåñ„Åô„Çã */
 #else
     }
 
-/* TCP/IP •π•ø•√•Ø§¨Õ¯Õ—≤ƒ«Ω§«§ §§ª˛§œΩ™Œª§π§Î */
+/* TCP/IP „Çπ„Çø„ÉÉ„ÇØ„ÅåÂà©Áî®ÂèØËÉΩ„Åß„Å™„ÅÑÊôÇ„ÅØÁµÇ‰∫Ü„Åô„Çã */
     if (gethostname( buf, MAXDATA ) != 0) {
 	fprintf(stderr,"TCP/IP stack is not working\n") ;
 	exit( 1 );
@@ -208,7 +210,7 @@ EarlyInit ( int argc, char* argv[] )
         pwent = getpwnam(userID);
 	if (pwent) {
 	    if(setgid(pwent->pw_gid)) {
-	        FatalError("cannaserver:couldn't set groupid to canna user's group\n");	  
+	        FatalError("cannaserver:couldn't set groupid to canna user's group\n");
 	    }
 	    if (initgroups(userID, pwent->pw_gid)) {
 	        FatalError("cannserver: couldn't init supplementary groups\n");
@@ -224,13 +226,13 @@ EarlyInit ( int argc, char* argv[] )
 #ifdef DEBUG
     DebugMode = 0 ;
     ServerLogFp = stderr ;
-		
+
     for( i = 1; i < argc; i++ ) {
 	if( !strcmp( argv[ i ], "-d" )) {
 	    DebugMode = 1 ;
 	    LogLevel = 5 ;
 	}
-	
+
 	if( !strcmp( argv[ i ], "-l" ) ) {
 	  if (++i < argc) {
 	    LogLevel = atoi(argv[ i ]);
@@ -243,9 +245,9 @@ EarlyInit ( int argc, char* argv[] )
 	  }
 	}
     }
-    
+
     if (LogLevel && !DebugMode) {
-	/* •Ì•∞•’•°•§•Î∫Ó¿Æ */
+	/* „É≠„Ç∞„Éï„Ç°„Ç§„É´‰ΩúÊàê */
 	if( (Fp = fopen( LOGFILE, "w" ) ) != NULL ){
 	    ServerLogFp = Fp ;
 	} else {
@@ -258,7 +260,7 @@ EarlyInit ( int argc, char* argv[] )
 
     getserver_version() ;
 
-   ir_debug( Dmsg(5, "º≠ΩÒ•€°º•‡•«•£•Ï•Ø•»•Í•£ = %s\n", ddname ); )
+   ir_debug( Dmsg(5, "ËæûÊõ∏„Éõ„Éº„É†„Éá„Ç£„É¨„ÇØ„Éà„É™„Ç£ = %s\n", ddname ); )
 
     if ((context = RkwInitialize( (char *)ddname )) < 0)
         FatalError("cannaserver:Initialize failed: RkwInitialize()\n") ;
@@ -302,7 +304,7 @@ BecomeDaemon ()
 
     if (DebugMode) {
 	mysignal(SIGPIPE,  SIG_IGN) ;
-	return 0; /* •«°º•‚•Û§À§ §È§ §§ */
+	return 0; /* „Éá„Éº„É¢„É≥„Å´„Å™„Çâ„Å™„ÅÑ */
     }
 
     parentid = getpid() ;
@@ -332,7 +334,7 @@ CloseServer()
     if (rkw_initialize_done)
 	RkwFinalize() ;
 }
-/* ΩÈ¥¸≤Ω§Àº∫«‘§∑§øæÏπÁ§À∏∆§÷°£EventMgr_run()§ﬁ§«ÕË§ø§È∏∆§–§ §§§≥§»°£ */
+/* ÂàùÊúüÂåñ„Å´Â§±Êïó„Åó„ÅüÂ†¥Âêà„Å´Âëº„Å∂„ÄÇEventMgr_run()„Åæ„ÅßÊù•„Åü„ÇâÂëº„Å∞„Å™„ÅÑ„Åì„Å®„ÄÇ */
 static void
 FatalError(f)
     const char *f;
@@ -720,7 +722,7 @@ CreateAccessControlList()
 		p++;
 	    else if( *p != '\0' )
 		continue;
-	    /* §≥§≥§«§Œ∑¡º∞•¡•ß•√•Ø§œ∏∑Ã©§«§ §Ø§∆§Ë§§ */
+	    /* „Åì„Åì„Åß„ÅÆÂΩ¢Âºè„ÉÅ„Çß„ÉÉ„ÇØ„ÅØÂé≥ÂØÜ„Åß„Å™„Åè„Å¶„Çà„ÅÑ */
 	    bodylen = strspn( wp, "0123456789ABCDEFabcdef:." );
 	    if( !bodylen || !( wp[bodylen] == '\0' || wp[bodylen] == '%' )
 		    || strchr( wp, ':' ) == NULL )
@@ -739,7 +741,7 @@ CreateAccessControlList()
 #endif /* !INET6 */
 
 	if( !(current = (ACLPtr)malloc( sizeof( ACLRec ) )) ) {
-	    PrintMsg("Can't create access control list!!" ) ;	
+	    PrintMsg("Can't create access control list!!" ) ;
 	    fclose( fp ) ;
 	    FreeAccessControlList() ;
 	    return( -1 ) ;
@@ -753,21 +755,21 @@ CreateAccessControlList()
 	  strcpy(current->hostname, wp);
 	}
 
-	/* AccessControlList§Ú•§•Û•ø°º•Õ•√•»•¢•…•Ï•π§«¥…Õ˝§π§Î */
-	/* hosts.canna§´§È•€•π•»Ãæ§Úµ·§·§Î */
-	/* •€•π•»Ãæ§´§È•§•Û•ø°º•Õ•√•»•¢•…•Ï•π§Úµ·§·§∆ ACLRec§À≈–œø§π§Î  */
+	/* AccessControlList„Çí„Ç§„É≥„Çø„Éº„Éç„ÉÉ„Éà„Ç¢„Éâ„É¨„Çπ„ÅßÁÆ°ÁêÜ„Åô„Çã */
+	/* hosts.canna„Åã„Çâ„Éõ„Çπ„ÉàÂêç„ÇíÊ±Ç„ÇÅ„Çã */
+	/* „Éõ„Çπ„ÉàÂêç„Åã„Çâ„Ç§„É≥„Çø„Éº„Éç„ÉÉ„Éà„Ç¢„Éâ„É¨„Çπ„ÇíÊ±Ç„ÇÅ„Å¶ ACLRec„Å´ÁôªÈå≤„Åô„Çã  */
 	current->hostaddrs = GetAddrListFromName(wp);
 	if (!current->hostaddrs) {
-	  /* •¢•…•Ï•π§¨∏´§ƒ§´§È§ §§æÏπÁ */
-	  /* •§•Û•ø°º•Õ•√•»•¢•…•Ï•π…Ωµ≠§¨¥÷∞„§√§∆§§§Î§Œ§«ÃµªÎ§π§Î */
-	  /* hosts§À•®•Û•»•Í§¨Ãµ§§§≥§»§Ú•·•√•ª°º•∏§À§¿§∑§ø ˝§¨Œ…§§§´ */
-	  /* §‚√Œ§Ï§ §§ */
+	  /* „Ç¢„Éâ„É¨„Çπ„ÅåË¶ã„Å§„Åã„Çâ„Å™„ÅÑÂ†¥Âêà */
+	  /* „Ç§„É≥„Çø„Éº„Éç„ÉÉ„Éà„Ç¢„Éâ„É¨„ÇπË°®Ë®ò„ÅåÈñìÈÅï„Å£„Å¶„ÅÑ„Çã„ÅÆ„ÅßÁÑ°Ë¶ñ„Åô„Çã */
+	  /* hosts„Å´„Ç®„É≥„Éà„É™„ÅåÁÑ°„ÅÑ„Åì„Å®„Çí„É°„ÉÉ„Çª„Éº„Ç∏„Å´„Å†„Åó„ÅüÊñπ„ÅåËâØ„ÅÑ„Åã */
+	  /* „ÇÇÁü•„Çå„Å™„ÅÑ */
 	  if (current->hostname)
 	    free((char *)current->hostname);
 	  free((char *)current);
 	  continue;
 	}
-	/* ∫£§Œ§»§≥§Ì•¢•…•Ï•π§¨Ω≈ £§∑§∆§§§∆§‚§Ω§Œ§ﬁ§ﬁ≥–§®§∆§™§Ø */
+	/* ‰ªä„ÅÆ„Å®„Åì„Çç„Ç¢„Éâ„É¨„Çπ„ÅåÈáçË§á„Åó„Å¶„ÅÑ„Å¶„ÇÇ„Åù„ÅÆ„Åæ„ÅæË¶ö„Åà„Å¶„Åä„Åè */
 
 	wp = p;
 
@@ -800,7 +802,7 @@ CreateAccessControlList()
 }
 
 static void
-FreeAccessControlList() 
+FreeAccessControlList()
 {
     ACLPtr  wp, tailp = (ACLPtr)NULL;
 
@@ -837,8 +839,8 @@ const char *username;
   ir_debug(Dmsg(5, "My name is %s\n", MyName));
 
   for (wp = ACLHead ; wp ; wp = wp->next) {
-    /* AccessControlList§«ª˝§√§∆§§§Î•§•Û•ø•Õ•√•»•¢•…•Ï•π§»∞Ï√◊§π§Î
-       §‚§Œ§Ú•µ°º•¡§π§Î */
+    /* AccessControlList„ÅßÊåÅ„Å£„Å¶„ÅÑ„Çã„Ç§„É≥„Çø„Éç„ÉÉ„Éà„Ç¢„Éâ„É¨„Çπ„Å®‰∏ÄËá¥„Åô„Çã
+       „ÇÇ„ÅÆ„Çí„Çµ„Éº„ÉÅ„Åô„Çã */
     if (SearchAddrList(wp->hostaddrs, hostaddrp)) {
       if (wp->usernames) {
 	for (i = 0, userp = wp->usernames ; i < wp->usercnt ; i++) {
@@ -903,7 +905,7 @@ int cxnum ;
       strcpy(dichome, DDPATH);
     }
 
-   ir_debug( Dmsg(5,"º≠ΩÒ•€°º•‡•«•£•Ï•Ø•»•Í•£°ß%s\n", dichome ); )
+   ir_debug( Dmsg(5,"ËæûÊõ∏„Éõ„Éº„É†„Éá„Ç£„É¨„ÇØ„Éà„É™„Ç£Ôºö%s\n", dichome ); )
     if( RkwSetDicPath( cxnum, dichome ) == -1 ) {
 	return( -1 ) ;
     }
@@ -970,16 +972,16 @@ DetachTTY()
 {
   char    errfile[ERRSIZE];
   int     errfd;
-  
+
 #ifdef DEBUG
   if (!DebugMode)
   {
-#endif 
-    /* …∏Ω‡•®•È°ºΩ–Œœ§Ú•®•È°º•’•°•§•Î§À¿⁄§Í¬ÿ§®§∆°¢…∏Ω‡∆˛Ω–Œœ§Ú•Ø•Ì°º•∫§π§Î */
+#endif
+    /* Ê®ôÊ∫ñ„Ç®„É©„ÉºÂá∫Âäõ„Çí„Ç®„É©„Éº„Éï„Ç°„Ç§„É´„Å´Âàá„ÇäÊõø„Åà„Å¶„ÄÅÊ®ôÊ∫ñÂÖ•Âá∫Âäõ„Çí„ÇØ„É≠„Éº„Ç∫„Åô„Çã */
 
-    if(!Syslog) {    
+    if(!Syslog) {
       sprintf(errfile,"%s/%s%d%s", ERRDIR, ERRFILE, PortNumberPlus, ERRFILE2);
-    
+
       if((errfd = open(errfile, O_CREAT | O_RDWR | O_TRUNC, 0644)) < 0) {
 	(void)fprintf(stderr, "Warning: %s: %s open faild\n", Name, errfile);
 	(void)perror("");
@@ -995,7 +997,7 @@ DetachTTY()
       close(errfd);
     }
     /*
-     * TTY §Œ¿⁄§ÍŒ•§∑
+     * TTY „ÅÆÂàá„ÇäÈõ¢„Åó
      */
 #if defined(HAVE_SETSID)
     (void)setsid();
@@ -1007,7 +1009,7 @@ DetachTTY()
 #else
     setpgrp(0, getpid());
 #endif
-    
+
 #if defined(TIOCNOTTY) && !defined(HAVE_SETSID)
     {
       int fd = open("/dev/tty", O_RDWR, 0);
@@ -1017,13 +1019,13 @@ DetachTTY()
       }
     }
 #endif
-    
+
 #ifdef DEBUG
   }
 #endif
-  
+
     /*
-     * •∑•∞• •ÎΩËÕ˝
+     * „Ç∑„Ç∞„Éä„É´Âá¶ÁêÜ
      */
     mysignal(SIGHUP,   SIG_IGN);
     mysignal(SIGINT,   Reset);

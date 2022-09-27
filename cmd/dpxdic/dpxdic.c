@@ -36,13 +36,6 @@ static char rcsid[]="@(#) 102.1 $Id: dpxdic.c,v 1.7.2.2 2003/12/27 17:15:22 aida
 #include "canna/ccompat.h"
 #include "RKindep/file.h"
 
-#ifndef HYOUJUN_GRAM
-#ifdef USE_OBSOLETE_STYLE_FILENAME
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.d"
-#else
-#define HYOUJUN_GRAM "/usr/lib/canna/dic/canna/fuzokugo.cbd"
-#endif
-#endif
 
 int	inv = 0;
 static	char	*program;
