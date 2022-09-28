@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+set -e
+
+db_input medium canna/run_cannaserver || true
+db_go
+
+db_get canna/run_cannaserver
+
+if [ "$RET" = "true" ] ; then
+
+    db_input medium canna/run_with_inet || true
+    db_go
+
+    db_get canna/run_with_inet
+
+    if [ "$RET" = "true" ] ; then
+
+	db_input medium canna/manage_allow_hosts_with_debconf || true
+	db_go
+
+	db_get canna/manage_allow_hosts_with_debconf
+
+	if [ "$RET" = "true" ] ; then
+	    db_input medium canna/allow_hosts || true
+	    db_go
+	fi
+    fi
+fi

@@ -1,0 +1,5 @@
+debian/manpages/update-canna-dics_dir.8
+debian/manpages/canlisp.1
+debian/manpages/forsort.1
+debian/manpages/mergeword.1
+cmd/catdic/chmoddic.man

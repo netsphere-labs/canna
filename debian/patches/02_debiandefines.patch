@@ -1,0 +1,125 @@
+## 02_debiandefines by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Debian defines, adding shareddir.
+## Applies to 3.7p3 okay.
+
+--- canna-3.7.orig/Canna.conf.dist
++++ canna-3.7/Canna.conf.dist
+@@ -104,27 +104,10 @@
+ /* #define ObsoleteInstallDir */
+ 
+ /* 以下デフォルト値、変更不要 */
+-#ifdef InstallAsUser
+-# define DefCannaPrefix $(HOME)/canna
+-# define DefErrDir $(cannaPrefix)/log
+-# define DefLibCannaDir $(cannaExecPrefix)/lib
+-#else 
+-# define DefCannaPrefix /usr/local/canna
+-# ifdef ObsoleteInstallDir
+-#  define DefErrDir /usr/spool/canna
+-#  define DefLibCannaDir /usr/lib
+-# else
+-#  define DefErrDir /var/log
+-#  define DefLibCannaDir $(cannaExecPrefix)/lib
+-# endif
+-#endif
+-#ifdef ObsoleteInstallDir
+-# define DefCannaSrvDir $(cannaExecPrefix)/bin
+-# define DefCannaLibDir $(cannaPrefix)/lib
+-#else
+-# define DefCannaSrvDir $(cannaExecPrefix)/sbin
+-# define DefCannaLibDir $(cannaPrefix)/share/canna
+-#endif
++#define DefCannaLibDir /etc/canna
++#define DefCannaPrefix /usr/
++#define DefErrDir /var/log/canna
++#define DefLibCannaDir $(cannaExecPrefix)/lib
+ 
+ #if defined(LinuxArchitecture) || defined(FreeBSDArchitecture) \
+     || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+@@ -148,7 +131,8 @@
+ XCOMM cannaLibDir = /var/db/canna
+ cannaLibDir = DefCannaLibDir
+ XCOMM cannaManDir = $(cannaPrefix)/share/man
+-cannaManDir = $(cannaPrefix)/man
++cannaShareDir = $(cannaPrefix)/share/canna
++cannaManDir = $(cannaShareDir)/man
+ cannaIncDir = $(cannaPrefix)/include/canna
+ 
+ libCannaDir = DefLibCannaDir
+@@ -237,7 +221,7 @@
+ /* #define UseInstalledLibCanna YES */
+ #define UseInstalledLibCanna NO
+ 
+-DicDir   = $(cannaLibDir)/dic
++DicDir   = /var/lib/canna/dic
+ 
+ /* ここから下は変更不要です */
+ 
+--- canna-3.7.orig/dic/phono/Imakefile
++++ canna-3.7/dic/phono/Imakefile
+@@ -28,8 +28,9 @@
+        ROMAJI_DIC_DEF = -DSHIFT
+ 
+                DICDIR = $(cannaLibDir)/dic
+-            SAMPLEDIR = $(cannaLibDir)/sample
+-         SAMPLESRCDIR = $(cannaLibDir)/sample/src
++        CANNASHAREDIR = $(cannaShareDir)
++            SAMPLEDIR = $(cannaDocDir)/sample
++         SAMPLESRCDIR = $(cannaDocDir)/sample/src
+ 
+     KPDEF = default.kpdef jdaemon.kpdef just.kpdef kaisoku.kpdef kana.kpdef \
+             lan5.kpdef matsu.kpdef newjis.kpdef romaji.kpdef sokuon.kpdef \
+@@ -69,7 +70,7 @@
+ MakeDirectories(install,$(DICDIR))
+ MakeDirectories(install,$(SAMPLESRCDIR))
+ 
+-InstallMultiple($(ROMKANA_TABLES),$(DICDIR))
++InstallMultiple($(ROMKANA_TABLES),$(CANNASHAREDIR))
+ 
+ #ifdef USE_OBSOLETE_STYLE_FILENAME
+ InstallNonExec(default.kpdef,$(SAMPLESRCDIR))
+--- canna-3.7.orig/misc/initfiles/Imakefile
++++ canna-3.7/misc/initfiles/Imakefile
+@@ -6,7 +6,7 @@
+ #endif
+ 
+             CANNAROOT = ../..
+-            SAMPLEDIR = $(cannaLibDir)/sample
++            SAMPLEDIR = $(cannaShareDir)
+ 
+ all::
+ 
+--- canna-3.7.orig/misc/Imakefile
++++ canna-3.7/misc/Imakefile
+@@ -48,7 +48,7 @@
+ MakeLintLibSubdirs($(SUBDIRS))
+ MakeLintSubdirs($(SUBDIRS),install.ln,install.ln)
+ 
+-MakeDirectories(install,$(cannaLibDir)/sample/src)
++MakeDirectories(install,$(cannaDocDir)/sample/src)
+ 
+ #ifdef USE_OBSOLETE_STYLE_FILENAME
+ default.canna: default.ca
+@@ -58,8 +58,8 @@
+ 	$(CP) default.ca default.canna
+ #endif
+ 
+-InstallNonExec(default.canna,$(cannaLibDir))
+-InstallNonExec(is.c,$(cannaLibDir)/sample/src)
++InstallNonExec(default.canna,$(cannaDocDir))
++InstallNonExec(is.c,$(cannaDocDir)/sample/src)
+ 
+ clean::
+ 	$(RM) $(PROGRAMS)
+--- canna-3.7.orig/Imakefile
++++ canna-3.7/Imakefile
+@@ -84,6 +84,7 @@
+ 	 echo "/* for lib/canna */";\
+ 	 echo "#define CANNALIBDIR \"$(cannaLibDir)\""; \
+ 	 echo "#define SUPPORT_OLD_WCHAR $(supportOldWchar)"; \
++	 echo "#define CANNASHAREDIR \"$(cannaShareDir)\""; \
+ 	 echo "/* for scripts */";\
+ 	 echo "#define CANNABINDIR $(cannaBinDir)"; \
+ 	 echo "/* others */";\

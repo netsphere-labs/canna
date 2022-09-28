@@ -1,0 +1,727 @@
+Description: fix many manpages errors
+Author: HIGUCHI Daisuke (VDR dai) <dai@debian.org>
+Last-Update: 2013-06-09
+
+diff --git a/cmd/catdic/cannakill.man b/cmd/catdic/cannakill.man
+index 9137314..7edb1b3 100644
+--- a/cmd/catdic/cannakill.man
++++ b/cmd/catdic/cannakill.man
+@@ -20,7 +20,7 @@
+ .\" PERFORMANCE OF THIS SOFTWARE.
+ .\"
+ .\" $Id: cannakill.man,v 1.2 2002/10/22 15:19:13 aida_s Exp $
+-.TH CANNAKILL 1M
++.TH CANNAKILL 1
+ .SH "NAME"
+ cannakill \- Terminate operation of the Kana-Kanji conversion server
+ cannaserver
+@@ -29,14 +29,14 @@ cannaserver
+ .SH "DESCRIPTION"
+ .PP
+ cannakill terminates operation of Kana-Kanji conversion server
+-cannaserver(1M).  This causes the server to delete the socket and
++cannaserver(1).  This causes the server to delete the socket and
+ close all open dictionaries before terminating its processing.
+ .PP
+-The user who has started cannaserver(1M) or the super user can only
+-use cannakill(1M) to terminate operation of canncannaer.
++The user who has started cannaserver(1) or the super user can only
++use cannakill(1) to terminate operation of canncannaer.
+ .SH "FILES"
+ .IP "@(UnixSockDir)/@(UnixSockName)[:num]" 36
+ Socket
+ .SH "SEE ALSO"
+ .PP
+-cannaserver(1M), cannastat(1), cannacheck(1)
++cannaserver(1), cannastat(1), cannacheck(1)
+diff --git a/cmd/catdic/catdic.jmn b/cmd/catdic/catdic.jmn
+index 5467aa8..5657947 100644
+--- a/cmd/catdic/catdic.jmn
++++ b/cmd/catdic/catdic.jmn
+@@ -57,7 +57,7 @@ cannaserver(1M)
+ 出力します．
+ 
+ .nf
+-   catdic test -l test2.t 
++   catdic test \-l test2.t 
+ リモートホストにある辞書名testの辞書ファイルをカレントディレ
+ クトリのtest2.tというファイルに出力します．
+ 
+diff --git a/cmd/catdic/chmoddic.man b/cmd/catdic/chmoddic.man
+index a21173a..a6abb4f 100644
+--- a/cmd/catdic/chmoddic.man
++++ b/cmd/catdic/chmoddic.man
+@@ -26,8 +26,8 @@
+ .SH "SYNOPSIS"
+ .nf
+ .ft 4
+-chmoddic [{(-cs | - cannaserver} \f2canna-server\f4] {+ | -}{r|w|rw|wr} 
+-[-G] \f2dicname\f4
++chmoddic [{(\-cs | \- cannaserver} \f2canna-server\f4] {+ | \-}{r|w|rw|wr} 
++[\-G] \f2dicname\f4
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+diff --git a/cmd/catdic/lsdic.jmn b/cmd/catdic/lsdic.jmn
+index c025816..f71b81d 100644
+--- a/cmd/catdic/lsdic.jmn
++++ b/cmd/catdic/lsdic.jmn
+@@ -46,7 +46,7 @@ lsdic \- 
+ .IP "\-l" 12
+ 辞書のアクセス権を表示します。 \-i,\-g,\-u,\-a と組み合わせて使用することはできません.
+ .SH "使用例"
+-lsdic  -u  username 
++lsdic  \-u  username 
+ .SH "関連情報"
+ cpdic(1), mkdic(1), mvdic(1), rmdic(1)
+ 
+diff --git a/cmd/catdic/mkdic.jmn b/cmd/catdic/mkdic.jmn
+index 59f7614..13656fe 100644
+--- a/cmd/catdic/mkdic.jmn
++++ b/cmd/catdic/mkdic.jmn
+@@ -53,7 +53,7 @@ mkdic \- 
+ .SH "使用例"
+ 
+ .IP
+-catdic -cs host1 srcdic | mkdic -cs host2 - objdic 
++catdic \-cs host1 srcdic | mkdic \-cs host2 \- objdic 
+ .br  
+ host1のsrcdicをhost2のobjdicにコピーします．
+ 
+diff --git a/cmd/dicar/dicar.jmn b/cmd/dicar/dicar.jmn
+index 32a4b1e..ca04309 100644
+--- a/cmd/dicar/dicar.jmn
++++ b/cmd/dicar/dicar.jmn
+@@ -72,7 +72,7 @@ chimei.d shima.d shima.mwd.d
+ % dicar r shima.d chimei.d　(shima.dにchimei.dを追加します)
+ 
+ .br
+-% dicar -t shima.d
++% dicar \-t shima.d
+ .br
+ (テキスト辞書ファイル名 [バージョン(辞書作成時刻)] = 総単語数 + 総読み数)
+ .br
+diff --git a/cmd/mkbindic/mkbindic.jmn b/cmd/mkbindic/mkbindic.jmn
+index 681a403..7ca5ba1 100644
+--- a/cmd/mkbindic/mkbindic.jmn
++++ b/cmd/mkbindic/mkbindic.jmn
+@@ -41,13 +41,13 @@ mkbindic \- 
+ 形式辞書の user.cbd ファイルと学習辞書の user.cld ファイルを作成します．
+ .fi
+ .sp
+-% mkbindic -s user2.ctd
++% mkbindic \-s user2.ctd
+ 
+ テキスト形式辞書の user2.ctd ファイルから，付属語辞書としてバイナリ
+ 形式辞書の user2.cbd ファイルと学習辞書の user2.cld ファイルを作成します．
+ .fi
+ .sp
+-% mkbindic -m -name foo.d user3.ctd
++% mkbindic \-m \-name foo.d user3.ctd
+ 
+ テキスト形式辞書の user3.ctd ファイルから，自立語辞書としてバイナリ
+ 形式辞書の foo.d ファイルと学習辞書の user3.cld ファイルを作成します．
+diff --git a/cmd/wtoc/wtoc.jmn b/cmd/wtoc/wtoc.jmn
+index d701260..a169733 100644
+--- a/cmd/wtoc/wtoc.jmn
++++ b/cmd/wtoc/wtoc.jmn
+@@ -35,7 +35,7 @@ Wnn
+ .fi
+ .SH "使用例"
+ .nf
+-  wtoc -f tsuikahinshi kihon.u kihon.t
++  wtoc \-f tsuikahinshi kihon.u kihon.t
+ .fi
+ .sp
+ 品詞対応情報をtsuikahinshiより入力しWnnテキスト形式辞書kihon.uを本日本語入力
+diff --git a/cmd/wtoc/wtoc.man b/cmd/wtoc/wtoc.man
+index 529328e..db0f147 100644
+--- a/cmd/wtoc/wtoc.man
++++ b/cmd/wtoc/wtoc.man
+@@ -28,7 +28,7 @@ while delimiting by a space(s) or tab.
+ .fi
+ .SH "EXAMPLE"
+ .nf
+-% wtoc -f tsuikahinshi kihon.u kihon.t
++% wtoc \-f tsuikahinshi kihon.u kihon.t
+ .fi
+ .sp
+ Inputs word-type correspondence information from tsuikahinshi,
+diff --git a/lib/RK/RkBgnBun.jmn b/lib/RK/RkBgnBun.jmn
+index f86244c..2b9645b 100644
+--- a/lib/RK/RkBgnBun.jmn
++++ b/lib/RK/RkBgnBun.jmn
+@@ -94,7 +94,7 @@ RK_XFER                            
+ に至るまで，変換モードに入ります．変換モードはネストすることはできません．
+ .SH "戻り値"
+ 変換で得られた文節の個数を示します．
+-変換に失敗した場合には -1 を返します．
++変換に失敗した場合には \-1 を返します．
+ .SH "関連情報"
+ RkEndBun(3)
+ .\".if t .pn 575
+diff --git a/lib/RK/RkBgnBun.man b/lib/RK/RkBgnBun.man
+index 43234a0..bfd8800 100644
+--- a/lib/RK/RkBgnBun.man
++++ b/lib/RK/RkBgnBun.man
+@@ -22,7 +22,7 @@
+ .\" $Id: RkBgnBun.man,v 1.1.1.1 2002/10/19 08:27:44 aida_s Exp $ NEC;
+ .TH "RKBGNBUN" "3"
+ .SH "NAME"
+-\f4RkBgnBun\f1 / \f4RkwBgnBun\f1 \- convert the reading of a specified length to kanji
++\f4RkBgnBun\f1, \f4RkwBgnBun\f1 \- convert the reading of a specified length to kanji
+ .SH "SYNOPSIS"
+ .nf
+ .ft 4
+diff --git a/lib/RK/RkDefine.jmn b/lib/RK/RkDefine.jmn
+index 250d481..02555a3 100644
+--- a/lib/RK/RkDefine.jmn
++++ b/lib/RK/RkDefine.jmn
+@@ -54,6 +54,6 @@ RkDefineDic \- 
+ を与えると，読み「かんじ」で定義された品詞 #T35 でつづりが「漢字」と一致する
+ 候補を指定することになります．
+ .SH "戻り値"
+-成功すると 0 ，失敗すると -1 を返します．
+-また，変換モードのコンテクストで実行された場合には何もせずに -1 を返します．
++成功すると 0 ，失敗すると \-1 を返します．
++また，変換モードのコンテクストで実行された場合には何もせずに \-1 を返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkDelete.jmn b/lib/RK/RkDelete.jmn
+index ce02c35..e33f93a 100644
+--- a/lib/RK/RkDelete.jmn
++++ b/lib/RK/RkDelete.jmn
+@@ -54,6 +54,6 @@ RkDeleteDic \- 
+ を与えると，読み「かんじ」で定義された品詞 #T35 でつづりが「漢字」と一致する
+ 候補を指定することになります．
+ .SH "戻り値"
+-成功すると 0 ，失敗すると -1 を返します．
+-また，変換モードのコンテクストで実行された場合には何もせずに -1 を返します．
++成功すると 0 ，失敗すると \-1 を返します．
++また，変換モードのコンテクストで実行された場合には何もせずに \-1 を返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetDic.jmn b/lib/RK/RkGetDic.jmn
+index 82284ab..0c2ea31 100644
+--- a/lib/RK/RkGetDic.jmn
++++ b/lib/RK/RkGetDic.jmn
+@@ -55,5 +55,5 @@ RkGetDicList \- 
+ によりバイト数で与えます．
+ 辞書名リストがこのサイズを越える場合には，文字列単位で切り捨てられます．
+ .SH "戻り値"
+-辞書名の個数を返します．コンテクスト番号が正しくない場合には -1 を返します．
++辞書名の個数を返します．コンテクスト番号が正しくない場合には \-1 を返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetKan.jmn b/lib/RK/RkGetKan.jmn
+index 1f90c27..c7fb950 100644
+--- a/lib/RK/RkGetKan.jmn
++++ b/lib/RK/RkGetKan.jmn
+@@ -37,9 +37,9 @@ RkGetkanji \- 
+ .I kanji
+ に設定します．文字列のバイト数が
+ .I maxkanji
+--1 を超える場合には，結果は切り捨てられます．
++\-1 を超える場合には，結果は切り捨てられます．
+ .SH "戻り値"
+ カレント候補の長さを返します．
+-変換モードでないコンテクストで実行された場合には何もせずに -1 を
++変換モードでないコンテクストで実行された場合には何もせずに \-1 を
+ 返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetKan.man b/lib/RK/RkGetKan.man
+index cafb7ef..47f566b 100644
+--- a/lib/RK/RkGetKan.man
++++ b/lib/RK/RkGetKan.man
+@@ -34,6 +34,6 @@ int maxkanji;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkGetKanji\f1 sets kanji in the area \f2kanji\f1.  The resulting character string is truncated when its byte length exceeds \f2maxkanji\f1 -1.
++\f2RkGetKanji\f1 sets kanji in the area \f2kanji\f1.  The resulting character string is truncated when its byte length exceeds \f2maxkanji\f1 \-1.
+ .SH "RETURN VALUE"
+ This function returns the length of the current candidate, or returns \f4-1\f1, without doing anything, if it has been run in a nonconversion mode context.
+diff --git a/lib/RK/RkGetLex.jmn b/lib/RK/RkGetLex.jmn
+index 069777f..ed07457 100644
+--- a/lib/RK/RkGetLex.jmn
++++ b/lib/RK/RkGetLex.jmn
+@@ -50,6 +50,6 @@ RkGetLex \- 
+   dicnum  未使用
+ .fi
+ .SH "戻り値"
+-変換モードでないコンテクストで実行された場合には何もせずに -1 を
++変換モードでないコンテクストで実行された場合には何もせずに \-1 を
+ 返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetSta.jmn b/lib/RK/RkGetSta.jmn
+index 8664b76..b57dda3 100644
+--- a/lib/RK/RkGetSta.jmn
++++ b/lib/RK/RkGetSta.jmn
+@@ -47,6 +47,6 @@ RkGetStat \- 
+ .fi
+ .SH "戻り値"
+ 0 を返します．
+-変換モードでないコンテクストで実行された場合には何もせずに -1 を
++変換モードでないコンテクストで実行された場合には何もせずに \-1 を
+ 返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetYom.jmn b/lib/RK/RkGetYom.jmn
+index 8bee6c7..cc939c9 100644
+--- a/lib/RK/RkGetYom.jmn
++++ b/lib/RK/RkGetYom.jmn
+@@ -37,9 +37,9 @@ RkGetYomi \- 
+ .I yomi
+ に設定します．文字列のバイト数が
+ .I maxyomi
+--1 を超える場合には，結果は切り捨てられます．
++\-1 を超える場合には，結果は切り捨てられます．
+ .SH "戻り値"
+ カレント文節の読みの長さを返します．
+-変換モードでないコンテクストで実行された場合には何もせずに -1 を
++変換モードでないコンテクストで実行された場合には何もせずに \-1 を
+ 返します．
+ .\".if t .pn 575
+diff --git a/lib/RK/RkGetYom.man b/lib/RK/RkGetYom.man
+index 2036bea..87eb627 100644
+--- a/lib/RK/RkGetYom.man
++++ b/lib/RK/RkGetYom.man
+@@ -34,6 +34,6 @@ int maxyomi;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkGetYomi\f1 gets the reading of the current clause and sets it in the area \f2yomi\f1.  The resulting character string is truncated when its byte length exceeds \f2maxyomi\f1 -1.
++\f2RkGetYomi\f1 gets the reading of the current clause and sets it in the area \f2yomi\f1.  The resulting character string is truncated when its byte length exceeds \f2maxyomi\f1 \-1.
+ .SH "RETURN VALUE"
+ This function returns the length of the reading of the current clause, or returns \f4-1\f1, without doing anything, if it has been run in a nonconversion mode context.
+diff --git a/lib/RK/RkInitia.jmn b/lib/RK/RkInitia.jmn
+index b2cc83d..d3b0c3d 100644
+--- a/lib/RK/RkInitia.jmn
++++ b/lib/RK/RkInitia.jmn
+@@ -49,7 +49,7 @@ RkInitialize \- 
+ 標準コンテクストだけが存在します． コンテクストを一つだけ使用する
+ アプリケーションは標準コンテクストを使用することができます．
+ .SH "戻り値"
+-初期化に成功した場合には 0 を，失敗した場合には -1 を返します．
++初期化に成功した場合には 0 を，失敗した場合には \-1 を返します．
+ .SH "関連情報"
+ RkFinalize(3)
+ .\".if t .pn 575
+diff --git a/lib/RK/RkIntro.man b/lib/RK/RkIntro.man
+index c8ffa4c..2acf202 100644
+--- a/lib/RK/RkIntro.man
++++ b/lib/RK/RkIntro.man
+@@ -22,7 +22,7 @@
+ .\" $Id: RkIntro.man,v 1.1.1.1 2002/10/19 08:27:44 aida_s Exp $ NEC;
+ .TH "DICLIBINTRO" "3"
+ .SH "NAME"
+-\f4DICLib intro\f1 \- dictionary access library introduction
++\f4DICLib_intro\f1 \- dictionary access library introduction
+ .SH "DESCRIPTION"
+ The dictionary access library provides basic functions for kana-kanji conversion.  The following files are prerequisite to using the dictionary access library:
+ .IP "Header file" 
+diff --git a/lib/RK/RkMountD.jmn b/lib/RK/RkMountD.jmn
+index 99c454d..72d7b5e 100644
+--- a/lib/RK/RkMountD.jmn
++++ b/lib/RK/RkMountD.jmn
+@@ -45,7 +45,7 @@ RkMountDic \- 
+ .PP
+ 辞書はこのコンテクストにマウントされていないものでなければなりません．
+ .SH "戻り値"
+-マウントに成功した場合は 0 ，失敗した場合には -1 を返します．
++マウントに成功した場合は 0 ，失敗した場合には \-1 を返します．
+ .SH "関連情報"
+ RkUnmountDic(3)
+ .\".if t .pn 575
+diff --git a/lib/RK/RkRemoun.jmn b/lib/RK/RkRemoun.jmn
+index 76cf391..d33ebd1 100644
+--- a/lib/RK/RkRemoun.jmn
++++ b/lib/RK/RkRemoun.jmn
+@@ -38,7 +38,7 @@ RkRemountDic \- 
+ が 0 の場合には，辞書リストの最後に，それ以外では先頭に移動します．
+ 辞書はすでにマウントされたものでなければなりません．
+ .SH "戻り値"
+-成功した場合は 0 ，失敗した場合には -1 を返します．
++成功した場合は 0 ，失敗した場合には \-1 を返します．
+ .SH "関連情報"
+ RkMountDic(3)
+ .\".if t .pn 575
+diff --git a/lib/RK/RkUnmoun.jmn b/lib/RK/RkUnmoun.jmn
+index 58d9f0e..95a18ac 100644
+--- a/lib/RK/RkUnmoun.jmn
++++ b/lib/RK/RkUnmoun.jmn
+@@ -39,7 +39,7 @@ RkUnmountDic \- 
+ .PP
+ 辞書はすでにマウントされたものでなければなりません．
+ .SH "戻り値"
+-成功した場合は 0 ，失敗した場合には -1 を返します．
++成功した場合は 0 ，失敗した場合には \-1 を返します．
+ .SH "関連情報"
+ RkMountDic(3)
+ .\".if t .pn 575
+diff --git a/lib/canna/RkCloseR.man b/lib/canna/RkCloseR.man
+index 460b105..f2285e0 100644
+--- a/lib/canna/RkCloseR.man
++++ b/lib/canna/RkCloseR.man
+@@ -22,7 +22,7 @@
+ .\" $Id: RkCloseR.man,v 1.1.1.1 2002/10/19 08:27:47 aida_s Exp $ NEC;
+ .TH "RkCloseContext" "3"
+ .SH "NAME"
+-\f4RkCloseRoma\f1 / \f4RkwCloseRoma\f1 \- close the dictionary used for Romaji-kana conversion
++\f4RkCloseRoma\f1 , \f4RkwCloseRoma\f1 \- close the dictionary used for Romaji-kana conversion
+ .SH "SYNOPSIS"
+ .nf
+ .ft 4
+diff --git a/lib/canna/RkCvtEuc.jmn b/lib/canna/RkCvtEuc.jmn
+index af4634b..e606b98 100644
+--- a/lib/canna/RkCvtEuc.jmn
++++ b/lib/canna/RkCvtEuc.jmn
+@@ -45,7 +45,7 @@ RkCvtEuc \- 
+ に格納され，変換対象とならない文字はそのままコピーされます．
+ 変換されたコードのバイト数が
+ .I maxdst
+--1 を超える場合には，
++\-1 を超える場合には，
+ EUC コードの文字境界に合わせて切り捨てられます． さらに
+ .I dst
+ の最後には可能ならばヌル文字が付け加えられます．
+diff --git a/lib/canna/RkCvtEuc.man b/lib/canna/RkCvtEuc.man
+index b441691..9b49ed2 100644
+--- a/lib/canna/RkCvtEuc.man
++++ b/lib/canna/RkCvtEuc.man
+@@ -35,7 +35,7 @@ int srclen;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkCvtEuc\f1 converts the \f2srclen\f1 bytes of shift JIS code data to EUC code, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they are.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.
++\f2RkCvtEuc\f1 converts the \f2srclen\f1 bytes of shift JIS code data to EUC code, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they are.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.
+ .P
+ \f4NULL\f1 can be specified in \f2dst\f1.  \f4NULL\f1 overrides the entire conversion result.
+ .SH "RETURN VALUE"
+diff --git a/lib/canna/RkCvtHan.jmn b/lib/canna/RkCvtHan.jmn
+index da000a0..b172b65 100644
+--- a/lib/canna/RkCvtHan.jmn
++++ b/lib/canna/RkCvtHan.jmn
+@@ -50,7 +50,7 @@ RkCvtHan / RkwCvtHan \- 
+ に格納され，変換対象とならない文字はそのままコピーされます．
+ 変換されたコードのバイト数が
+ .I maxdst
+--1 を超える場合には，
++\-1 を超える場合には，
+ EUC コードの文字境界に合わせて切り捨てられます． さらに
+ .I dst
+ の最後には可能ならばヌル文字が付け加えられます．
+diff --git a/lib/canna/RkCvtHan.man b/lib/canna/RkCvtHan.man
+index 50c5939..e878ce9 100644
+--- a/lib/canna/RkCvtHan.man
++++ b/lib/canna/RkCvtHan.man
+@@ -22,7 +22,7 @@
+ .\" $Id: RkCvtHan.man,v 1.1.1.1 2002/10/19 08:27:47 aida_s Exp $ NEC;
+ .TH "RKCVTHAN" "3"
+ .SH "NAME"
+-\f4RkCvtHan\f1 / \f4RkwCvtHan\f1 \- convert double-width symbols, alphanumeric characters, hiragana, and katakana to single-width characters
++\f4RkCvtHan\f1 , \f4RkwCvtHan\f1 \- convert double-width symbols, alphanumeric characters, hiragana, and katakana to single-width characters
+ .SH "SYNOPSIS"
+ .nf
+ .ft 4
+@@ -40,7 +40,7 @@ int srclen;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkCvtHan\f1 converts the \f2srclen\f1 bytes of double-width symbol, alphanumeric characters, hiragana, and katakana data to single-width characters, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they are.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
++\f2RkCvtHan\f1 converts the \f2srclen\f1 bytes of double-width symbol, alphanumeric characters, hiragana, and katakana data to single-width characters, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they are.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
+ .P
+ \f2RkwCvtHan\f1 is the wchar_t version of \f2RkCvtHan\f1.  Arguments which specify the length are regarded as they count the character length instead of byte length.
+ .P
+diff --git a/lib/canna/RkCvtHir.jmn b/lib/canna/RkCvtHir.jmn
+index 2441de2..12acbe9 100644
+--- a/lib/canna/RkCvtHir.jmn
++++ b/lib/canna/RkCvtHir.jmn
+@@ -45,7 +45,7 @@ RkCvtHira \- 
+ に格納され，変換対象とならない文字はそのままコピーされます．
+ 変換されたコードのバイト数が
+ .I maxdst
+--1 を超える場合には，
++\-1 を超える場合には，
+ EUC コードの文字境界に合わせて切り捨てられます． さらに
+ .I dst
+ の最後には可能ならばヌル文字が付け加えられます．
+diff --git a/lib/canna/RkCvtHir.man b/lib/canna/RkCvtHir.man
+index cb623ce..8f54554 100644
+--- a/lib/canna/RkCvtHir.man
++++ b/lib/canna/RkCvtHir.man
+@@ -35,7 +35,7 @@ int srclen;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkCvtHira\f1 converts the \f2srclen\f1 bytes of double-width katakana data to double-width hiragana, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
++\f2RkCvtHira\f1 converts the \f2srclen\f1 bytes of double-width katakana data to double-width hiragana, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
+ .P
+ \f4NULL\f1 can be specified in \f2dst\f1.  \f4NULL\f1 overrides the entire conversion result.
+ .SH "RETURN VALUE"
+diff --git a/lib/canna/RkCvtKan.jmn b/lib/canna/RkCvtKan.jmn
+index 241c73c..864257c 100644
+--- a/lib/canna/RkCvtKan.jmn
++++ b/lib/canna/RkCvtKan.jmn
+@@ -45,7 +45,7 @@ RkCvtKana \- 
+ に格納され，変換対象とならない文字はそのままコピーされます．
+ 変換されたコードのバイト数が
+ .I maxdst
+--1 を超える場合には，
++\-1 を超える場合には，
+ EUC コードの文字境界に合わせて切り捨てられます． さらに
+ .I dst
+ の最後には可能ならばヌル文字が付け加えられます．
+diff --git a/lib/canna/RkCvtKan.man b/lib/canna/RkCvtKan.man
+index 09db566..3ee5a56 100644
+--- a/lib/canna/RkCvtKan.man
++++ b/lib/canna/RkCvtKan.man
+@@ -35,7 +35,7 @@ int srclen;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkCvtKana\f1 converts the \f2srclen\f1 bytes of double-width hiragana data to double-width katakana, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
++\f2RkCvtKana\f1 converts the \f2srclen\f1 bytes of double-width hiragana data to double-width katakana, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
+ .P
+ \f4NULL\f1 can be specified in \f2dst\f1.  \f4NULL\f1 overrides the entire conversion result.
+ .SH "RETURN VALUE"
+diff --git a/lib/canna/RkCvtZen.jmn b/lib/canna/RkCvtZen.jmn
+index 89c4d8e..ad3bea2 100644
+--- a/lib/canna/RkCvtZen.jmn
++++ b/lib/canna/RkCvtZen.jmn
+@@ -45,7 +45,7 @@ RkCvtZen \- ASCII文
+ に格納され，変換対象とならない文字はそのままコピーされます．
+ 変換されたコードのバイト数が
+ .I maxdst
+--1 を超える場合には，
++\-1 を超える場合には，
+ EUC コードの文字境界に合わせて切り捨てられます． さらに
+ .I dst
+ の最後には可能ならばヌル文字が付け加えられます．
+diff --git a/lib/canna/RkCvtZen.man b/lib/canna/RkCvtZen.man
+index a9d607c..d54e6aa 100644
+--- a/lib/canna/RkCvtZen.man
++++ b/lib/canna/RkCvtZen.man
+@@ -35,7 +35,7 @@ int srclen;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkCvtZen\f1 converts the \f2srclen\f1 bytes of ASCII character and single-width katakana data to double-width character, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
++\f2RkCvtZen\f1 converts the \f2srclen\f1 bytes of ASCII character and single-width katakana data to double-width character, starting at the area \f2src\f1.  A null character in \f2src\f1 is not interpreted as the end of the string.  The conversion result is stored in the area \f2dst\f1.  Characters that are not subject to conversion are copied as they area.  The conversion result is truncated to adjust to character boundaries in the EUC code when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.  EUC code is used to represent both \f2src\f1 and \f2dst\f1. 
+ .P
+ \f4NULL\f1 can be specified in \f2dst\f1.  \f4NULL\f1 overrides the entire conversion result.
+ .SH "RETURN VALUE"
+diff --git a/lib/canna/RkMapPho.man b/lib/canna/RkMapPho.man
+index aa5de25..7f3ba24 100644
+--- a/lib/canna/RkMapPho.man
++++ b/lib/canna/RkMapPho.man
+@@ -42,7 +42,7 @@ int *rule;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkMapPhonogram\f1 performs Romaji-kana conversion by using a specified Romaji-kana conversion table.  \f2romaji\f1 specifies a pointer to the Romaji-kana conversion table that has been returned by \f2RkOpenRoma(3)\f1.  \f2RkMapPhonogram\f1 interprets the \f2srclen\f1 bytes of contiguous data starting at the area \f2src\f1 as a Romaji character string and searches through the Romaji-kana conversion table for the rule of Romaji-kana conversion that matches the beginning of the Romaji character string.  If the corresponding conversion rule is found, the area \f2dst\f1 is loaded with the corresponding kana character string, with \f2dlen\f1 being set to its byte length.  The resulting character string is truncated when its byte length exceeds \f2maxdst\f1 -1.  
++\f2RkMapPhonogram\f1 performs Romaji-kana conversion by using a specified Romaji-kana conversion table.  \f2romaji\f1 specifies a pointer to the Romaji-kana conversion table that has been returned by \f2RkOpenRoma(3)\f1.  \f2RkMapPhonogram\f1 interprets the \f2srclen\f1 bytes of contiguous data starting at the area \f2src\f1 as a Romaji character string and searches through the Romaji-kana conversion table for the rule of Romaji-kana conversion that matches the beginning of the Romaji character string.  If the corresponding conversion rule is found, the area \f2dst\f1 is loaded with the corresponding kana character string, with \f2dlen\f1 being set to its byte length.  The resulting character string is truncated when its byte length exceeds \f2maxdst\f1 \-1.  
+ .P
+ \f2flags\f1 is a combination of the following Romaji-kana conversion flags connected by or:
+ .P
+diff --git a/lib/canna/RkMapRom.jmn b/lib/canna/RkMapRom.jmn
+index 96b03f9..b487a03 100644
+--- a/lib/canna/RkMapRom.jmn
++++ b/lib/canna/RkMapRom.jmn
+@@ -53,7 +53,7 @@ RkMapRoma \- 
+ .I dst
+ 領域に格納します．ただし，文字列のバイト数が
+ .I maxdst
+--1 を超える場合には結果は切り捨てられます． また，可能ならば変換最終位
++\-1 を超える場合には結果は切り捨てられます． また，可能ならば変換最終位
+ 置にヌル文字が付け加えられます．
+ .PP
+ .I flags
+diff --git a/lib/canna/RkMapRom.man b/lib/canna/RkMapRom.man
+index 05b3ba7..9a679b0 100644
+--- a/lib/canna/RkMapRom.man
++++ b/lib/canna/RkMapRom.man
+@@ -38,7 +38,7 @@ int *status;
+ .ft 1
+ .fi
+ .SH "DESCRIPTION"
+-\f2RkMapRoma\f1 performs Romaji-kana conversion by using a specified Romaji-kana conversion table.  \f2romaji\f1 specifies a pointer to the Romaji-kana conversion table that has been returned by \f2RkOpenRoma(3)\f1.  \f2RkMapRoma\f1 interprets the \f2srclen\f1 bytes of contiguous data starting at the area \f2src\f1 as a Romaji character string and searches through the Romaji-kana conversion table for the rule of Romaji-kana conversion that matches the beginning of the Romaji character string.  If the corresponding conversion rule is found, the corresponding kana character string is stored in the area \f2dst\f1.  The resulting character string is truncated when its byte length exceeds \f2maxdst\f1 -1.  \f2dst\f1 is padded with null characters at the end if possible.
++\f2RkMapRoma\f1 performs Romaji-kana conversion by using a specified Romaji-kana conversion table.  \f2romaji\f1 specifies a pointer to the Romaji-kana conversion table that has been returned by \f2RkOpenRoma(3)\f1.  \f2RkMapRoma\f1 interprets the \f2srclen\f1 bytes of contiguous data starting at the area \f2src\f1 as a Romaji character string and searches through the Romaji-kana conversion table for the rule of Romaji-kana conversion that matches the beginning of the Romaji character string.  If the corresponding conversion rule is found, the corresponding kana character string is stored in the area \f2dst\f1.  The resulting character string is truncated when its byte length exceeds \f2maxdst\f1 \-1.  \f2dst\f1 is padded with null characters at the end if possible.
+ .P
+ \f2flags\f1 is a combination of the following Romaji-kana conversion flags connected by or:
+ .P
+diff --git a/lib/canna/cannalib.man b/lib/canna/cannalib.man
+index ea02314..a7ce4dd 100644
+--- a/lib/canna/cannalib.man
++++ b/lib/canna/cannalib.man
+@@ -23,7 +23,7 @@
+ .if t .pn 575
+ .TH CANNALIB 3
+ .SH "NAME"
+-CannaLib intro \(em Kana-to-Kanji Conversion Library Intro
++CannaLib_intro \(em Kana-to-Kanji Conversion Library Intro
+ .SH "DESCRIPTION"
+ .PP
+ Canna provides the following three libraries:
+diff --git a/lib/canna/uilib.jmn b/lib/canna/uilib.jmn
+index 99e8a77..e8b439a 100644
+--- a/lib/canna/uilib.jmn
++++ b/lib/canna/uilib.jmn
+@@ -687,7 +687,7 @@ KC_QUERYMAXMODESTR \- 
+ .sp
+ .RE
+ .\" @(#)kanji.man	1.5	89/06/30 09:13:01
+-.TH XLookupKanjiString 3K "1 September 1988" "X Version 11"
++.TH XLookupKanjiString 3 "1 September 1988" "X Version 11"
+ .SH 名称
+ XLookupKanjiString \- キーボード入力の漢字文字列への変換
+ .SH 記述形式
+diff --git a/lib/canna/uilib.man b/lib/canna/uilib.man
+index 9bd7948..7c17e13 100644
+--- a/lib/canna/uilib.man
++++ b/lib/canna/uilib.man
+@@ -23,7 +23,7 @@
+ .if t .pn 575
+ .TH UILIBINTRO 3
+ .SH "NAME"
+-UILib intro \(em User interface library intro
++UILib_intro \(em User interface library intro
+ .SH "DESCRIPTION"
+ .PP
+ User interface libraries are responding to one-chracter 
+@@ -592,7 +592,7 @@ map, rather than character strings.  In this case, return of numeric
+ data as mode information helps you execute the process.  Specify
+ KC_SETMODEINFOSTYLE in \fIjrKanjiControl\fP, and pass 1 to \fIarg\fP.
+ After this, one character representing the mode code (numeric) plus
+-'@' (0x40) returns to the jrKanjiStatus structure's \fImode\fP member.
++\'@' (0x40) returns to the jrKanjiStatus structure's \fImode\fP member.
+ To convert the value into the mode code, subtract '@' (0x40) from the
+ returned character string.  For the mode codes, see the mode change
+ description of Item (2) KC_CHANGEMODE.
+@@ -1182,7 +1182,7 @@ map, rather than character strings.  In this case, return of numeric
+ data as mode information helps you execute the process.  Specify
+ KC_SETMODEINFOSTYLE in \fIXKanjiControl\fP, and pass 1 to \fIarg\fP.
+ After this, one character representing the mode code (numeric) plus
+-'@' (0x40) returns to the XKanjiStatus structure's \fImode\fP member.
++\'@' (0x40) returns to the XKanjiStatus structure's \fImode\fP member.
+ To convert the value into the mode code, subtract '@' (0x40) from the
+ returned character string.  For the mode codes, see the mode change
+ description of Item (2) KC_CHANGEMODE.
+diff --git a/server/server.jmn b/server/server.jmn
+index 8c68d9b..4aeb661 100644
+--- a/server/server.jmn
++++ b/server/server.jmn
+@@ -35,7 +35,7 @@ cannaserver \- 
+ .PP
+ cannaserver(1M)は、デフォルトではUNIXドメインソケットを通した同一
+ ホストのクライアントからの接続しか受け付けません。ただし、オプション
+--inet（または-inet6）により、TCP 接続も受け入れるようになります。
++\-inet（または-inet6）により、TCP 接続も受け入れるようになります。
+ 上記のいずれの設定であっても、ホスト、ユーザ単位でアクセスを制御する
+ ために @(AccessFile) ファイルを用いることができます。
+ .PP
+@@ -67,7 +67,7 @@ UNIX
+ しかできません。
+ .IP "\-inet6" 12
+ IPv6サポートを有効にします。これを単独で指定した場合は、IPv4での接続は
+-できません。IPv4も有効にするには、-inet -inet6と指定します。
++できません。IPv4も有効にするには、-inet \-inet6と指定します。
+ .IP "\-l \fIn\fP" 12
+ cannaserver(1M) のログを /tmp/canna.log に出力します。n でログ
+ のレベルを設定します。ログのレベルとして 1〜5 の数字を指定
+@@ -90,8 +90,8 @@ cannaserver(1M)
+ .IP "@(AccessFile)" 8
+ アクセス制御ファイル
+ .IP "@(ErrDir)/CANNA?msgs" 8
+-ログファイル。"?" は -p で指定した \fInum\fP で、デフォルトは 0 です。
+--syslog を指定した際はこのファイルにログは出力されません。
++ログファイル。"?" は \-p で指定した \fInum\fP で、デフォルトは 0 です。
++\-syslog を指定した際はこのファイルにログは出力されません。
+ .SH "関連コマンド"
+ .PP
+ cannakill(1M), cannastat(1), cannacheck(1), cshost(1)
+diff --git a/server/server.man b/server/server.man
+index 78d1b1f..640fbb8 100644
+--- a/server/server.man
++++ b/server/server.man
+@@ -20,33 +20,33 @@
+ .\" PERFORMANCE OF THIS SOFTWARE. 
+ .\"
+ .\" $Id: server.man,v 1.9 2003/02/04 14:04:54 aida_s Exp $
+-.TH CANNASERVER 1M
++.TH CANNASERVER 1
+ .SH "NAME"
+ cannaserver \- Kana-Kanji conversion server
+ .SH "SYNOPSIS"
+ .B "cannaserver [\-d] [\-u \fIuserid\fP] [\-inet] [\-inet6] [\-l \fIn\fP] [\-syslog] [\-p \fInum\fP] [\fIddpath\fP] "
+ .SH "DESCRIPTION"
+ .PP
+-cannaserver(1M) provides the Kana\-Kanji conversion service.
++cannaserver(1) provides the Kana\-Kanji conversion service.
+ Most commonly this daemon starts at daemon bootup framework
+ like /etc/rc depending on your system, so you do not usually
+ start it up manually.
+ .PP
+-By default, cannaserver(1M) only accepts connections from clients
++By default, cannaserver(1) only accepts connections from clients
+ at the same host where the server is running (via UNIX domain socket).
+ You can make it accessible from other hosts via TCP by using option \-inet
+ (or \-inet6). Whether you use this option or not, you can get access
+ control based on user and host using @(AccessFile).
+ .PP
+-cannaserver(1M) immediately forks and gets into the background after
++cannaserver(1) immediately forks and gets into the background after
+ it starts.  You do not need to use '&' explicitly to make it run in the
+ background.
+ .PP
+-When it starts, cannaserver(1M) creates the UNIX domain socket
++When it starts, cannaserver(1) creates the UNIX domain socket
+ @(UnixSockDir)/@(UnixSockName)[:num] to communicate clients.  The
+-socket is deleted automatically if cannaserver(1M) terminates normally.
+-The socket may exist while cannaserver(1M) is not running (because,
+-for example, cannaserver(1M) terminated abnormally).  In this case, delete
++socket is deleted automatically if cannaserver(1) terminates normally.
++The socket may exist while cannaserver(1) is not running (because,
++for example, cannaserver(1) terminated abnormally).  In this case, delete
+ the file manually or you cannot start it.
+ .PP
+ @(DicDir)/*/dics.dir includes the list of dictionaries which are available
+@@ -56,28 +56,28 @@ in ~/.canna.
+ .IP "\fIddpath\fP" 12
+ Specifies the directory that contains dictionaries.
+ .IP "\-inet" 12
+-This option lets cannaserver(1M) accept connections from remote hosts
++This option lets cannaserver(1) accept connections from remote hosts
+ using inet domain socket (IPv4).
+-By default, the cannaserver(1M) uses only UNIX domain socket,
++By default, the cannaserver(1) uses only UNIX domain socket,
+ i.e. only clients in your local machine can connect to the server.
+ .IP "\-inet6" 12
+ Enable IPv6. If this option is used solely, IPv4 access is disabled.
+ If you want to use IPv4 at the same time, use both \-inet and \-inet6.
+ .IP "\-l \fIn\fP" 12
+-Outputs the cannaserver(1M) log to /tmp/canna.log.  n (1 to 5)
++Outputs the cannaserver(1) log to /tmp/canna.log.  n (1 to 5)
+ specifies the log level.
+ .IP "\-d" 12
+-Starts cannaserver(1M) in debug mode.  It is executed as the
++Starts cannaserver(1) in debug mode.  It is executed as the
+ foreground process.  Log data at log level 5 is output to the standard
+ output.
+ .IP "\-u \fIuserid\fP" 12
+-Specifies which user cannaserver(1M) runs as.  By default, cannaserver(1M)
+-runs as the user who started cannaserver(1M).
++Specifies which user cannaserver(1) runs as.  By default, cannaserver(1)
++runs as the user who started cannaserver(1).
+ .IP "\-syslog" 12
+-Outputs the cannaserver(1M) log to syslogd(8). If you specify
++Outputs the cannaserver(1) log to syslogd(8). If you specify
+ this option, logs are not output to @(ErrDir)/CANNA?msgs.
+ .IP "\-p \fInum\fP" 12
+-By this option cannaserver(1M) uses the port number 5680 + num. The
++By this option cannaserver(1) uses the port number 5680 + num. The
+ default port number is 5680. This option also has an effect on the
+ filename of the socket and the log file. See below.
+ .SH "FILES"
+@@ -94,4 +94,4 @@ Log messages are not output to this file when \-syslog
+ is specified.
+ .SH "SEE ALSO"
+ .PP
+-cannakill(1M), cannastat(1), cannacheck(1), cshost(1)
++cannakill(1), cannastat(1), cannacheck(1), cshost(1)

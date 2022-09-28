@@ -1,0 +1,23 @@
+## 03_debian_useshareddir by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Use shareddir
+
+--- canna-3.6p4.orig/lib/canna/romaji.c
++++ canna-3.6p4/lib/canna/romaji.c
+@@ -438,7 +438,6 @@
+ 	}
+       }
+       
+-#if 0 /* currently CANNASHAREDDIR is not defined */
+       if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
+         extern jrUserInfoStruct *uinfo;
+ 	
+@@ -463,7 +462,6 @@
+ 	  }
+ 	}
+       }
+-#endif
+       
+       if (retval == (struct RkRxDic *)NULL) { /* 全部オープンできない */
+ 	sprintf(rdic, 

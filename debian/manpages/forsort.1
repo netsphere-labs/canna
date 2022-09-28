@@ -1,0 +1,23 @@
+.TH "forsort" 1 "2003 Dec 20" "Debian" "canna"
+.SH NAME
+forsort \- Protect text from 7-bit only sort command.
+.SH SYNOPSIS
+.BI "forsort [-7|-8] " "filename" 
+.SH DESCRIPTION
+Protects 8-bit text from 7-bit-only 
+.B sort 
+command.
+
+Input is taken from standard input, and output is given to standard output.
+
+.SH OPTIONS
+
+.B -7
+Encodes 8-bit input to 7-bit text.
+
+.B -8
+Decodes from encoded 7-bit to 8-bit text.
+
+.SH AUTHOR
+This manual page was written by Junichi Uekawa 
+(dancer@debian.org) for Debian GNU/Linux and may be used by others.

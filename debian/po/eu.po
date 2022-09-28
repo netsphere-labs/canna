@@ -1,0 +1,163 @@
+# translation of canna_3.7p3-6.2_eu.po to Basque
+# translation of canna debconf template to Euskara
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+#
+# Xabier Bilbao <xabidu@gmail.com>, 2008.
+# Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: canna_3.7p3-6.2_eu\n"
+"Report-Msgid-Bugs-To: canna@packages.debian.org\n"
+"POT-Creation-Date: 2009-05-03 07:53+0200\n"
+"PO-Revision-Date: 2009-04-30 21:07+0200\n"
+"Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
+"Language-Team: Basque <debian-l10n-basque@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Should the Canna server run automatically?"
+msgstr "Canna zerbitzaria automatikoki exekutatu behar da?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"This package contains the Canna server and server-related utilities. If you "
+"are only interested in these utilities, you can disable the Canna server now."
+msgstr ""
+"Pakete hau Canna zerbitzariak eta zerbitzariaren utilitate osagarriek "
+"osatzen dute. Utilitateetan soilik interesaturik bazaude, Canna zerbitzaria "
+"desgaitu dezakezu orain."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "Should the Canna server run in network mode?"
+msgstr "Canna zerbitzaria sareko moduan exekutatu?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"By default the Canna server will run without support for network "
+"connections, and will only accept connections on UNIX domain sockets, from "
+"clients running on the same host."
+msgstr ""
+"Lehenetsi gisa Canna zerbitzariak ez du sareko konexiorik onartzen, eta "
+"ostalari berean exekutatzen diren bezeroen  UNIX domeinuko socketen "
+"konexioak soilik onartzen ditu."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"If you choose this option, network support will be activated, and the Canna "
+"server will accept connections on TCP sockets from clients that may be on "
+"remote hosts. Some clients (such as egg and yc-el) require this mode even if "
+"they run on the local host."
+msgstr ""
+"Aukera hau hautatzen baduzu, sareko euskarria aktibatuko da, eta Canna "
+"zerbitzariak TCP socket-eko konexioak onartuko ditu urruneko ostalarietako "
+"bezeroetatik. Bezero batzuk ('egg' eta 'yc-el' bezalakoak) modu hau eskatzen "
+"dute nahiz eta haiek lokaleko ostalarian exekutatzen egon."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid "Manage /etc/hosts.canna automatically?"
+msgstr "Kudeatu /etc/hosts.canna automatikoki?"
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"The /etc/hosts.canna file lists hosts allowed to connect to the Canna server."
+msgstr ""
+"Zerbizari honetara konekta daitezkeen ostalariak zerrendatzen ditu /etc/"
+"hosts.canna fitxategiak."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
+msgid ""
+"You should not accept this option if you prefer managing the file's contents "
+"manually."
+msgstr ""
+"Ez zenuke aukera hau hautatu behar fitxategiaren edukia eskuz kudeatzea nahi "
+"baduzu."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "Hosts allowed to connect to this Canna server:"
+msgstr "Baimendutako ostalariak Canna zerbitzari honekin konektatzeko:"
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid ""
+"Please enter the names of the hosts allowed to connect to this Canna server, "
+"separated by spaces."
+msgstr ""
+"Idatzi Canna zerbitzariarekin konektatzeko baimena duten ostalarien izenak, "
+"zuriunez bereiztuz."
+
+#. Type: string
+#. Description
+#: ../templates:5001
+msgid "You can use \"unix\" to allow access via UNIX domain sockets."
+msgstr ""
+"\"unix\" erabil dezakezu UNIX domeinuko socket-en bidez sarbidea baimentzeko."
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid "Canna input style:"
+msgstr "Canna sarrerako estiloa:"
+
+#. Type: select
+#. Description
+#: ../libcanna1g.templates:2001
+msgid ""
+"Please choose the default Canna input style:\n"
+" verbose: Canna3.5 default style with verbose comments;\n"
+" 1.1    : old Canna style (ver. 1.1);\n"
+" 1.2    : old Canna style (ver. 1.2);\n"
+" jdaemon: jdaemon style;\n"
+" just   : JustSystems ATOK style;\n"
+" lan5   : LAN5 style;\n"
+" matsu  : Matsu word processor style;\n"
+" skk    : SKK style;\n"
+" tut    : TUT-Code style;\n"
+" unix   : UNIX style;\n"
+" vje    : vje style;\n"
+" wx2+   : WX2+ style."
+msgstr ""
+"Aukeratu Canna-ren sarrerako estilo lehenetsia:\n"
+" verbose - Canna3.5 estilo lehenetsia iruzkin xehatuekin\n"
+" 1.1     - Canna estilo zaharra (1.1 ber.)\n"
+" 1.2     - Canna estilo zaharra (1.2 ber.)\n"
+" jdaemon - jdaemon estiloa\n"
+" just    - Justsystem ATOK erako estiloa\n"
+" lan5    - LAN5 erako estiloa\n"
+" matsu   - MATSU hitz prozesatzailearen erako estiloa\n"
+" skk     - SKK erako estiloa\n"
+" tut     - TUT-Code-rako estiloa\n"
+" unix    - UNIX estiloa\n"
+" vje     - vje erako estiloa\n"
+" wx2+    - WX2+ estiloa."

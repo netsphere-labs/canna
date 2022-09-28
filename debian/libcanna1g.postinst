@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+set -e
+
+case "$1" in
+    configure)
+	db_get canna/default_style
+	cp /usr/share/canna/${RET}.canna /etc/canna/default.canna
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+    ;;
+esac
+
+
+
+#DEBHELPER#

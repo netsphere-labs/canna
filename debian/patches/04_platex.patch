@@ -1,0 +1,16 @@
+## 04_platex by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Use platex instead of latex for compiling.
+
+--- canna-3.7.orig/doc/man/guide/tex/Imakefile
++++ canna-3.7/doc/man/guide/tex/Imakefile
+@@ -3,7 +3,7 @@
+ 
+   CANNAROOT = ../../../..
+   INCLUDES  = -I$(CANNAROOT)/include
+-  JLATEXCMD = latex
++  JLATEXCMD = platex --kanji=euc
+   DVI2PSCMD = dvi2ps
+   DVIPDFMX  = dvipdfmx
+ 

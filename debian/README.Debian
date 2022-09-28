@@ -1,0 +1,54 @@
+Canna for DEBIAN
+----------------
+
+Configuration
+=============
+
+    This is Canna, a Japanese input system, packaged for Debian.
+
+    For security reasons, the server doesn't listen on a TCP socket by
+default.  This can be enabled by using the "-inet" option and is
+required in order to establish remote connections to the server. You
+also have to add the hostname of the remote machine to /etc/hosts.canna
+for this to work.
+
+    This can be reconfigured by issuing the command:
+
+    $ dpkg-reconfigure canna
+
+    If the environment variable CANNAHOST is unset or set to the value
+"unix", the canna client will usually use UNIX domain sockets for the
+communication with the server.  Any other value (including "localhost")
+will cause the client to use a TCP connection.
+
+
+dics.dir
+========
+
+There is a file /var/lib/canna/dic/canna/dics.dir, 
+the file is updated through update-canna-dics_dir.
+The dics.dir should be in /etc/canna/dics.dir.d/
+
+If you are going to create a dictionary package for canna,
+please edit there.
+
+
+Upgrading dictionary frequency data
+===================================
+
+.cld files are dictionary frequency data for canna.
+They are not really upgradable currently.
+
+
+Binary Dictionary data for Debian
+=================================
+
+To keep dictionary frequency data between upgrades,
+binary dictionary data is not upgraded automatically from 
+3.6p1-8.
+The data is stored in /usr/lib/canna/debian-template/
+and copied to /var/lib/canna/dic/canna/ if files are missing
+(i. e. on fresh install).
+
+ -- Junichi Uekawa <dancer@debian.org>, Wed Nov 12 08:09:52 2003
+

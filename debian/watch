@@ -1,0 +1,3 @@
+version=3
+http://sourceforge.jp/projects/canna/releases/ \
+ /projects/canna/downloads/.*/Canna(.*p.*)\.tar\.bz2/

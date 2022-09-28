@@ -1,0 +1,25 @@
+## 01_mkrelease_autoconf213_debian by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: change call to autoconf213 to autoconf2.13 which exists in Debian
+## Updated for 3.7p3 
+
+Index: b/mkrelease.sh
+===================================================================
+--- a/mkrelease.sh
++++ b/mkrelease.sh
+@@ -3,10 +3,10 @@
+ set -e
+ set -x
+ cp Canna.conf.dist Canna.conf
+-autoconf259
+-autoheader259
++autoconf
++autoheader
+ rm -rf autom4te.cache
+ cd canuum
+-autoconf213
+-autoheader259
++autoconf
++autoheader
+ rm -rf autom4te.cache

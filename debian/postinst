@@ -1,0 +1,112 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+    # Source debconf library.
+    . /usr/share/debconf/confmodule
+    db_version 2.0
+
+    adduser --quiet --system --group --no-create-home  --home /var/lib/canna --gecos "Canna server" --disabled-password --disabled-login canna
+    chown canna:canna /var/lib/canna /var/lib/canna/dic /var/lib/canna/dic/canna /var/lib/canna/dic/canna/*.ctd
+    mkdir -p /var/log/canna
+    chown canna:canna /var/log/canna
+    update-canna-dics_dir
+
+    # debconf processing for running cannaserver
+
+    db_get canna/run_cannaserver
+    if [ "$RET" = "true" ] ; then
+	CANNA_SERVER_RUN=yes
+
+	db_get canna/run_with_inet
+	if [ "$RET" = "true" ] ; then
+	    CANNA_ENABLE_INET=yes
+
+	    db_get canna/manage_allow_hosts_with_debconf
+	    if [ "$RET" = "true" ] ; then
+		CANNA_MANAGE_CANNAHOST=yes		
+		db_get canna/allow_hosts
+		CANNA_ALLOW_HOSTS="$RET"
+	    else
+		CANNA_MANAGE_CANNAHOST=no
+		CANNA_ALLOW_HOSTS="unix"
+	    fi
+	else
+	    CANNA_ENABLE_INET=no
+	    CANNA_MANAGE_CANNAHOST=yes
+	    CANNA_ALLOW_HOSTS="unix"
+	fi
+    else
+	CANNA_SERVER_RUN=no
+	CANNA_ENABLE_INET=no
+	CANNA_MANAGE_CANNAHOST=yes
+	CANNA_ALLOW_HOSTS="unix"
+    fi
+    db_stop
+
+    if [ -e /etc/default/canna ] ; then
+	cp /etc/default/canna /etc/default/canna.dpkg-old
+	rm -f /etc/default/canna
+    fi
+
+    cat > /etc/default/canna <<EOF
+# Enable cannaserver
+CANNA_SERVER_RUN=${CANNA_SERVER_RUN}
+
+# Enable inet socket connection
+CANNA_ENABLE_INET=${CANNA_ENABLE_INET}
+EOF
+
+    if [ "${CANNA_MANAGE_CANNAHOST}" = "yes" ] ; then
+	    TMPFILE=`mktemp`
+	    for HOST in ${CANNA_ALLOW_HOSTS}
+	      do
+	      echo $HOST >> ${TMPFILE}
+	    done
+	    if [ -e /etc/hosts.canna ] ; then
+		cmp -s ${TMPFILE} /etc/hosts.canna || \
+		    (cp /etc/hosts.canna /etc/hosts.canna.dpkg-old && cp ${TMPFILE} /etc/hosts.canna)
+	    else
+		cp ${TMPFILE} /etc/hosts.canna
+	    fi
+	    chmod 644 /etc/hosts.canna
+	    rm -f ${TMPFILE}
+    else
+	[ ! -e /etc/hosts.canna ] && echo unix > /etc/hosts.canna
+	chmod 644 /etc/hosts.canna
+    fi
+
+    # Install files from template dir to /var
+    if [ -f /var/lib/canna/dic/canna/iroha.cbd ] && [ -f /var/lib/canna/dic/canna/iroha.cld ] && [ -f /var/lib/canna/dic/canna/bushu.cld ]; then
+	: # the files already exist, ignore
+	echo "iroha dics are already installed... ignoring" >&2
+    else
+	for FILE in iroha.cbd iroha.cld bushu.cld; do
+	    cp -p /usr/lib/canna/debian-template/$FILE /var/lib/canna/dic/canna/
+	    chown canna:canna /var/lib/canna/dic/canna/$FILE
+	done
+	echo "Installed new iroha dic" >&2
+    fi
+
+    if [ -f /var/lib/canna/dic/canna/fuzokugo.cbd ] && [ -f /var/lib/canna/dic/canna/fuzokugo.cld ]; then
+	: # the files already exist, ignore
+	echo "fuzokugo dics are already installed... ignoring" >&2
+    else
+	cp -p /usr/lib/canna/debian-template/fuzokugo.cbd /var/lib/canna/dic/canna/
+	chown canna:canna /var/lib/canna/dic/canna/fuzokugo.cbd
+	rm -f /var/lib/canna/dic/canna/fuzokugo.cld
+	echo "Installed new fuzokugo dics" >&2
+    fi
+
+    
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+    
+    *)
+    ;;
+esac
+
+#DEBHELPER#

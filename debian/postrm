@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    purge)
+    rm -rf /var/log/canna
+    # see http://lists.debian.org/debian-devel/2002/10/msg00345.html
+    # debhelper might cause this script to be called twice on purge
+    # therefore test, if the user exists before trying to remove it
+    if getent passwd canna >/dev/null ;  then
+      userdel --remove canna
+    fi
+    rm -f /etc/default/canna
+    rm -f /etc/default/canna.dpkg-old
+    rm -f /etc/hosts.canna
+    rm -rf /var/lib/canna/dic/group
+    rm -rf /var/lib/canna/dic/user
+    rm -f /var/lib/canna/dic/canna/*.cld
+    rm -f /var/lib/canna/dic/canna/*.cbd
+    rm -f /var/lib/canna/dic/canna/dics.dir
+    rm -f /etc/canna/dics.dir.d/00canna.dics.dir
+    rm -rf /etc/canna/dics.dir.d
+    #rm -rf /etc/canna
+    ;;
+    
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    ;;
+    
+    *)
+    ;;
+esac
+
+#DEBHELPER#
