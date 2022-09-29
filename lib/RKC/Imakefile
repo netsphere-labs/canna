@@ -14,6 +14,9 @@
 #define DoNormalLib NO
 #endif
 
+AR = ar cq
+MODAR = ar cq
+
         CANNAROOT = ../..
              OPTS =
          LINTLIBS = ../RK/llib-lRK.ln

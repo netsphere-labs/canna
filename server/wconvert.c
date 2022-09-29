@@ -1162,7 +1162,7 @@ ClientPtr *clientp ;
                                sizeof(local_buffer) / sizeof(Ushort), &bufp);
 	  RkwGoTo(cxnum, bunsetu);
 	} else {
-	    PrintMsg("%s RkwStoreYomi faild\n",
+	    PrintMsg("%s RkwStoreYomi failed\n",
 		    irwerrhdr(client, wStoreYomi));
 	    stat = -1 ;
 	}

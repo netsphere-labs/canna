@@ -3,7 +3,7 @@
 
   CANNAROOT = ../../../..
   INCLUDES  = -I$(CANNAROOT)/include
-  JLATEXCMD = latex
+  JLATEXCMD = platex --kanji=euc
   DVI2PSCMD = dvi2ps
   DVIPDFMX  = dvipdfmx
 

@@ -1,3 +1,4 @@
+﻿.\" -*- coding:utf-8-with-signature -*-
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
 .\" Permission to use, copy, modify, distribute and sell this software
@@ -21,9 +22,9 @@
 .\"
 .\" $Id: RkBgnBun.jmn,v 1.1.1.1 2002/10/19 08:27:44 aida_s Exp $ NEC;
 .TH RKBGNBUN 3 "4 April 1991"
-.SH "̾��"
-RkBgnBun / RkwBgnBun \- ���ꤷ��Ĺ�����ɤߤδ����Ѵ�
-.SH "����"
+.SH "名前"
+RkBgnBun / RkwBgnBun \- 指定した長さの読みの漢字変換
+.SH "形式"
 .nf
 .B #include <canna/RK.h>
 .B int RkBgnBun(cxnum, yomi, maxyomi, mode)
@@ -37,64 +38,64 @@ RkBgnBun / RkwBgnBun \- ���ꤷ��Ĺ�����ɤߤδ����Ѵ�
 .B int maxyomi;
 .B int mode;
 .fi
-.SH "����"
+.SH "説明"
 .I RkBgnBun
-�ϡ�Ĺ��
+は，長さ
 .I maxyomi
-�Х��Ȥ��ɤߤ���
+バイトの読みがな
 .I yomi
-��������Ѵ����ޤ���
-�ɤߤ��ʤϡ� EUC �����ɤ�ʸ�������˽���ʤ���Фʤ�ޤ���
-����ƥ����Ȥ��Ѵ��⡼�ɤ����ꡤ������ʸ�ᡤ�����ȸ���Ȥ�� 0 ��
-���ꤵ��ޤ���
+を漢字に変換します．
+読みがなは， EUC コードの文字境界に従わなければなりません．
+コンテクストは変換モードに入り，カレント文節，カレント候補ともに 0 に
+設定されます．
 .PP
 .I RkwBgnBun
-��, 
+は, 
 .I yomi
-��
+が
 .I wchar_t
-����Ϳ����������
+型で与えられる点が
 .I RkBgnBun
-�Ȱۤʤ�ޤ�. �ޤ�
+と異なります. また
 .I maxyomi
-��, �Х���Ĺ�ǤϤʤ�ʸ��Ĺ��ɽ���褦�ˤʤ�ޤ�.
+は, バイト長ではなく文字長を表すようになります.
 .PP
 .I mode
-�ϡ���ʸ����ɲä���륳�����Ѵ������ӥåȥե�����ɤ�ɽ�����ޤ���
-�ӥåȥե�����ɤ����� RK_XFERBITS �ǡ����Τ����줫����ꤹ�뤳�Ȥ��Ǥ��ޤ���
+は，各文節に追加されるコード変換候補をビットフィールドで表現します．
+ビットフィールドの幅は RK_XFERBITS で，次のいずれかを指定することができます．
 .RS
 .IP RK_XFER 10
-�Ҥ餬��
+ひらがな
 .IP RK_HFER 10
-Ⱦ��ʸ��
+半角文字
 .IP RK_KFER 10
-��������
+カタカナ
 .IP RK_ZFER 10
-����ʸ��
+全角文字
 .RE
 .PP
-������ʸ��θ������N�Ȥ�����硤�ǲ��̤Υӥåȥե�����ɤ�����֤� 
-N��N+1���� ���ܤθ�����ɤߤ��ʤ��饳�����Ѵ��ˤ�������ɲä��ޤ���
-�ʤ����б�����ӥåȥե�����ɤ� 0 �ˤʤä���ǡ������ɲäϽ�λ���ޤ���
+カレント文節の候補数をNとした場合，最下位のビットフィールドから順番に 
+N，N+1，… 番目の候補を読みがなからコード変換により候補を追加します．
+なお，対応するビットフィールドが 0 になった所で，候補追加は終了します．
 .PP
-�ʲ�����򼨤��ޤ�
+以下に例を示します
 .RS
 .nf
-mode                               ����
-RK_XFER                            ��̾�� ���ʤ�
-(RK_XFER << RK_XFERBITS) | RK_KFER ��̾�� ���ʥ� ���ʤ�
-(RK_KFER << RK_XFERBITS) | RK_XFER ��̾�� ���ʤ� ���ʥ�
+mode                               候補
+RK_XFER                            仮名を かなを
+(RK_XFER << RK_XFERBITS) | RK_KFER 仮名を カナヲ かなを
+(RK_KFER << RK_XFERBITS) | RK_XFER 仮名を かなを カナヲ
 .fi
 .RE
 .PP
-����ƥ����Ȥϡ�
+コンテクストは，
 .I RkBgnBun
-����
+から
 .IR RkEndBun(3)
-�˻��ޤǡ��Ѵ��⡼�ɤ�����ޤ����Ѵ��⡼�ɤϥͥ��Ȥ��뤳�ȤϤǤ��ޤ���
-.SH "�����"
-�Ѵ�������줿ʸ��θĿ��򼨤��ޤ���
-�Ѵ��˼��Ԥ������ˤ� -1 ���֤��ޤ���
-.SH "��Ϣ����"
+に至るまで，変換モードに入ります．変換モードはネストすることはできません．
+.SH "戻り値"
+変換で得られた文節の個数を示します．
+変換に失敗した場合には \-1 を返します．
+.SH "関連情報"
 RkEndBun(3)
 .\".if t .pn 575

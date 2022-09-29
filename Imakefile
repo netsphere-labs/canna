@@ -90,6 +90,7 @@ cannaconf.h: Canna.conf
 	 echo "#define CANNALIBDIR \"$(cannaLibDir)\""; \
 	 echo "#define CANNASHAREDIR \"$(cannaShareDir)\""; \
 	 echo "#define SUPPORT_OLD_WCHAR $(supportOldWchar)"; \
+	 echo "#define CANNASHAREDIR \"$(cannaShareDir)\""; \
 	 echo "/* for scripts */";\
 	 echo "#define CANNABINDIR $(cannaBinDir)"; \
 	 echo "/* others */";\

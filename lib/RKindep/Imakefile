@@ -4,6 +4,9 @@ CANNAROOT = ../..
 DEFINES = 
 INCLUDES = -I$(CANNAROOT)/include
 
+AR = ar cq
+MODAR = ar cq
+
 OBJS = cfuncs.o basename.o cksum.o file.o strops.o
 SRCS = cfuncs.c basename.c cksum.c file.c strops.c
 HEADER = cfuncs.h file.h cksum.h ecfuncs.h strops.h

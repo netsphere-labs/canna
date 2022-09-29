@@ -31,6 +31,7 @@ static char rcsid[]="@(#) 102.1 $Id: crxdic.c,v 1.11.2.2 2003/12/27 17:15:21 aid
 #include <time.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <assert.h>
 #include "canna/ccompat.h"
 #include "RKindep/file.h"
@@ -925,6 +926,9 @@ makeHeader(dic)
   unsigned		i;
   RkiCksumCalc		calc;
   unsigned		off;
+  char *source_date_epoch;
+  unsigned long long epoch;
+  char *endptr;
 
   if (RkiCksumCRCInit(&calc)
       || RkiCksumAdd(&calc, dic->Dir->buf, dic->Dir->dirsiz)) {
@@ -956,7 +960,32 @@ makeHeader(dic)
     hd.data[HD_CMPV].var = 0x300702L;
     hd.flag[HD_CMPV] = -1;
   }
-  hd.data[HD_TIME].var = tloc = time(0);
+  source_date_epoch = getenv("SOURCE_DATE_EPOCH");
+  if (source_date_epoch) {
+    errno = 0;
+    epoch = strtoull(source_date_epoch, &endptr, 10);
+    if ((errno == ERANGE && (epoch == ULLONG_MAX || epoch == 0))
+                    || (errno != 0 && epoch == 0)) {
+            fprintf(stderr, "Environment variable $SOURCE_DATE_EPOCH: strtoull: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+    }
+    if (endptr == source_date_epoch) {
+            fprintf(stderr, "Environment variable $SOURCE_DATE_EPOCH: No digits were found: %s\n", endptr);
+            exit(EXIT_FAILURE);
+    }
+    if (*endptr != '\0') {
+            fprintf(stderr, "Environment variable $SOURCE_DATE_EPOCH: Trailing garbage: %s\n", endptr);
+            exit(EXIT_FAILURE);
+    }
+    if (epoch > ULONG_MAX) {
+            fprintf(stderr, "Environment variable $SOURCE_DATE_EPOCH: value must be smaller than or equal to %lu but was found to be: %llu \n", ULONG_MAX, epoch);
+            exit(EXIT_FAILURE);
+    }
+    tloc = epoch;
+  } else {
+    tloc = time(0);
+  }
+  hd.data[HD_TIME].var = tloc;
   hd.flag[HD_TIME] = -1;
   hd.data[HD_DMNM].ptr = (unsigned char *)STrdup(dic->name);
   hd.flag[HD_DMNM] = strlen(dic->name);
@@ -1221,7 +1250,7 @@ main (argc, argv)
     if (!(dic->gramdata = RkiReadWholeFile(fp, &dic->gramsz)))
       goto gram_err;
     fclose(fp);
-    if ((fd = open(gfile, 0)) < 0 || !(gram = RkReadGram(fd, dic->gramsz)))
+    if ((fd = open(gfile, O_RDONLY)) < 0 || !(gram = RkReadGram(fd, dic->gramsz)))
       goto gram_err;
     close(fd);
     goto gram_ok;

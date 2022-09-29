@@ -1,3 +1,4 @@
+﻿.\" -*- coding:utf-8-with-signature -*-
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
 .\" Permission to use, copy, modify, distribute and sell this software
@@ -21,25 +22,25 @@
 .\"
 .\" $Id: RkUnmoun.jmn,v 1.1.1.1 2002/10/19 08:27:45 aida_s Exp $ NEC;
 .TH RKUNMOUNTDIC 3 "4 April 1991"
-.SH "̾��"
-RkUnmountDic \- ����ꥹ�Ȥ���μ���κ��
-.SH "����"
+.SH "名前"
+RkUnmountDic \- 辞書リストからの辞書の削除
+.SH "形式"
 .nf
 .B #include <canna/RK.h>
 .B int RkUnmountDic(cxnum, dicname)
 .B int cxnum;
 .B char *dicname;
 .fi
-.SH "����"
+.SH "説明"
 .I RkUnmountDic
-�ϡ�����ꥹ�Ȥ���
+は，辞書リストから
 .I dicname
-�˻��ꤵ�줿�����������ޤ���
-������줿����ϡ�����Τ��ʴ����Ѵ����鸡������ޤ���
+に指定された辞書を取り除きます．
+削除された辞書は，次回のかな漢字変換から検索されません．
 .PP
-����Ϥ��Ǥ˥ޥ���Ȥ��줿��ΤǤʤ���Фʤ�ޤ���
-.SH "�����"
-������������ 0 �����Ԥ������ˤ� -1 ���֤��ޤ���
-.SH "��Ϣ����"
+辞書はすでにマウントされたものでなければなりません．
+.SH "戻り値"
+成功した場合は 0 ，失敗した場合には \-1 を返します．
+.SH "関連情報"
 RkMountDic(3)
 .\".if t .pn 575

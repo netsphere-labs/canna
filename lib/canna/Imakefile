@@ -10,6 +10,9 @@
 # define RkcName RKC
 #endif
 
+AR = ar cq
+MODAR = ar cq
+
          CANNAROOT = ../..
           SOLIBREV = 1
 

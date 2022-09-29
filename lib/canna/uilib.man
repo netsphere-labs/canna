@@ -23,7 +23,7 @@
 .if t .pn 575
 .TH UILIBINTRO 3
 .SH "NAME"
-UILib intro \(em User interface library intro
+UILib_intro \(em User interface library intro
 .SH "DESCRIPTION"
 .PP
 User interface libraries are responding to one-chracter 
@@ -592,7 +592,7 @@ map, rather than character strings.  In this case, return of numeric
 data as mode information helps you execute the process.  Specify
 KC_SETMODEINFOSTYLE in \fIjrKanjiControl\fP, and pass 1 to \fIarg\fP.
 After this, one character representing the mode code (numeric) plus
-'@' (0x40) returns to the jrKanjiStatus structure's \fImode\fP member.
+\'@' (0x40) returns to the jrKanjiStatus structure's \fImode\fP member.
 To convert the value into the mode code, subtract '@' (0x40) from the
 returned character string.  For the mode codes, see the mode change
 description of Item (2) KC_CHANGEMODE.
@@ -809,7 +809,7 @@ data input:
 	    int length;		        /* length of echo string */
 	    int revPos;                 /* reverse position  */
 	    int revLen;                 /* reverse length    */
-	    unsigned long info;		/* other informations */
+	    unsigned long info;		/* other information */
 	    unsigned char *mode;	/* mode information */
 	    struct {
 		unsigned char *line;	/* a grance of Kanji characters */
@@ -1182,7 +1182,7 @@ map, rather than character strings.  In this case, return of numeric
 data as mode information helps you execute the process.  Specify
 KC_SETMODEINFOSTYLE in \fIXKanjiControl\fP, and pass 1 to \fIarg\fP.
 After this, one character representing the mode code (numeric) plus
-'@' (0x40) returns to the XKanjiStatus structure's \fImode\fP member.
+\'@' (0x40) returns to the XKanjiStatus structure's \fImode\fP member.
 To convert the value into the mode code, subtract '@' (0x40) from the
 returned character string.  For the mode codes, see the mode change
 description of Item (2) KC_CHANGEMODE.

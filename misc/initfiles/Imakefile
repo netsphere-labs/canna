@@ -6,7 +6,7 @@
 #endif
 
             CANNAROOT = ../..
-            SAMPLEDIR = $(cannaLibDir)/sample
+            SAMPLEDIR = $(cannaShareDir)
 
 all::
 

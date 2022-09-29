@@ -8,6 +8,9 @@
           DEBUGFLAGS = -DDebug
 #endif
 
+AR = ar cq
+MODAR = ar cq
+
              OBJS = tempdic.o permdic.o dicsw.o ngram.o \
 			bun.o context.o nword.o ncache.o \
 			dic.o util.o kana.o \

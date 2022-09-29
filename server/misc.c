@@ -311,7 +311,7 @@ BecomeDaemon ()
 
 #ifndef __EMX__
     if ((parent = fork()) == -1) {
-	PrintMsg( "Fork faild\n" );
+	PrintMsg( "Fork failed\n" );
 	exit( 1 ) ;
     }
     if ( parent ) {
@@ -983,11 +983,11 @@ DetachTTY()
       sprintf(errfile,"%s/%s%d%s", ERRDIR, ERRFILE, PortNumberPlus, ERRFILE2);
 
       if((errfd = open(errfile, O_CREAT | O_RDWR | O_TRUNC, 0644)) < 0) {
-	(void)fprintf(stderr, "Warning: %s: %s open faild\n", Name, errfile);
+	(void)fprintf(stderr, "Warning: %s: %s open failed\n", Name, errfile);
 	(void)perror("");
       } else {
 	if(dup2( errfd, fileno(stderr)) < 0) {
-	  (void)fprintf(stderr, "Warning: %s: %s dup2 faild\n", Name, errfile);
+	  (void)fprintf(stderr, "Warning: %s: %s dup2 failed\n", Name, errfile);
 	  (void)perror("");
 	  close(fileno(stderr));
 	}

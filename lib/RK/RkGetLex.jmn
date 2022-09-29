@@ -1,3 +1,4 @@
+﻿.\" -*- coding:utf-8-with-signature -*-
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
 .\" Permission to use, copy, modify, distribute and sell this software
@@ -21,9 +22,9 @@
 .\"
 .\" $Id: RkGetLex.jmn,v 1.1.1.1 2002/10/19 08:27:44 aida_s Exp $ NEC;
 .TH RKGETLEX 3 "19 April 1991"
-.SH "̾��"
-RkGetLex \- �����ȸ����������ñ����η����Ǿ���μ�����
-.SH "����"
+.SH "名前"
+RkGetLex \- カレント候補を構成する単語毎の形態素情報の取りだし
+.SH "形式"
 .nf
 .B #include <canna/RK.h>
 .B int RkGetLex(cxnum, lex, maxlex)
@@ -31,25 +32,25 @@ RkGetLex \- �����ȸ����������ñ����η����Ǿ���μ�����
 .B RkLex *lex;
 .B int maxlex;
 .fi
-.SH "����"
+.SH "説明"
 .I RkGetLex
-�ϡ������ȸ����������ñ����η����Ǿ������ޤ���
-�����ȸ����������ñ��η����Ǿ���򺸤�����֤�����
+は，カレント候補を構成する単語毎の形態素情報を求めます．
+カレント候補を構成する単語の形態素情報を左から順番に配列
 .I lex
-�˳�Ǽ���ޤ���ñ�����
+に格納します．単語数が
 .I maxlex
-��Ķ������ˤϡ�����ñ������ڤ�ΤƤ��ޤ���
+を超える場合には，右の単語情報が切り捨てられます．
 .PP
-��¤�� lex �γƥե�����ɤˤϡ��ʲ��Τ褦�ʾ������ꤵ��ޤ���
+構造体 lex の各フィールドには，以下のような情報が設定されます．
 .sp
 .nf
-  ylen    ñ����ɤߤΥХ��ȿ�
-  klen    ñ��δ����ΥХ��ȿ�
-  rownum  ñ��ι��ֹ�
-  coldnum ñ������ֹ�
-  dicnum  ̤����
+  ylen    単語の読みのバイト数
+  klen    単語の漢字のバイト数
+  rownum  単語の行番号
+  coldnum 単語の列番号
+  dicnum  未使用
 .fi
-.SH "�����"
-�Ѵ��⡼�ɤǤʤ�����ƥ����ȤǼ¹Ԥ��줿���ˤϲ��⤻���� -1 ��
-�֤��ޤ���
+.SH "戻り値"
+変換モードでないコンテクストで実行された場合には何もせずに \-1 を
+返します．
 .\".if t .pn 575

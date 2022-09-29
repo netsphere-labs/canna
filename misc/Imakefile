@@ -48,7 +48,7 @@ DependSubdirs($(SUBDIRS))
 MakeLintLibSubdirs($(SUBDIRS))
 MakeLintSubdirs($(SUBDIRS),install.ln,install.ln)
 
-MakeDirectories(install,$(cannaLibDir)/sample/src)
+MakeDirectories(install,$(cannaDocDir)/sample/src)
 
 #ifdef USE_OBSOLETE_STYLE_FILENAME
 default.canna: default.ca
@@ -58,8 +58,8 @@ default.canna: default.ca
 	$(CP) default.ca default.canna
 #endif
 
-InstallNonExec(default.canna,$(cannaLibDir))
-InstallNonExec(is.c,$(cannaLibDir)/sample/src)
+InstallNonExec(default.canna,$(cannaDocDir))
+InstallNonExec(is.c,$(cannaDocDir)/sample/src)
 
 clean::
 	$(RM) $(PROGRAMS)

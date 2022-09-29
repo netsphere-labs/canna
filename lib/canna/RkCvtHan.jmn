@@ -1,3 +1,4 @@
+﻿.\" -*- coding:utf-8-with-signature -*-
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
 .\" Permission to use, copy, modify, distribute and sell this software
@@ -21,9 +22,9 @@
 .\"
 .\" $Id: RkCvtHan.jmn,v 1.1.1.1 2002/10/19 08:27:47 aida_s Exp $ NEC;
 .TH RKCVTHAN 3 "4 April 1991"
-.SH "̾��"
-RkCvtHan / RkwCvtHan \- ���ѵ��桤�ѿ������Ҥ餬�ʡ��������ʤ�Ⱦ��ʸ�����Ѵ�����
-.SH "����"
+.SH "名前"
+RkCvtHan / RkwCvtHan \- 全角記号，英数字，ひらがな，カタカナを半角文字に変換する
+.SH "形式"
 .nf
 .B #include <canna/RK.h>
 .B int RkCvtHan(dst, maxdst, src, srclen)
@@ -37,42 +38,42 @@ RkCvtHan / RkwCvtHan \- ���ѵ��桤�ѿ������Ҥ餬�ʡ��������ʤ�Ⱦ��ʸ�����Ѵ�����
 .B wchar_t *src;
 .B int srclen;
 .fi
-.SH "����"
+.SH "説明"
 .I RkCvtHan
-�ϡ��ΰ�
+は，領域
 .I src
-���鳫�Ϥ���
+から開始する
 .I srclen
-�Х��Ȥ����ѵ��桤�ѿ������Ҥ餬�ʡ��������ʥǡ�����Ⱦ��ʸ�����Ѵ����ޤ��� 
+バイトの全角記号，英数字，ひらがな，カタカナデータを半角文字に変換します． 
 .I src
-��Υ̥�ʸ����ʸ����ν����Ȥϲ�ᤵ��ޤ����Ѵ����줿��̤��ΰ�
+中のヌル文字は文字列の終わりとは解釈されません．変換された結果は領域
 .I dst
-�˳�Ǽ���졤�Ѵ��оݤȤʤ�ʤ�ʸ���Ϥ��Τޤޥ��ԡ�����ޤ���
-�Ѵ����줿�����ɤΥХ��ȿ���
+に格納され，変換対象とならない文字はそのままコピーされます．
+変換されたコードのバイト数が
 .I maxdst
--1 ��Ķ������ˤϡ�
-EUC �����ɤ�ʸ�������˹�碌���ڤ�ΤƤ��ޤ��� �����
+\-1 を超える場合には，
+EUC コードの文字境界に合わせて切り捨てられます． さらに
 .I dst
-�κǸ�ˤϲ�ǽ�ʤ�Х̥�ʸ�����դ��ä����ޤ���
-�����ɤ�ɽ����
+の最後には可能ならばヌル文字が付け加えられます．
+コードの表現は
 .I src
-��
+，
 .I dst
-�Ȥ� EUC �����ɤ��Ѥ����ޤ���
+とも EUC コードが用いられます．
 .PP
 .I RkwCvtHan
-�Ǥ�
+では
 .I RkCvtHan
-�ΰ�����
+の引数が
 .I wchar_t
-�ˤʤäƤ��ޤ�. ������Ĺ����ɽ����ΤϥХ���Ĺ�ǤϤʤ�ʸ��Ĺ��ɽ���ޤ�.
+になっています. 引数で長さを表すものはバイト長ではなく文字長を表します.
 .PP .I dst
-�ˤ� NULL ��Ϳ���뤳�Ȥ��Ǥ��ޤ��� ���ξ�硤�Ѵ����줿�����ɤ�
-���٤�̵�뤵��ޤ���
-.SH "�����"
-�Ѵ����줿�����ɤΥХ��ȿ�(�ޤ���
+には NULL を与えることができます． この場合，変換されたコードは
+すべて無視されます．
+.SH "戻り値"
+変換されたコードのバイト数(または
 .I RkwCvtHan
-�ξ���ʸ��Ĺ)���֤��ޤ��� 
+の場合は文字長)を返します． 
 .I maxdst
-�������ʾ��ˤ� 0 ���֤��ޤ���
+が不正な場合には 0 を返します．
 .\".if t .pn 575

@@ -104,27 +104,10 @@
 /* #define ObsoleteInstallDir */
 
 /* 以下デフォルト値、変更不要 */
-#ifdef InstallAsUser
-# define DefCannaPrefix $(HOME)/canna
-# define DefErrDir $(cannaPrefix)/log
-# define DefLibCannaDir $(cannaExecPrefix)/lib
-#else 
-# define DefCannaPrefix /usr/local/canna
-# ifdef ObsoleteInstallDir
-#  define DefErrDir /usr/spool/canna
-#  define DefLibCannaDir /usr/lib
-# else
-#  define DefErrDir /var/log
-#  define DefLibCannaDir $(cannaExecPrefix)/lib
-# endif
-#endif
-#ifdef ObsoleteInstallDir
-# define DefCannaSrvDir $(cannaExecPrefix)/bin
-# define DefCannaLibDir $(cannaPrefix)/lib
-#else
-# define DefCannaSrvDir $(cannaExecPrefix)/sbin
-# define DefCannaLibDir $(cannaPrefix)/share/canna
-#endif
+#define DefCannaLibDir /etc/canna
+#define DefCannaPrefix /usr/
+#define DefErrDir /var/log/canna
+#define DefLibCannaDir $(cannaExecPrefix)/lib
 
 #if defined(LinuxArchitecture) || defined(FreeBSDArchitecture) \
     || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
@@ -148,7 +131,8 @@ XCOMM cannaLibDir = /var/lib/canna
 XCOMM cannaLibDir = /var/db/canna
 cannaLibDir = DefCannaLibDir
 XCOMM cannaManDir = $(cannaPrefix)/share/man
-cannaManDir = $(cannaPrefix)/man
+cannaShareDir = $(cannaPrefix)/share/canna
+cannaManDir = $(cannaShareDir)/man
 cannaIncDir = $(cannaPrefix)/include/canna
 
 libCannaDir = DefLibCannaDir
@@ -237,7 +221,7 @@ cannaLight = 1
 /* #define UseInstalledLibCanna YES */
 #define UseInstalledLibCanna NO
 
-DicDir   = $(cannaLibDir)/dic
+DicDir   = /var/lib/canna/dic
 
 /* ここから下は変更不要です */
 

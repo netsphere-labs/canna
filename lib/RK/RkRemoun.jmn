@@ -1,3 +1,4 @@
+﻿.\" -*- coding:utf-8-with-signature -*-
 .\" Copyright 1994 NEC Corporation, Tokyo, Japan.
 .\"
 .\" Permission to use, copy, modify, distribute and sell this software
@@ -21,9 +22,9 @@
 .\"
 .\" $Id: RkRemoun.jmn,v 1.1.1.1 2002/10/19 08:27:45 aida_s Exp $ NEC;
 .TH RKREMOUNTDIC 3 "4 April 1991"
-.SH "̾��"
-RkRemountDic \- ���˼���ꥹ�Ȥˤ��뼭���ͥ���٤��ѹ�
-.SH "����"
+.SH "名前"
+RkRemountDic \- 既に辞書リストにある辞書の優先度の変更
+.SH "形式"
 .nf
 .B #include <canna/RK.h>
 .B int RkRemountDic(cxnum, dicname, pos)
@@ -31,14 +32,14 @@ RkRemountDic \- ���˼���ꥹ�Ȥˤ��뼭���ͥ���٤��ѹ�
 .B char *dicname;
 .B int pos;
 .fi
-.SH "����"
+.SH "説明"
 .I RkRemountDic
-�ϡ����˼���ꥹ�Ȥˤ��뼭���ͥ���٤��ѹ����ޤ��� 
+は，既に辞書リストにある辞書の優先度を変更します． 
 .I pos
-�� 0 �ξ��ˤϡ�����ꥹ�ȤκǸ�ˡ�����ʳ��Ǥ���Ƭ�˰�ư���ޤ���
-����Ϥ��Ǥ˥ޥ���Ȥ��줿��ΤǤʤ���Фʤ�ޤ���
-.SH "�����"
-������������ 0 �����Ԥ������ˤ� -1 ���֤��ޤ���
-.SH "��Ϣ����"
+が 0 の場合には，辞書リストの最後に，それ以外では先頭に移動します．
+辞書はすでにマウントされたものでなければなりません．
+.SH "戻り値"
+成功した場合は 0 ，失敗した場合には \-1 を返します．
+.SH "関連情報"
 RkMountDic(3)
 .\".if t .pn 575
