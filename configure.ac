@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.71])
 
 # [FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS]
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
@@ -18,9 +18,10 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_CC_STDC
+# AC_PROG_CC_STDC is obsolete; use AC_PROG_CC
+AC_PROG_CC
 AM_PROG_AR
-# AM_PROG_LIBTOOL is deprecated.
+# AC_PROG_LIBTOOL and AM_PROG_LIBTOOL are deprecated.
 LT_INIT
 AC_PROG_LN_S
 
@@ -28,14 +29,15 @@ AC_PROG_LN_S
 # Checks for libraries.
 
 # Checks for header files.
-AC_HEADER_STDC
+# The preprocessor macro `STDC_HEADERS' is obsolete.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h locale.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+
 AC_STRUCT_TM
 AC_TYPE_INT16_T
 AC_TYPE_INT32_T
@@ -86,20 +88,20 @@ dnl setup various package/compilation settings
 dnl ----------------------------------------------------------------------------
 
 # <kbd>autoheader</kbd> uses `AH_TEMPLATE` to generate `config.h.in`. In older releases, <kbd>autoheader</kbd> copied from `acconfig.h`.
-AH_TEMPLATE(PACKAGE_LOCALSTATE_DIR, [Package localstate directory.])
+AH_TEMPLATE(LOCALSTATE_DIR, [The localstate directory.])
 # $ac_default_prefix=/usr/local; $prefix=NONE; $localstatedir='${prefix}/var'
 #  => 単に $prefix を使えない. うーむ.
 if test "x${localstatedir}" = 'x${prefix}/var'; then
   if test "x${prefix}" = "xNONE"; then
-    PACKAGE_LOCALSTATE_DIR="${ac_default_prefix}/var"
+    LOCALSTATE_DIR="${ac_default_prefix}/var"
   else
-    PACKAGE_LOCALSTATE_DIR="${prefix}/var"
+    LOCALSTATE_DIR="${prefix}/var"
   fi
 else
-  PACKAGE_LOCALSTATE_DIR="${localstatedir}"
+  LOCALSTATE_DIR="${localstatedir}"
 fi
 # `config.h` に値を埋め込むには, `AC_DEFINE()`.
-AC_DEFINE_UNQUOTED(PACKAGE_LOCALSTATE_DIR, "${PACKAGE_LOCALSTATE_DIR}")
+AC_DEFINE_UNQUOTED(LOCALSTATE_DIR, "${LOCALSTATE_DIR}")
 
 dnl Set PACKAGE_SYSCONF_DIR in config.h.
 AH_TEMPLATE(PACKAGE_SYSCONF_DIR, [Configuration directory of the package.])
@@ -107,14 +109,27 @@ AH_TEMPLATE(PACKAGE_SYSCONF_DIR, [Configuration directory of the package.])
 #   => 実際に保存するのは /etc/canna 以下.
 if test "x${sysconfdir}" = 'x${prefix}/etc'; then
   if test "x${prefix}" = "xNONE"; then
-    PACKAGE_SYSCONF_DIR="${ac_default_prefix}/etc"
+    AC_DEFINE_UNQUOTED(PACKAGE_SYSCONF_DIR, "${ac_default_prefix}/etc/${PACKAGE}")
   else
-    PACKAGE_SYSCONF_DIR="${prefix}/etc"
+    AC_DEFINE_UNQUOTED(PACKAGE_SYSCONF_DIR, "${prefix}/etc/${PACKAGE}")
   fi
 else
-  PACKAGE_SYSCONF_DIR="${sysconfdir}"
+  AC_DEFINE_UNQUOTED(PACKAGE_SYSCONF_DIR, "${sysconfdir}/${PACKAGE}")
 fi
-AC_DEFINE_UNQUOTED(PACKAGE_SYSCONF_DIR, "${PACKAGE_SYSCONF_DIR}")
+
+dnl Set PACKAGE_DATA_DIR in config.h.
+dnl Makefile.am ファイルで次のようにしてもよいが, 定義を1ヶ所に集める.
+dnl     AM_CFLAGS = ... -DPKGDATADIR='"$(pkgdatadir)"'
+AH_TEMPLATE(PACKAGE_DATA_DIR, [Data directory of the package.])
+if test "x${datadir}" = 'x${prefix}/share'; then
+  if test "x${prefix}" = "xNONE"; then
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${ac_default_prefix}/share/${PACKAGE}")
+  else
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}")
+  fi
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
+fi
 
 
 AC_CONFIG_FILES([

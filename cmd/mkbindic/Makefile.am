@@ -1,7 +1,7 @@
 
 AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib
 
-bin_PROGRAMS = mkbindic
+bin_PROGRAMS = mkbindic$(EXEEXT)
 
-mkbindic: mkbindic.cpp
+mkbindic$(EXEEXT): mkbindic.cpp
 	$(CPP) $< -o $@ -I../..

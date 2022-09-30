@@ -1,8 +1,8 @@
 
 AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib
 
-bin_PROGRAMS = mkromdic
+bin_PROGRAMS = mkromdic$(EXEEXT)
 
-mkromdic: mkromdic.cpp
+mkromdic$(EXEEXT): mkromdic.cpp
 	$(CPP) $< -o $@ -I../..
 

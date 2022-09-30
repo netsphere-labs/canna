@@ -71,7 +71,7 @@ typedef unsigned char BYTE;
  */
 #ifndef CANNALIBDIR
 // 出来上がり = /var/lib/canna/dic/canna/keishiki.ctd
-#define CANNALIBDIR PACKAGE_LOCALSTATE_DIR "/canna"
+#define CANNALIBDIR   LOCALSTATE_DIR "/lib/canna"
 #endif
 
 /* flags の情報 */

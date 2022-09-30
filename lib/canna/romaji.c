@@ -434,7 +434,7 @@ OpenRoma(const char* table)
 	  strcpy(rdic, uinfo->topdir);
         }
         else {
-          strcpy(rdic, PKGDATADIR);
+            strcpy(rdic, PACKAGE_DATA_DIR);
         }
 	strcat(rdic, "/");
 	strcat(rdic, table);

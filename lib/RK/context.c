@@ -59,13 +59,8 @@ static struct RkContext	*CX;
 #include <fcntl.h>      /* mmap */
 int fd_dic = -1;        /* mmap */
 
-#ifdef WINDOWS_STYLE_FILENAME
-#define DEFAULTGRAMDIC "/canna/fuzokugo.cbd"
-#endif
+#define DEFAULTGRAMDIC "/fuzokugo.cbd"
 
-#ifndef DEFAULTGRAMDIC
-#define DEFAULTGRAMDIC "/canna/fuzokugo.d"
-#endif
 
 // @return -1 Failed.
 static int

@@ -71,7 +71,7 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 
 #ifndef CANNAHOSTFILE
 // See man cannacheck
-#define CANNAHOSTFILE   PACKAGE_SYSCONF_DIR "/canna/cannahost"
+#define CANNAHOSTFILE   PACKAGE_SYSCONF_DIR "/cannahost"
 #endif
 
 #define ReqType0    0

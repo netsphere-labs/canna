@@ -1,5 +1,5 @@
 
-AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -DPKGDATADIR='"$(pkgdatadir)"'
+AM_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib 
 
 lib_LTLIBRARIES = libcanna16.la
 

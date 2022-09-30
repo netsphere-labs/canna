@@ -47,12 +47,11 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #include <sys/ioctl.h>
 
 #ifndef DICHOME
-#define DICHOME  PACKAGE_LOCALSTATE_DIR "/canna/dic"
+  #define DICHOME  LOCALSTATE_DIR "/lib/canna/dic"
 #endif
 
-// TODO: これはアカン. 設定可能にすること.
 #ifndef ERRDIR
-#define ERRDIR      "/var/spool/canna"
+  #define ERRDIR   LOCALSTATE_DIR "/spool/canna"
 #endif
 
 #define ERRFILE     "CANNA"

@@ -1794,8 +1794,8 @@ char **argv ;
 	 Progname = p + 1 ;
      }
 #endif
-    strcpy(init, PACKAGE_LOCALSTATE_DIR "/canna/dic");  /* サーバ方式では無意味 */
-     for ( i = 0; i < NCOMMANDS ; i++) {
+    strcpy(init, LOCALSTATE_DIR "/lib/canna/dic");  /* サーバ方式では無意味 */
+    for ( i = 0; i < NCOMMANDS ; i++) {
 	 if (strcmp(Progname,commands[i].name) == 0) {
 	     cmd_code = commands[i].cmd_code ;
 	     (*commands[i].func)(argc,argv);

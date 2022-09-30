@@ -72,7 +72,7 @@ typedef cannawc Wchar; // For compatibility
 #include "canna/ccompat.h"
 
 #if !defined( HYOUJUN_GRAM )
-  #define HYOUJUN_GRAM PACKAGE_LOCALSTATE_DIR "/canna/dic/fuzokugo.cbd"
+  #define HYOUJUN_GRAM   LOCALSTATE_DIR "/lib/canna/dic/fuzokugo.cbd"
 #endif
 
 #include <unistd.h>

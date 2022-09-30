@@ -1,6 +1,6 @@
 
 # default localstatedir = ${prefix}/var
-dicdir = ${localstatedir}/canna/dic
+dicdir = ${localstatedir}/lib/canna/dic
 dist_dic_DATA = fuzokugo.cbd
 
 SORT = sort
