@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: lisp.h,v 1.3 2003/09/17 10:15:09 aida_s Exp $ */
@@ -106,7 +106,6 @@ typedef POINTERINT	pointerint;
 #define xstring(x) (((struct stringcell *)(celltop + celloffset(x)))->str)
 #define xstrlen(x) (((struct stringcell *)(celltop + celloffset(x)))->length)
 
-#define argnchk(fn,x)	if (n != x) argnerr(fn)
 
 /* data type definitions */
 
@@ -120,8 +119,10 @@ struct atomcell {
   list	value;
   char	*pname;
   int	ftype;
-  list 	(*func)();
-  list  (*valfunc)();
+    // ftype = EXPR または MACRO の場合, list 型の値.
+    // ftype = SPECIAL or CMACRO の場合, func().
+    list  (*func)(int);
+    list  (*valfunc)(int, list);
   int	mid;
   int	fid;
   list	hlink;
@@ -137,22 +138,24 @@ struct gccell {
 };
 
 struct atomdefs {
-	char	*symname;
-	int	symtype;
-	list	(*symfunc)();
+    const char	*symname;
+    int	symtype;
+    list	(*symfunc)(int);
 };
 
+
 struct cannafndefs {
-  char *fnname;
-  int  fnid;
+    const char *fnname;
+    int  fnid;
 };
 
 struct cannamodedefs {
-  char *mdname;
-  int  mdid;
+    const char *mdname;
+    int  mdid;
 };
 
+
 struct cannavardefs {
-  char *varname;
-  list (*varfunc)();
+    const char *varname;
+    list (*varfunc)(int, list);
 };

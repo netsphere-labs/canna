@@ -466,9 +466,7 @@ char *s;
 }
 
 static int
-KC_keyconvCallback(d, arg)
-uiContext d;
-char *arg;
+KC_keyconvCallback(uiContext d, char* arg)
 /* ARGSUSED */
 {
   extern void (*keyconvCallback)();

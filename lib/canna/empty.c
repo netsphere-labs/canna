@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -29,13 +30,11 @@ static char rcs_id[] = "@(#) 102.1 $Id: empty.c,v 1.2 2003/09/17 08:50:53 aida_s
 
 extern KanjiModeRec yomi_mode, cy_mode;
 
-/* EmptySelfInsert -- ¼«Ê¬¼«¿È¤ò³ÎÄêÊ¸»úÎó¤È¤·¤ÆÊÖ¤¹´Ø¿ô¡£
- * 
+/* EmptySelfInsert -- è‡ªåˆ†è‡ªèº«ã‚’ç¢ºå®šæ–‡å­—åˆ—ã¨ã—ã¦è¿”ã™é–¢æ•°ã€‚
+ *
  */
 
-static
-inEmptySelfInsert(d)
-uiContext d;
+static int inEmptySelfInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   int res = 0;
@@ -44,37 +43,35 @@ uiContext d;
   if (!(yc->generalFlags & CANNA_YOMI_END_IF_KAKUTEI)) {
     res = d->nbytes;
   }
-  /* else { ³ÎÄê¥Ç¡¼¥¿¤À¤±¤òÂÔ¤Ã¤Æ¤¤¤ë¿Í¤Ë¤Ï³ÎÄê¥Ç¡¼¥¿¤òÅÏ¤µ¤Ê¤¤ } */
+  /* else { ç¢ºå®šãƒ‡ãƒ¼ã‚¿ã ã‘ã‚’å¾…ã£ã¦ã„ã‚‹äººã«ã¯ç¢ºå®šãƒ‡ãƒ¼ã‚¿ã‚’æ¸¡ã•ãªã„ } */
 
   return res;
 }
 
 static EmptySelfInsert pro((uiContext));
 
-static
-EmptySelfInsert(d)
-uiContext d;
+static int EmptySelfInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   int res = inEmptySelfInsert(d);
 
-/* Ã±¸ìÅÐÏ¿¤Î¤È¤­¤Ë yomi mode ¤Î³ÎÄê¥­¡¼¤¬ empty mode ¤Ç¤Ï³ÎÄê¥­¡¼¤Ç¤Ê
-   ¤«¤Ã¤¿¤ê¤¹¤ë¤È¡¢¤½¤Î¥­¡¼¤Î²¡²¼¤Ç»à¤ó¤Ç¤·¤Þ¤Ã¤¿¤ê¤¹¤ë¤Î¤ÎµßºÑ¡£yomi
-   mode ¤Î¾å¤Ë yomi mode ¤¬¾è¤Ã¤Æ¤¤¤ë¤Î¤ÏÃ±¸ìÅÐÏ¿¤Î»þ¤°¤é¤¤¤À¤í¤¦¤È¸À
-   ¤¦¤³¤È¤ÇÈ½ÃÇ¤ÎºàÎÁ¤Ë¤·¤Æ¤¤¤ë¡£ËÜÅö¤Ï¤³¤ó¤Ê¤³¤È¤ä¤ê¤¿¤¯¤Ê¤¤¡£ */
+/* å˜èªžç™»éŒ²ã®ã¨ãã« yomi mode ã®ç¢ºå®šã‚­ãƒ¼ãŒ empty mode ã§ã¯ç¢ºå®šã‚­ãƒ¼ã§ãª
+   ã‹ã£ãŸã‚Šã™ã‚‹ã¨ã€ãã®ã‚­ãƒ¼ã®æŠ¼ä¸‹ã§æ­»ã‚“ã§ã—ã¾ã£ãŸã‚Šã™ã‚‹ã®ã®æ•‘æ¸ˆã€‚yomi
+   mode ã®ä¸Šã« yomi mode ãŒä¹—ã£ã¦ã„ã‚‹ã®ã¯å˜èªžç™»éŒ²ã®æ™‚ãã‚‰ã„ã ã‚ã†ã¨è¨€
+   ã†ã“ã¨ã§åˆ¤æ–­ã®ææ–™ã«ã—ã¦ã„ã‚‹ã€‚æœ¬å½“ã¯ã“ã‚“ãªã“ã¨ã‚„ã‚ŠãŸããªã„ã€‚ */
 
   if (yc->next && yc->next->id == YOMI_CONTEXT &&
       yomi_mode.keytbl[d->buffer_return[0]] == CANNA_FN_Kakutei) {
     d->status = EXIT_CALLBACK;
     if (d->cb->func[EXIT_CALLBACK] != NO_CALLBACK) {
-      d->kanji_status_return->info &= ~KanjiThroughInfo; /* »Å»ö¤·¤¿ */
+      d->kanji_status_return->info &= ~KanjiThroughInfo; /* ä»•äº‹ã—ãŸ */
       popYomiMode(d);
     }
   }
   return res;
 }
 
-/* EmptyYomiInsert -- ¡û¥â¡¼¥É¤Ë°Ü¹Ô¤·¡¢ÆÉ¤ß¤òÆþÎÏ¤¹¤ë´Ø¿ô
+/* EmptyYomiInsert -- â—‹ãƒ¢ãƒ¼ãƒ‰ã«ç§»è¡Œã—ã€èª­ã¿ã‚’å…¥åŠ›ã™ã‚‹é–¢æ•°
  *
  */
 
@@ -89,17 +86,17 @@ uiContext d;
   d->current_mode = (yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE) ?
     &cy_mode : &yomi_mode;
   RomajiClearYomi(d);
-  return YomiInsert(d); /* ¥³¡¼¥ë¥Ð¥Ã¥¯¤Î¥Á¥§¥Ã¥¯¤Ï YomiInsert ¤Ç¤µ¤ì¤ë */
+  return YomiInsert(d); /* ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®ãƒã‚§ãƒƒã‚¯ã¯ YomiInsert ã§ã•ã‚Œã‚‹ */
 }
 
-/* EmptyQuotedInsert -- ¼¡¤Î°ì»ú¤¬¤É¤Î¤è¤¦¤ÊÊ¸»ú¤Ç¤â¥¹¥ë¡¼¤ÇÄÌ¤¹´Ø¿ô¡£
+/* EmptyQuotedInsert -- æ¬¡ã®ä¸€å­—ãŒã©ã®ã‚ˆã†ãªæ–‡å­—ã§ã‚‚ã‚¹ãƒ«ãƒ¼ã§é€šã™é–¢æ•°ã€‚
  *
  */
 
-/* 
-  Empty ¥â¡¼¥É¤Ç¤Î quotedInset ¤Ï ^Q ¤Î¤è¤¦¤ÊÊ¸»ú¤¬°ì²ó Emacs ¤Ê¤É¤ÎÊý
-  ¤ËÄÌ¤Ã¤Æ¤·¤Þ¤¨¤Ð¥Þ¥Ã¥×¤¬ÊÖ¤é¤ì¤Æ¤·¤Þ¤¦¤Î¤Ç¡¢¥«¥Ê´Á»úÊÑ´¹¤ÎÊý¤Ç²¿¤«¤ò
-  ¤¹¤ë¤Ê¤ó¤Æ¤³¤È¤ÏÉ¬Í×¤Ê¤¤¤Î¤Ç¤Ï¤Ê¤¤¤Î¤«¤Ê¤¡¡£
+/*
+  Empty ãƒ¢ãƒ¼ãƒ‰ã§ã® quotedInset ã¯ ^Q ã®ã‚ˆã†ãªæ–‡å­—ãŒä¸€å›ž Emacs ãªã©ã®æ–¹
+  ã«é€šã£ã¦ã—ã¾ãˆã°ãƒžãƒƒãƒ—ãŒè¿”ã‚‰ã‚Œã¦ã—ã¾ã†ã®ã§ã€ã‚«ãƒŠæ¼¢å­—å¤‰æ›ã®æ–¹ã§ä½•ã‹ã‚’
+  ã™ã‚‹ãªã‚“ã¦ã“ã¨ã¯å¿…è¦ãªã„ã®ã§ã¯ãªã„ã®ã‹ãªãã€‚
  */
 
 static EmptyQuotedInsert pro((uiContext));
@@ -115,8 +112,8 @@ uiContext d;
   return YomiQuotedInsert(d);
 }
 
-/* 
-  AlphaSelfInsert -- ¼«Ê¬¼«¿È¤ò³ÎÄêÊ¸»úÎó¤È¤·¤ÆÊÖ¤¹´Ø¿ô¡£
+/*
+  AlphaSelfInsert -- è‡ªåˆ†è‡ªèº«ã‚’ç¢ºå®šæ–‡å­—åˆ—ã¨ã—ã¦è¿”ã™é–¢æ•°ã€‚
  */
 
 static AlphaSelfInsert pro((uiContext));
@@ -133,7 +130,7 @@ uiContext d;
   if ( d->nbytes != 1 || kanap <= 0xa0 || 0xe0 <= kanap ) {
     return d->nbytes;
   }
-  else { /* ²¾Ì¾¥­¡¼ÆþÎÏ¤Î¾ì¹ç */
+  else { /* ä»®åã‚­ãƒ¼å…¥åŠ›ã®å ´åˆ */
     if (d->n_buffer > 1) {
       return 1;
     }
@@ -149,7 +146,7 @@ static
 AlphaNop(d)
 uiContext d;
 {
-  /* currentModeInfo ¤Ç¥â¡¼¥É¾ðÊó¤¬É¬¤ºÊÖ¤ë¤è¤¦¤Ë¥À¥ß¡¼¤Î¥â¡¼¥É¤òÆþ¤ì¤Æ¤ª¤¯ */
+  /* currentModeInfo ã§ãƒ¢ãƒ¼ãƒ‰æƒ…å ±ãŒå¿…ãšè¿”ã‚‹ã‚ˆã†ã«ãƒ€ãƒŸãƒ¼ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å…¥ã‚Œã¦ãŠã */
   d->majorMode = d->minorMode = CANNA_MODE_KigoMode;
   currentModeInfo(d);
   return 0;
@@ -166,7 +163,7 @@ uiContext d;
   res = inEmptySelfInsert(d);
   d->status = QUIT_CALLBACK;
   if (d->cb->func[QUIT_CALLBACK] != NO_CALLBACK) {
-    d->kanji_status_return->info &= ~KanjiThroughInfo; /* »Å»ö¤·¤¿ */
+    d->kanji_status_return->info &= ~KanjiThroughInfo; /* ä»•äº‹ã—ãŸ */
     popYomiMode(d);
   }
   return res;
@@ -183,7 +180,7 @@ uiContext d;
   res = inEmptySelfInsert(d);
   d->status = EXIT_CALLBACK;
   if (d->cb->func[EXIT_CALLBACK] != NO_CALLBACK) {
-    d->kanji_status_return->info &= ~KanjiThroughInfo; /* »Å»ö¤·¤¿ */
+    d->kanji_status_return->info &= ~KanjiThroughInfo; /* ä»•äº‹ã—ãŸ */
     popYomiMode(d);
   }
   return res;
@@ -191,14 +188,13 @@ uiContext d;
 
 static EmptyDeletePrevious pro((uiContext));
 
-static
-EmptyDeletePrevious(d)
-uiContext d;
+static int
+EmptyDeletePrevious(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_DELETE_DONT_QUIT) {
-    /* Delete ¤Ç QUIT ¤·¤Ê¤¤¤Î¤Ç¤¢¤ì¤Ð¡¢selfInsert */
+    /* Delete ã§ QUIT ã—ãªã„ã®ã§ã‚ã‚Œã°ã€selfInsert */
     return inEmptySelfInsert(d);
   }
   else {
@@ -206,11 +202,8 @@ uiContext d;
   }
 }
 
-extraFunc *
-FindExtraFunc(fnum)
-int fnum;
+extraFunc* FindExtraFunc(int fnum)
 {
-  extern extraFunc *extrafuncp;
   extraFunc *extrafunc;
 
   for (extrafunc = extrafuncp; extrafunc; extrafunc = extrafunc->next) {
@@ -238,7 +231,7 @@ extraFunc *estruct;
   yc->generalFlags &= ~CANNA_YOMI_ATTRFUNCS;
   yc->generalFlags |= nmode->flags;
   if (yc->generalFlags & CANNA_YOMI_END_IF_KAKUTEI) {
-    /* ³ÎÄê¤Ç½ª¤ï¤ë¤è¤¦¤Ê¥â¡¼¥É¤À¤Ã¤¿¤é³ÎÄê¥â¡¼¥É¤Ë¤Ê¤é¤Ê¤¤ */
+    /* ç¢ºå®šã§çµ‚ã‚ã‚‹ã‚ˆã†ãªãƒ¢ãƒ¼ãƒ‰ã ã£ãŸã‚‰ç¢ºå®šãƒ¢ãƒ¼ãƒ‰ã«ãªã‚‰ãªã„ */
     yc->generalFlags &= ~CANNA_YOMI_KAKUTEI;
   }
   yc->romdic = nmode->romdic;
@@ -266,7 +259,7 @@ extraFunc *estruct;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   info = d->selinfo;
   while (info) {
     if (info->ichiran == estruct->u.kigoptr) {
@@ -278,7 +271,7 @@ extraFunc *estruct;
 
   if (!selinfo) {
     selinfo = (selectinfo *)malloc(sizeof(selectinfo));
-    /* malloc ¤Ë¼ºÇÔ¤·¤¿¾ì¹ç¤Ï¡¢Á°²óÁªÂò¤·¤¿ÈÖ¹æ¤¬ÊÝÂ¸¤µ¤ì¤Ê¤¤ */
+    /* malloc ã«å¤±æ•—ã—ãŸå ´åˆã¯ã€å‰å›žé¸æŠžã—ãŸç•ªå·ãŒä¿å­˜ã•ã‚Œãªã„ */
     if (selinfo) {
       selinfo->ichiran = estruct->u.kigoptr;
       selinfo->curnum = 0;
@@ -296,10 +289,10 @@ extraFunc *estruct;
   if (!kigop) {
     return NothingChangedWithBeep(d);
   }
-  return uuKigoMake(d, kigop->kigo_data, kigop->kigo_size, 
+  return uuKigoMake(d, kigop->kigo_data, kigop->kigo_size,
                     curkigo, kigop->kigo_mode, uuKigoGeneralExitCatch, posp);
 }
-  
+
 static
 UserMenu(d, estruct)
 uiContext d;
@@ -309,7 +302,7 @@ extraFunc *estruct;
 }
 #endif /* NO_EXTEND_MENU */
 
-/* ¥Ç¥Õ¥©¥ë¥È°Ê³°¤Î¥â¡¼¥É»ÈÍÑ»þ¤Ë¸Æ¤Ó½Ð¤¹´Ø¿ô¤òÀÚ¤êÊ¬¤±¤ë */
+/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆä»¥å¤–ã®ãƒ¢ãƒ¼ãƒ‰ä½¿ç”¨æ™‚ã«å‘¼ã³å‡ºã™é–¢æ•°ã‚’åˆ‡ã‚Šåˆ†ã‘ã‚‹ */
 
 static
 ProcExtraFunc(d, fnum)
@@ -371,7 +364,7 @@ yomiContext yc;
   return res;
 }
 
-/* ¥Ù¡¼¥¹Ê¸»ú¤ÎÀÚ¤êÂØ¤¨ */
+/* ãƒ™ãƒ¼ã‚¹æ–‡å­—ã®åˆ‡ã‚Šæ›¿ãˆ */
 
 void
 EmptyBaseModeInfo(d, yc)
@@ -423,7 +416,7 @@ uiContext d;
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
   }
-/*  yc->generalFlags &= ~CANNA_YOMI_ATTRFUNCS; ¥¯¥ê¥¢¤¹¤ë¤Î¤ä¤á */
+/*  yc->generalFlags &= ~CANNA_YOMI_ATTRFUNCS; ã‚¯ãƒªã‚¢ã™ã‚‹ã®ã‚„ã‚ */
   yc->generalFlags |= CANNA_YOMI_ROMAJI |
     ((yc->generalFlags & CANNA_YOMI_BASE_HANKAKU) ? 0 : CANNA_YOMI_ZENKAKU);
   EmptyBaseModeInfo(d, yc);
@@ -442,8 +435,8 @@ uiContext d;
   if (yc->generalFlags & CANNA_YOMI_ROMAJI) {
     yc->generalFlags |= CANNA_YOMI_ZENKAKU;
   }
-  /* ¢¨Ãí ¥í¡¼¥Þ»ú¥â¡¼¥É¤Ç¤«¤Ä¥«¥¿¥«¥Ê¥â¡¼¥É¤Î»þ¤¬¤¢¤ë
-          (¤½¤Î¾ì¹çÉ½ÌÌ¾å¤Ï¥í¡¼¥Þ»ú¥â¡¼¥É) */
+  /* â€»æ³¨ ãƒ­ãƒ¼ãƒžå­—ãƒ¢ãƒ¼ãƒ‰ã§ã‹ã¤ã‚«ã‚¿ã‚«ãƒŠãƒ¢ãƒ¼ãƒ‰ã®æ™‚ãŒã‚ã‚‹
+          (ãã®å ´åˆè¡¨é¢ä¸Šã¯ãƒ­ãƒ¼ãƒžå­—ãƒ¢ãƒ¼ãƒ‰) */
   if (yc->generalFlags & CANNA_YOMI_KATAKANA) {
     yc->generalFlags &= ~CANNA_YOMI_HANKAKU;
   }
@@ -457,19 +450,19 @@ uiContext d;
   yomiContext yc = (yomiContext)d->modec;
 
   if ((yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) ||
-      /* ¥â¡¼¥ÉÊÑ¹¹¤¬¶Ø»ß¤µ¤ì¤Æ¤¤¤ë¤È¤« */
+      /* ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´ãŒç¦æ­¢ã•ã‚Œã¦ã„ã‚‹ã¨ã‹ */
       (cannaconf.InhibitHankakuKana &&
        (yc->generalFlags & CANNA_YOMI_KATAKANA) &&
        !(yc->generalFlags & CANNA_YOMI_ROMAJI))) {
-    /* È¾³Ñ¥«¥Ê¤¬¶Ø»ß¤µ¤ì¤Æ¤¤¤ë¤Î¤ËÈ¾³Ñ¥«¥Ê¤Ë¤¤¤­¤½¤¦¤Ê¤È¤­ */
+    /* åŠè§’ã‚«ãƒŠãŒç¦æ­¢ã•ã‚Œã¦ã„ã‚‹ã®ã«åŠè§’ã‚«ãƒŠã«ã„ããã†ãªã¨ã */
     return NothingChangedWithBeep(d);
   }
   yc->generalFlags |= CANNA_YOMI_BASE_HANKAKU;
   if (yc->generalFlags & CANNA_YOMI_ROMAJI) {
     yc->generalFlags &= ~CANNA_YOMI_ZENKAKU;
   }
-  /* ¢¨Ãí ¥í¡¼¥Þ»ú¥â¡¼¥É¤Ç¤«¤Ä¥«¥¿¥«¥Ê¥â¡¼¥É¤Î»þ¤¬¤¢¤ë
-          (¤½¤Î¾ì¹çÉ½ÌÌ¾å¤Ï¥í¡¼¥Þ»ú¥â¡¼¥É) */
+  /* â€»æ³¨ ãƒ­ãƒ¼ãƒžå­—ãƒ¢ãƒ¼ãƒ‰ã§ã‹ã¤ã‚«ã‚¿ã‚«ãƒŠãƒ¢ãƒ¼ãƒ‰ã®æ™‚ãŒã‚ã‚‹
+          (ãã®å ´åˆè¡¨é¢ä¸Šã¯ãƒ­ãƒ¼ãƒžå­—ãƒ¢ãƒ¼ãƒ‰) */
   if (yc->generalFlags & CANNA_YOMI_KATAKANA) {
     if (!cannaconf.InhibitHankakuKana) {
       yc->generalFlags |= CANNA_YOMI_HANKAKU;
@@ -485,11 +478,11 @@ uiContext d;
   yomiContext yc = (yomiContext)d->modec;
 
   if ((yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) ||
-      /* ¥â¡¼¥ÉÊÑ¹¹¤¬¶Ø»ß¤µ¤ì¤Æ¤¤¤¿¤ê */
+      /* ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´ãŒç¦æ­¢ã•ã‚Œã¦ã„ãŸã‚Š */
       (!cannaconf.InhibitHankakuKana &&
        (yc->generalFlags & CANNA_YOMI_KATAKANA) &&
        (yc->generalFlags & CANNA_YOMI_BASE_HANKAKU))) {
-    /* È¾³Ñ¥«¥Ê¤¬¶Ø»ß¤µ¤ì¤Æ¤¤¤ë¤Î¤ËÈ¾³Ñ¥«¥Ê¤Ë¤Ê¤Ã¤Æ¤·¤Þ¤¤¤½¤¦¤Ê¾ì¹ç */
+    /* åŠè§’ã‚«ãƒŠãŒç¦æ­¢ã•ã‚Œã¦ã„ã‚‹ã®ã«åŠè§’ã‚«ãƒŠã«ãªã£ã¦ã—ã¾ã„ãã†ãªå ´åˆ */
     return NothingChangedWithBeep(d);
   }
   yc->generalFlags &= ~(CANNA_YOMI_ROMAJI | CANNA_YOMI_ZENKAKU);
@@ -539,14 +532,14 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
   if (ToggleChikuji(d, 0) == -1) {
     jrKanjiError = "\317\242\312\270\300\341\312\321\264\271\244\313\300\332"
 	"\302\330\244\250\244\353\244\263\244\310\244\254\244\307\244\255"
 	"\244\336\244\273\244\363";
-                   /* Ï¢Ê¸ÀáÊÑ´¹¤ËÀÚÂØ¤¨¤ë¤³¤È¤¬¤Ç¤­¤Þ¤»¤ó */
+                   /* é€£æ–‡ç¯€å¤‰æ›ã«åˆ‡æ›¿ãˆã‚‹ã“ã¨ãŒã§ãã¾ã›ã‚“ */
     makeGLineMessageFromString(d, jrKanjiError);
     currentModeInfo(d);
     return(-1);
@@ -554,7 +547,7 @@ uiContext d;
   else {
     makeGLineMessageFromString(d, "\317\242\312\270\300\341\312\321\264\271"
 	"\244\313\300\332\302\330\244\250\244\336\244\267\244\277");
-                   /* Ï¢Ê¸ÀáÊÑ´¹¤ËÀÚÂØ¤¨¤Þ¤·¤¿ */
+                   /* é€£æ–‡ç¯€å¤‰æ›ã«åˆ‡æ›¿ãˆã¾ã—ãŸ */
     currentModeInfo(d);
     return 0;
   }
@@ -570,14 +563,14 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
 
   sprintf(s, "\306\374\313\334\270\354\306\376\316\317\245\267\245\271\245\306"
 	"\245\340\241\330\244\253\244\363\244\312\241\331Version %d.%d",
 	  cannaconf.CannaVersion / 1000, cannaconf.CannaVersion % 1000);
-             /* ÆüËÜ¸ìÆþÎÏ¥·¥¹¥Æ¥à¡Ø¤«¤ó¤Ê¡Ù */
+             /* æ—¥æœ¬èªžå…¥åŠ›ã‚·ã‚¹ãƒ†ãƒ ã€Žã‹ã‚“ãªã€ */
   strcat(s, CANNA_PATCH_LEVEL);
   makeGLineMessageFromString(d, s);
   currentModeInfo(d);
@@ -597,7 +590,7 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
 
@@ -605,13 +598,13 @@ uiContext d;
     sprintf(s, "\244\253\244\312\264\301\273\372\312\321\264\271\245\265"
 	"\241\274\245\320\244\310\244\316\300\334\302\263\244\254\300\332"
 	"\244\354\244\306\244\244\244\336\244\271");
-               /* ¤«¤Ê´Á»úÊÑ´¹¥µ¡¼¥Ð¤È¤ÎÀÜÂ³¤¬ÀÚ¤ì¤Æ¤¤¤Þ¤¹ */
+               /* ã‹ãªæ¼¢å­—å¤‰æ›ã‚µãƒ¼ãƒã¨ã®æŽ¥ç¶šãŒåˆ‡ã‚Œã¦ã„ã¾ã™ */
   }
   else {
     sprintf(s, "%s \244\316\244\253\244\312\264\301\273\372\312\321\264\271"
 	"\245\265\241\274\245\320\244\313\300\334\302\263\244\267\244\306"
 	"\244\244\244\336\244\271", RkwGetServerName());
-               /* ¤Î¤«¤Ê´Á»úÊÑ´¹¥µ¡¼¥Ð¤ËÀÜÂ³¤·¤Æ¤¤¤Þ¤¹ */
+               /* ã®ã‹ãªæ¼¢å­—å¤‰æ›ã‚µãƒ¼ãƒã«æŽ¥ç¶šã—ã¦ã„ã¾ã™ */
   }
   makeGLineMessageFromString(d, s);
   currentModeInfo(d);
@@ -631,19 +624,19 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
-  
+
   if (cannaconf.Gakushu == 1) {
     makeGLineMessageFromString(d, "\263\330\275\254\244\254\243\317\243\316"
 	"\244\316\276\365\302\326\244\307\244\271");
-                                  /* ³Ø½¬¤¬£Ï£Î¤Î¾õÂÖ¤Ç¤¹ */
+                                  /* å­¦ç¿’ãŒï¼¯ï¼®ã®çŠ¶æ…‹ã§ã™ */
   }
   else {
     makeGLineMessageFromString(d, "\263\330\275\254\244\254\243\317\243\306"
 	"\243\306\244\316\276\365\302\326\244\307\244\271");
-                                  /* ³Ø½¬¤¬£Ï£Æ£Æ¤Î¾õÂÖ¤Ç¤¹ */
+                                  /* å­¦ç¿’ãŒï¼¯ï¼¦ï¼¦ã®çŠ¶æ…‹ã§ã™ */
   }
     currentModeInfo(d);
 
@@ -661,7 +654,7 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
 
@@ -669,14 +662,14 @@ uiContext d;
     sprintf(s, "\245\253\245\271\245\277\245\336\245\244\245\272\245\325"
 	"\245\241\245\244\245\353\244\317 %s \244\362\273\310\315\321\244\267"
 	"\244\306\244\244\244\336\244\271", CANNA_initfilename);
-               /* ¥«¥¹¥¿¥Þ¥¤¥º¥Õ¥¡¥¤¥ë¤Ï %s ¤ò»ÈÍÑ¤·¤Æ¤¤¤Þ¤¹ */
+               /* ã‚«ã‚¹ã‚¿ãƒžã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã¯ %s ã‚’ä½¿ç”¨ã—ã¦ã„ã¾ã™ */
     makeGLineMessageFromString(d, s);
   }
   else {
     sprintf(s, "\245\253\245\271\245\277\245\336\245\244\245\272\245\325"
 	"\245\241\245\244\245\353\244\317\300\337\304\352\244\265\244\354"
 	"\244\306\244\244\244\336\244\273\244\363");
-               /* ¥«¥¹¥¿¥Þ¥¤¥º¥Õ¥¡¥¤¥ë¤ÏÀßÄê¤µ¤ì¤Æ¤¤¤Þ¤»¤ó */
+               /* ã‚«ã‚¹ã‚¿ãƒžã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã¯è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ */
     makeGLineMessageFromString(d, s);
   }
     currentModeInfo(d);
@@ -695,23 +688,23 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
-  
+
   if (RomkanaTable && romajidic) {
     sprintf(s, "\245\355\241\274\245\336\273\372\244\253\244\312\312\321"
 	"\264\271\245\306\241\274\245\326\245\353\244\317 %s \244\362\273\310"
 	"\315\321\244\267\244\306\244\244\244\336\244\271",
 	    RomkanaTable);
-               /* ¥í¡¼¥Þ»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤Ï %s ¤ò»ÈÍÑ¤·¤Æ¤¤¤Þ¤¹ */
+               /* ãƒ­ãƒ¼ãƒžå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã¯ %s ã‚’ä½¿ç”¨ã—ã¦ã„ã¾ã™ */
     makeGLineMessageFromString(d, s);
   }
   else {
     sprintf(s, "\245\355\241\274\245\336\273\372\244\253\244\312\312\321"
 	"\264\271\245\306\241\274\245\326\245\353\244\317\273\310\315\321"
 	"\244\265\244\354\244\306\244\244\244\336\244\273\244\363");
-               /* ¥í¡¼¥Þ»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤Ï»ÈÍÑ¤µ¤ì¤Æ¤¤¤Þ¤»¤ó */
+               /* ãƒ­ãƒ¼ãƒžå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã¯ä½¿ç”¨ã•ã‚Œã¦ã„ã¾ã›ã‚“ */
     makeGLineMessageFromString(d, s);
   }
     currentModeInfo(d);
@@ -730,7 +723,7 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
   killmenu(d);
 
@@ -738,8 +731,8 @@ uiContext d;
   sprintf(s, "\274\255\275\361\244\316 Sync \275\350\315\375%s",
           retval < 0 ? "\244\313\274\272\307\324\244\267\244\336\244\267"
 	"\244\277" : "\244\362\271\324\244\244\244\336\244\267\244\277");
-          /* ¼­½ñ¤Î Sync ½èÍý%s",
-                retval < 0 ? "¤Ë¼ºÇÔ¤·¤Þ¤·¤¿" : "¤ò¹Ô¤¤¤Þ¤·¤¿ */
+          /* è¾žæ›¸ã® Sync å‡¦ç†%s",
+                retval < 0 ? "ã«å¤±æ•—ã—ã¾ã—ãŸ" : "ã‚’è¡Œã„ã¾ã—ãŸ */
   makeGLineMessageFromString(d, s);
   currentModeInfo(d);
 

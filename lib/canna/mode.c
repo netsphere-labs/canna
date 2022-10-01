@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -44,7 +44,7 @@ static
 char *
 _sModeNames[CANNA_MODE_MAX_IMAGINARY_MODE] = {
   "      ",		          /* AlphaMode */
-  "[ \244\242 ]",	/* あ */  /* EmptyMode */ 
+  "[ \244\242 ]",	/* あ */  /* EmptyMode */
   "[\265\255\271\346]",	/* 記号 *//* KigoMode */
   "[\244\350\244\337]",	/* よみ *//* YomiMode (モード文字列表示には使わない) */
   "[\273\372\274\357]",	/* 字種 *//* JishuMode */
@@ -91,7 +91,6 @@ _sModeNames[CANNA_MODE_MAX_IMAGINARY_MODE] = {
 
 static wchar_t * _ModeNames[CANNA_MODE_MAX_IMAGINARY_MODE];
 
-extern extraFunc *FindExtraFunc();
 #define findExtraMode(mnum) \
  FindExtraFunc((mnum) - CANNA_MODE_MAX_IMAGINARY_MODE + CANNA_FN_MAX_FUNC)
 
@@ -135,7 +134,7 @@ int mid;
   return (wchar_t *)0;
 }
 
-void    
+void
 currentModeInfo(d)
 uiContext d;
 {
@@ -170,7 +169,7 @@ uiContext d;
     }
   }
 }
-     
+
 /* このファイルにはモード変更に関する操作一般が入っている。モードの変
  * 更とは、ローマ字かな変換の表面に現れるモードの変更だけではなく、全
  * く読みがない状態から、読みがある状態に移る時にも生じるものを指す。
@@ -180,10 +179,10 @@ void
 initModeNames()
 {
   int i;
-  
+
   for (i = 0 ; i < CANNA_MODE_MAX_IMAGINARY_MODE ; i++) {
     ModeNames[i].alloc = 0;
-    ModeNames[i].name = _ModeNames[i] = 
+    ModeNames[i].name = _ModeNames[i] =
       _sModeNames[i] ? WString(_sModeNames[i]) : 0;
   }
   if (!bad) {
@@ -327,7 +326,7 @@ wchar_t *arg;
 
       if (yc->id == YOMI_CONTEXT) {
         fl = yc->generalFlags;
-       
+
         if (fl & CANNA_YOMI_ROMAJI) {
           res = CANNA_MODE_ZenAlphaHenkanMode;
         }
@@ -365,14 +364,12 @@ wchar_t *arg;
   return 0;
 }
 
-/* 
+/*
  *   あるモードに対してモード表示文字列を決定する。
  *
  */
 
-changeModeName(modeid, str)
-int modeid;
-char *str;
+int changeModeName(int modeid, const char* str)
 {
   extraFunc *ep;
 

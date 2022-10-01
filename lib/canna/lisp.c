@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,24 +13,25 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
 static char rcsid[] = "$Id: lisp.c,v 1.11.2.1 2004/04/26 22:49:21 aida_s Exp $";
 #endif
 
-/* 
-** main program of lisp 
+/*
+** main program of lisp
 */
+#include "canna.h"
 #include "lisp.h"
 #include "canna/patchlevel.h"
-
+#include "canna/rkcapi.h" // RkwGetProtocolVersion()
 #include <signal.h>
 
 static FILE *outstream = (FILE *)0;
@@ -39,26 +41,33 @@ static char *memtop;
 
 static int ncells = CELLSIZE;
 
-static initIS();
 static void finIS();
-static allocarea(), skipspaces(), zaplin(), isterm();
-static void prins();
-static list mkatm(), read1(), ratom(), ratom2(), rstring();
+static list read1(), ratom(), rstring();
 static int tyipeek(), tyi();
 static void tyo pro((int));
-static void defatms(), epush();
-static void push(), pop();
-static int  evpsh();
-static void freearea(), print();
-static list getatm(), getatmz(), newsymbol(), copystring();
-static list assq(), pop1();
-static list Lprogn(), Lcons(), Lread();
-static list Leval(), Lprint(), Lmodestr(), Lputd(), Lxcons(), Lncons();
-static list NumAcc(), StrAcc();
+static void defatms();
+static void freearea();
+static list pop1();
+static list Lmodestr(), Lputd();
+static list NumAcc();
+
+static int initIS();
+static int allocarea();
+static list Leval(int n);
+static void markcopycell(list* addr);
+static list ratom2(int a);
+static void error(const char* msg, list v);
+static list Lread(int n);
+static void print(list l);
+static void gc();
+static int equal(list x, list y);
+
+#define argnchk(fn,x)	if (n != x) argnerr(fn)
 
 /* parameter stack */
 
-static list	*stack, *sp;
+static list *stack = NULL;
+static list *sp = NULL;
 
 /* environment stack	*/
 
@@ -81,12 +90,12 @@ static int  filep;
 
 /* lisp read buffer & read pointer */
 
-static char *readbuf;		/* read buffer	*/
-static char *readptr;		/* read pointer	*/
+static char* readbuf;		/* read buffer	*/
+static char* readptr;		/* read pointer	*/
 
 /* error functions	*/
 
-static void	argnerr(), numerr(), error();
+static void	numerr();
 
 /* multiple values */
 
@@ -112,29 +121,24 @@ static jmp_buf fatal_env;
 
 /* external functions
 
-   ³°Éô´Ø¿ô¤Ï°Ê²¼¤Î£³¤Ä
+   å¤–éƒ¨é–¢æ•°ã¯ä»¥ä¸‹ã®ï¼“ã¤
 
-  (1) clisp_init()  --  ¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ë¤òÆÉ¤à¤¿¤á¤Î½àÈ÷¤ò¤¹¤ë
+  (1) clisp_init()  --  ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã‚€ãŸã‚ã®æº–å‚™ã‚’ã™ã‚‹
 
-    lisp ¤Î½é´ü²½¤ò¹Ô¤¤É¬Í×¤Ê¥á¥â¥ê¤ò allocate ¤¹¤ë¡£
+    lisp ã®åˆæœŸåŒ–ã‚’è¡Œã„å¿…è¦ãªãƒ¡ãƒ¢ãƒªã‚’ allocate ã™ã‚‹ã€‚
 
-  (2) clisp_fin()   --  ¥«¥¹¥¿¥Ş¥¤¥ºÆÉ¤ß¹ş¤ßÍÑ¤ÎÎÎ°è¤ò²òÊü¤¹¤ë¡£
+  (2) clisp_fin()   --  ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºèª­ã¿è¾¼ã¿ç”¨ã®é ˜åŸŸã‚’è§£æ”¾ã™ã‚‹ã€‚
 
-    ¾åµ­¤Î½é´ü²½¤ÇÆÀ¤¿¥á¥â¥ê¤ò²òÊü¤¹¤ë¡£
+    ä¸Šè¨˜ã®åˆæœŸåŒ–ã§å¾—ãŸãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ã€‚
 
-  (3) YYparse_by_rcfilename((char *)s) -- ¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹ş¤à¡£
+  (3) YYparse_by_rcfilename((char *)s) -- ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ã€‚
 
-    s ¤Ç»ØÄê¤µ¤ì¤¿¥Õ¥¡¥¤¥ëÌ¾¤Î¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹ş¤ó¤Ç¥«¥¹¥¿
-    ¥Ş¥¤¥º¤ÎÀßÄê¤ò¹Ô¤¦¡£¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤¹¤ì¤Ğ 1 ¤òÊÖ¤·¤½¤¦¤Ç¤Ê¤±¤ì¤Ğ
-    0 ¤òÊÖ¤¹¡£
+    s ã§æŒ‡å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«åã®ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ã‚«ã‚¹ã‚¿
+    ãƒã‚¤ã‚ºã®è¨­å®šã‚’è¡Œã†ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚Œã° 1 ã‚’è¿”ã—ãã†ã§ãªã‘ã‚Œã°
+    0 ã‚’è¿”ã™ã€‚
 
  */
 
-#ifdef __STDC__
-static list getatmz(char *);
-#else
-static list getatmz();
-#endif
 
 /*********************************************************************
  *                      wchar_t replace begin                        *
@@ -143,6 +147,17 @@ static list getatmz();
 # error "wchar_t is already defined"
 #endif
 #define wchar_t cannawc
+
+
+static void epush(list value)
+{
+  if (esp <= estack) {
+    error("Estack over flow",NON);
+    /* NOTREACHED */
+  }
+  else
+    *--esp = value;
+}
 
 
 int
@@ -184,7 +199,6 @@ clisp_init()
 static void
 fillMenuEntry()
 {
-  extern extraFunc *FindExtraFunc(), *extrafuncp;
   extraFunc *p, *fp;
   int i, n, fid;
   menuitem *mb;
@@ -227,7 +241,7 @@ void
 clisp_fin()
 {
 #ifndef NO_EXTEND_MENU
-  /* ½ª¤ë¤ËÅö¤¿¤Ã¤Æ¡¢menu ´ØÏ¢¤Î¥Ç¡¼¥¿¤òËä¤á¤ë */
+  /* çµ‚ã‚‹ã«å½“ãŸã£ã¦ã€menu é–¢é€£ã®ãƒ‡ãƒ¼ã‚¿ã‚’åŸ‹ã‚ã‚‹ */
   fillMenuEntry();
 #endif
 
@@ -251,11 +265,23 @@ clisp_fin()
   }
 }
 
-int
-YYparse_by_rcfilename(s)
-char *s;
+
+/* push down an S-expression to parameter stack	*/
+static void push(list value)
 {
-  extern ckverbose;
+  if (sp <= stack) {
+    error("Stack over flow",NON);
+    /* NOTREACHED */
+  }
+  else
+    *--sp = value;
+}
+
+
+int
+YYparse_by_rcfilename(const char* s)
+{
+  extern int ckverbose;
   int retval = 0;
   FILE *f;
   FILE *saved_outstream;
@@ -265,7 +291,7 @@ char *s;
     goto quit_parse_rcfile;
   }
 
-  if (jmpenvp <= 0) { /* ºÆµ¢¤¬¿¼¤¹¤®¤ë¾ì¹ç */
+  if (jmpenvp <= 0) { /* å†å¸°ãŒæ·±ã™ãã‚‹å ´åˆ */
     return 0;
   }
   jmpenvp--;
@@ -278,10 +304,10 @@ char *s;
   f = fopen(s, "r");
   if (f) {
     if (ckverbose == CANNA_FULL_VERBOSE) {
-      printf("¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ë¤È¤·¤Æ \"%s\" ¤òÍÑ¤¤¤Ş¤¹¡£\n", s);
+      printf("ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«ã¨ã—ã¦ \"%s\" ã‚’ç”¨ã„ã¾ã™ã€‚\n", s);
     }
     files[++filep].f = f;
-    files[filep].name = malloc(strlen(s) + 1);
+    files[filep].name = (char*) malloc(strlen(s) + 1);
     if (files[filep].name) {
       strcpy(files[filep].name, s);
     }
@@ -319,8 +345,7 @@ char *s;
 #ifdef WITH_MAIN
 
 static void
-intr(sig)
-int sig;
+intr(int sig)
 /* ARGSUSED */
 {
   error("Interrupt:",NON);
@@ -329,20 +354,18 @@ int sig;
 
 /* cfuncdef
 
-   parse_string -- Ê¸»úÎó¤ò¥Ñ¡¼¥¹¤¹¤ë¡£
+   parse_string -- æ–‡å­—åˆ—ã‚’ãƒ‘ãƒ¼ã‚¹ã™ã‚‹ã€‚
 
 */
-
-parse_string(str)
-char *str;
+int parse_string(char* str)
 {
-  char *readbufbk;
+    char* readbufbk;
 
   if (clisp_init() == 0) {
     return -1;
   }
 
-  /* read buffer ¤È¤·¤ÆÍ¿¤¨¤é¤ì¤¿Ê¸»ú¤ò»È¤¦ */
+  /* read buffer ã¨ã—ã¦ä¸ãˆã‚‰ã‚ŒãŸæ–‡å­—ã‚’ä½¿ã† */
   readbufbk = readbuf;
   readptr = readbuf = str;
 
@@ -350,7 +373,7 @@ char *str;
     goto quit_parse_string;
   }
 
-  if (jmpenvp <= 0) { /* ºÆµ¢¤¬¿¼¤¹¤®¤ë¾ì¹ç */
+  if (jmpenvp <= 0) { /* å†å¸°ãŒæ·±ã™ãã‚‹å ´åˆ */
     return -1;
   }
 
@@ -384,6 +407,35 @@ char *str;
 
 static void intr();
 
+/* prins -
+	print string	*/
+static void prins(const char* s)
+{
+	while (*s) {
+		tyo(*s++);
+	}
+}
+
+
+/* pop up n S-expressions from parameter stack	*/
+static void pop(int x)
+{
+  if (0 < x && sp >= &stack[STKSIZE]) {
+    error("Stack under flow",NON);
+    /* NOTREACHED */
+  }
+  sp += x;
+}
+
+
+static list Lprint(int n)
+{
+	print(sp[0]);
+	pop(n);
+	return (T);
+}
+
+
 void
 clisp_main()
 {
@@ -396,7 +448,7 @@ clisp_main()
     goto quit_clisp_main;
   }
 
-  if (jmpenvp <= 0) { /* ºÆµ¢¤¬¿¼¤¹¤®¤ë¾ì¹ç */
+  if (jmpenvp <= 0) { /* å†å¸°ãŒæ·±ã™ãã‚‹å ´åˆ */
     return;
   }
   jmpenvp--;
@@ -438,7 +490,7 @@ clisp_main()
 static int longestkeywordlen;
 
 typedef struct {
-  char *seq;
+    const char *seq;
   int id;
 } SeqToID;
 
@@ -511,16 +563,15 @@ typedef struct {
   int *tbl;
 } seqlines;
 
-static seqlines *seqTbl;	/* ÆâÉô¤ÎÉ½(¼Âºİ¤Ë¤ÏÉ½¤ÎÉ½) */
-static int nseqtbl;		/* ¾õÂÖ¤Î¿ô¡£¾õÂÖ¤Î¿ô¤À¤±É½¤¬¤¢¤ë */
+static seqlines *seqTbl;	/* å†…éƒ¨ã®è¡¨(å®Ÿéš›ã«ã¯è¡¨ã®è¡¨) */
+static int nseqtbl;		/* çŠ¶æ…‹ã®æ•°ã€‚çŠ¶æ…‹ã®æ•°ã ã‘è¡¨ãŒã‚ã‚‹ */
 static int nseq;
 static int seqline;
 
-static
-initIS()
+static int initIS()
 {
   SeqToID *p;
-  char *s;
+  const char *s;
   int i;
   seqlines seqTbls[1024];
 
@@ -538,13 +589,13 @@ initIS()
     return 0;
   }
 
-  /* ¤Ş¤º²¿Ê¸»ú»È¤ï¤ì¤Æ¤¤¤ë¤«¤òÄ´¤Ù¤ë¡£
-     nseq ¤Ï»È¤ï¤ì¤Æ¤¤¤ëÊ¸»ú¿ô¤è¤ê£±Âç¤­¤¤ÃÍ¤Ç¤¢¤ë */
+  /* ã¾ãšä½•æ–‡å­—ä½¿ã‚ã‚Œã¦ã„ã‚‹ã‹ã‚’èª¿ã¹ã‚‹ã€‚
+     nseq ã¯ä½¿ã‚ã‚Œã¦ã„ã‚‹æ–‡å­—æ•°ã‚ˆã‚Šï¼‘å¤§ãã„å€¤ã§ã‚ã‚‹ */
   for (p = keywordtable ; p->id ; p++) {
     int len = 0;
     for (s = p->seq ; *s ; s++) {
       if ( !charToNumTbl[*s - ' '] ) {
-	charToNumTbl[*s - ' '] = nseq; /* ³ÆÊ¸»ú¤Ë¥·¥ê¥¢¥ëÈÖ¹æ¤ò¿¶¤ë */
+	charToNumTbl[*s - ' '] = nseq; /* å„æ–‡å­—ã«ã‚·ãƒªã‚¢ãƒ«ç•ªå·ã‚’æŒ¯ã‚‹ */
 	nseq++;
       }
       len ++;
@@ -553,7 +604,7 @@ initIS()
       longestkeywordlen = len;
     }
   }
-  /* Ê¸»ú¿ôÊ¬¤Î¥Æ¡¼¥Ö¥ë */
+  /* æ–‡å­—æ•°åˆ†ã®ãƒ†ãƒ¼ãƒ–ãƒ« */
   seqTbls[nseqtbl].tbl = (int *)calloc(nseq, sizeof(int));
   if ( !seqTbls[nseqtbl].tbl ) {
     goto initISerr;
@@ -561,21 +612,21 @@ initIS()
   nseqtbl++;
   for (p = keywordtable ; p->id ; p++) {
     int line, nextline;
-    
+
     line = 0;
     for (s = p->seq ; *s ; s++) {
-      if (seqTbls[line].tbl == 0) { /* ¥Æ¡¼¥Ö¥ë¤¬¤Ê¤¤ */
+      if (seqTbls[line].tbl == 0) { /* ãƒ†ãƒ¼ãƒ–ãƒ«ãŒãªã„ */
 	seqTbls[line].tbl = (int *)calloc(nseq, sizeof(int));
 	if ( !seqTbls[line].tbl ) {
 	  goto initISerr;
 	}
       }
       nextline = seqTbls[line].tbl[charToNum(*s)];
-      /* ¤Á¤Ê¤ß¤Ë¡¢charToNum(*s) ¤ÏÀäÂĞ¤Ë£°¤Ë¤Ê¤é¤Ê¤¤ */
+      /* ã¡ãªã¿ã«ã€charToNum(*s) ã¯çµ¶å¯¾ã«ï¼ã«ãªã‚‰ãªã„ */
       if ( nextline ) {
 	line = nextline;
       }
-      else { /* ºÇ½é¤Ë¥¢¥¯¥»¥¹¤·¤¿ */
+      else { /* æœ€åˆã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸ */
 	line = seqTbls[line].tbl[charToNum(*s)] = nseqtbl++;
       }
     }
@@ -608,7 +659,7 @@ initIS()
 }
 
 static void
-finIS() /* identifySequence ¤ËÍÑ¤¤¤¿¥á¥â¥ê»ñ¸»¤ò³«Êü¤¹¤ë */
+finIS() /* identifySequence ã«ç”¨ã„ãŸãƒ¡ãƒ¢ãƒªè³‡æºã‚’é–‹æ”¾ã™ã‚‹ */
 {
   int i;
 
@@ -628,17 +679,15 @@ finIS() /* identifySequence ¤ËÍÑ¤¤¤¿¥á¥â¥ê»ñ¸»¤ò³«Êü¤¹¤ë */
 
 /* cvariable
 
-  seqline: identifySequence ¤Ç¤Î¾õÂÖ¤òÊİ»ı¤¹¤ëÊÑ¿ô
+  seqline: identifySequence ã§ã®çŠ¶æ…‹ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
 
  */
 
 #define CONTINUE 1
 #define END	 0
 
-static
-identifySequence(c, val)
-unsigned c;
-int *val;
+static int
+identifySequence(unsigned c, int* val)
 {
   int nextline;
 
@@ -669,7 +718,7 @@ alloccell()
   char *p;
 
   cellsize = ncells * sizeof(list);
-  p = malloc(cellsize);
+  p = (char*) malloc(cellsize);
   if (p == (char *)0) {
     return 0;
   }
@@ -680,14 +729,13 @@ alloccell()
   return 1;
 }
 
-/* ¤¦¤Ş¤¯¹Ô¤«¤Ê¤«¤Ã¤¿¤é£°¤òÊÖ¤¹ */
+/* ã†ã¾ãè¡Œã‹ãªã‹ã£ãŸã‚‰ï¼ã‚’è¿”ã™ */
 
-static
-allocarea()
+static int allocarea()
 {
-  /* ¤Ş¤º¤Ï¥»¥ëÎÎ°è */
+  /* ã¾ãšã¯ã‚»ãƒ«é ˜åŸŸ */
   if (alloccell()) {
-    /* ¥¹¥¿¥Ã¥¯ÎÎ°è */
+    /* ã‚¹ã‚¿ãƒƒã‚¯é ˜åŸŸ */
     stack = (list *)calloc(STKSIZE, sizeof(list));
     if (stack) {
       estack = (list *)calloc(STKSIZE, sizeof(list));
@@ -699,7 +747,7 @@ allocarea()
 	  filep = 0;
 	  files = (lispfile *)calloc(MAX_DEPTH, sizeof(lispfile));
 	  if (files) {
-	    readbuf = malloc(BUFSIZE);
+              readbuf = (char*) malloc(BUFSIZE);
 	    if (readbuf) {
 	      /* jump env */
 	      jmpenvp = MAX_DEPTH;
@@ -745,24 +793,32 @@ freearea()
   }
 }
 
-static list
-getatmz(name)
-char *name;
-{
-  int  key;
-  char *p;
 
-  for (p = name, key = 0 ; *p ; p++)
-    key += *p;
-  return getatm(name,key);
+static list newsymbol(const char* name)
+{
+  list retval;
+  struct atomcell *temp;
+  int namesize;
+
+  namesize = strlen(name);
+  namesize = ((namesize / sizeof(list)) + 1) * sizeof(list); /* +1ã¯'\0'ã®åˆ† */
+  if (freecell + (sizeof(struct atomcell)) + namesize >= cellbtm) {
+    gc();
+  }
+  temp = (struct atomcell *)freecell;
+  retval = SYMBOL_TAG | (freecell - celltop);
+  freecell += sizeof(struct atomcell);
+  (void)strcpy(freecell, name);
+  temp->pname = freecell;
+  freecell += namesize;
+
+  return retval;
 }
+
 
 /* mkatm -
 	making symbol function	*/
-
-static list 
-mkatm(name)
-char *name;
+static list mkatm(const char* name)
 {
   list temp;
   struct atomcell *newatom;
@@ -772,8 +828,8 @@ char *name;
   newatom->value = (*name == ':') ? (list)temp : (list)UNBOUND;
   newatom->plist = NIL;			/* set null plist	*/
   newatom->ftype = UNDEF;		/* set undef func-type	*/
-  newatom->func  = (list (*)())0;	/* Don't kill this line	*/
-  newatom->valfunc  = (list (*)())0;	/* Don't kill this line	*/
+  newatom->func    = NULL;	/* Don't kill this line	*/
+  newatom->valfunc = NULL; 	/* Don't kill this line	*/
   newatom->hlink = NIL;		/* no hash linking	*/
   newatom->mid = -1;
   newatom->fid = -1;
@@ -781,12 +837,10 @@ char *name;
   return temp;
 }
 
-/* getatm -- get atom from the oblist if possible	*/
 
-static list 
-getatm(name,key)
-char *name;
-int  key;
+/* getatm -- get atom from the oblist if possible	*/
+static list
+getatm(const char* name, int key)
 {
   list p;
   struct atomcell *atomp;
@@ -806,12 +860,21 @@ int  key;
   return p;
 }
 
+
+static list getatmz(const char* name)
+{
+  int  key;
+  const char *p;
+
+  for (p = name, key = 0 ; *p ; p++)
+    key += *p;
+  return getatm(name,key);
+}
+
+
 #define MESSAGE_MAX 256
 
-static void
-error(msg,v)
-char *msg;
-list v;
+static void error(const char* msg, list v)
 /* ARGSUSED */
 {
   char buf[MESSAGE_MAX];
@@ -838,10 +901,9 @@ list v;
   longjmp(env[jmpenvp].jmp_env,YES);
 }
 
+
 static void
-fatal(msg,v)
-char *msg;
-list v;
+fatal(const char* msg, list v)
 /* ARGSUSED */
 {
   char buf[MESSAGE_MAX];
@@ -866,18 +928,16 @@ list v;
 }
 
 static void
-argnerr(msg)
-char *msg;
+argnerr(const char* msg)
 {
   prins("incorrect number of args to ");
   error(msg, NON);
   /* NOTREACHED */
 }
 
+
 static void
-numerr(fn,arg)
-char *fn;
-list arg;
+numerr(const char* fn, list arg)
 {
   prins("Non-number ");
   if (fn) {
@@ -889,9 +949,7 @@ list arg;
 }
 
 static void
-lisp_strerr(fn,arg)
-char *fn;
-list arg;
+lisp_strerr(const char* fn, list arg)
 {
   prins("Non-string ");
   if (fn) {
@@ -902,9 +960,8 @@ list arg;
   /* NOTREACHED */
 }
 
-static list
-Lread(n)
-int n;
+
+static list Lread(int n)
 {
   list t;
 
@@ -938,13 +995,108 @@ int n;
 static void untyi pro((int));
 static list rcharacter pro((void));
 
+static list newcons()
+{
+  list retval;
+
+  if (freecell + sizeof(struct cell) >= cellbtm) {
+    gc();
+  }
+  retval = CONS_TAG | (freecell - celltop);
+  freecell += sizeof(struct cell);
+  return retval;
+}
+
+
+static list Lcons(int n)
+{
+	list temp;
+
+	argnchk("cons",2);
+	temp = newcons();
+	cdr(temp) = pop1();
+	car(temp) = pop1();
+	return(temp);
+}
+
+
+static list
+Lncons(int n)
+{
+	list temp;
+
+	argnchk("ncons",1);
+	temp = newcons();
+	car(temp) = pop1();
+	cdr(temp) = NIL;
+	return(temp);
+}
+
+
+/* isterm -
+	check if the character is terminating the lisp expression	*/
+static int isterm(int c)
+{
+	if (c <= ' ')
+		return(YES);
+	else {
+		switch (c)
+		{
+		case '(':
+		case ')':
+		case ';':
+			return(YES);
+		default:
+			return(NO);
+		}
+	}
+}
+
+
+/* skipping spaces function -
+	if eof read then return NO	*/
+static int skipspaces()
+{
+  int c;
+
+  while ((c = tyi()) <= ' ') {
+    if ( !c ) {
+      return(NO);
+    }
+#ifdef QUIT_IF_BINARY_CANNARC
+/* å®Ÿã¯ fatal() ã«ã—ã¦ã—ã¾ã†ã¨ read ã§ããªã‹ã£ãŸã¨æ€ã„ã€æ¬¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’
+   æ¢ã—ã«è¡Œãã®ã§ã‚ã¾ã‚Šè‰¯ããªã„ã€‚return ã‚’å—ã‘ãŸã¨ã“ã‚ã‚‚å¤‰ãˆãªã‘ã‚Œã°ãª
+   ã‚‰ãªã„ã€‚é¢å€’ãªã®ã§ã€ã¨ã‚Šã‚ãˆãšå¤–ã™ */
+    if (c != '\033' && c != '\n' && c != '\r' && c!= '\t' && c < ' ') {
+      fatal("read: Binary data read.", NON);
+    }
+#endif
+  }
+  untyi(c);
+  return(YES);
+}
+
+
+/* skip reading until '\n' -
+	if eof read then return NO	*/
+static int zaplin()
+{
+	int c;
+
+	while ((c = tyi()) != '\n')
+		if ( !c )
+			return(NO);
+	return(YES);
+}
+
+
 static list
 read1()
 {
   int  c;
   list p, *pp;
   list t;
-  char *eofmsg = "EOF hit in reading a list : ";
+  const char* eofmsg = "EOF hit in reading a list : ";
 
  lab:
   if ( !skipspaces() ) {
@@ -957,7 +1109,7 @@ read1()
     car(p) = p;
     push(p);
     pp = sp;
-    
+
     for (;;) {
     lab2:
       if ( !skipspaces() ) {
@@ -1028,88 +1180,39 @@ read1()
   }
 }
 
-/* skipping spaces function -
-	if eof read then return NO	*/
 
-static
-skipspaces()
+/*
+**  print atom function
+**  please make sure it is an atom (not list)
+**  no check is done here.
+*/
+static void patom(list atm)
 {
-  int c;
+  char namebuf[BUFSIZE];
 
-  while ((c = tyi()) <= ' ') {
-    if ( !c ) {
-      return(NO);
+  if (constp(atm)) {
+    if (numberp(atm)) {
+      (void)sprintf(namebuf,"%d",(int)xnum(atm));
+      prins(namebuf);
     }
-#ifdef QUIT_IF_BINARY_CANNARC
-/* ¼Â¤Ï fatal() ¤Ë¤·¤Æ¤·¤Ş¤¦¤È read ¤Ç¤­¤Ê¤«¤Ã¤¿¤È»×¤¤¡¢¼¡¤Î¥Õ¥¡¥¤¥ë¤ò
-   Ãµ¤·¤Ë¹Ô¤¯¤Î¤Ç¤¢¤Ş¤êÎÉ¤¯¤Ê¤¤¡£return ¤ò¼õ¤±¤¿¤È¤³¤í¤âÊÑ¤¨¤Ê¤±¤ì¤Ğ¤Ê
-   ¤é¤Ê¤¤¡£ÌÌÅİ¤Ê¤Î¤Ç¡¢¤È¤ê¤¢¤¨¤º³°¤¹ */
-    if (c != '\033' && c != '\n' && c != '\r' && c!= '\t' && c < ' ') {
-      fatal("read: Binary data read.", NON);
+    else {		/* this is a string */
+      int i, len = xstrlen(atm);
+      char *s = xstring(atm);
+
+      tyo('"');
+      for (i = 0 ; i < len ; i++) {
+	tyo(s[i]);
+      }
+      tyo('"');
     }
-#endif
   }
-  untyi(c);
-  return(YES);
-}
-
-/* skip reading until '\n' -
-	if eof read then return NO	*/
-
-static
-zaplin()
-{
-	int c;
-
-	while ((c = tyi()) != '\n')
-		if ( !c )
-			return(NO);
-	return(YES);
-}
-
-static void gc();
-
-static list
-newcons()
-{
-  list retval;
-
-  if (freecell + sizeof(struct cell) >= cellbtm) {
-    gc();
+  else {
+    prins(symbolpointer(atm)->pname);
   }
-  retval = CONS_TAG | (freecell - celltop);
-  freecell += sizeof(struct cell);
-  return retval;
 }
 
-static list
-newsymbol(name)
-char *name;
-{
-  list retval;
-  struct atomcell *temp;
-  int namesize;
 
-  namesize = strlen(name);
-  namesize = ((namesize / sizeof(list)) + 1) * sizeof(list); /* +1¤Ï'\0'¤ÎÊ¬ */
-  if (freecell + (sizeof(struct atomcell)) + namesize >= cellbtm) {
-    gc();
-  }
-  temp = (struct atomcell *)freecell;
-  retval = SYMBOL_TAG | (freecell - celltop);
-  freecell += sizeof(struct atomcell);
-  (void)strcpy(freecell, name);
-  temp->pname = freecell;
-  freecell += namesize;
-  
-  return retval;
-}
-
-static void patom();
-
-static void
-print(l)
-list l;
+static void print(list l)
 {
 	if ( !l )	/* case NIL	*/
 		prins("nil");
@@ -1126,7 +1229,7 @@ list l;
 				patom(l);
 				break;
 			}
-			else 
+			else
 				print(car(l));
 		}
 		tyo(')');
@@ -1134,26 +1237,31 @@ list l;
 }
 
 
+static int isnum(char* name)
+{
+	if (*name == '-') {
+		name++;
+		if ( !*name )
+			return(NO);
+	}
+	for(; *name ; name++) {
+		if (*name < '0' || '9' < *name) {
+			if (*name != '.' || *(name + 1)) {
+				return(NO);
+			}
+		}
+	}
+	return(YES);
+}
+
 
 /*
 ** read atom
 */
 
-
-static list 
-ratom()
-{
-	return(ratom2(tyi()));
-}
-
 /* read atom with the first one character -
 	check if the token is numeric or pure symbol & return proper value */
-
-static isnum();
-
-static list 
-ratom2(a)
-int  a;
+static list ratom2(int a)
 {
   int  i, c, flag;
   char atmbuf[BUFSIZE];
@@ -1199,6 +1307,56 @@ int  a;
   }
 }
 
+
+static list
+ratom()
+{
+	return(ratom2(tyi()));
+}
+
+
+static list
+allocstring(int n)
+{
+  int namesize;
+  list retval;
+
+  namesize = ((n + (sizeof(pointerint)) + 1 + 3)/ sizeof(list)) * sizeof(list);
+  if (freecell + namesize >= cellbtm) { /* gc ä¸­ã¯èµ·ã“ã‚Šå¾—ãªã„ã¯ãš */
+    gc();
+  }
+  ((struct stringcell *)freecell)->length = n;
+  retval = STRING_TAG | (freecell - celltop);
+  freecell += namesize;
+  return retval;
+}
+
+
+/* null æ–‡å­—ã§çµ‚ã‚ã‚‰ãªã„ strncpy */
+static char *
+Strncpy(char* x, const char* y, int len)
+{
+  int i;
+
+  for (i = 0 ; i < len ; i++) {
+    x[i] = y[i];
+  }
+  return x;
+}
+
+
+static list
+copystring(const char* s, int n)
+{
+  list retval;
+
+  retval = allocstring(n);
+  (void)Strncpy(xstring(retval), s, n);
+  xstring(retval)[n] = '\0';
+  return retval;
+}
+
+
 static list
 rstring()
 {
@@ -1234,7 +1392,7 @@ rstring()
   return copystring(strb, strp);
 }
 
-/* rcharacter -- °ìÊ¸»úÆÉ¤ó¤ÇÍè¤ë¡£ */
+/* rcharacter -- ä¸€æ–‡å­—èª­ã‚“ã§æ¥ã‚‹ã€‚ */
 
 static list
 rcharacter()
@@ -1244,7 +1402,7 @@ rcharacter()
   list retval;
   int bufp;
 
-  tempbuf = malloc(longestkeywordlen + 1);
+  tempbuf = (char*) malloc(longestkeywordlen + 1);
   if ( !tempbuf ) {
     fatal("read: malloc failed in reading character.", NON);
     /* NOTREACHED */
@@ -1255,11 +1413,11 @@ rcharacter()
   if (ch == '\\') {
     int code, res;
 
-    do { /* ¥­¡¼¥ï¡¼¥É¤È¾È¹ç¤¹¤ë */
+    do { /* ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨ç…§åˆã™ã‚‹ */
       tempbuf[bufp++] = ch = tyi();
       res = identifySequence(ch, &code);
     } while (res == CONTINUE);
-    if (code != -1) { /* ¥­¡¼¥ï¡¼¥É¤È°ìÃ×¤·¤¿¡£ */
+    if (code != -1) { /* ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨ä¸€è‡´ã—ãŸã€‚ */
       retval = mknum(code);
     }
     else if (bufp > 2 && tempbuf[0] == 'C' && tempbuf[1] == '-') {
@@ -1277,7 +1435,7 @@ rcharacter()
       untyi(tempbuf[3]);
       retval = mknum(CANNA_KEY_PF1);
     }
-    else { /* Á´Á³ÂÌÌÜ */
+    else { /* å…¨ç„¶é§„ç›® */
       while (bufp > 1) {
 	untyi(tempbuf[--bufp]);
       }
@@ -1292,7 +1450,7 @@ rcharacter()
       ch += tyi();
       goto shift_more;
     }
-    else if (ch & 0x80) { /* ¤¦¡Á¤ó¡¢ÆüËÜ¸ì¤Ë°ÍÂ¸¤·¤Æ¤¤¤ë */
+    else if (ch & 0x80) { /* ã†ã€œã‚“ã€æ—¥æœ¬èªã«ä¾å­˜ã—ã¦ã„ã‚‹ */
     shift_more:
       ch <<= 8;
       ch += tyi();
@@ -1304,29 +1462,10 @@ rcharacter()
   return retval;
 }
 
-static isnum(name)
-char *name;
-{
-	if (*name == '-') {
-		name++;
-		if ( !*name )
-			return(NO);
-	}
-	for(; *name ; name++) {
-		if (*name < '0' || '9' < *name) {
-			if (*name != '.' || *(name + 1)) {
-				return(NO);
-			}
-		}
-	}
-	return(YES);
-}
 
 /* tyi -- input one character from buffered stream	*/
-
 static void
-untyi(c)
-int c;
+untyi(int c)
 {
   if (readbuf < readptr) {
     *--readptr = c;
@@ -1334,19 +1473,19 @@ int c;
   else {
     if (untyip >= untyisize) {
       if (untyisize == 0) {
-	untyibuf = malloc(UNTYIUNIT);
+          untyibuf = (char*) malloc(UNTYIUNIT);
 	if (untyibuf) {
 	  untyisize = UNTYIUNIT;
 	}
       }
       else {
-	untyibuf = realloc(untyibuf, UNTYIUNIT + untyisize);
+          untyibuf = (char*) realloc(untyibuf, UNTYIUNIT + untyisize);
 	if (untyibuf) {
 	  untyisize += UNTYIUNIT;
 	}
       }
     }
-    if (untyip < untyisize) { /* ¤½¤ì¤Ç¤â¥Á¥§¥Ã¥¯¤¹¤ë */
+    if (untyip < untyisize) { /* ãã‚Œã§ã‚‚ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
       untyibuf[untyip++] = c;
     }
   }
@@ -1394,8 +1533,8 @@ tyi()
   /* NOTREACHED */
 }
 
-/* tyipeek -- input one character without advance the read pointer	*/
 
+/* tyipeek -- input one character without advance the read pointer	*/
 static int
 tyipeek()
 {
@@ -1404,80 +1543,18 @@ tyipeek()
   return c;
 }
 
-/* tyo -- output one character	*/
 
-static void tyo(c)
-int c;
+/* tyo -- output one character	*/
+static void tyo(int c)
 {
   if (outstream) {
     (void)putc(c, outstream);
   }
 }
-	
 
-/* prins -
-	print string	*/
-
-static void prins(s)
-char *s;
-{
-	while (*s) {
-		tyo(*s++);
-	}
-}
-
-
-/* isterm -
-	check if the character is terminating the lisp expression	*/
-
-static isterm(c)
-int  c;
-{
-	if (c <= ' ')
-		return(YES);
-	else {
-		switch (c)
-		{
-		case '(':
-		case ')':
-		case ';':
-			return(YES);
-		default:
-			return(NO);
-		}
-	}
-}
-
-/* push down an S-expression to parameter stack	*/
-
-static void
-push(value)
-list value;
-{
-  if (sp <= stack) {
-    error("Stack over flow",NON);
-    /* NOTREACHED */
-  }
-  else
-    *--sp = value;
-}
-
-/* pop up n S-expressions from parameter stack	*/
-
-static void 
-pop(x)
-int  x;
-{
-  if (0 < x && sp >= &stack[STKSIZE]) {
-    error("Stack under flow",NON);
-    /* NOTREACHED */
-  }
-  sp += x;
-}
 
 /* pop up an S-expression from parameter stack	*/
-
-static list 
+static list
 pop1()
 {
   if (sp >= &stack[STKSIZE]) {
@@ -1487,19 +1564,8 @@ pop1()
   return(*sp++);
 }
 
-static void
-epush(value)
-list value;
-{
-  if (esp <= estack) {
-    error("Estack over flow",NON);
-    /* NOTREACHED */
-  }
-  else
-    *--esp = value;
-}
 
-static list 
+static list
 epop()
 {
   if (esp >= &estack[STKSIZE]) {
@@ -1515,48 +1581,12 @@ epop()
 */
 
 
-/*
-**  print atom function
-**  please make sure it is an atom (not list)
-**  no check is done here.
-*/
-
-static void
-patom(atm)
-list atm;
-{
-  char namebuf[BUFSIZE];
-
-  if (constp(atm)) {
-    if (numberp(atm)) {
-      (void)sprintf(namebuf,"%d",(int)xnum(atm));
-      prins(namebuf);
-    }
-    else {		/* this is a string */
-      int i, len = xstrlen(atm);
-      char *s = xstring(atm);
-
-      tyo('"');
-      for (i = 0 ; i < len ; i++) {
-	tyo(s[i]);
-      }
-      tyo('"');
-    }
-  }
-  else {
-    prins(symbolpointer(atm)->pname);
-  }
-}
-
-static void markcopycell();
-
 static char *oldcelltop;
 static char *oldcellp;
 
 #define oldpointer(x) (oldcelltop + celloffset(x))
 
-static void
-gc() /* ¥³¥Ô¡¼Êı¼°¤Î¥¬¡¼¥Ù¥¸¥³¥ì¥¯¥·¥ç¥ó¤Ç¤¢¤ë */
+static void gc() /* ã‚³ãƒ”ãƒ¼æ–¹å¼ã®ã‚¬ãƒ¼ãƒ™ã‚¸ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã§ã‚ã‚‹ */
 {
   int i;
   list *p;
@@ -1607,41 +1637,9 @@ gc() /* ¥³¥Ô¡¼Êı¼°¤Î¥¬¡¼¥Ù¥¸¥³¥ì¥¯¥·¥ç¥ó¤Ç¤¢¤ë */
   under_gc = 0;
 }
 
-static char *Strncpy();
 
 static list
-allocstring(n)
-int n;
-{
-  int namesize;
-  list retval;
-
-  namesize = ((n + (sizeof(pointerint)) + 1 + 3)/ sizeof(list)) * sizeof(list);
-  if (freecell + namesize >= cellbtm) { /* gc Ãæ¤Ïµ¯¤³¤êÆÀ¤Ê¤¤¤Ï¤º */
-    gc();
-  }
-  ((struct stringcell *)freecell)->length = n;
-  retval = STRING_TAG | (freecell - celltop);
-  freecell += namesize;
-  return retval;
-}
-
-static list
-copystring(s, n)
-char *s;
-int n;
-{
-  list retval;
-
-  retval = allocstring(n);
-  (void)Strncpy(xstring(retval), s, n);
-  xstring(retval)[n] = '\0';
-  return retval;
-}
-
-static list
-copycons(l)
-struct cell *l;
+copycons(struct cell* l)
 {
   list newcell;
 
@@ -1651,9 +1649,8 @@ struct cell *l;
   return newcell;
 }
 
-static void
-markcopycell(addr)
-list *addr;
+
+static void markcopycell(list* addr)
 {
   list temp;
  redo:
@@ -1702,16 +1699,16 @@ list *addr;
     }
     markcopycell(&newatom->plist);
     if (newatom->ftype == EXPR || newatom->ftype == MACRO) {
-      markcopycell((int *)&newatom->func);
+        markcopycell( (list*) &newatom->func);
     }
     addr = &newatom->hlink;
     goto redo;
   }
 }
 
+
 static list
-bindall(var,par,a,e)
-list var, par, a, e;
+bindall(list var, list par, list a, list e)
 {
   list *pa, *pe, retval;
 
@@ -1745,7 +1742,7 @@ list var, par, a, e;
 }
 
 static list
-Lquote()
+Lquote(int)
 {
 	list p;
 
@@ -1756,12 +1753,60 @@ Lquote()
 		return(car(p));
 }
 
+
 static list
-Leval(n)
-int n;
+assq(list e, list a)
+{
+  list i;
+
+  for (i = a ; i ; i = cdr(i)) {
+    if (consp(car(i)) && e == caar(i)) {
+      return(car(i));
+    }
+  }
+  return((list)NIL);
+}
+
+
+/* eval each argument and push down each value to parameter stack	*/
+static int evpsh(list args)
+{
+  int  counter;
+  list temp;
+
+  counter = 0;
+  while (consp(args)) {
+    push(args);
+    push(car(args));
+    temp = Leval(1);
+    args = cdr(pop1());
+    counter++;
+    push(temp);
+  }
+  return (counter);
+}
+
+
+static list Lprogn(int)
+{
+  list val, *pf;
+
+  val = NIL;
+  pf = sp;
+  for (; consp(*pf) ; *pf = cdr(*pf)) {
+    symbolpointer(T)->value = T;
+    push(car(*pf));
+    val = Leval(1);
+  }
+  pop1();
+  return (val);
+}
+
+
+static list Leval(int n)
 {
   list e, t, s, tmp, aa, *pe, *pt, *ps, *paa;
-  list fn, (*cfn)(), *pfn;
+  list fn, (*cfn)(int), *pfn;
   int i, j;
   argnchk("eval",1);
   e = sp[0];
@@ -1815,7 +1860,7 @@ int n;
       return (t);
     case SPECIAL:
       push(cdr(e));
-      t = (*(symbolpointer(fn)->func))();
+      t = (*(symbolpointer(fn)->func))(0);
       pop1();
       return (t);
     case EXPR:
@@ -1902,7 +1947,7 @@ int n;
 /* Lambda binding finished, and a new environment is established.	*/
       epush(pop1());	/* set the new environment	*/
       push(cddr(*pfn));
-      t = Lprogn();
+      t = Lprogn(0);
       epop();
       pop(5);
       return (t);
@@ -1917,7 +1962,7 @@ int n;
       push(fn);
       epush(bindall(t,s,NIL,e));
       push(cddr(pop1()));
-      t = Lprogn();
+      t = Lprogn(0);
       epop();
       push(t);
       push(t);
@@ -1931,7 +1976,7 @@ int n;
       return (s);
     case CMACRO:
       push(e);
-      push(t = (*(symbolpointer(fn)->func))());
+      push(t = (*(symbolpointer(fn)->func))(0));
       push(t);
       s = Leval(1);
       t = pop1();
@@ -1956,40 +2001,6 @@ int n;
   return NIL;
 }
 
-static list
-assq(e,a)
-list e, a;
-{
-  list i;
-
-  for (i = a ; i ; i = cdr(i)) {
-    if (consp(car(i)) && e == caar(i)) {
-      return(car(i));
-    }
-  }
-  return((list)NIL);
-}
-
-/* eval each argument and push down each value to parameter stack	*/
-
-static int
-evpsh(args)
-list args;
-{
-  int  counter;
-  list temp;
-
-  counter = 0;
-  while (consp(args)) {
-    push(args);
-    push(car(args));
-    temp = Leval(1);
-    args = cdr(pop1());
-    counter++;
-    push(temp);
-  }
-  return (counter);
-}
 
 /*
 static int
@@ -2009,50 +2020,7 @@ list args;
 */
 
 static list
-Lprogn()
-{
-  list val, *pf;
-
-  val = NIL;
-  pf = sp;
-  for (; consp(*pf) ; *pf = cdr(*pf)) {
-    symbolpointer(T)->value = T;
-    push(car(*pf));
-    val = Leval(1);
-  }
-  pop1();
-  return (val);
-}
-
-static list
-Lcons(n)
-int n;
-{
-	list temp;
-
-	argnchk("cons",2);
-	temp = newcons();
-	cdr(temp) = pop1();
-	car(temp) = pop1();
-	return(temp);
-}
-
-static list 
-Lncons(n)
-int n;
-{
-	list temp;
-
-	argnchk("ncons",1);
-	temp = newcons();
-	car(temp) = pop1();
-	cdr(temp) = NIL;
-	return(temp);
-}
-
-static list
-Lxcons(n)
-int n;
+Lxcons(int n)
 {
 	list temp;
 
@@ -2063,18 +2031,9 @@ int n;
 	return(temp);
 }
 
-static list 
-Lprint(n)
-int n;
-{
-	print(sp[0]);
-	pop(n);
-	return (T);
-}
 
 static list
-Lset(n)
-int n;
+Lset(int n)
 {
   list val, t;
   list var;
@@ -2101,7 +2060,7 @@ int n;
 }
 
 static list
-Lsetq()
+Lsetq(int )
 {
   list a, *pp;
 
@@ -2121,11 +2080,9 @@ Lsetq()
   return(a);
 }
 
-static int equal();
 
-static list 
-Lequal(n)
-int n;
+static list
+Lequal(int n)
 {
   argnchk("equal (=)",2);
   if (equal(pop1(),pop1()))
@@ -2134,12 +2091,9 @@ int n;
     return(NIL);
 }
 
-/* null Ê¸»ú¤Ç½ª¤ï¤é¤Ê¤¤ strncmp */
-
+/* null æ–‡å­—ã§çµ‚ã‚ã‚‰ãªã„ strncmp */
 static int
-Strncmp(x, y, len)
-char *x, *y;
-int len;
+Strncmp(const char* x, const char* y, int len)
 {
   int i;
 
@@ -2151,24 +2105,8 @@ int len;
   return 0;
 }
 
-/* null Ê¸»ú¤Ç½ª¤ï¤é¤Ê¤¤ strncpy */
 
-static char *
-Strncpy(x, y, len)
-char *x, *y;
-int len;
-{
-  int i;
-
-  for (i = 0 ; i < len ; i++) {
-    x[i] = y[i];
-  }
-  return x;
-}
-
-static int
-equal(x,y)
-list x, y;
+static int equal(list x, list y)
 {
  equaltop:
   if (x == y)
@@ -2196,14 +2134,14 @@ list x, y;
       y = cdr(y);
       goto equaltop;
     }
-    else 
+    else
       return(NO);
   }
 }
 
-static list 
-Lgreaterp(n)
-int n;
+
+static list
+Lgreaterp(int n)
 {
   list p;
   pointerint x, y;
@@ -2232,9 +2170,9 @@ int n;
   }
 }
 
-static list 
-Llessp(n)
-int n;
+
+static list
+Llessp(int n)
 {
   list p;
   pointerint x, y;
@@ -2263,9 +2201,9 @@ int n;
   }
 }
 
+
 static list
-Leq(n)
-int n;
+Leq(int n)
 {
   list f;
 
@@ -2278,7 +2216,7 @@ int n;
 }
 
 static list
-Lcond()
+Lcond(int)
 {
   list *pp, t, a, c;
 
@@ -2301,7 +2239,7 @@ Lcond()
 	else {
 	  (void)pop1();
 	  push(t);
-	  return(Lprogn());
+	  return Lprogn(0);
 	}
       }
       else {
@@ -2313,9 +2251,9 @@ Lcond()
   return (NIL);
 }
 
+
 static list
-Lnull(n)
-int n;
+Lnull(int n)
 {
   argnchk("null",1);
   if (pop1())
@@ -2324,8 +2262,8 @@ int n;
     return T;
 }
 
-static list 
-Lor()
+static list
+Lor(int)
 {
   list *pp, t;
 
@@ -2341,8 +2279,8 @@ Lor()
   return(NIL);
 }
 
-static list 
-Land()
+static list
+Land(int)
 {
   list *pp, t;
 
@@ -2358,9 +2296,9 @@ Land()
   return(t);
 }
 
-static list 
-Lplus(n)
-int n;
+
+static list
+Lplus(int n)
 {
   list t;
   int  i;
@@ -2382,9 +2320,9 @@ int n;
   return(mknum(sum));
 }
 
+
 static list
-Ltimes(n)
-int n;
+Ltimes(int n)
 {
   list t;
   int  i;
@@ -2405,9 +2343,9 @@ int n;
   return(mknum(sum));
 }
 
+
 static list
-Ldiff(n)
-int n;
+Ldiff(int n)
 {
   list t;
   int  i;
@@ -2441,9 +2379,9 @@ int n;
   }
 }
 
-static list 
-Lquo(n)
-int n;
+
+static list
+Lquo(int n)
 {
   list t;
   int  i;
@@ -2475,9 +2413,9 @@ int n;
   return(mknum(sum));
 }
 
-static list 
-Lrem(n)
-int n;
+
+static list
+Lrem(int n)
 {
   list t;
   int  i;
@@ -2512,19 +2450,17 @@ int n;
 /*
  *	Garbage Collection
  */
-
-static list 
-Lgc(n)
-int n;
+static list
+Lgc(int n)
 {
   argnchk("gc",0);
   gc();
   return(NIL);
 }
 
+
 static list
-Lusedic(n)
-int n;
+Lusedic(int n)
 {
   int i;
   list retval = NIL, temp;
@@ -2565,7 +2501,7 @@ int n;
     if (stringp(temp)) {
       kanjidicname  = (struct dicname *)malloc(sizeof(struct dicname));
       if (kanjidicname) {
-	kanjidicname->name = malloc(strlen(xstring(temp)) + 1);
+          kanjidicname->name = (char*) malloc(strlen(xstring(temp)) + 1);
 	if (kanjidicname->name) {
 	  strcpy(kanjidicname->name , xstring(temp));
 	  kanjidicname->dictype = dictype;
@@ -2595,9 +2531,9 @@ int n;
   return retval;
 }
 
+
 static list
-Llist(n)
-int n;
+Llist(int n)
 {
 	push(NIL);
 	for (; n ; n--) {
@@ -2606,9 +2542,9 @@ int n;
 	return (pop1());
 }
 
+
 static list
-Lcopysym(n)
-int n;
+Lcopysym(int n)
 {
   list src, dst;
   struct atomcell *dsta, *srca;
@@ -2636,12 +2572,12 @@ int n;
   return src;
 }
 
+
 static list
-Lload(n)
-int n;
+Lload(int n)
 {
   list p, t;
-  FILE *instream, *fopen();
+  FILE *instream;
 
   argnchk("load",1);
   p = pop1();
@@ -2657,12 +2593,12 @@ int n;
   print(p);
   prins("]\n");
 
-  if (jmpenvp <= 0) { /* ºÆµ¢¤¬¿¼¤¹¤®¤ë¾ì¹ç */
+  if (jmpenvp <= 0) { /* å†å¸°ãŒæ·±ã™ãã‚‹å ´åˆ */
     return NIL;
   }
   jmpenvp--;
   files[++filep].f = instream;
-  files[filep].name = malloc(xstrlen(p) + 1);
+  files[filep].name = (char*) malloc(xstrlen(p) + 1);
   if (files[filep].name) {
     strcpy(files[filep].name, xstring(p));
   }
@@ -2686,9 +2622,9 @@ int n;
   return(T);
 }
 
+
 static list
-Lmodestr(n)
-int n;
+Lmodestr(int n)
 {
   list p;
   int mode;
@@ -2707,14 +2643,10 @@ int n;
   return p;
 }
 
-/* µ¡Ç½¥·¡¼¥±¥ó¥¹¤Î¼è¤ê½Ğ¤· */
 
+/* æ©Ÿèƒ½ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ã®å–ã‚Šå‡ºã— */
 static int
-xfseq(fname, l, arr, arrsize)
-char *fname;
-list l;
-unsigned char *arr;
-int arrsize;
+xfseq(const char* fname, list l, unsigned char* arr, int arrsize)
 {
   int i;
 
@@ -2747,8 +2679,7 @@ int arrsize;
 }
 
 static list
-Lsetkey(n)
-int n;
+Lsetkey(int n)
 {
   list p;
   int mode, slen;
@@ -2785,9 +2716,9 @@ int n;
   return p;
 }
 
+
 static list
-Lgsetkey(n)
-int n;
+Lgsetkey(int n)
 {
   list p;
   int slen;
@@ -2822,8 +2753,7 @@ int n;
 }
 
 static list
-Lputd(n)
-int n;
+Lputd(int n)
 {
   list body, a;
   list sym;
@@ -2839,23 +2769,23 @@ int n;
   }
   if (null(body)) {
     symp->ftype = UNDEF;
-    symp->func = (list (*)())UNDEF;
+    symp->func = (list (*)(int))UNDEF;
   }
   else if (consp(body)) {
     if (car(body) == _MACRO) {
       symp->ftype = MACRO;
-      symp->func = (list (*)())body;
+      symp->func = (list (*)(int))body;
     }
     else {
       symp->ftype = EXPR;
-      symp->func = (list (*)())body;
+      symp->func = (list (*)(int))body;
     }
   }
   return(a);
 }
 
 static list
-Ldefun()
+Ldefun(int)
 {
   list form, res;
 
@@ -2873,8 +2803,9 @@ Ldefun()
   return (res);
 }
 
+
 static list
-Ldefmacro()
+Ldefmacro(int)
 {
   list form, res;
 
@@ -2892,9 +2823,9 @@ Ldefmacro()
   return (res);
 }
 
+
 static list
-Lcar(n)
-int n;
+Lcar(int n)
 {
   list f;
 
@@ -2909,9 +2840,9 @@ int n;
   return(car(f));
 }
 
+
 static list
-Lcdr(n)
-int n;
+Lcdr(int n)
 {
   list f;
 
@@ -2926,9 +2857,9 @@ int n;
   return(cdr(f));
 }
 
+
 static list
-Latom(n)
-int n;
+Latom(int n)
 {
   list f;
 
@@ -2941,7 +2872,7 @@ int n;
 }
 
 static list
-Llet()
+Llet(int)
 {
   list lambda, args, p, *pp, *pq, *pl, *px;
 
@@ -2998,7 +2929,7 @@ Llet()
 /* (if con tr . falist) -> (cond (con tr) (t . falist))*/
 
 static list
-Lif()
+Lif(int)
 {
   list x, *px, retval;
 
@@ -3026,9 +2957,9 @@ Lif()
   }
 }
 
+
 static list
-Lunbindkey(n)
-int n;
+Lunbindkey(int n)
 {
   unsigned char fseq[2];
   static unsigned char keyseq[2] = {(unsigned char)CANNA_KEY_Undefine,
@@ -3059,9 +2990,9 @@ int n;
   return retval;
 }
 
+
 static list
-Lgunbindkey(n)
-int n;
+Lgunbindkey(int n)
 {
   unsigned char fseq[2];
   static unsigned char keyseq[2] = {(unsigned char)CANNA_KEY_Undefine,
@@ -3092,7 +3023,7 @@ int n;
 #define DEFMODE_ILLFUNCTION 2
 
 static list
-Ldefmode()
+Ldefmode(int)
 {
   list form, *sym, e, *p, fn, rd, md, us;
   extern extraFunc *extrafuncp;
@@ -3114,7 +3045,7 @@ Ldefmode()
     /* NOTREACHED */
   }
 
-  /* °ú¿ô¤ò¥×¥Ã¥·¥å¤¹¤ë */
+  /* å¼•æ•°ã‚’ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹ */
   for (i = 0, e = cdr(form) ; i < 4 ; i++, e = cdr(e)) {
     if (atom(e)) {
       for (j = i ; j < 4 ; j++) {
@@ -3129,7 +3060,7 @@ Ldefmode()
     /* NOTREACHED */
   }
 
-  /* É¾²Á¤¹¤ë */
+  /* è©•ä¾¡ã™ã‚‹ */
   for (i = 0, p = sym - 1 ; i < 4 ; i++, p--) {
     push(*p);
     push(Leval(1));
@@ -3143,12 +3074,12 @@ Ldefmode()
   ecode = DEFMODE_MEMORY;
   extrafunc = (extraFunc *)malloc(sizeof(extraFunc));
   if (extrafunc) {
-    /* ¥·¥ó¥Ü¥ë¤Î´Ø¿ôÃÍ¤È¤·¤Æ¤ÎÄêµÁ */
+    /* ã‚·ãƒ³ãƒœãƒ«ã®é–¢æ•°å€¤ã¨ã—ã¦ã®å®šç¾© */
     symbolpointer(*sym)->mid = CANNA_MODE_MAX_IMAGINARY_MODE + nothermodes;
     symbolpointer(*sym)->fid =
       extrafunc->fnum = CANNA_FN_MAX_FUNC + nothermodes;
 
-    /* ¥Ç¥Õ¥©¥ë¥È¤ÎÀßÄê */
+    /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è¨­å®š */
     extrafunc->display_name = (wchar_t *)NULL;
     extrafunc->u.modeptr = (newmode *)malloc(sizeof(newmode));
     if (extrafunc->u.modeptr) {
@@ -3160,21 +3091,20 @@ Ldefmode()
       extrafunc->u.modeptr->flags = CANNA_YOMI_IGNORE_USERSYMBOLS;
       extrafunc->u.modeptr->emode = (KanjiMode)0;
 
-      /* ¥â¡¼¥É¹½Â¤ÂÎ¤ÎºîÀ® */
+      /* ãƒ¢ãƒ¼ãƒ‰æ§‹é€ ä½“ã®ä½œæˆ */
       kanjimode = (KanjiMode)malloc(sizeof(KanjiModeRec));
       if (kanjimode) {
-	int searchfunc();
 	extern KanjiModeRec empty_mode;
 	extern BYTE *emptymap;
 
 	kanjimode->func = searchfunc;
 	kanjimode->keytbl = emptymap;
-	kanjimode->flags = 
+	kanjimode->flags =
 	  CANNA_KANJIMODE_TABLE_SHARED | CANNA_KANJIMODE_EMPTY_MODE;
 	kanjimode->ftbl = empty_mode.ftbl;
 	extrafunc->u.modeptr->emode = kanjimode;
 
-	/* ¥â¡¼¥ÉÉ½¼¨Ê¸»úÎó */
+	/* ãƒ¢ãƒ¼ãƒ‰è¡¨ç¤ºæ–‡å­—åˆ— */
 	ecode = DEFMODE_NOTSTRING;
 	edata = md;
 	if (stringp(md) || null(md)) {
@@ -3183,7 +3113,7 @@ Ldefmode()
 	  }
 	  ecode = DEFMODE_MEMORY;
 	  if (null(md) || extrafunc->display_name) {
-	    /* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë */
+	    /* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
 	    ecode = DEFMODE_NOTSTRING;
 	    edata = rd;
 	    if (stringp(rd) || null(rd)) {
@@ -3191,7 +3121,7 @@ Ldefmode()
 	      long f = extrafunc->u.modeptr->flags;
 
 	      if (stringp(rd)) {
-		newstr = malloc(strlen(xstring(rd)) + 1);
+                  newstr = (char*) malloc(strlen(xstring(rd)) + 1);
 	      }
 	      ecode = DEFMODE_MEMORY;
 	      if (null(rd) || newstr) {
@@ -3199,7 +3129,7 @@ Ldefmode()
 		  strcpy(newstr, xstring(rd));
 		  extrafunc->u.modeptr->romaji_table = newstr;
 		}
-		/* ¼Â¹Ôµ¡Ç½ */
+		/* å®Ÿè¡Œæ©Ÿèƒ½ */
 		for (e = fn ; consp(e) ; e = cdr(e)) {
 		  l = car(e);
 		  if (symbolp(l) && symbolpointer(l)->fid) {
@@ -3225,7 +3155,7 @@ Ldefmode()
 		    case CANNA_FN_Romaji:
 		      f |= CANNA_YOMI_ROMAJI;
 		      break;
-		      /* °Ê²¼¤Ï¤½¤Î¤¦¤Á¤ä¤í¤¦ */
+		      /* ä»¥ä¸‹ã¯ãã®ã†ã¡ã‚„ã‚ã† */
 		    case CANNA_FN_ToUpper:
 		      break;
 		    case CANNA_FN_Capitalize:
@@ -3242,12 +3172,12 @@ Ldefmode()
 		}
 		extrafunc->u.modeptr->flags = f;
 
-		/* ¥æ¡¼¥¶¥·¥ó¥Ü¥ë¤Î»ÈÍÑ¤ÎÍ­Ìµ */
+		/* ãƒ¦ãƒ¼ã‚¶ã‚·ãƒ³ãƒœãƒ«ã®ä½¿ç”¨ã®æœ‰ç„¡ */
 		if (us) {
 		  extrafunc->u.modeptr->flags &=
 		    ~CANNA_YOMI_IGNORE_USERSYMBOLS;
 		}
- 
+
 		extrafunc->keyword = EXTRA_FUNC_DEFMODE;
 		extrafunc->next = extrafuncp;
 		extrafuncp = extrafunc;
@@ -3285,13 +3215,13 @@ Ldefmode()
 }
 
 static list
-Ldefsym()
+Ldefsym(int)
 {
   list form, res, e;
   int i, ncand, group;
   wchar_t cand[1024], *p, *mcand, **acand, key, xkey;
   int mcandsize;
-  extern nkeysup;
+  extern int nkeysup;
   extern keySupplement keysup[];
 
   form = sp[0];
@@ -3299,7 +3229,7 @@ Ldefsym()
     error("Illegal form ",form);
     /* NOTREACHED */
   }
-  /* ¤Ş¤º¿ô¤ò¤«¤¾¤¨¤ë */
+  /* ã¾ãšæ•°ã‚’ã‹ããˆã‚‹ */
   for (ncand = 0 ; consp(form) ; ) {
     e = car(form);
     if (!numberp(e)) {
@@ -3380,7 +3310,7 @@ Ldefsym()
 	;
     }
     acand[i] = 0;
-    /* ¼Âºİ¤Ë³ÊÇ¼¤¹¤ë */
+    /* å®Ÿéš›ã«æ ¼ç´ã™ã‚‹ */
     keysup[nkeysup].key = key;
     keysup[nkeysup].xkey = xkey;
     keysup[nkeysup].groupid = group;
@@ -3395,8 +3325,8 @@ Ldefsym()
 
 #ifndef NO_EXTEND_MENU
 
-/* 
-   defselection ¤Ç°ìÍ÷¤ÎÊ¸»ú¤ò¼è¤ê½Ğ¤¹¤¿¤á¤ËÉ¬Í×¤Ê¤Î¤Ç¡¢°Ê²¼¤òÄêµÁ¤¹¤ë
+/*
+   defselection ã§ä¸€è¦§ã®æ–‡å­—ã‚’å–ã‚Šå‡ºã™ãŸã‚ã«å¿…è¦ãªã®ã§ã€ä»¥ä¸‹ã‚’å®šç¾©ã™ã‚‹
  */
 
 #define SS2	((char)0x8e)
@@ -3411,13 +3341,10 @@ static int cswidth[4] = {1, 2, 2, 3};
 
 
 /*
-   getKutenCode -- Ê¸»ú¤Î¶èÅÀ¥³¡¼¥É¤ò¼è¤ê½Ğ¤¹
+   getKutenCode -- æ–‡å­—ã®åŒºç‚¹ã‚³ãƒ¼ãƒ‰ã‚’å–ã‚Šå‡ºã™
  */
-
 static int
-getKutenCode(data, ku, ten)
-char *data;
-int *ku, *ten;
+getKutenCode(char* data, int* ku, int* ten)
 {
   int codeset;
 
@@ -3442,16 +3369,14 @@ int *ku, *ten;
   }
   return codeset;
 }
-    
-/* 
-   howManuCharsAre -- defselection ¤ÇÈÏ°Ï»ØÄê¤·¤¿¾ì¹ç¤Ë
-                      ¤½¤ÎÈÏ°ÏÆâ¤Î¿Ş·ÁÊ¸»ú¤Î¸Ä¿ô¤òÊÖ¤¹
- */
 
+
+/*
+   howManuCharsAre -- defselection ã§ç¯„å›²æŒ‡å®šã—ãŸå ´åˆã«
+                      ãã®ç¯„å›²å†…ã®å›³å½¢æ–‡å­—ã®å€‹æ•°ã‚’è¿”ã™
+ */
 static int
-howManyCharsAre(tdata, edata, tku, tten, codeset)
-char *tdata, *edata;
-int *tku, *tten, *codeset;
+howManyCharsAre(char* tdata, char* edata, int* tku, int* tten, int* codeset)
 {
   int eku, eten, kosdata, koedata;
 
@@ -3468,12 +3393,10 @@ int *tku, *tten, *codeset;
 
 
 /*
-   pickupChars -- ÈÏ°ÏÆâ¤Î¿Ş·ÁÊ¸»ú¤ò¼è¤ê½Ğ¤¹
+   pickupChars -- ç¯„å›²å†…ã®å›³å½¢æ–‡å­—ã‚’å–ã‚Šå‡ºã™
  */
-
 static char *
-pickupChars(tku, tten, num, kodata)
-int tku, tten, num, kodata;
+pickupChars(int tku, int tten, int num, int kodata)
 {
   char *dptr, *tdptr, *edptr;
 
@@ -3516,14 +3439,12 @@ int tku, tten, num, kodata;
   }
 }
 
-/* 
-   numtostr -- Key data ¤«¤éÊ¸»ú¤ò¼è¤ê½Ğ¤¹
+/*
+   numtostr -- Key data ã‹ã‚‰æ–‡å­—ã‚’å–ã‚Šå‡ºã™
  */
 
 static void
-numtostr(num, str)
-unsigned long num;
-char *str;
+numtostr(unsigned long num, char* str)
 {
   if (num & 0xff0000) {
     *str++ = (char)((num >> 16) & 0xff);
@@ -3536,14 +3457,14 @@ char *str;
 }
 
 /*
-  defselection -- Ê¸»ú°ìÍ÷¤ÎÄêµÁ
+  defselection -- æ–‡å­—ä¸€è¦§ã®å®šç¾©
 
-  ¡Ô·Á¼°¡Õ
-  (defselection function-symbol "¥â¡¼¥ÉÉ½¼¨" '(character-list))
+  ã€Šå½¢å¼ã€‹
+  (defselection function-symbol "ãƒ¢ãƒ¼ãƒ‰è¡¨ç¤º" '(character-list))
  */
 
 static list
-Ldefselection()
+Ldefselection(int)
 {
   list form, sym, e, e2, md, kigo_list, buf;
   extern extraFunc *extrafuncp;
@@ -3570,7 +3491,7 @@ Ldefselection()
     error("String data expected ", md);
     /* NOTREACHED */
   }
-    
+
   push(car(cdr(cdr(form))));
   push(Leval(1));
 
@@ -3580,11 +3501,11 @@ Ldefselection()
     /* NOTREACHED */
   }
 
-  /* ¤Ş¤ºÎÎ°è¤ò³ÎÊİ¤¹¤ë */
+  /* ã¾ãšé ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ */
   buf = kigo_list;
   while (!atom(buf)) {
     if (!atom(cdr(buf)) && (car(cdr(buf)) == HYPHEN)) {
-      /* ÈÏ°Ï»ØÄê¤Î¤È¤­ */
+      /* ç¯„å›²æŒ‡å®šã®ã¨ã */
       if (atom(cdr(cdr(buf)))) {
         error("Illegal form ", buf);
         /* NOTREACHED */
@@ -3617,7 +3538,7 @@ Ldefselection()
       buf = cdr(cdr(cdr(buf)));
     }
     else {
-     /* Í×ÁÇ»ØÄê¤Î¤È¤­ */
+     /* è¦ç´ æŒ‡å®šã®ã¨ã */
       char xx[4], *xxp;
 
       e = car(buf);
@@ -3648,7 +3569,7 @@ Ldefselection()
         }
         kigolen = kigolen + cswidth[cs];
       }
-      kigolen += 1;  /* ³ÆÍ×ÁÇ¤ÎºÇ¸å¤Ë \0 ¤òÆş¤ì¤ë */
+      kigolen += 1;  /* å„è¦ç´ ã®æœ€å¾Œã« \0 ã‚’å…¥ã‚Œã‚‹ */
       nkigo_data++;
       buf = cdr(buf);
     }
@@ -3661,10 +3582,10 @@ Ldefselection()
   }
   p = kigo_str;
 
-  /* °ìÍ÷¤ò¼è¤ê½Ğ¤¹ */
+  /* ä¸€è¦§ã‚’å–ã‚Šå‡ºã™ */
   while (!atom(kigo_list)) {
     if (!atom(cdr(kigo_list)) && (car(cdr(kigo_list)) == HYPHEN)) {
-    /* ÈÏ°Ï»ØÄê¤Î¤È¤­ */
+    /* ç¯„å›²æŒ‡å®šã®ã¨ã */
       int sku, sten, codeset, num;
       char *ww, *sww, *eww, ss[4], ee[4], bak;
 
@@ -3689,7 +3610,7 @@ Ldefselection()
       kigo_list = cdr(cdr(cdr(kigo_list)));
     }
     else {
-      /* Í×ÁÇ»ØÄê¤Î¤È¤­ */
+      /* è¦ç´ æŒ‡å®šã®ã¨ã */
       char xx[4], *xxp;
 
       e = car(kigo_list);
@@ -3721,7 +3642,7 @@ Ldefselection()
       ;
   }
 
-  /* ÎÎ°è¤ò³ÎÊİ¤¹¤ë */
+  /* é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ */
   extrafunc = (extraFunc *)malloc(sizeof(extraFunc));
   if (!extrafunc) {
     free((char *)kigo_str);
@@ -3738,13 +3659,13 @@ Ldefselection()
     /* NOTREACHED */
   }
 
-  /* ¥·¥ó¥Ü¥ë¤Î´Ø¿ôÃÍ¤È¤·¤Æ¤ÎÄêµÁ */
+  /* ã‚·ãƒ³ãƒœãƒ«ã®é–¢æ•°å€¤ã¨ã—ã¦ã®å®šç¾© */
   symbolpointer(sym)->mid = extrafunc->u.kigoptr->kigo_mode
                           = CANNA_MODE_MAX_IMAGINARY_MODE + nothermodes;
   symbolpointer(sym)->fid = extrafunc->fnum
                           = CANNA_FN_MAX_FUNC + nothermodes;
 
-  /* ¼Âºİ¤Ë³ÊÇ¼¤¹¤ë */
+  /* å®Ÿéš›ã«æ ¼ç´ã™ã‚‹ */
   extrafunc->u.kigoptr->kigo_data = akigo_data;
   extrafunc->u.kigoptr->kigo_str = kigo_str;
   extrafunc->u.kigoptr->kigo_size = nkigo_data;
@@ -3764,16 +3685,16 @@ Ldefselection()
 }
 
 /*
-  defmenu -- ¥á¥Ë¥å¡¼¤ÎÄêµÁ
+  defmenu -- ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®å®šç¾©
 
-  ¡Ô·Á¼°¡Õ
+  ã€Šå½¢å¼ã€‹
   (defmenu first-menu
-    ("ÅĞÏ¿" touroku)
-    ("¥µ¡¼¥ĞÁàºî" server))
+    ("ç™»éŒ²" touroku)
+    ("ã‚µãƒ¼ãƒæ“ä½œ" server))
  */
 
 static list
-Ldefmenu()
+Ldefmenu(int)
 {
   list form, sym, e;
   extern extraFunc *extrafuncp;
@@ -3784,7 +3705,6 @@ Ldefmenu()
   menustruct *men;
   menuitem *menubody;
   wchar_t *wp, **wpp;
-  extern menustruct *allocMenu();
 
   form = sp[0];
   if (atom(form) || atom(cdr(form))) {
@@ -3797,7 +3717,7 @@ Ldefmenu()
     /* NOTREACHED */
   }
 
-  /* °ú¿ô¤ò¿ô¤¨¤ë¡£¤Ä¤¤¤Ç¤ËÉ½¼¨Ê¸»úÎó¤ÎÊ¸»ú¿ô¤ò¿ô¤¨¤ë */
+  /* å¼•æ•°ã‚’æ•°ãˆã‚‹ã€‚ã¤ã„ã§ã«è¡¨ç¤ºæ–‡å­—åˆ—ã®æ–‡å­—æ•°ã‚’æ•°ãˆã‚‹ */
   for (n = 0, clen = 0, e = cdr(form) ; !atom(e) ; n++, e = cdr(e)) {
     list l = car(e), d, fn;
     if (atom(l) || atom(cdr(l))) {
@@ -3819,7 +3739,7 @@ Ldefmenu()
     men = allocMenu(n, clen);
     if (men) {
       menubody = men->body;
-      /* ¥¿¥¤¥È¥ëÊ¸»ú¤ò¥Ç¡¼¥¿¥Ğ¥Ã¥Õ¥¡¤Ë¥³¥Ô¡¼ */
+      /* ã‚¿ã‚¤ãƒˆãƒ«æ–‡å­—ã‚’ãƒ‡ãƒ¼ã‚¿ãƒãƒƒãƒ•ã‚¡ã«ã‚³ãƒ”ãƒ¼ */
       for (i = 0, wp = men->titledata, wpp = men->titles, e = cdr(form) ;
 	   i < n ; i++, e = cdr(e)) {
 	len = MBstowcs(wp, xstring(car(car(e))), 512);
@@ -3831,7 +3751,7 @@ Ldefmenu()
       }
       men->nentries = n;
 
-      /* ¥·¥ó¥Ü¥ë¤Î´Ø¿ôÃÍ¤È¤·¤Æ¤ÎÄêµÁ */
+      /* ã‚·ãƒ³ãƒœãƒ«ã®é–¢æ•°å€¤ã¨ã—ã¦ã®å®šç¾© */
       symbolpointer(sym)->mid =
 	men->modeid = CANNA_MODE_MAX_IMAGINARY_MODE + nothermodes;
       symbolpointer(sym)->fid =
@@ -3853,9 +3773,9 @@ Ldefmenu()
 }
 #endif /* NO_EXTEND_MENU */
 
+
 static list
-Lsetinifunc(n)
-int n;
+Lsetinifunc(int n)
 {
   unsigned char fseq[256];
   int i, len;
@@ -3884,8 +3804,7 @@ int n;
 }
 
 static list
-Lboundp(n)
-int n;
+Lboundp(int n)
 {
   list e;
   struct atomcell *sym;
@@ -3919,8 +3838,7 @@ int n;
 }
 
 static list
-Lfboundp(n)
-int n;
+Lfboundp(int n)
 {
   list e;
 
@@ -3944,11 +3862,10 @@ int n;
 }
 
 static list
-Lgetenv(n)
-int n;
+Lgetenv(int n)
 {
   list e;
-  char strbuf[256], *ret, *getenv();
+  char strbuf[256], *ret;
   list retval;
 
   argnchk("getenv",1);
@@ -3972,9 +3889,9 @@ int n;
   return retval;
 }
 
+
 static list
-LdefEscSeq(n)
-int n;
+LdefEscSeq(int n)
 {
   extern void (*keyconvCallback)();
 
@@ -3993,22 +3910,22 @@ int n;
     /* NOTREACHED */
   }
   if (keyconvCallback) {
-    (*keyconvCallback)(CANNA_CTERMINAL, 
-		       xstring(sp[2]), xstring(sp[1]), xnum(sp[0]));
+      abort();  // ã©ã†ã—ãŸã‚‰ã„ã„??
+      // (*keyconvCallback)(CANNA_CTERMINAL,
+      //                    xstring(sp[2]), xstring(sp[1]), xnum(sp[0]));
   }
   pop(3);
   return NIL;
 }
 
 static list
-Lconcat(n)
-int n;
+Lconcat(int n)
 {
   list t, res;
   int  i, len;
   char *p;
 
-  /* ¤Ş¤ºÄ¹¤µ¤ò¿ô¤¨¤ë¡£ */
+  /* ã¾ãšé•·ã•ã‚’æ•°ãˆã‚‹ã€‚ */
   for (len= 0, i = n ; i-- ;) {
     t = sp[i];
     if (!stringp(t)) {
@@ -4038,7 +3955,7 @@ ObtainVersion()
 {
 #if !defined(STANDALONE) && !defined(WIN_CANLISP)
   int a, b;
-  char *serv;
+  const char* serv;
   extern int protocol_version, server_version;
   extern char *server_name;
 
@@ -4048,18 +3965,18 @@ ObtainVersion()
   }
   RkwInitialize(serv);
 
-  /* ¥×¥í¥È¥³¥ë¥Ğ¡¼¥¸¥ç¥ó */
+  /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
   RkwGetProtocolVersion(&a, &b);
   protocol_version = a * 1000 + b;
 
-  /* ¥µ¡¼¥Ğ¥Ğ¡¼¥¸¥ç¥ó */
+  /* ã‚µãƒ¼ãƒãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
   RkwGetServerVersion(&a, &b);
   server_version = a * 1000 + b;
 
-  /* ¥µ¡¼¥ĞÌ¾ */
+  /* ã‚µãƒ¼ãƒå */
   if (server_name)
     free(server_name);
-  server_name = malloc(strlen(DEFAULT_CANNA_SERVER_NAME) + 1);
+  server_name = (char*) malloc(strlen(DEFAULT_CANNA_SERVER_NAME) + 1);
   if (server_name) {
     strcpy(server_name, DEFAULT_CANNA_SERVER_NAME);
   }
@@ -4068,13 +3985,10 @@ ObtainVersion()
 #endif /* STANDALONE */
 }
 
-/* ÊÑ¿ô¥¢¥¯¥»¥¹¤Î¤¿¤á¤Î´Ø¿ô */
+/* å¤‰æ•°ã‚¢ã‚¯ã‚»ã‚¹ã®ãŸã‚ã®é–¢æ•° */
 
 static list
-VTorNIL(var, setp, arg)
-BYTE *var;
-int setp;
-list arg;
+VTorNIL(BYTE* var, int setp, list arg)
 {
   if (setp == VALSET) {
     *var = (arg == NIL) ? 0 : 1;
@@ -4086,10 +4000,7 @@ list arg;
 }
 
 static list
-StrAcc(var, setp, arg)
-char **var;
-int setp;
-list arg;
+StrAcc(char** var, int setp, list arg)
 {
   if (setp == VALSET) {
     if (null(arg) || stringp(arg)) {
@@ -4097,7 +4008,7 @@ list arg;
 	free(*var);
       }
       if (stringp(arg)) {
-	*var = malloc(strlen(xstring(arg)) + 1);
+          *var = (char*) malloc(strlen(xstring(arg)) + 1);
 	if (*var) {
 	  strcpy(*var, xstring(arg));
 	  return arg;
@@ -4128,10 +4039,7 @@ list arg;
 }
 
 static list
-NumAcc(var, setp, arg)
-int *var;
-int setp;
-list arg;
+NumAcc(int* var, int setp, list arg)
 {
   if (setp == VALSET) {
     if (numberp(arg)) {
@@ -4146,19 +4054,19 @@ list arg;
   return (list)mknum(*var);
 }
 
-/* ¤³¤³¤«¤é²¼¤¬¥«¥¹¥¿¥Ş¥¤¥º¤ÎÄÉ²ÃÅù¤ÇÎÉ¤¯¤¤¤¸¤ëÉôÊ¬ */
+/* ã“ã“ã‹ã‚‰ä¸‹ãŒã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã®è¿½åŠ ç­‰ã§è‰¯ãã„ã˜ã‚‹éƒ¨åˆ† */
 
-/* ¼Âºİ¤Î¥¢¥¯¥»¥¹´Ø¿ô */
+/* å®Ÿéš›ã®ã‚¢ã‚¯ã‚»ã‚¹é–¢æ•° */
 
 #define DEFVAR(fn, acc, ty, var) \
-static list fn(setp, arg) int setp; list arg; { \
+static list fn(int setp, list arg) { \
   extern ty var; return acc(&var, setp, arg); }
 
 #define DEFVAREX(fn, acc, var) \
-static list fn(setp, arg) int setp; list arg; { \
+static list fn(int setp, list arg) { \
   extern struct CannaConfig cannaconf; return acc(&var, setp, arg); }
 
-static list Vnkouhobunsetsu(setp, arg) int setp; list arg;
+static list Vnkouhobunsetsu(int setp, list arg)
 {
   extern int nKouhoBunsetsu;
 
@@ -4174,10 +4082,10 @@ static list Vnkouhobunsetsu(setp, arg) int setp; list arg;
   return arg;
 }
 
-static list VProtoVer(setp, arg) int setp; list arg;
+static list VProtoVer(int setp, list arg)
 {
 #ifndef STANDALONE
-  extern protocol_version;
+  extern int protocol_version;
 
   if (protocol_version < 0) {
     ObtainVersion();
@@ -4186,10 +4094,10 @@ static list VProtoVer(setp, arg) int setp; list arg;
 #endif /* STANDALONE */
 }
 
-static list VServVer(setp, arg) int setp; list arg;
+static list VServVer(int setp, list arg)
 {
 #ifndef STANDALONE
-  extern server_version;
+  extern int server_version;
 
   if (server_version < 0) {
     ObtainVersion();
@@ -4198,7 +4106,8 @@ static list VServVer(setp, arg) int setp; list arg;
 #endif /* STANDALONE */
 }
 
-static list VServName(setp, arg) int setp; list arg;
+
+static list VServName(int setp, list arg)
 {
 #ifndef STANDALONE
   extern char *server_name;
@@ -4210,23 +4119,27 @@ static list VServName(setp, arg) int setp; list arg;
 #endif /* STANDALONE */
 }
 
-static list
-VCannaDir(setp, arg) int setp; list arg;
-{
-  char *canna_dir = CANNALIBDIR;
 
-  if (setp == VALGET) {
-    return StrAcc(&canna_dir, setp, arg);
-  }
+static list
+VCannaDir(int setp, list arg)
+{
+    const char* canna_dir = CANNALIBDIR;
+
+    if (setp == VALGET) {
+        abort(); // ã©ã†ã™ã‚‹ã‹??
+        //return StrAcc(&path, setp, arg);
+        return NULL;
+    }
   else {
     return NIL;
   }
 }
 
-static list VCodeInput(setp, arg) int setp; list arg;
+
+static list VCodeInput(int setp, list arg)
 {
   extern struct CannaConfig cannaconf;
-  static char *input_code[CANNA_MAX_CODE] = {"jis", "sjis", "kuten"};
+  static const char *input_code[CANNA_MAX_CODE] = {"jis", "sjis", "kuten"};
 
   if (setp == VALSET) {
     if (null(arg) || stringp(arg)) {
@@ -4258,7 +4171,7 @@ static list VCodeInput(setp, arg) int setp; list arg;
     }
   }
   /* else { .. */
-  if (/* 0 <= cannaconf.code_input && /* unsigned ¤Ë¤·¤¿¤Î¤Ç¾éÄ¹¤Ë¤Ê¤Ã¤¿ */
+  if (/* 0 <= cannaconf.code_input &&   -- unsigned ã«ã—ãŸã®ã§å†—é•·ã«ãªã£ãŸ */
       cannaconf.code_input <= CANNA_CODE_KUTEN) {
     return copystring(input_code[cannaconf.code_input],
 		      strlen(input_code[cannaconf.code_input]));
@@ -4320,7 +4233,7 @@ DEFVAREX(VDelayConnect  ,VTorNIL         ,cannaconf.DelayConnect)
 DEFVAR(Vchikuji_debug, VTorNIL, int, chikuji_debug)
 #endif
 
-/* Lisp ¤Î´Ø¿ô¤È C ¤Î´Ø¿ô¤ÎÂĞ±şÉ½ */
+/* Lisp ã®é–¢æ•°ã¨ C ã®é–¢æ•°ã®å¯¾å¿œè¡¨ */
 
 static struct atomdefs initatom[] = {
   {"quote"		,SPECIAL,Lquote		},
@@ -4395,7 +4308,7 @@ deflispfunc()
 }
 
 
-/* ÊÑ¿ôÉ½ */
+/* å¤‰æ•°è¡¨ */
 
 static struct cannavardefs cannavars[] = {
   {S_VA_RomkanaTable		,Vromkana},
@@ -4414,7 +4327,7 @@ static struct cannavardefs cannavars[] = {
   {S_VA_BreakIntoRoman		,Vbreakin},
   {S_VA_NHenkanForIchiran	,Vnhenkan},
   {S_VA_GrammaticalQuestion	,Vgrammati},
-  {"gramatical-question"	,Vgrammati}, /* °ÊÁ°¤Î¥¹¥Ú¥ë¥ß¥¹¤ÎµßºÑ */
+  {"gramatical-question"	,Vgrammati}, /* ä»¥å‰ã®ã‚¹ãƒšãƒ«ãƒŸã‚¹ã®æ•‘æ¸ˆ */
   {S_VA_ForceKana		,Vforceka},
   {S_VA_KouhoCount		,Vkouhoco},
   {S_VA_Auto			,Vauto},
@@ -4466,7 +4379,7 @@ defcannavar()
 
 
 
-/* ¥â¡¼¥ÉÉ½ */
+/* ãƒ¢ãƒ¼ãƒ‰è¡¨ */
 
 static struct cannamodedefs cannamodes[] = {
   {S_AlphaMode			,CANNA_MODE_AlphaMode},
@@ -4526,7 +4439,7 @@ defcannamode()
 
 
 
-/* µ¡Ç½É½ */
+/* æ©Ÿèƒ½è¡¨ */
 
 static struct cannafndefs cannafns[] = {
   {S_FN_Undefined		,CANNA_FN_Undefined},
@@ -4575,8 +4488,8 @@ static struct cannafndefs cannafns[] = {
   {S_FN_CaseRotate		,CANNA_FN_CaseRotate},
   {S_FN_BaseHiragana		,CANNA_FN_BaseHiragana},
   {S_FN_BaseKatakana		,CANNA_FN_BaseKatakana},
-  {S_FN_BaseKana		,CANNA_FN_BaseKana},	
-  {S_FN_BaseEisu		,CANNA_FN_BaseEisu},	
+  {S_FN_BaseKana		,CANNA_FN_BaseKana},
+  {S_FN_BaseEisu		,CANNA_FN_BaseEisu},
   {S_FN_BaseZenkaku		,CANNA_FN_BaseZenkaku},
   {S_FN_BaseHankaku		,CANNA_FN_BaseHankaku},
   {S_FN_BaseKakutei		,CANNA_FN_BaseKakutei},

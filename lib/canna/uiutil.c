@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -63,20 +63,20 @@ typedef struct {
 #define MT_FILE   6
 #endif
 
-static e_menuitem e_helptable[] = { 
+static e_menuitem e_helptable[] = {
   /* 記号入力 */
-  {"\265\255\271\346\306\376\316\317",   MENU_NEXT_MENU, MT_KIGO}, 
+  {"\265\255\271\346\306\376\316\317",   MENU_NEXT_MENU, MT_KIGO},
   /* コード入力 */
-  {"\245\263\241\274\245\311\306\376\316\317", MENU_FUNC_NUM,  CANNA_FN_HexMode},  
+  {"\245\263\241\274\245\311\306\376\316\317", MENU_FUNC_NUM,  CANNA_FN_HexMode},
   /* 部首入力 */
-  {"\311\364\274\363\306\376\316\317",   MENU_FUNC_NUM,  CANNA_FN_BushuMode}, 
+  {"\311\364\274\363\306\376\316\317",   MENU_FUNC_NUM,  CANNA_FN_BushuMode},
   /* 単語登録 */
   {"\303\261\270\354\305\320\317\277",   MENU_NEXT_MENU, MT_TANGO},
   /* 環境設定 */
   {"\264\304\266\255\300\337\304\352",   MENU_NEXT_MENU, MT_SONOTA},
 };
 
-static e_menuitem e_uusonotatable[] = { 
+static e_menuitem e_uusonotatable[] = {
 #ifndef CODED_MESSAGE
   {"変換方式",       MENU_NEXT_MENU, MT_HENKAN},
 #ifndef STANDALONE /* This is not used in Windows environment */
@@ -174,8 +174,7 @@ static menustruct *me[N_BUILTIN_MENU];
 #define MBUFSIZE 512
 
 void
-freeMenu(m)
-menustruct *m;
+freeMenu(menustruct* m)
 {
   free((char *)m->titles);
   free((char *)m->titledata);
@@ -183,9 +182,7 @@ menustruct *m;
   free((char *)m);
 }
 
-menustruct *
-allocMenu(n, nc)
-int n, nc;
+menustruct* allocMenu(int n, int nc)
 {
   wchar_t *wctab, **wcs;
   menuitem *menubody;
@@ -394,7 +391,7 @@ mode_context env;
     if (men->u.fnum < 0) {
       jrKanjiError = "\244\263\244\316\271\340\314\334\244\317\300\265\244\267"
 	"\244\257\304\352\265\301\244\265\244\354\244\306\244\244\244\336"
-	"\244\273\244\363";                
+	"\244\273\244\363";
 	    /* この項目は正しく定義されていません */
       killmenu(d);
       makeGLineMessageFromString(d, jrKanjiError);
@@ -531,7 +528,7 @@ menustruct *table;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
 
   minfo = findMenuInfo(d->minfo, table);
   if (!minfo) {

@@ -1129,6 +1129,22 @@ extern int EUCListCallback pro((char *, int, cannawc **, int, int *));
 extern int owcListCallback pro((char *, int, cannawc **, int, int *));
 #endif
 
+// empty.c
+extern extraFunc* FindExtraFunc(int fnum);
+extern extraFunc* extrafuncp;
+
+// mode.c
+extern int changeModeName(int modeid, const char* str);
+
+// keydef.c
+extern int changeKeyfunc(int modenum, int key, int fnum, unsigned char* actbuff,
+                         unsigned char* keybuff);
+extern int changeKeyfuncOfAll(int key, int fnum, unsigned char* actbuff,
+                              unsigned char* keybuff);
+
+// uiutil.c
+extern menustruct* allocMenu(int n, int nc);
+
 #endif /* _UTIL_FUNCTIONS_DEF_ */
 
 

@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -177,12 +177,12 @@ restoreDefaultKeymaps()
 }
 
 
-/* 
+/*
  * あるモードのキーに対して関数を割り当てる処理
  *
  */
 
-/* 
+/*
 
   １６進の時は４文字目を入れた時のモードにも設定する。
 
@@ -190,11 +190,8 @@ restoreDefaultKeymaps()
 
 extern nothermodes;
 
-changeKeyfunc(modenum, key, fnum, actbuff, keybuff)
-int modenum;
-int key;
-int fnum;
-unsigned char *actbuff, *keybuff;
+int changeKeyfunc(int modenum, int key, int fnum, unsigned char* actbuff,
+                  unsigned char* keybuff)
 {
   int i, retval = 0;
   unsigned char *p, *q;
@@ -233,7 +230,7 @@ unsigned char *actbuff, *keybuff;
   }
 
   if (mode && mode->func((uiContext)0/*dummy*/, mode,
-                           KEY_CHECK, 0/*dummy*/, fnum)) { 
+                           KEY_CHECK, 0/*dummy*/, fnum)) {
     /* その機能がそのモードにおいて有効な機能であれば */
     if (mode->keytbl) { /* キーテーブルが存在すれば */
       /* これは絶対に存在するのでは？ */
@@ -327,14 +324,13 @@ unsigned char *actbuff, *keybuff;
   return retval;
 }
 
+
 /*
  * 全てのモードの、あるキーに対して関数を割り当てる処理
  *
  */
-
-changeKeyfuncOfAll(key, fnum, actbuff, keybuff)
-int key, fnum;
-unsigned char *actbuff, *keybuff;
+int changeKeyfuncOfAll(int key, int fnum, unsigned char* actbuff,
+                       unsigned char* keybuff)
 {
   extern extraFunc *extrafuncp;
   extraFunc *ep;
@@ -508,7 +504,7 @@ unsigned char *buff;
       strcpy((char *)p->kinou_seq,(char *)buff);
     p->next = (struct seq_struct *)NULL;
   }
-}  
+}
 
 /* ハッシュテーブルから削除 */
 static void
@@ -650,13 +646,13 @@ int      depth;
 
   actbuffsize = strlen((char *)actbuff);
   keybuffsize = specialen(keybuff);
-  hashKey = 
+  hashKey =
     createHashKey((unsigned char *)tbl, keybuff[depth], KEYHASHTABLESIZE);
   debug_message("regist_map:hashKey = %d \244\307\244\271\241\243\n",hashKey,0,0);
                                          /* です。 */
   for (pp = &otherMap[hashKey]; (p = *pp) != (struct map *)0 ;
        pp = &(p->next)) {
-    if (p->key == keybuff[depth] && p->tbl == tbl) { 
+    if (p->key == keybuff[depth] && p->tbl == tbl) {
       for (q = p->mode->keytbl; *q != 255; q += 2) {
 	if (*q == keybuff[depth+1]) {  /* 既に同じキーが存在した。 */
 	  ++q;
@@ -774,7 +770,7 @@ unsigned char *actbuff;
   int keybuffsize, i;
 
   keybuffsize = specialen(keybuff);
-  map_ptr = regist_map((KanjiMode)tbl_ptr, keybuff, actbuff, 0);  
+  map_ptr = regist_map((KanjiMode)tbl_ptr, keybuff, actbuff, 0);
   if (!map_ptr) {
     return NG;
   }
@@ -809,7 +805,7 @@ copyMultiSequence(key, old_tbl, new_tbl)
   hashKey = createHashKey((unsigned char *)new_tbl, key, KEYHASHTABLESIZE);
   for (pp = &otherMap[hashKey]; (p = *pp) != (struct map *)0 ;
        pp = &(p->next)) {
-    if (p->key == key && p->tbl == new_tbl) { 
+    if (p->key == key && p->tbl == new_tbl) {
       return 0;
     }
   }
@@ -835,7 +831,7 @@ copyMultiSequence(key, old_tbl, new_tbl)
 		free((char *)p);
 		*pp = (struct map *)0;
 		return(-1);
-	      }		
+	      }
 	    } else if (old_sequence[i] == CANNA_FN_FuncSequence)
 	      regist_act_hash((unsigned char *)p->mode, old_sequence[i-1],
 			      actFromHash((unsigned char *)old_map->mode,
