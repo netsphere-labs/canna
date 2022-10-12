@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -30,63 +31,63 @@ static char rcs_id[] = "@(#) 102.1 $Id: commondata.c,v 1.4.2.1 2004/04/26 22:53:
 
 struct CannaConfig cannaconf;
 
-/* ¥Ç¥Õ¥©¥ë¥È¤Î¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹ÍÑ¤Î¥Ğ¥Ã¥Õ¥¡ */
+/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ç”¨ã®ãƒãƒƒãƒ•ã‚¡ */
 
 int defaultContext = -1;
 int defaultBushuContext = -1;
 
-/* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë */
+/* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
 /*
- * ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤Ï£±¸Ä¤¢¤ì¤ĞÎÉ¤¤¤Ç¤·¤ç¤¦¡£Ê£¿ô¸ÄÉ¬Í×¤Ê¤Î¤Ç
- * ¤¢¤ì¤Ğ RomeStruct ¤Î¥á¥ó¥Ğ¤È¤·¤ÆÆş¤ì¤Æ¤ª¤¯É¬Í×¤â¤¢¤ê¤Ş¤·¤ç¤¦¤¬...¤½
- * ¤Î»ş¤Ï¤½¤Î»ş¤Ç¹Í¤¨¤Ş¤·¤ç¤¦¡£
+ * ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã¯ï¼‘å€‹ã‚ã‚Œã°è‰¯ã„ã§ã—ã‚‡ã†ã€‚è¤‡æ•°å€‹å¿…è¦ãªã®ã§
+ * ã‚ã‚Œã° RomeStruct ã®ãƒ¡ãƒ³ãƒã¨ã—ã¦å…¥ã‚Œã¦ãŠãå¿…è¦ã‚‚ã‚ã‚Šã¾ã—ã‚‡ã†ãŒ...ã
+ * ã®æ™‚ã¯ãã®æ™‚ã§è€ƒãˆã¾ã—ã‚‡ã†ã€‚
  */
 
 struct RkRxDic *romajidic, *englishdic;
 
-/* Ì¤ÄêµÁ¥­¡¼ÂÇ¸°»ş¤Î½èÍı¤Î¤·¤«¤¿ */
+/* æœªå®šç¾©ã‚­ãƒ¼æ‰“éµæ™‚ã®å‡¦ç†ã®ã—ã‹ãŸ */
 
 int howToBehaveInCaseOfUndefKey = kc_normal;
 
 /*
- * ¼­½ñ¤ÎÌ¾Á°¤òÆş¤ì¤Æ¤ª¤¯ÊÑ¿ô
+ * è¾æ›¸ã®åå‰ã‚’å…¥ã‚Œã¦ãŠãå¤‰æ•°
  */
 
-char saveapname[CANNA_MAXAPPNAME]; /* ¥µ¡¼¥Ğ¤È¤ÎÀÜÂ³¤òÀÚ¤ë¤È¤­¤ÎAPÌ¾ */
+char saveapname[CANNA_MAXAPPNAME]; /* ã‚µãƒ¼ãƒã¨ã®æ¥ç¶šã‚’åˆ‡ã‚‹ã¨ãã®APå */
 
 /*
- * irohacheck ¥³¥Ş¥ó¥É¤Ë¤è¤Ã¤Æ»È¤ï¤ì¤Æ¤¤¤ë¤«¤È¤«¡¢
- * irohacheck ¤Ê¤¤¤Ç¤Î verbose ¤òÉ½¤¹ÃÍ¡£
+ * irohacheck ã‚³ãƒãƒ³ãƒ‰ã«ã‚ˆã£ã¦ä½¿ã‚ã‚Œã¦ã„ã‚‹ã‹ã¨ã‹ã€
+ * irohacheck ãªã„ã§ã® verbose ã‚’è¡¨ã™å€¤ã€‚
  */
 
 int ckverbose = 0;
 
 /*
- * ¥¨¥é¡¼¤Î¥á¥Ã¥»¡¼¥¸¤òÆş¤ì¤Æ¤ª¤¯ÊÑ¿ô
+ * ã‚¨ãƒ©ãƒ¼ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å…¥ã‚Œã¦ãŠãå¤‰æ•°
  */
 
 char *jrKanjiError = "";
 
 /*
- * ¥Ç¥Ğ¥°¥á¥Ã¥»¡¼¥¸¤ò½Ğ¤¹¤«¤É¤¦¤«¤Î¥Õ¥é¥°
+ * ãƒ‡ãƒã‚°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡ºã™ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
  */
 
 int iroha_debug = 0;
 
 /*
- * »Ï¤á¤Æ¤Î»ÈÍÑ¤«¤É¤¦¤«¤ò¼¨¤¹¥Õ¥é¥°
+ * å§‹ã‚ã¦ã®ä½¿ç”¨ã‹ã©ã†ã‹ã‚’ç¤ºã™ãƒ•ãƒ©ã‚°
  */
 
 int FirstTime = 1;
 
 /*
- * ¥Ó¡¼¥×²»¤òÌÄ¤é¤¹´Ø¿ô¤ò³ÊÇ¼¤¹¤ë¤È¤³¤í
+ * ãƒ“ãƒ¼ãƒ—éŸ³ã‚’é³´ã‚‰ã™é–¢æ•°ã‚’æ ¼ç´ã™ã‚‹ã¨ã“ã‚
  */
 
 int (*jrBeepFunc)() = (int (*)())NULL;
 
 /*
- * KC_INITIALIZE Ä¾¸å¤Ë¼Â¹Ô¤¹¤ëµ¡Ç½¤ÎÎó
+ * KC_INITIALIZE ç›´å¾Œã«å®Ÿè¡Œã™ã‚‹æ©Ÿèƒ½ã®åˆ—
  */
 
 BYTE *initfunc = (BYTE *)0;
@@ -108,14 +109,14 @@ keySupplement keysup[MAX_KEY_SUP];
 int nkeysup = 0;
 
 /*
- * ½é´ü²½¤Îºİ»ÈÍÑ¤·¤¿½é´ü²½¥Õ¥¡¥¤¥ëÌ¾¤òÁ´¤Æ¤È¤Ã¤Æ¤ª¤¯¥Ğ¥Ã¥Õ¥¡¡£
- * ¥Õ¥¡¥¤¥ëÌ¾¤Ï","¤Ç¶èÀÚ¤é¤ì¤ë¡£(³ÈÄ¥µ¡Ç½¤Ç»ÈÍÑ)
+ * åˆæœŸåŒ–ã®éš›ä½¿ç”¨ã—ãŸåˆæœŸåŒ–ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å…¨ã¦ã¨ã£ã¦ãŠããƒãƒƒãƒ•ã‚¡ã€‚
+ * ãƒ•ã‚¡ã‚¤ãƒ«åã¯","ã§åŒºåˆ‡ã‚‰ã‚Œã‚‹ã€‚(æ‹¡å¼µæ©Ÿèƒ½ã§ä½¿ç”¨)
  */
 
 char *CANNA_initfilename = (char *)NULL;
 
 /*
- * ¥Ğ¡¼¥¸¥ç¥ó
+ * ãƒãƒ¼ã‚¸ãƒ§ãƒ³
  */
 
 int protocol_version = -1;
@@ -125,19 +126,19 @@ char *server_name = (char *)NULL;
 int chikuji_debug = 0;
 int auto_define = 0;
 
-void (*keyconvCallback)() = (void (*)())0;
+void (*keyconvCallback)(int, struct stringcell*, struct stringcell*, int) = NULL;
 
 extraFunc *extrafuncp = (extraFunc *)NULL;
-struct dicname *kanjidicnames; /* .canna ¤Ç»ØÄê¤·¤Æ¤¤¤ë¼­½ñ¥ê¥¹¥È */
-char *kataautodic = (char *)NULL; /* ¥«¥¿¥«¥Ê¸ì¼«Æ°ÅĞÏ¿ÍÑ¼­½ñ */
+struct dicname *kanjidicnames; /* .canna ã§æŒ‡å®šã—ã¦ã„ã‚‹è¾æ›¸ãƒªã‚¹ãƒˆ */
+char *kataautodic = (char *)NULL; /* ã‚«ã‚¿ã‚«ãƒŠèªè‡ªå‹•ç™»éŒ²ç”¨è¾æ›¸ */
 #ifdef HIRAGANAAUTO
-char *hiraautodic = (char *)NULL; /* ¤Ò¤é¤¬¤Ê¸ì¼«Æ°ÅĞÏ¿ÍÑ¼­½ñ */
+char *hiraautodic = (char *)NULL; /* ã²ã‚‰ãŒãªèªè‡ªå‹•ç™»éŒ²ç”¨è¾æ›¸ */
 #endif
 
-/* ¥æ¡¼¥¶¾ğÊó */
+/* ãƒ¦ãƒ¼ã‚¶æƒ…å ± */
 jrUserInfoStruct *uinfo = (jrUserInfoStruct *)NULL;
 
- /* ¥Ş¥¦¥ó¥È½èÍı¤ò¹Ô¤Ã¤Æ¤¤¤ë¤«¤É¤¦¤« */
+ /* ãƒã‚¦ãƒ³ãƒˆå‡¦ç†ã‚’è¡Œã£ã¦ã„ã‚‹ã‹ã©ã†ã‹ */
 int mountnottry = 1;
 
 void
@@ -194,7 +195,7 @@ freeUInfo()
 }
 
 /*
-  ¥Ç¥Õ¥¡¡¼¥ë¥ÈÃÍ¤Ë¤â¤É¤¹¡£
+  ãƒ‡ãƒ•ã‚¡ãƒ¼ãƒ«ãƒˆå€¤ã«ã‚‚ã©ã™ã€‚
 */
 void
 restoreBindings()
@@ -221,7 +222,7 @@ restoreBindings()
   KatakanaGakushu = (struct dicname *)NULL;
   HiraganaGakushu = (struct dicname *)NULL;
   howToBehaveInCaseOfUndefKey = kc_normal;
-/*  kanjidicname[nkanjidics = 0] = (char *)NULL; Âå¤ï¤ê¤Î¤³¤È¤ò¤·¤Ê¤±¤ì¤Ğ */
+/*  kanjidicname[nkanjidics = 0] = (char *)NULL; ä»£ã‚ã‚Šã®ã“ã¨ã‚’ã—ãªã‘ã‚Œã° */
   kanjidicnames = (struct dicname *)NULL;
   kataautodic = (char *)NULL;
 #ifdef HIRAGANAAUTO
@@ -236,6 +237,6 @@ restoreBindings()
   nKouhoBunsetsu = 16;
   nkeysup = 0;
   chikuji_debug = 0;
-  keyconvCallback = (void (*)())0;
+  keyconvCallback = NULL;
   freeUInfo();
 }

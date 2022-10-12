@@ -405,7 +405,6 @@ int parse_string(char* str)
   return 0;
 }
 
-static void intr();
 
 /* prins -
 	print string	*/
@@ -3890,11 +3889,10 @@ Lgetenv(int n)
 }
 
 
+// S_defEscSequence   "define-esc-sequence"
 static list
 LdefEscSeq(int n)
 {
-  extern void (*keyconvCallback)();
-
   argnchk("define-esc-sequence",3);
 
   if (!stringp(sp[2])) {
@@ -3910,9 +3908,8 @@ LdefEscSeq(int n)
     /* NOTREACHED */
   }
   if (keyconvCallback) {
-      abort();  // どうしたらいい??
-      // (*keyconvCallback)(CANNA_CTERMINAL,
-      //                    xstring(sp[2]), xstring(sp[1]), xnum(sp[0]));
+      (*keyconvCallback)(CANNA_CTERMINAL,
+                         xstring(sp[2]), xstring(sp[1]), xnum(sp[0]));
   }
   pop(3);
   return NIL;
@@ -4120,19 +4117,22 @@ static list VServName(int setp, list arg)
 }
 
 
+#define MAX_PATH 260
+
+// #define S_VA_CannaDir              "canna-directory"
 static list
 VCannaDir(int setp, list arg)
 {
-    const char* canna_dir = CANNALIBDIR;
+    static char canna_dir[MAX_PATH + 1];
+    char* path = canna_dir;
 
     if (setp == VALGET) {
-        abort(); // どうするか??
-        //return StrAcc(&path, setp, arg);
-        return NULL;
+        strcpy(canna_dir, CANNALIBDIR);
+        return StrAcc(&path, setp, arg);
     }
-  else {
-    return NIL;
-  }
+    else {
+        return NIL;
+    }
 }
 
 
@@ -4233,8 +4233,8 @@ DEFVAREX(VDelayConnect  ,VTorNIL         ,cannaconf.DelayConnect)
 DEFVAR(Vchikuji_debug, VTorNIL, int, chikuji_debug)
 #endif
 
-/* Lisp の関数と C の関数の対応表 */
 
+/* Lisp の関数と C の関数の対応表 */
 static struct atomdefs initatom[] = {
   {"quote"		,SPECIAL,Lquote		},
   {"setq"		,SPECIAL,Lsetq		},

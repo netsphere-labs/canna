@@ -1145,6 +1145,10 @@ extern int changeKeyfuncOfAll(int key, int fnum, unsigned char* actbuff,
 // uiutil.c
 extern menustruct* allocMenu(int n, int nc);
 
+// commondata.c
+struct stringcell;
+extern void (*keyconvCallback)(int, struct stringcell*, struct stringcell*, int);
+
 #endif /* _UTIL_FUNCTIONS_DEF_ */
 
 
