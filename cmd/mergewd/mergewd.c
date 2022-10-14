@@ -28,11 +28,8 @@ static char rcsid[]="@(#) 112.1 $Id: mergewd.c,v 1.1.1.1.4.2 2003/12/27 17:15:23
 #include <stdio.h>
 #include <locale.h>
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define RkwIsGraphicChar(x) ((unsigned long)(x) > (unsigned long)' ')
 #define RkwIsControlChar(x) ((unsigned long)(x) < (unsigned long)' ')

@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -32,11 +33,8 @@ static char rcsid[] = "@(#) 112.1 $Id: splitwd.c,v 1.2.4.2 2003/12/27 17:15:23 a
 #include <locale.h>
 #endif
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define		SIZE			4192
 #define		ISSPACE(c)		('\n' == c || ' ' == c || '\t' == c)
@@ -133,18 +131,18 @@ int	nline;
 
     lp = line;
 
-    lp = getword(lp,word.yomi);			/* head ¤ËÆÉ¤ß¤òÆş¤ì¤ë */
-    lp = getword(lp,hinshi);			/* hinshi ¤ò¼è¤ê¹ş¤à */
+    lp = getword(lp,word.yomi);			/* head ã«èª­ã¿ã‚’å…¥ã‚Œã‚‹ */
+    lp = getword(lp,hinshi);			/* hinshi ã‚’å–ã‚Šè¾¼ã‚€ */
     if ('#' != word.yomi[0] && '#' != hinshi[0])
         fprintf(stderr, gettxt("cannacmd:48", "No hinshi in line %d\n"),
 		nline);
 
     next:
-    while(1){ 		       			/* É½µ­ÆÉ¤ß¹ş¤ß loop */
+    while(1){ 		       			/* è¡¨è¨˜èª­ã¿è¾¼ã¿ loop */
 	lp = getword(lp,tsuduri);
-	if( '\0' == tsuduri[0] ) 		/* 1 ¹Ô½ª¤ï¤ê */
+	if( '\0' == tsuduri[0] ) 		/* 1 è¡Œçµ‚ã‚ã‚Š */
 	    break;
-	if( '#' == tsuduri[0] ){ 		/* ÉÊ»ì¤¬ÆÉ¤ß¹ş¤Ş¤ì¤¿ */
+	if( '#' == tsuduri[0] ){ 		/* å“è©ãŒèª­ã¿è¾¼ã¾ã‚ŒãŸ */
 	    strcpy((char *)hinshi, (char *)tsuduri);
 	    goto next;
 	}
@@ -197,7 +195,7 @@ splitword(fp, name)
 FILE *fp;
 char *name;
 {
-  int nline = 0; /* ÆÉ¤ß¹ş¤à¹Ô¿ô¤ò¿ô¤¨¤ë */
+  int nline = 0; /* èª­ã¿è¾¼ã‚€è¡Œæ•°ã‚’æ•°ãˆã‚‹ */
   uchar line[SIZE];
 
   while (fgets((char *)line, sizeof(line), fp)) {
@@ -233,7 +231,7 @@ char	*argv[];
     (void)setlocale(LC_ALL,"");
 #endif
 
-    if( argc == 1 ) {		/* ¥³¥Ş¥ó¥É¤À¤±¤Î»ş */
+    if( argc == 1 ) {		/* ã‚³ãƒãƒ³ãƒ‰ã ã‘ã®æ™‚ */
       splitword(stdin, argv[0]);
     }
 

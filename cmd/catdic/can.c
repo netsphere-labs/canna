@@ -44,11 +44,8 @@ static char rcs[] = "@(#) 112.1 $Id: can.c,v 1.4 2003/02/01 19:34:20 aida_s Exp 
 #include <locale.h>
 #endif
 
-#ifdef SVR4
-extern  char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define TRUE 1
 #define FALSE 0

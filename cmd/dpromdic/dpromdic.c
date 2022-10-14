@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -34,11 +35,9 @@ static char rcsid[]="@(#) 112.1 $Id: dpromdic.c,v 1.3.2.2 2003/12/27 17:15:22 ai
 #include "canna/ccompat.h"
 #define CANNA_NEW_WCHAR_AWARE
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
+
 # include	<canna/RK.h>
 
 extern struct RkRxDic  *RkwOpenRoma() ;
@@ -58,7 +57,7 @@ int main( int argc, char* argv[] )
 #ifdef __EMX__
   _fsetmode(stdout, "b");
 #endif
-  mode = 0x0004; /* ÆÉ¤ß¼è¤ê²ÄÇ½¤«¡© */
+  mode = 0x0004; /* èª­ã¿å–ã‚Šå¯èƒ½ã‹ï¼Ÿ */
 
   if(argc != 2){
     fprintf(stderr, gettxt("cannacmd:15", "Usage: dpromdic <file name>\n"));
@@ -83,13 +82,13 @@ int main( int argc, char* argv[] )
 
     for(i=0; i<rdic->nr_nkey; i++) {
       s = rdic->nr_keyaddr[i];
-      /* ¥í¡¼¥Ş»ú */
+      /* ãƒ­ãƒ¼ãƒå­— */
       for(s = rdic->nr_keyaddr[i]; *s; s++) {
 	  printch(*s) ;
       }
       printf("\t");
       s++;
-      /* ¤«¤Ê */
+      /* ã‹ãª */
       if ( *s ==   0  ) printf("%s",zero) ;
       else {
 	for(; *s; s++) {

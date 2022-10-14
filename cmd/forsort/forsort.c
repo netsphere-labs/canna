@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -24,10 +25,10 @@
 static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.2 2003/02/01 19:34:21 aida_s Exp $";
 #endif
 /*
- * forsort.c	¥½¡¼¥È¤ò¹Ô¤Ê¤¦»ş¤Ë8¥Ó¥Ã¥È¥³¡¼¥É¤òÊİ¸î¤¹¤ë
+ * forsort.c	ã‚½ãƒ¼ãƒˆã‚’è¡Œãªã†æ™‚ã«8ãƒ“ãƒƒãƒˆã‚³ãƒ¼ãƒ‰ã‚’ä¿è­·ã™ã‚‹
  *	forsort -7 < [in-file-name] > [out-file-name]
- *		-7	Á°½èÍı
- *		-8	¸å½èÍı
+ *		-7	å‰å‡¦ç†
+ *		-8	å¾Œå‡¦ç†
  */
 #include	<stdio.h>
 #include	<ctype.h>
@@ -36,11 +37,8 @@ static char rcsid[]="@(#) 112.1 $Id: forsort.c,v 1.2 2003/02/01 19:34:21 aida_s 
 #endif
 #include "canna/ccompat.h"
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 char	*hd	= "0123456789ABCDEF";
 
@@ -88,7 +86,7 @@ char	*args[];
   _fsetmode(stdout, "b");
 #endif
 
-    if( n == 1 ) {		/* ¥³¥Ş¥ó¥ÉÌ¾¤À¤±¤Î»ş */
+    if( n == 1 ) {		/* ã‚³ãƒãƒ³ãƒ‰åã ã‘ã®æ™‚ */
 	fprintf(stderr, gettxt("cannacmd:21", "Usage: forsort -7 < [file],\n       forsort -8 < [file]\n"));
 	exit( -1 );
     }

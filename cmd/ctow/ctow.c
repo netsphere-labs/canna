@@ -33,11 +33,8 @@ static char rcs[]="@(#) 112.1 $Id: ctow.c,v 1.3.2.3 2003/12/27 17:15:22 aida_s E
 #include	<unistd.h>
 #include <locale.h>
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define		MAXTANGO	256
 #define         MAXHINSHI       100

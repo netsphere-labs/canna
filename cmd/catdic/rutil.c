@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -45,11 +46,8 @@ static char rcs[] = "@(#) 112.1 $Id: rutil.c,v 1.3.2.2 2003/12/27 17:15:21 aida_
 #include <locale.h>
 #endif
 
-#ifdef SVR4
-extern  char *gettxt();
-#else
+// å¾€å¹´ã® SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define  BUFLEN  1024        /* add 91.11.21. */
 #define  ERR_VALUE  1
@@ -103,14 +101,14 @@ char *line;
   }
   sp = line;
   while (*sp == ' ' || *sp == '\t'   )
-    sp++; /* ¶õÇò¤ÎÆÉ¤ßÈô¤Ğ¤· */
+    sp++; /* ç©ºç™½ã®èª­ã¿é£›ã°ã— */
 
-  if (!*sp || *sp == '#') /* ¥³¥á¥ó¥È¹Ô */
+  if (!*sp || *sp == '#') /* ã‚³ãƒ¡ãƒ³ãƒˆè¡Œ */
     goto endDefineLine;
 
   dp = buf;
-  while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* ÆÉ¤ß¤Î¤È¤ê¤À¤· */
-      if (*sp == '\\' && *(sp+1) ) { /* ¥¨¥¹¥¨¡¼¥×¤µ¤ì¤¿Ê¸»ú */
+  while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* èª­ã¿ã®ã¨ã‚Šã ã— */
+      if (*sp == '\\' && *(sp+1) ) { /* ã‚¨ã‚¹ã‚¨ãƒ¼ãƒ—ã•ã‚ŒãŸæ–‡å­— */
 	  *dp++ = *sp++ ;
       }
       *dp++ = *sp++;
@@ -120,32 +118,32 @@ char *line;
 
   while (*sp) {
     while (*sp == ' ' || *sp == '\t' )
-      sp++; /* ¶õÇò¤ÎÆÉ¤ßÈô¤Ğ¤· */
+      sp++; /* ç©ºç™½ã®èª­ã¿é£›ã°ã— */
 
     if (*sp) {
       if (*sp == '#') {
 	dp = buf + yomilen;
-	while (*sp && (*sp != ' ' && *sp != '\t' )) { /* ÉÊ»ì¤ÈÉÑÅÙ¤Î¥³¥Ô¡¼ */
+	while (*sp && (*sp != ' ' && *sp != '\t' )) { /* å“è©ã¨é »åº¦ã®ã‚³ãƒ”ãƒ¼ */
 	  *dp++ = *sp++;
 	}
 	*dp++ = ' ';
 	yomihinshilen = dp - buf;
 
 	while (*sp == ' ' || *sp == '\t' )
-	  sp++; /* ¶õÇò¤ÎÆÉ¤ßÈô¤Ğ¤· */
+	  sp++; /* ç©ºç™½ã®èª­ã¿é£›ã°ã— */
       }
-      if (yomihinshilen == 0) { /* ¤³¤³¤Ş¤ÇÉÊ»ì¾ğÊó¤¬½Ğ¤Æ¤³¤Ê¤«¤Ã¤¿¡£ */
+      if (yomihinshilen == 0) { /* ã“ã“ã¾ã§å“è©æƒ…å ±ãŒå‡ºã¦ã“ãªã‹ã£ãŸã€‚ */
 	goto endDefineLine;
       }
-      else if (*sp) { /* ¸õÊä¤¬¤¢¤ë¤Î¤Ê¤é */
+      else if (*sp) { /* å€™è£œãŒã‚ã‚‹ã®ãªã‚‰ */
 	dp = buf + yomihinshilen;
-	while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* ¸õÊä¤Î¥³¥Ô¡¼ */
-	    if (*sp == '\\' && *(sp+1) ) { /* ¥¨¥¹¥¨¡¼¥×¤µ¤ì¤¿Ê¸»ú */
+	while (*sp && ( *sp != ' ' && *sp != '\t' )) { /* å€™è£œã®ã‚³ãƒ”ãƒ¼ */
+	    if (*sp == '\\' && *(sp+1) ) { /* ã‚¨ã‚¹ã‚¨ãƒ¼ãƒ—ã•ã‚ŒãŸæ–‡å­— */
 		*dp++ = *sp++ ;
 	    }
 	    *dp++ = *sp++;
 	}
-	*dp++ = '\0'; /* ¥Ì¥ëÊ¸»ú¤òºÇ¸å¤ËÆş¤ì¤ë */
+	*dp++ = '\0'; /* ãƒŒãƒ«æ–‡å­—ã‚’æœ€å¾Œã«å…¥ã‚Œã‚‹ */
 	res = RkDefineDic(cx_num, (char *)name, buf);
 	if (res < 0) {
 	  goto endDefineLine;
@@ -164,7 +162,7 @@ int cx_num;
 char *name;
 char *word;
 {
-  printf("¡ùÃ±¸ì¤ÎÄêµÁ(¼­½ñ:%s) \"%s\"\n", name, word);
+  printf("â˜†å˜èªã®å®šç¾©(è¾æ›¸:%s) \"%s\"\n", name, word);
   return 0;
 }
 
@@ -204,17 +202,17 @@ int            mode ;
   msg_set();
   (void)strcpy((char *)dic1_bk, (char *)dicname1);
 
-  do { /* RkGetWordTextDic¤ÎÊÖ¤êÃÍ¤¬Àµ¤Î´Ö¥ë¡¼¥×¤¹¤ë */
+  do { /* RkGetWordTextDicã®è¿”ã‚Šå€¤ãŒæ­£ã®é–“ãƒ«ãƒ¼ãƒ—ã™ã‚‹ */
     if((ret = RkGetWordTextDic(cx_num, dirname, dic1_bk, buf, BUFLEN)) >= 0) {
       if(!ret)
 	break;
-      if(dic1_bk[0] != '\0') { /* £±²óÌÜ¤Ï¥Ş¥¦¥ó¥È¤¹¤ë */
+      if(dic1_bk[0] != '\0') { /* ï¼‘å›ç›®ã¯ãƒã‚¦ãƒ³ãƒˆã™ã‚‹ */
 	if(RkMountDic(cx_num, (char *)dicname2, 0)) {
 
 #ifdef DEBUG
 	  (void)fprintf(stderr, "\nmode=%d\n", mode);
 #endif
-	  /* ¥Ş¥¦¥ó¥È¤Ë¼ºÇÔ¤·¤¿»ş¤Î½èÍı */
+	  /* ãƒã‚¦ãƒ³ãƒˆã«å¤±æ•—ã—ãŸæ™‚ã®å‡¦ç† */
 	  if ((mode & KYOUSEI) == KYOUSEI) {
 	    RkCreateDic(cx_num, dicname2, mode);
 	  } else {
@@ -225,7 +223,7 @@ int            mode ;
 	  return -1;
 	}
       }
-      /* £±¹ÔÅĞÏ¿¤¹¤ë */
+      /* ï¼‘è¡Œç™»éŒ²ã™ã‚‹ */
       if (RkDefineLine(cx_num, dicname2, (char *)buf) == -1) {
 	(void)fprintf(stderr,gettxt("cannacmd:194",
 	    "write error: \"%s\"\n"), buf);
@@ -238,7 +236,7 @@ int            mode ;
 	(void)fputs (".", stderr);
       }
     }
-    else { /* RkGetWordTextDic¤ÎÊÖ¤êÃÍ¤¬Éé¤Î»ş */
+    else { /* RkGetWordTextDicã®è¿”ã‚Šå€¤ãŒè² ã®æ™‚ */
       RkUnmountDic(cx_num,(char *)dicname2);
       (void)fprintf(stderr,"\n");
       PrintMessage(ret, dic1_bk);
@@ -312,7 +310,7 @@ int mode ;
   msg_set();
   /*  server  new/old check  */
   bak = RkwGetServerVersion(&majv, &minv);
-  if(bak) { /* ¥µ¡¼¥Ğ¤Î¾õÂÖ¤¬°Û¾ï */
+  if(bak) { /* ã‚µãƒ¼ãƒã®çŠ¶æ…‹ãŒç•°å¸¸ */
     if (init[0] != '/') {
 	(void)fprintf(stderr, msg_abnls, init);
     }
@@ -323,7 +321,7 @@ int mode ;
     return ret;
   }
   if ( majv < 2 ) { /* irohaserver */
-    if(minv < 2) { /* R7.1¤è¤êÁ° */
+    if(minv < 2) { /* R7.1ã‚ˆã‚Šå‰ */
       if (init[0] != '/') {
 	  (void)fprintf(stderr, msg_mnts, init);
       }
@@ -547,7 +545,7 @@ int  mode ;
 
   /*  server  new/old check  */
   bak = RkwGetServerVersion(&majv, &minv);
-  if(bak) { /* ¥µ¡¼¥Ğ¤Î¾õÂÖ¤¬°Û¾ï */
+  if(bak) { /* ã‚µãƒ¼ãƒã®çŠ¶æ…‹ãŒç•°å¸¸ */
     if (init[0] != '/') {
       (void)fprintf(stderr, msg_abnls,init);
     }
@@ -558,7 +556,7 @@ int  mode ;
     return ret;
   }
   if ( majv < 2 ) { /* irohaserver */
-    if(minv < 2) { /* R7.1¤è¤êÁ° */
+    if(minv < 2) { /* R7.1ã‚ˆã‚Šå‰ */
       if (init[0] != '/') {
 	(void)fprintf(stderr, msg_mnts, init);
       }
@@ -670,7 +668,7 @@ int  mode ;
 void
 Message(fmt, a, b, c, d, e, f, g, h, i, j)
 char *fmt;
-/* ARGSUSED *//* d °Ê¹ß¤Ï°ú¿ôÎÎ°è³ÎÊİ¤Î¤¿¤á¤Î¥À¥ß¡¼°ú¿ô(ÉÔÍ×¡©) */
+/* ARGSUSED *//* d ä»¥é™ã¯å¼•æ•°é ˜åŸŸç¢ºä¿ã®ãŸã‚ã®ãƒ€ãƒŸãƒ¼å¼•æ•°(ä¸è¦ï¼Ÿ) */
 {
     (void)fprintf(stderr, fmt, a, b, c);
     (void)fprintf(stderr, "\n");

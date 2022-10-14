@@ -10,7 +10,12 @@ CBP   = default.cbp jdaemon.cbp just.cbp kaisoku.cbp kana.cbp \
 # Automake では指定してはいけない.
 #.SUFFIXES: .cbp .kpdef
 
+FORCPP = ../../cmd/forcpp/forcpp
+KPDIC = ../../cmd/kpdic/kpdic
+ROMAJI_DIC_DEF = -DSHIFT
+
+# gcc -E プリプロセスのみ実行
 .kpdef.cbp:
-	$(FORCPP) -7 < $< | $(CPP) $(ROMAJI_DIC_DEF) | $(FORCPP) -8 | $(KPDIC) > $@
+	$(CPP) $(ROMAJI_DIC_DEF) - < $< | $(KPDIC) > $@
 
 dist_pkgdata_DATA = $(CBP)

@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -23,7 +24,7 @@
 #ifndef lint
 static char rcsid[]="@(#) 112.1 $Id: wtoc.c,v 1.2.2.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
-/* wtoi.c  ¥Æ¥­¥¹¥È·Á¼°¤Î¼­½ñ¤ò£×£î£î¤«¤é¡Ö¤¤¤í¤Ï¡×¤Î¤â¤Î¤ËÊÑ´¹¤¹¤ë¡£
+/* wtoi.c  ãƒ†ã‚­ã‚¹ãƒˆå½¢å¼ã®è¾æ›¸ã‚’ï¼·ï½ï½ã‹ã‚‰ã€Œã„ã‚ã¯ã€ã®ã‚‚ã®ã«å¤‰æ›ã™ã‚‹ã€‚
  *	wtoi [-f hinshifile] [wnndic] [irohadic]
  */
 #include	<stdio.h>
@@ -35,11 +36,8 @@ static char rcsid[]="@(#) 112.1 $Id: wtoc.c,v 1.2.2.2 2003/12/27 17:15:23 aida_s
 #include <locale.h>
 #endif
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #define		MAXTANGO	256
 #define         MAXHINSHI       100
@@ -55,28 +53,28 @@ struct hin{
 };
 
 static struct hin table[] = {
-  {"Ì¾»ì","#T35"},{"¿ÍÌ¾","#JN"},{"ÃÏÌ¾","#CN"},{"¿ÍÌ¾&ÃÏÌ¾","#JCN"},
-  {"¸ÇÍ­Ì¾»ì","#KK"},{"¿ô»ì","#NN"},
-  {"°ìÆ°´´","#KSr"},
-  {"¥«¹Ô¸ŞÃÊ","#K5r"},{"¥¬¹Ô¸ŞÃÊ","#G5r"},{"¥µ¹Ô¸ŞÃÊ","#S5r"},
-  {"¥¿¹Ô¸ŞÃÊ","#T5r"},{"¥Ê¹Ô¸ŞÃÊ","#N5"},{"¥Ğ¹Ô¸ŞÃÊ","#B5r"},
-  {"¥Ş¹Ô¸ŞÃÊ","#M5r"},{"¥é¹Ô¸ŞÃÊ","#R5r"},{"¥ï¹Ô¸ŞÃÊ","#W5r"},
-  {"°ìÃÊ","#KS"},{"°ìÃÊ&Ì¾»ì","#KSr"},{"¥«¹Ô(¹Ô¤¯)","#C5r"},
-  {"¥µ¹Ô(¤¹¤ë)","#SX"},{"¥¶¹Ô(¤º¤ë)","#ZX"},{"¥µ¹Ô(¤¹¤ë)&Ì¾»ì","#T30"},
-  {"Íè(¤³)","#kxo"},{"Íè(¤­)","#kxi"},{"Íè(¤¯)","#kxuru"},
-  {"°Ù(¤·)","#sxi"},{"°Ù(¤¹)","#sxuru"},{"°Ù(¤»)","#sxe"},
-  {"¥é¹Ô(²¼¤µ¤¤)","#L5"},
-  {"·ÁÍÆ»ì","#KY"},
-  {"·ÁÍÆÆ°»ì","#T05"},{"·ÁÍÆÆ°»ì&Ì¾»ì","#T05"},{"·ÁÍÆÆ°»ì(¤¿¤ë)","#F00"},
-  {"Éû»ì","#F14"},{"Ï¢ÂÎ»ì","#RT"},{"ÀÜÂ³»ì,´¶Æ°»ì","#CJ"},
-  {"Ã±´Á»ú","#KJ"},
-  {"ÀÜÆ¬¸ì","#PRE"},{"ÀÜÈø¸ì","#SUC"},
-  {"ÀÜÆ¬¿ô»ì","#NNPRE"},{"½õ¿ô»ì","#JS"},{"ÀÜÆ¬½õ¿ô»ì","#JS"},
-  {"ÀÜÈø½õ¿ô»ì","#JSSUC"},
-  {"ÀÜÈø¿ÍÌ¾","#JNSUC"},{"ÀÜÆ¬ÃÏÌ¾","#CNPRE"},{"ÀÜÈøÃÏÌ¾","#CNSUC1"},
-  {"·ÁÍÆÆ°»ì²½ÀÜÈø¸ì","#N2T17"},{"¥µ¹Ô(¤¹¤ë)&Ì¾»ì²½ÀÜÈø¸ì","#N2T30"},
-  {"ÀÜÈøÆ°»ì","#D2T35"},{"·ÁÍÆ»ì²½ÀÜÈøÆ°»ì","#D2KY"},
-  {"ÀÜÆ¬¸ì(¤ª)","#PRE"},{"ÀÜÆ¬¸ì(³Æ)","#PRE"},{"µ­¹æ","#T35"}
+  {"åè©","#T35"},{"äººå","#JN"},{"åœ°å","#CN"},{"äººå&åœ°å","#JCN"},
+  {"å›ºæœ‰åè©","#KK"},{"æ•°è©","#NN"},
+  {"ä¸€å‹•å¹¹","#KSr"},
+  {"ã‚«è¡Œäº”æ®µ","#K5r"},{"ã‚¬è¡Œäº”æ®µ","#G5r"},{"ã‚µè¡Œäº”æ®µ","#S5r"},
+  {"ã‚¿è¡Œäº”æ®µ","#T5r"},{"ãƒŠè¡Œäº”æ®µ","#N5"},{"ãƒè¡Œäº”æ®µ","#B5r"},
+  {"ãƒè¡Œäº”æ®µ","#M5r"},{"ãƒ©è¡Œäº”æ®µ","#R5r"},{"ãƒ¯è¡Œäº”æ®µ","#W5r"},
+  {"ä¸€æ®µ","#KS"},{"ä¸€æ®µ&åè©","#KSr"},{"ã‚«è¡Œ(è¡Œã)","#C5r"},
+  {"ã‚µè¡Œ(ã™ã‚‹)","#SX"},{"ã‚¶è¡Œ(ãšã‚‹)","#ZX"},{"ã‚µè¡Œ(ã™ã‚‹)&åè©","#T30"},
+  {"æ¥(ã“)","#kxo"},{"æ¥(ã)","#kxi"},{"æ¥(ã)","#kxuru"},
+  {"ç‚º(ã—)","#sxi"},{"ç‚º(ã™)","#sxuru"},{"ç‚º(ã›)","#sxe"},
+  {"ãƒ©è¡Œ(ä¸‹ã•ã„)","#L5"},
+  {"å½¢å®¹è©","#KY"},
+  {"å½¢å®¹å‹•è©","#T05"},{"å½¢å®¹å‹•è©&åè©","#T05"},{"å½¢å®¹å‹•è©(ãŸã‚‹)","#F00"},
+  {"å‰¯è©","#F14"},{"é€£ä½“è©","#RT"},{"æ¥ç¶šè©,æ„Ÿå‹•è©","#CJ"},
+  {"å˜æ¼¢å­—","#KJ"},
+  {"æ¥é ­èª","#PRE"},{"æ¥å°¾èª","#SUC"},
+  {"æ¥é ­æ•°è©","#NNPRE"},{"åŠ©æ•°è©","#JS"},{"æ¥é ­åŠ©æ•°è©","#JS"},
+  {"æ¥å°¾åŠ©æ•°è©","#JSSUC"},
+  {"æ¥å°¾äººå","#JNSUC"},{"æ¥é ­åœ°å","#CNPRE"},{"æ¥å°¾åœ°å","#CNSUC1"},
+  {"å½¢å®¹å‹•è©åŒ–æ¥å°¾èª","#N2T17"},{"ã‚µè¡Œ(ã™ã‚‹)&åè©åŒ–æ¥å°¾èª","#N2T30"},
+  {"æ¥å°¾å‹•è©","#D2T35"},{"å½¢å®¹è©åŒ–æ¥å°¾å‹•è©","#D2KY"},
+  {"æ¥é ­èª(ãŠ)","#PRE"},{"æ¥é ­èª(å„)","#PRE"},{"è¨˜å·","#T35"}
 };
 
 char *salloc(s)
@@ -93,7 +91,7 @@ char *salloc(s)
   return(new);
 }
 
-/* ÉÊ»ìÂĞ±ş */
+/* å“è©å¯¾å¿œ */
 char *chghinshi( hinshi, taiou, fshurui )
      char   *hinshi;
      struct hin   *taiou;
@@ -115,7 +113,7 @@ char *chghinshi( hinshi, taiou, fshurui )
   return( "#??" );
 }
 
-/* ÉÊ»ì¥Õ¥¡¥¤¥ëÆÉ¤ß¹ş¤ß */
+/* å“è©ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿ */
 int read_hinshi( fp, taiou )
      FILE    *fp;
      struct  hin  *taiou;
@@ -137,15 +135,15 @@ int read_hinshi( fp, taiou )
   return ( shurui );
 }
 
-/* ½ĞÎÏ */
+/* å‡ºåŠ› */
 wtoi_write( fp, yomi, hinshi, kouho, hindo )
      FILE	*fp;
      uchar   *yomi, *hinshi, *kouho;
      int	hindo;
 {
   if( !strcmp((char *)hinshi,"#kxuru") || !strcmp((char *)hinshi,"#sxuru")){
-    strcat((char *)yomi,"¤ë");
-    strcat((char *)kouho,"¤ë");
+    strcat((char *)yomi,"ã‚‹");
+    strcat((char *)kouho,"ã‚‹");
   }
   if( hindo == 0 )
     fprintf( fp, "%s %s %s \n", yomi, hinshi, kouho );
@@ -178,9 +176,9 @@ main(argc,argv)
   (void)setlocale(LC_ALL,"");
 #endif
   option = 0;
-  if( argc <= 5 ) { /* °ú¿ô¤ÏÀµÅö¤«¡© */
-    if( argc > 2 && !strcmp(argv[1],"-f") ) { /* ÉÊ»ì¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹ş¤à¤«¡© */
-      if( (fph = fopen( argv[2], "r" ) ) == NULL) { /* ÉÊ»ì¥Õ¥¡¥¤¥ë¤ò£ï£ğ£å£î */
+  if( argc <= 5 ) { /* å¼•æ•°ã¯æ­£å½“ã‹ï¼Ÿ */
+    if( argc > 2 && !strcmp(argv[1],"-f") ) { /* å“è©ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ã‹ï¼Ÿ */
+      if( (fph = fopen( argv[2], "r" ) ) == NULL) { /* å“è©ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ï½ï½ï½…ï½ */
 	fprintf(stderr,gettxt("cannacmd:49", "%s: cannot open %s\n"), argv[0], argv[2] );
 	exit(2);
       }
@@ -194,16 +192,16 @@ main(argc,argv)
     _fsetmode (fpo, "b");
 #endif
   }
-  else { /* °ú¿ô¤¬ÉÔÀµ */
+  else { /* å¼•æ•°ãŒä¸æ­£ */
     fprintf(stderr,gettxt("cannacmd:50", "Usage: wtoc [-f part-of-speech table] [wnndic] [cannadic]\n"));
     exit(2);
   }
-  if( argc >= (2 + option*2) ) { /* £×£î£î¼­½ñ¤ò¥ª¡¼¥×¥ó */
+  if( argc >= (2 + option*2) ) { /* ï¼·ï½ï½è¾æ›¸ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ */
     if( (fpi = fopen( argv[1 + option*2], "r" ) ) == NULL) {
       fprintf(stderr,gettxt("cannacmd:51", "%s: cannot open %s\n"), argv[0], argv[1 + option*2] );
       exit(2);
     }
-    if( argc == (3 + option*2) ) { /* ¤¤¤í¤Ï¼­½ñ¤ò¥ª¡¼¥×¥ó */
+    if( argc == (3 + option*2) ) { /* ã„ã‚ã¯è¾æ›¸ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ */
       if( (fpo = fopen( argv[2 + option*2], "w" ) ) == NULL) {
 	fprintf(stderr,gettxt("cannacmd:52", "%s: cannot create %s\n"), argv[0], argv[2 + option*2] );
 	exit(2);
@@ -211,7 +209,7 @@ main(argc,argv)
     }
   }
 
-  /* ¼ç½èÍı */
+  /* ä¸»å‡¦ç† */
   while( fgets( (char *)S, sizeof(S), fpi ) ) {
     if( 4 >  sscanf( (char *)S, "%s %s %s %s", y, k, h, nd ) )
       continue;

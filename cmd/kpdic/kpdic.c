@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -28,11 +29,8 @@ static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 1.4.2.2 2003/12/27 17:15:23 aida_
 #include <locale.h>
 #endif
 
-#ifdef SVR4
-extern char *gettxt();
-#else
+// SVR4
 #define	gettxt(x,y)  (y)
-#endif
 
 #include "canna/ccompat.h"
 
@@ -63,24 +61,24 @@ int chk_dflt pro((int c));
 	    char  *intr ;
         }    ;
 	static struct def_tbl def [] = {
-	    {0,"kk","§√","k"},
-	    {0,"ss","§√","s"},
-	    {0,"tt","§√","t"},
-	    {0,"hh","§√","h"},
-	    {0,"mm","§√","m"},
-	    {0,"yy","§√","y"},
-	    {0,"rr","§√","r"},
-	    {0,"ww","§√","w"},
-	    {0,"gg","§√","g"},
-	    {0,"zz","§√","z"},
-	    {0,"dd","§√","d"},
-	    {0,"bb","§√","b"},
-	    {0,"pp","§√","p"},
-	    {0,"cc","§√","c"},
-	    {0,"ff","§√","f"},
-	    {0,"jj","§√","j"},
-	    {0,"qq","§√","q"},
-	    {0,"vv","§√","v"}
+	    {0,"kk","„Å£","k"},
+	    {0,"ss","„Å£","s"},
+	    {0,"tt","„Å£","t"},
+	    {0,"hh","„Å£","h"},
+	    {0,"mm","„Å£","m"},
+	    {0,"yy","„Å£","y"},
+	    {0,"rr","„Å£","r"},
+	    {0,"ww","„Å£","w"},
+	    {0,"gg","„Å£","g"},
+	    {0,"zz","„Å£","z"},
+	    {0,"dd","„Å£","d"},
+	    {0,"bb","„Å£","b"},
+	    {0,"pp","„Å£","p"},
+	    {0,"cc","„Å£","c"},
+	    {0,"ff","„Å£","f"},
+	    {0,"jj","„Å£","j"},
+	    {0,"qq","„Å£","q"},
+	    {0,"vv","„Å£","v"}
 	}  ;
 
 
@@ -323,7 +321,7 @@ main(argc, argv)
 	    roman[nKey].roma = (unsigned char *)0;
 	    roman[nKey].kana = (unsigned char *)0;
 	    roman[nKey].temp = (unsigned char *)0;
-	    nKey--; /* §“§»§ƒÃ·§∑§∆§™§Ø */
+	    nKey--; /* „Å≤„Å®„Å§Êàª„Åó„Å¶„Åä„Åè */
 
 	    werr = 1;
 	  }
@@ -422,7 +420,7 @@ main(argc, argv)
     if (roman[i].temp) {
       r = roman[i].temp; while (*r) putchar(*r++);
     }
-    putchar(roman[i].bang); /* temp §¨§ §Ø§∆°¢bang §¨£±§œ§¢§Í§®§ §§ */
+    putchar(roman[i].bang); /* temp „Åå„Å™„Åè„Å¶„ÄÅbang „ÅåÔºë„ÅØ„ÅÇ„Çä„Åà„Å™„ÅÑ */
   };
   freeallocs(roman, nKey);
   free((char *)roman);
