@@ -1,3 +1,4 @@
+я╗┐// -*- coding:utf-8-with-signature -*-
 /* Copyright (c) 2003 Canna Project. All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -19,6 +20,8 @@
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
+// хЕиф╜УчЪДуБл UNIXуБ╣уБгуБЯуВКуАВцДПхЫ│уБЧуБЯцМЩхЛХуБпф╜ХуБЛ?
 
 #include "canna/sglobal.h"
 #include "rkcw.h"
@@ -249,7 +252,7 @@ rkc_configure()
       RkcErrorBuf_add(&rkc_errors, "RKC\244\316\300\337\304\352\245\325"
 	  "\245\241\245\244\245\353\244\254\244\242\244\352\244\336\244"
 	  "\273\244\363");
-      /* RKCд╬└▀─ъе╒ебедеыдмдвдъд▐д╗дє */
+      /* RKCуБошинхоЪуГХуВбуВдуГлуБМуБВуВКуБ╛уБЫуВУ */
       goto last;
     } else
       goto input_error;
@@ -269,7 +272,7 @@ input_error:
   RkcErrorBuf_add(&rkc_errors, "RKC\244\316\300\337\304\352\245\325\245"
       "\241\245\244\245\353\244\316\306\311\244\337\271\376\244\337\245"
       "\250\245\351\241\274\244\307\244\271");
-    /* RKCд╬└▀─ъе╒ебедеыд╬╞╔д▀╣■д▀еиещб╝д╟д╣ */
+    /* RKCуБошинхоЪуГХуВбуВдуГлуБошкнуБ┐ш╛╝уБ┐уВиуГйуГ╝уБзуБЩ */
 last:
   Parser_delete(parser);
   Lexer_delete(lexer);
@@ -409,7 +412,7 @@ fail:
   RkcErrorBuf_add(&rkc_errors, "\300\337\304\352\245\325\245\241\245"
       "\244\245\353\244\316\306\311\244\337\271\376\244\337\245"
       "\250\245\351\241\274\244\307\244\271");
-    /* └▀─ъе╒ебедеыд╬╞╔д▀╣■д▀еиещб╝д╟д╣ */
+    /* шинхоЪуГХуВбуВдуГлуБошкнуБ┐ш╛╝уБ┐уВиуГйуГ╝уБзуБЩ */
   free(cx);
   return NULL;
 }

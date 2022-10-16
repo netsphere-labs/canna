@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -31,8 +32,6 @@ static char rcsid[]="@(#) 102.1 $Id: RKroma.c,v 1.4.2.1 2004/04/26 22:49:21 aida
 #include <assert.h>
 #include <stdlib.h>
 
-#define euccharlen eucchars
-
 #define S2TOS(s2)	(((unsigned short)(s2)[0]<<8)|(s2)[1])
 #define L4TOL(l4)\
         ((((((((uint32_t) ((unsigned char)(l4)[0])) << 8) | \
@@ -48,49 +47,50 @@ struct romaRec {
 };
 
 
-int
-compar(struct romaRec* p, struct romaRec* q)
+// for qsort()
+static int compar(const void* p, const void* q)
 {
-  unsigned char	*s = p->roma;
-  unsigned char	*t = q->roma;
+    const unsigned char* s = ((const struct romaRec*) p)->roma;
+    const unsigned char* t = ((const struct romaRec*) q)->roma;
 
-  while ( *s == *t )
-    if (*s)
-      s++, t++;
-    else
-      return 0;
-  return ((int)*s) - ((int)*t);
+    while ( *s == *t ){
+        if (*s)
+            s++, t++;
+        else
+            return 0;
+    }
+    return ((int)*s) - ((int)*t);
 }
 #endif /* JAPANESE_SORT */
 
-static int
-readHeader(rdic, dicfd)
-struct RkRxDic *rdic;
-int dicfd;
+
+// @return æˆåŠŸ = 0, ã‚¨ãƒ©ãƒ¼ = -1
+static int readHeader(struct RkRxDic* rdic, FILE* dicfd)
 {
     char magic[3];
     unsigned char hdrbuf[8];
     int hdrsize;
 
-    if (read(dicfd, magic, 2) != 2)
-	return -1;
+    if (fread(magic, 1, 2, dicfd) != 2)
+        return -1;
     magic[2] = '\0';
     if (!strcmp(magic, "KP")) {
-	rdic->dic = RX_KPDIC;
-	hdrsize = 4;
+        rdic->dic = RX_KPDIC;
+        hdrsize = 4;
     }
-    else if (!strcmp(magic, "RD")) {
-	rdic->dic = RX_RXDIC;
-	hdrsize = 4;
-    }
-    else if (!strcmp(magic, "PT")) {
-	rdic->dic = RX_PTDIC;
-	hdrsize = 8;
+/*  else if (!strcmp(magic, "RD")) {  // Old format. ã‚‚ã¯ã‚„ä½¿ã‚ã‚Œã¦ã„ãªã„.
+        rdic->dic = RX_RXDIC;
+        hdrsize = 4;
+    } */
+    else if (!strcmp(magic, "PT")) {  // flag_large
+        rdic->dic = RX_PTDIC;
+        hdrsize = 8;
     }
     else
-	return -1;
-    if (read(dicfd, hdrbuf, hdrsize) != hdrsize)
-	return -1;
+        return -1;
+
+    if ( fread(hdrbuf, 1, hdrsize, dicfd) != hdrsize)
+        return -1;
     if (hdrsize == 4) {
 	rdic->nr_strsz = S2TOS(hdrbuf);
 	rdic->nr_nkey = S2TOS(hdrbuf + 2);
@@ -102,9 +102,10 @@ int dicfd;
 }
 
 
+// ãƒ­ãƒ¼ãƒå­—ã‹ãªãƒ†ãƒ¼ãƒ–ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€.
 // @return If failed, NULL.
 struct RkRxDic *
-RkwOpenRoma(char* romaji)
+RkwOpenRoma(const char* romaji)
 {
     struct RkRxDic	*rdic;
 #ifdef JAPANESE_SORT
@@ -115,70 +116,67 @@ RkwOpenRoma(char* romaji)
     if (!rdic)
         return NULL;
 
-    int	dic;
+    FILE* dic;
     unsigned char	*s;
     int	i, sz;
 
-    int open_flags = O_RDONLY;
-#ifdef _WIN32
-    open_flags |= O_BINARY;
-#endif
-    if ( (dic = open(romaji, open_flags)) < 0 ) {
+    if ( !(dic = fopen(romaji, "rb")) ) {
         free(rdic);
         return NULL;
     }
-	if ( readHeader(rdic, dic) ) {
-		(void)close(dic);
-		free((char *)rdic);
-		return((struct RkRxDic *)0);
-	}
-	if (rdic->nr_strsz > 0) {
-	  rdic->nr_string =
-	    (unsigned char *)malloc((unsigned int)rdic->nr_strsz);
+    if ( readHeader(rdic, dic) ) {
+        fclose(dic);
+        free( rdic);
+        return NULL;
+    }
 
-	  if ( !rdic->nr_string ) {
-		(void)close(dic);
-		free((char *)rdic);
-		return((struct RkRxDic *)0);
-	  }
+    if (rdic->nr_strsz > 0) {
+        rdic->nr_string = (unsigned char*) malloc(rdic->nr_strsz);
+        if ( !rdic->nr_string ) {
+            fclose(dic);
+            free( rdic);
+            return NULL;
+        }
 
-	  sz = read(dic, (char *)rdic->nr_string, rdic->nr_strsz);
-	  (void)close(dic);
-	  if ( sz != rdic->nr_strsz ) {
-	    free((char *)rdic->nr_string);
-	    free((char *)rdic);
-	    return((struct RkRxDic *)0);
-	  }
-	}
-	else {
-	  rdic->nr_string = (unsigned char *)0;
-	}
+        sz = fread((char*)rdic->nr_string, 1, rdic->nr_strsz, dic);
+        fclose(dic);
+        if ( sz != rdic->nr_strsz ) {
+            free( rdic->nr_string);
+            free( rdic);
+            return NULL;
+        }
+    }
+    else {
+        fprintf(stderr, "warning: nr_strsz = 0\n");
+        rdic->nr_string = NULL;
+    }
 
-	if (rdic->nr_nkey > 0) {
-	  rdic->nr_keyaddr =
-	    (unsigned char **)calloc((unsigned)rdic->nr_nkey,
+    if (rdic->nr_nkey > 0) {
+        rdic->nr_keyaddr =
+	    (unsigned char **)calloc(rdic->nr_nkey,
 				     sizeof(unsigned char *));
-	  if ( !rdic->nr_keyaddr ) {
-	    free((char *)rdic->nr_string);
-	    free((char *)rdic);
-	    return((struct RkRxDic *)0);
-	  }
-	}
-	else {
-	  rdic->nr_keyaddr = (unsigned char **)0;
-	}
+        if ( !rdic->nr_keyaddr ) {
+            free( rdic->nr_string);
+            free( rdic);
+            return NULL;
+        }
+    }
+    else {
+        fprintf(stderr, "warning: nr_nkey = 0\n");
+        rdic->nr_keyaddr = NULL;
+    }
 
-	s = rdic->nr_string;
+    s = rdic->nr_string;
 
-	/* ¥È¥ê¥¬¡¼Ê¸»ú¤Î¥İ¥¤¥ó¥¿ */
-	if (rdic->dic != RX_RXDIC) {
-	  /* RXDIC°Ê³° ¤Ç nr_string ¤¬Ìµ¤¤¤³¤È¤Ï¤Ê¤¤ */
+    /* ãƒãƒƒã‚¯ãƒˆãƒ©ãƒƒã‚¯ã®ãƒˆãƒªã‚¬ãƒ¼æ–‡å­—ã®ãƒã‚¤ãƒ³ã‚¿ */
+//  if (rdic->dic != RX_RXDIC) {
+	  /* RXDICä»¥å¤– ã§ nr_string ãŒç„¡ã„ã“ã¨ã¯ãªã„ */
 	  rdic->nr_bchars = s;
 	  while (*s++)
 	    /* EMPTY */
 	    ;
 
-	  /* ¥È¥ê¥¬¡¼Ê¸»ú¤¬¤¢¤ë¤Î¤Ê¤é¡¢¥È¥ê¥¬¡¼¥ë¡¼¥ë¤â¤¢¤ë¤Ï¤º */
+	  /* ãƒˆãƒªã‚¬ãƒ¼æ–‡å­—ãŒã‚ã‚‹ã®ãªã‚‰ã€ãƒˆãƒªã‚¬ãƒ¼ãƒ«ãƒ¼ãƒ«ã‚‚ã‚ã‚‹ã¯ãš */
 	  if (*rdic->nr_string && rdic->nr_nkey > 0) {
 	    rdic->nr_brules = (unsigned char *)calloc((unsigned)rdic->nr_nkey,
                                                        sizeof(unsigned char));
@@ -186,31 +184,32 @@ RkwOpenRoma(char* romaji)
 	  else {
 	    rdic->nr_brules = (unsigned char *)0;
 	  }
-	}
-	else {
-	  rdic->nr_brules = (unsigned char *)0;
-	}
+//  }
+//  else {
+//	  rdic->nr_brules = (unsigned char *)0;
+//  }
 
-	/* ¥ë¡¼¥ë¤ÎÆÉ¤ß¹ş¤ß */
-	for ( i = 0; i < rdic->nr_nkey; i++ ) {
-	    rdic->nr_keyaddr[i] = s;
-	    while (*s++)
-	      /* EMPTY */
-	      ;
-	    while (*s++)
-	      /* EMPTY */
-	      ;
-	    if (rdic->dic != RX_RXDIC) {
-	      while ( *s > 0x19 ) s++;
-	      if (*s) { /* ¥È¥ê¥¬¡¼¥ë¡¼¥ë */
-		if (rdic->nr_brules) {
+    /* ãƒ«ãƒ¼ãƒ«ã®èª­ã¿è¾¼ã¿ */
+    for ( i = 0; i < rdic->nr_nkey; i++ ) {
+        rdic->nr_keyaddr[i] = s;
+        while (*s++)
+                /* EMPTY */   // ãƒ­ãƒ¼ãƒå­—
+            ;
+        while (*s++)
+                /* EMPTY */     // å‡ºåŠ›ã‹ãª
+            ;
+//	    if (rdic->dic != RX_RXDIC) {
+        while ( *s > 0x19 )
+            s++;      // tempéƒ¨
+        if (*s) { /* ãƒˆãƒªã‚¬ãƒ¼ãƒ«ãƒ¼ãƒ« */
+            if (rdic->nr_brules) {
 		  rdic->nr_brules[i] = (unsigned char)1;
-		}
-		*s = (unsigned char)'\0';
-	      }
-	      s++;
-	    }
-	}
+            }
+            *s = (unsigned char)'\0';  // temp ã‚’ãƒŠãƒ«çµ‚ç«¯ã•ã›ã¦ãŠã
+        }
+        s++;
+//	    }
+    }
 
 #ifdef JAPANESE_SORT
 	tmp_rdic = (struct romaRec *)calloc((unsigned)rdic->nr_nkey,
@@ -232,8 +231,7 @@ RkwOpenRoma(char* romaji)
 	    tmp_rdic[i].bang = rdic->nr_brules[i];
 	}
 
-        qsort((char *)tmp_rdic, rdic->nr_nkey, sizeof(struct romaRec),
-                (int (*) pro((const void *, const void *)))compar);
+        qsort(tmp_rdic, rdic->nr_nkey, sizeof(struct romaRec), compar);
 
         for (i = 0; i < rdic->nr_nkey; i++) {
 	  rdic->nr_keyaddr[i] = tmp_rdic[i].roma;
@@ -501,9 +499,9 @@ int		p;
 {
   register unsigned char	*kana;
 
-  if (rdic->dic == RX_RXDIC) {
-    return (unsigned char *)0;
-  }
+//  if (rdic->dic == RX_RXDIC) {
+//    return (unsigned char *)0;
+//  }
   kana = rdic->nr_keyaddr[p];
   while (*kana++)
     /* EMPTY */
@@ -554,11 +552,11 @@ int		*rule_id_inout;
       if (!key) {
 	if (rdic->nr_brules && rdic->nr_brules[lastrule] &&
 	    !(flags & RK_FLUSH)) {
-	  /* ¤â¤·¡¢! ¤¬ÉÕ¤¤¤Æ¤¤¤¿¾ì¹ç¤Ë¤ÏÂè£³¥Õ¥£¡¼¥ë¥É¤Ë½ñ¤«¤ì¤Æ¤¤¤ë
-             Ê¸»ú¤Ç»Ï¤Ş¤ë¥ë¡¼¥ë¤¬¤¢¤ë¤È²¾ÁÛÅª¤Ë¹Í¤¨¤é¤ì¤ë¤ï¤±¤Ç¤¢¤ë¤«
-             ¤é key ¤¬Í¿¤¨¤é¤ì¤Æ¤¤¤Ê¤¤¤Î¤Ç¤¢¤ì¤ĞÍ¿¤¨¤é¤ì¤¿Ê¸»úÎó¤¬Ã»¤«
-             ¤¹¤®¤ë¤¿¤á¤Ê¤ó¤È¤â¤Ç¤­¤Ê¤¤¤è¤·¤Î¥ê¥¿¡¼¥óÃÍ¤òÊÖ¤¹¡£ */
-	  /* RK_FLUSH ¤ÏÄ´¤Ù¤ë¤Ù¤­¤«¤É¤¦¤«Çº¤à¤È¤³¤í */
+	  /* ã‚‚ã—ã€! ãŒä»˜ã„ã¦ã„ãŸå ´åˆã«ã¯ç¬¬ï¼“ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«æ›¸ã‹ã‚Œã¦ã„ã‚‹
+             æ–‡å­—ã§å§‹ã¾ã‚‹ãƒ«ãƒ¼ãƒ«ãŒã‚ã‚‹ã¨ä»®æƒ³çš„ã«è€ƒãˆã‚‰ã‚Œã‚‹ã‚ã‘ã§ã‚ã‚‹ã‹
+             ã‚‰ key ãŒä¸ãˆã‚‰ã‚Œã¦ã„ãªã„ã®ã§ã‚ã‚Œã°ä¸ãˆã‚‰ã‚ŒãŸæ–‡å­—åˆ—ãŒçŸ­ã‹
+             ã™ãã‚‹ãŸã‚ãªã‚“ã¨ã‚‚ã§ããªã„ã‚ˆã—ã®ãƒªã‚¿ãƒ¼ãƒ³å€¤ã‚’è¿”ã™ã€‚ */
+	  /* RK_FLUSH ã¯èª¿ã¹ã‚‹ã¹ãã‹ã©ã†ã‹æ‚©ã‚€ã¨ã“ã‚ */
 	  byte = count = 0;
 	  templen = 0;
 	  found = 0;
@@ -581,7 +579,7 @@ int		*rule_id_inout;
 		  origin++;
 		}
 		if (i + 1 == srclen) {
-		  /* ¥Ğ¥Ã¥¯¥È¥é¥Ã¥¯¤ò¤¹¤ë */
+		  /* ãƒãƒƒã‚¯ãƒˆãƒ©ãƒƒã‚¯ã‚’ã™ã‚‹ */
 		  origin = rdic->nr_keyaddr[lastrule];
 
 		  for (i = 0 ; i < maxdst && *origin ; i++) {
@@ -623,31 +621,31 @@ int		*rule_id_inout;
 	while (--m > match && xkey(rdic, m->start, m - match))
 	  /* EMPTY */
 	  ;
-	if(m == match) { /* ¥Æ¡¼¥Ö¥ë¤Ë¤Ê¤«¤Ã¤¿»ş¤Î½èÍı */
+	if(m == match) { /* ãƒ†ãƒ¼ãƒ–ãƒ«ã«ãªã‹ã£ãŸæ™‚ã®å‡¦ç† */
 	  count = (*src & 0x80) ? 2 : 1;
 	  if (srclen < count) {
 	    count = 0;
 	  }
-	  if( (rdic->dic == RX_RXDIC) && /* tt ¤ÎµßºÑ(µì¼­½ñÍÑ) */
+/*	  if( (rdic->dic == RX_RXDIC) &&   // tt ã®æ•‘æ¸ˆ(æ—§è¾æ›¸ç”¨)
 	     (flags & RK_SOKON) &&
 	     (match[1].start < rdic->nr_nkey) &&
 	     (2 <= srclen) &&
 	     (src[0] == src[1]) &&
 	     (i == 1)) {
 	    kana = getTSU(rdic, flags);
-	    /* tsu ha jisho ni aru kao wo suru */
+            // tsu ha jisho ni aru kao wo suru
 	    byte = strlen((char *)kana);
 	    templen = 0;
 	    if (rule_id_inout) *rule_id_inout = 0;
 	  }
-	  else { /* £±Ê¸»úÊÑ´¹¤µ¤ì¤¿¤³¤È¤Ë¤¹¤ë */
+	  else { */ /* ï¼‘æ–‡å­—å¤‰æ›ã•ã‚ŒãŸã“ã¨ã«ã™ã‚‹ */
 	    byte = count;
 	    templen = 0;
 	    kana = src;
 	    found = 0;
-	  }
+//	  }
 	}
-	else {  /* 'n' ¤Ê¤É¤Î½èÍı: ºÇÃ»¤Î¤â¤Î¤ò¼è¤ë */
+	else {  /* 'n' ãªã©ã®å‡¦ç†: æœ€çŸ­ã®ã‚‚ã®ã‚’å–ã‚‹ */
 	  kana = getrawKana(rdic, m->start);
 	  byte = strlen((char *)kana);
 	  temp = getTemp(rdic, m->start);
@@ -663,7 +661,7 @@ int		*rule_id_inout;
 	  }
 	}
 	goto done;
-      case	1: /* ÅÓÃæ¤Ç¤É¤ó¤Ô¤·¤ã¤¬¸«¤Ä¤«¤Ã¤¿ */
+      case	1: /* é€”ä¸­ã§ã©ã‚“ã´ã—ã‚ƒãŒè¦‹ã¤ã‹ã£ãŸ */
 	/* key no hou ga nagai baai */
 	roma = getRoma(rdic, m->start);
 	if ( roma[i + 1] ) 	/* waiting suffix */
@@ -846,7 +844,7 @@ int RkwMapPhonogram(struct RkRxDic *romaji, cannawc *dst, int maxdst,
   }
     if (ulen) {
         cbuf1[fulen] = '\0';
-        *ulen = euccharlen(cbuf1, fulen); //MBstowcs(wbuf, cbuf1, CBUFSIZE);
+        *ulen = eucchars(cbuf1, fulen); //MBstowcs(wbuf, cbuf1, CBUFSIZE);
     }
 
   free(cbuf2);
@@ -855,7 +853,7 @@ int RkwMapPhonogram(struct RkRxDic *romaji, cannawc *dst, int maxdst,
 }
 
 
-// Ê¸»úÎó¤¹¤Ù¤Æ¤Î¥í¡¼¥Ş»ú -> Kana.
+// æ–‡å­—åˆ—ã™ã¹ã¦ã®ãƒ­ãƒ¼ãƒå­— -> Kana.
 // @return -1 malloc() failed.
 int RkwCvtRoma(struct RkRxDic* romaji, cannawc* dst, int maxdst,
         const cannawc* src, int srclen, int flags)

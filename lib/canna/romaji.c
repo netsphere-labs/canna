@@ -40,9 +40,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.11 2004/03/15 04:33:23 aida
 #define DEFAULT_ROMKANA_TABLE "/dic/default.kp"
 #endif
 
-#ifdef luna88k
-extern int errno;
-#endif
 
 /*********************************************************************
  *                      wchar_t replace begin                        *
@@ -332,8 +329,8 @@ extern ckverbose;
 static struct RkRxDic *
 OpenRoma(const char* table)
 {
-    struct RkRxDic *retval = NULL, *RkwOpenRoma();
-  char *p, *getenv();
+    struct RkRxDic *retval = NULL;
+    char *p;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
   char rdic[1024];
 #else

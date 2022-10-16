@@ -3,6 +3,7 @@ KPDEF = default.kpdef jdaemon.kpdef just.kpdef kaisoku.kpdef kana.kpdef \
         lan5.kpdef matsu.kpdef newjis.kpdef romaji.kpdef sokuon.kpdef \
         english.kpdef tut.kpdef vje.kpdef wx2+.kpdef
 
+# .kp は旧形式.
 CBP   = default.cbp jdaemon.cbp just.cbp kaisoku.cbp kana.cbp \
         lan5.cbp matsu.cbp newjis.cbp romaji.cbp sokuon.cbp \
         english.cbp tut.cbp vje.cbp wx2+.cbp
@@ -14,8 +15,15 @@ FORCPP = ../../cmd/forcpp/forcpp
 KPDIC = ../../cmd/kpdic/kpdic
 ROMAJI_DIC_DEF = -DSHIFT
 
-# gcc -E プリプロセスのみ実行
+# gcc -E プリプロセスのみ実行 -> アカン
+# cpp -fdirectives-only -E .. directives such as "#define", "#ifdef", and
+#                             "#error" のみ処理
+#     -nostdinc
 .kpdef.cbp:
-	$(CPP) $(ROMAJI_DIC_DEF) - < $< | $(KPDIC) > $@
+	LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc $(ROMAJI_DIC_DEF) $< > t
+	$(KPDIC) < t > $@
 
 dist_pkgdata_DATA = $(CBP)
+
+clean-local:
+	rm -f *.cbp

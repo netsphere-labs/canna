@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* The Authors:
  *   Copyright (c) 2002-2004 Canna Project.
  *   Copyright (c) 1990-1997 NEC Corporation, Tokyo, Japan.
@@ -70,15 +71,15 @@ RCSID("$Id: cannastat.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $");
 #endif
 
 typedef struct _Client {
-    int 	id ;			     /* ¥½¥±¥Ã¥ÈÈÖ¹æ */
-    int 	usr_no ;		     /* ¥æ¡¼¥¶´ÉÍıÈÖ¹æ */
-    ir_time_t	used_time ;		     /* ¥æ¡¼¥¶¾ÃÈñ»ş´Ö */
-    ir_time_t	idle_date ;		     /* ¥¢¥¤¥É¥ë»ş´Ö */
-    ir_time_t	connect_date ;		     /* ¥³¥Í¥¯¥È¤·¤¿»ş´Ö */
-    char	*username ;		     /* ¥æ¡¼¥¶Ì¾  */
-    char	*groupname;		     /* ¥°¥ë¡¼¥×Ì¾  */
-    char	*hostname ;		     /* ¥Û¥¹¥ÈÌ¾  */
-    char	*clientname ;		     /* ¥¯¥é¥¤¥¢¥ó¥ÈÌ¾  */
+    int 	id ;			     /* ã‚½ã‚±ãƒƒãƒˆç•ªå· */
+    int 	usr_no ;		     /* ãƒ¦ãƒ¼ã‚¶ç®¡ç†ç•ªå· */
+    ir_time_t	used_time ;		     /* ãƒ¦ãƒ¼ã‚¶æ¶ˆè²»æ™‚é–“ */
+    ir_time_t	idle_date ;		     /* ã‚¢ã‚¤ãƒ‰ãƒ«æ™‚é–“ */
+    ir_time_t	connect_date ;		     /* ã‚³ãƒã‚¯ãƒˆã—ãŸæ™‚é–“ */
+    char	*username ;		     /* ãƒ¦ãƒ¼ã‚¶å  */
+    char	*groupname;		     /* ã‚°ãƒ«ãƒ¼ãƒ—å  */
+    char	*hostname ;		     /* ãƒ›ã‚¹ãƒˆå  */
+    char	*clientname ;		     /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå  */
 } ClientRec, *ClientPtr;
 
 typedef unsigned int Uint;
@@ -97,17 +98,25 @@ static void DispInfo pro((ClientPtr client, int flag));
 static void DispProto pro((ClientPtr client));
 static int CreateData pro((const BYTE *readbuf,
 	    ClientPtr who, size_t cinfolen));
-static void usage pro((void));
 static int process_wide_reply pro((const BYTE *reply, size_t len,
 	    int argflag, int flag));
 static int get_check_str pro((char **dst, const BYTE *src, size_t len));
 static int get_check_str_adv pro((char **dst, size_t recvlen,
 	    const BYTE **receivep, size_t *requiredsize));
 
-int
-main(argc, argv)
-int argc ;
-char **argv ;
+static void
+usage()
+{
+    fprintf( stderr, "usage: cannastat [-cs | -cannaserver hostname] [-a|-v]\n" ) ;
+    fprintf( stderr, "                 [-cs | -cannaserver hostname] [-t]\n" ) ;
+    fprintf( stderr, "                 [-cs | -cannaserver hostname] [-p]\n" ) ;
+
+    fflush( stderr ) ;
+    exit( 0 ) ;
+}
+
+
+int main(int argc, char* argv[])
 {
     char		cannahostname[ 256 ] ;
     int 		argflag = 0, flag = 0 ;
@@ -152,7 +161,7 @@ char **argv ;
 	exit(2);
     }
 
-    /* ¥Ñ¥±¥Ã¥ÈÁÈ¤ßÎ©¤Æ */
+    /* ãƒ‘ã‚±ãƒƒãƒˆçµ„ã¿ç«‹ã¦ */
     *p++ = wGetServerInfo; /* major */
     *p++ = EXTPROTO; /* minor */
     STOS2(0, p); p += SIZEOFSHORT; /* datalen */
@@ -247,17 +256,17 @@ int flag;
 
     requiredsize =
 	HEADER_SIZE
-	+ SIZEOFCHAR            /* ½ªÎ»¾õÂÖ */
-	+ SIZEOFCHAR            /* ¥á¥¸¥ã¡¼¥Ğ¡¼¥¸¥ç¥ó */
-	+ SIZEOFCHAR            /* ¥Ş¥¤¥Ê¡¼¥Ğ¡¼¥¸¥ç¥ó */
-	+ SIZEOFLONG            /* »ş¹ï */
-	+ SIZEOFSHORT           /* ¥×¥í¥È¥³¥ë¿ô */
-	+ SIZEOFSHORT           /* ¥×¥í¥È¥³¥ëÌ¾¤ÎÄ¹¤µ */
-	+ 0                     /* ¥×¥í¥È¥³¥ëÌ¾(¤Ş¤À¤ï¤«¤é¤Ê¤¤) */
-	+ 0			/* ¥×¥í¥È¥³¥ë»ÈÍÑÉÑÅÙ(¤Ş¤À¤ï¤«¤é¤Ê¤¤) */
-	+ SIZEOFSHORT           /* ¥¯¥é¥¤¥¢¥ó¥È¿ô */
-	+ SIZEOFSHORT           /* ¥³¥ó¥Æ¥­¥¹¥È¿ô */
-	+ 0                     /* ¥¯¥é¥¤¥¢¥ó¥È¾ğÊó´ØÏ¢(¤Ş¤À¤ï¤«¤é¤Ê¤¤) */
+	+ SIZEOFCHAR            /* çµ‚äº†çŠ¶æ…‹ */
+	+ SIZEOFCHAR            /* ãƒ¡ã‚¸ãƒ£ãƒ¼ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
+	+ SIZEOFCHAR            /* ãƒã‚¤ãƒŠãƒ¼ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
+	+ SIZEOFLONG            /* æ™‚åˆ» */
+	+ SIZEOFSHORT           /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«æ•° */
+	+ SIZEOFSHORT           /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«åã®é•·ã• */
+	+ 0                     /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«å(ã¾ã ã‚ã‹ã‚‰ãªã„) */
+	+ 0			/* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ä½¿ç”¨é »åº¦(ã¾ã ã‚ã‹ã‚‰ãªã„) */
+	+ SIZEOFSHORT           /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ•° */
+	+ SIZEOFSHORT           /* ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆæ•° */
+	+ 0                     /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæƒ…å ±é–¢é€£(ã¾ã ã‚ã‹ã‚‰ãªã„) */
 	;
     TRACE(fprintf(stderr, "process_wide_reply: len=%u, requiredsize_0=%u\n",
 		(Uint)len, (Uint)requiredsize));
@@ -271,29 +280,29 @@ int flag;
 
     if (*p++ != 0) /* stat */
 	goto protoerr;
-    /* ¥µ¡¼¥Ğ¥Ğ¡¼¥¸¥ç¥ó¤ò¼èÆÀ¤¹¤ë */
+    /* ã‚µãƒ¼ãƒãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹ */
     major_version = *p++;
     minor_version = *p++;
     printf("Canna Server (Ver. %d.%d)\n", major_version, minor_version ) ;
 
-    /* ¥µ¡¼¥Ğ¤Î¥«¥ì¥ó¥È»ş´Ö */
+    /* ã‚µãƒ¼ãƒã®ã‚«ãƒ¬ãƒ³ãƒˆæ™‚é–“ */
     cur_time = (ir_time_t)L4TOL(p), p+= SIZEOFLONG;
 
-    /* ¥×¥í¥È¥³¥ë¿ô */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«æ•° */
     ProtoCount = S2TOS(p), p+= SIZEOFSHORT;
 
-    /* ¥×¥í¥È¥³¥ëÌ¾¥ê¥¹¥ÈÄ¹ */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«åãƒªã‚¹ãƒˆé•· */
     ListSize = S2TOS(p), p+= SIZEOFSHORT;
 
-    requiredsize += ListSize	/* ¥×¥í¥È¥³¥ëÌ¾(¤ï¤«¤Ã¤¿) */
-	+ ProtoCount * SIZEOFLONG /* ¥×¥í¥È¥³¥ë»ÈÍÑÉÑÅÙ(¤ï¤«¤Ã¤¿) */
+    requiredsize += ListSize	/* ãƒ—ãƒ­ãƒˆã‚³ãƒ«å(ã‚ã‹ã£ãŸ) */
+	+ ProtoCount * SIZEOFLONG /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ä½¿ç”¨é »åº¦(ã‚ã‹ã£ãŸ) */
 	;
     TRACE(fprintf(stderr, "ListSize=%u, ProtoCount=%u, requiredsize_1=%u\n",
 		(Uint)ListSize, (Uint)ProtoCount, (Uint)requiredsize));
     if (len < requiredsize)
 	goto protoerr;
 
-    /* ¥×¥í¥È¥³¥ëÌ¾¥ê¥¹¥È¼èÆÀ */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«åãƒªã‚¹ãƒˆå–å¾— */
     ProtoList = (char *)malloc( ListSize ) ;
     if (!ProtoList)
 	goto nomem;
@@ -301,7 +310,7 @@ int flag;
     p += ListSize;
     TRACE(fprintf(stderr, "after ProtoList: off=%x\n", (Uint)(p - reply)));
 
-    /* ¥×¥í¥È¥³¥ë»ÈÍÑÉÑÅÙ¼èÆÀ */
+    /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ä½¿ç”¨é »åº¦å–å¾— */
     TotalReqCount = (int *)calloc( ProtoCount, sizeof( int ) ) ;
     if (!TotalReqCount)
 	goto nomem;
@@ -344,12 +353,12 @@ int flag;
     if (!ContextFlag)
 	goto nomem;
 
-    /* ¥¯¥é¥¤¥¢¥ó¥È¾ğÊó´ØÏ¢ */
+    /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæƒ…å ±é–¢é€£ */
     for( i = 0; i < cConnectNum ; i++ ) {
 	size_t clientinfolen;
 
 	clientinfolen = S2TOS(p), p+= SIZEOFSHORT;
-	/* ¤³¤Î¥¯¥é¥¤¥¢¥ó¥È¤Ë¤Ä¤¤¤Æ¤ÏÊ¬¤«¤Ã¤¿ */
+	/* ã“ã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã«ã¤ã„ã¦ã¯åˆ†ã‹ã£ãŸ */
 	requiredsize += SIZEOFSHORT + clientinfolen;
 	TRACE(fprintf(stderr, "clientinfolen=%u, requiredsize_x=%u\n",
 		    (Uint)clientinfolen, (Uint)requiredsize));
@@ -406,10 +415,9 @@ last:
     return r;
 }
 
+
 static void
-DispInfo( client, flag )
-register ClientPtr client ;
-int flag ;
+DispInfo( ClientPtr client, int flag )
 {
     static char *week[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" } ;
     char	ctime[ 15 ], utime[ 10 ], itime[ 10 ] ;
@@ -423,7 +431,7 @@ int flag ;
     user_no = client->usr_no ;
     udate = client->used_time ;
 
-    /* ¥³¥Í¥¯¥È»ş´Ö¤ÎÀ°·Á */
+    /* ã‚³ãƒã‚¯ãƒˆæ™‚é–“ã®æ•´å½¢ */
     cdate = client->connect_date ;
     tt = localtime( &cdate ) ;
     if( flag ) {
@@ -455,7 +463,7 @@ int flag ;
     }
 
     idate = cur_time - client->idle_date ;
-    /* £±Ê¬°ÊÆâ¤ÏÉ½¼¨¤·¤Ê¤¤ */
+    /* ï¼‘åˆ†ä»¥å†…ã¯è¡¨ç¤ºã—ãªã„ */
     if( idate < 60 )
 	strcpy( itime, "" ) ;
     else if ( idate < 3600)
@@ -495,9 +503,9 @@ int flag ;
     }
 }
 
+
 static void
-DispProto( client )
-register ClientPtr client ;
+DispProto( ClientPtr client )
 {
     register int i ;
     char *protoname ;
@@ -514,11 +522,9 @@ register ClientPtr client ;
     putchar('\n') ;
 }
 
+
 static int
-CreateData( readbuf, who, cinfolen )
-const BYTE *readbuf ;
-ClientPtr   who ;
-size_t cinfolen ;
+CreateData( const BYTE* readbuf, ClientPtr who, size_t cinfolen )
 {
     const BYTE *receivep = readbuf ;
     size_t j ;
@@ -526,13 +532,13 @@ size_t cinfolen ;
     size_t requiredsize;
 
     requiredsize =
-	(5 * SIZEOFLONG)	/* ¥½¥±¥Ã¥ÈÈÖ¹æ¡¢¥æ¡¼¥¶´ÉÍıÈÖ¹æ¡¢³Æ¼ï»ş´Ö */
-	+ (ProtoCount * SIZEOFLONG) /* ¥×¥í¥È¥³¥ë»ÈÍÑÉÑÅÙ */
-	+ SIZEOFSHORT		/* ¥æ¡¼¥¶Ì¾¤ÎÄ¹¤µ */
-	+ SIZEOFSHORT		/* ¥Û¥¹¥ÈÌ¾¤ÎÄ¹¤µ */
+	(5 * SIZEOFLONG)	/* ã‚½ã‚±ãƒƒãƒˆç•ªå·ã€ãƒ¦ãƒ¼ã‚¶ç®¡ç†ç•ªå·ã€å„ç¨®æ™‚é–“ */
+	+ (ProtoCount * SIZEOFLONG) /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ä½¿ç”¨é »åº¦ */
+	+ SIZEOFSHORT		/* ãƒ¦ãƒ¼ã‚¶åã®é•·ã• */
+	+ SIZEOFSHORT		/* ãƒ›ã‚¹ãƒˆåã®é•·ã• */
 	+ ((major_version > 2) ? SIZEOFSHORT : 0)
-	    /* ¥¯¥é¥¤¥¢¥ó¥ÈÌ¾¤ÎÄ¹¤µ */
-	+ ContextNum		/* ¥³¥ó¥Æ¥­¥¹¥È´ÉÍı¥Õ¥é¥° */
+	    /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆåã®é•·ã• */
+	+ ContextNum		/* ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆç®¡ç†ãƒ•ãƒ©ã‚° */
 	;
     /*TRACE(DebugDump((const char *)readbuf, cinfolen));*/
     TRACE(fprintf(stderr, "CreateData: cinfolen=%u, requiredsize_0=%u\n",
@@ -626,15 +632,5 @@ size_t *requiredsize;
     return get_check_str(dst, p, len);
 }
 
-static void
-usage()
-{
-    fprintf( stderr, "usage: cannastat [-cs | -cannaserver hostname] [-a|-v]\n" ) ;
-    fprintf( stderr, "                 [-cs | -cannaserver hostname] [-t]\n" ) ;
-    fprintf( stderr, "                 [-cs | -cannaserver hostname] [-p]\n" ) ;
-
-    fflush( stderr ) ;
-    exit( 0 ) ;
-}
 
 /* vim: set sw=4: */

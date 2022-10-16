@@ -21,6 +21,10 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+// lib/canna/RKroma.c:RkwOpenRoma() 関数で読み込める形式に、ローマ字かなテーブル
+// ファイルを変換する.
+// => そもそも何でわざわざ変換するのか? テキストのままでいいやん
+
 #ifndef lint
 static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 1.4.2.2 2003/12/27 17:15:23 aida_s Exp $";
 #endif
@@ -40,6 +44,7 @@ static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 1.4.2.2 2003/12/27 17:15:23 aida_
 
 #include	<stdio.h>
 #include	<ctype.h>
+#include <stdarg.h>
 
 #define		MAXKEY	((1 << 16) / 4)
 #define		MAXSIZE	(1 << 16)
@@ -51,16 +56,17 @@ static char rcsid[]="@(#) 102.1 $Id: kpdic.c,v 1.4.2.2 2003/12/27 17:15:23 aida_
 
 static char	fileName[256];
 static int	lineNum;
-static int	errCount;
-int chk_dflt pro((int c));
+static int	errCount = 0;
 
-	struct  def_tbl {
+/* flag_old == 1 の場合にしか使われない.
+   Old format `RX_RXDIC` -> temp列がなく, 促音「っ」が決め打ち。上手くない.
+struct  def_tbl {
 	    int   used  ;
 	    char  *roma ;
 	    char  *kana ;
 	    char  *intr ;
         }    ;
-	static struct def_tbl def [] = {
+static struct def_tbl def [] = {
 	    {0,"kk","っ","k"},
 	    {0,"ss","っ","s"},
 	    {0,"tt","っ","t"},
@@ -80,39 +86,45 @@ int chk_dflt pro((int c));
 	    {0,"qq","っ","q"},
 	    {0,"vv","っ","v"}
 	}  ;
+*/
 
-
-/*VARARGS*/
-void
-alert(fmt, arg)
-char	*fmt;
-char	*arg;
+static void alert(const char* fmt, ...)
 {
-    char	msg[256];
-    (void)sprintf(msg, fmt, arg);
-    (void)fprintf(stderr, gettxt("cannacmd:23",
-		 "#line %d %s: (WARNING) %s\n"), lineNum, fileName, msg);
+    va_list args;
+    va_start(args, fmt);
+
+    fprintf(stderr, "#line %d %s: (WARNING) ", lineNum, fileName);
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
+    va_end(args);
+
     ++errCount;
 }
-void
-fatal(fmt, arg)
-char	*fmt;
-char	*arg;
+
+
+static void fatal(const char* fmt, ...)
 {
-    char	msg[256];
-    (void)sprintf(msg, fmt, arg);
-    (void)fprintf(stderr, gettxt("cannacmd:24",
-		 "#line %d %s: (FATAL) %s\n"), lineNum, fileName, msg);
+    va_list args;
+    va_start(args, fmt);
+
+    fprintf(stderr, "#line %d %s: (FATAL) ", lineNum, fileName);
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
+    va_end(args);
+
     exit(1);
 }
 
-int
-getWORD(s, news, word, maxword)
-unsigned char	*s, **news;
-unsigned char	*word;
-int		maxword;
+
+// 文字列から語を切り出す
+// @param word 語を書き込む領域. 呼び出し側が確保すること.
+// @param maxword word の大きさ.
+// @return 語があれば 1以上 (長さ).
+static int
+getWORD(const unsigned char* s, const unsigned char** news,
+        unsigned char* word, int maxword)
 {
-    unsigned 	c;
+    unsigned char c;
     int	 	i;
 
     i = 0;
@@ -122,23 +134,25 @@ int		maxword;
 	s++;
 	if ( c == '\\' ) {
 	    switch(*s) {
-	    case 0:
+            case '\0':
 		break;
-	    case '0':
+            case '0': // 8進数3桁
+                /*
 		if ( s[1] == 'x' && isxdigit(s[2]) && isxdigit(s[3]) ) {
 		    unsigned char   xx[3];
 
 		    s += 2;
 		    xx[0] = *s++; xx[1] = *s++; xx[2] = 0;
 		    sscanf((char *)xx, "%x", &c);
-		}
-		else {
-		    c = 0;
-		    while ( isdigit(*s) )
-			c = 8*c + (*s++ - '0');
-		};
+                    } */
+		{
+                    c = 0;
+                    int j = 0;
+                    while ( (++j) <= 3 && isdigit(*s) )
+                        c = 8 * c + (*s++ - '0');
+                }
 		break;
-	    case 'x':
+            case 'x':  // 16進数2桁
 		{
 		    unsigned char   xx[3];
 		    unsigned char   *xxp = xx;
@@ -148,25 +162,25 @@ int		maxword;
 		    if ( isxdigit(*s) )
 			*xxp++ = *s++;
 		    *xxp = '\0';
-		    sscanf((char *)xx, "%x", &c);
+		    sscanf((char *)xx, "%hhx", &c);
 		}
 		break;
 	    default:
 		c = *s++;
 		break;
-	    };
-	};
+            }
+        }
 	if ( i < maxword - 1 )
 	    word[i++] = c;
-    };
-    word[i] = 0;
+    }
+    word[i] = '\0';
     *news = s;
     return i;
 }
 
-unsigned char
-*allocs  (s)
-unsigned char	*s;
+
+// 文字列をコピーして作成する。呼び出し側が解放すること。
+static unsigned char* allocs(const unsigned char* s)
 {
     unsigned char	*d;
 
@@ -179,78 +193,96 @@ unsigned char	*s;
     return d;
 }
 
+// 入力行
 struct roman {
-    unsigned char	*roma;
-    unsigned char	*kana;
-    unsigned char	*temp;
-    int                 bang;
+    unsigned char	*roma; // ローマ字
+    unsigned char	*kana; // 出力かな
+    unsigned char	*temp; // ローマ字バッファに残す
+    int                 bang;  // 列4 これは何?
 };
 
-static void
-freeallocs(roman, nKey)
-struct roman *roman;
-int nKey;
-{
-  int i;
 
-  for (i = 0 ; i < nKey ; i++) {
-    /* free them */
-    free((char *)roman[i].roma); roman[i].roma = (unsigned char *)0;
-    free((char *)roman[i].kana); roman[i].kana = (unsigned char *)0;
-    if (roman[i].temp) {
-      free((char *)roman[i].temp); roman[i].temp = (unsigned char *)0;
+static void
+freeallocs(struct roman* roman, int nKey)
+{
+    int i;
+
+    for (i = 0 ; i < nKey ; i++) {
+        /* free them */
+        free(roman[i].roma); roman[i].roma = NULL;
+        free(roman[i].kana); roman[i].kana = NULL;
+        if (roman[i].temp) {
+            free(roman[i].temp); roman[i].temp = NULL;
+        }
     }
-  }
 }
 
-int
-compar(p, q)
-struct roman	*p, *q;
-{
-    unsigned char	*s = p->roma;
-    unsigned char	*t = q->roma;
 
-    while ( *s == *t )
-	if ( *s )
-	    s++, t++;
-	else
-	    return 0;
+// for qsort()
+static int compar(const void* p, const void* q)
+{
+    const unsigned char* s = ((const struct roman*) p)->roma;
+    const unsigned char* t = ((const struct roman*) q)->roma;
+
+    while ( *s == *t ) {
+        if ( *s )
+            s++, t++;
+        else
+            return 0;
+    }
     return ((int)*s) - ((int)*t);
 }
 
-main(argc, argv)
-  int    argc ;
-  char **argv ;
+
+/*
+static int chk_dflt(int c)
 {
-  struct roman *roman;
-  unsigned char	rule[256], *r;
+    int  i,n ;
+    char cc = (char)c;
+    n = sizeof(def) / sizeof(struct def_tbl) ;
+    for (i=0; i < n ; i++) {
+	if (cc == def[i].intr[0]) {
+	    return(i+1) ;
+	}
+    }
+    return(0);
+}
+*/
+
+static unsigned char* skip_sp(unsigned char* s)
+{
+    while (*s == ' ' || *s == '\t')
+        s++;
+    return s;
+}
+
+int main(int argc, char* argv[])
+{
+    struct roman *roman;
+    unsigned char	rule[256], *r;
   int			nKey, size;
   int			i, p;
-  int                   flag_old ;
+  //  int                   flag_old ;
   int                   flag_large = 0;
   int                   werr ;
   long maxkey, maxsize;
-  unsigned char	l4[4], *bangchars = 0, *pp;
+  unsigned char	l4[4], *bangchars = NULL, *pp;
 
 #if defined(__STDC__)  || defined(SVR4)
-    (void)setlocale(LC_ALL,"");
+    setlocale(LC_ALL,"");
 #endif
-#ifdef __EMX__
-    _fsetmode(stdout, "b");
-#endif
-#ifdef __CYGWIN32__
-    setmode(fileno(stdout), O_BINARY);
-#endif
+    // もっともポータブルなのは, C標準関数を使う方法. setmode() は UNIX のみ.
+    freopen(NULL, "wb", stdout);
 
 /* option */
-    flag_old =  0 ;
+//    flag_old =  0 ;
     werr = 0 ;
     while(--argc) {
     	argv++ ;
-        if (!strcmp(*argv,"-m")) {
-    		flag_old = 1 ;
-        }
-        else if (!strcmp(*argv,"-x")) {
+        //        if (!strcmp(*argv,"-m")) {
+        //		flag_old = 1 ;
+        //}
+        if (!strcmp(*argv,"-x")) {
     		flag_large = 1 ;
         }
     }
@@ -269,178 +301,151 @@ main(argc, argv)
     fatal(gettxt("cannacmd:8", "No more memory\n"), 0);
   }
 
-  nKey = 0;
-  size  = 0;
-  while (fgets((char *)(r = rule), sizeof(rule), stdin)) {
-    unsigned char	roma[256];
+    nKey = 0;
+    size  = 0;
+    // .kpdef ファイル: 文字コードはEUC-JP. 各行は次のいずれか
+    //    空行は無視
+    //    "#" 以下はコメント
+    //    @568 作者? コメント?
+    // 定義:
+    //    <ローマ字> <空白またはタブ> <出力かな> (<空白またはタブ> <残す>)opt
+    //    <ローマ字>には、かな文字を買いてもよい(!)
+    //       kk    っ   k    .. 2番目「っ」を出力し, 3番目「k」を残す
+    //       か@   が        .. バッファの末尾が「か」のときに"@"を打つと「が」
+    //       b     \0   こ   .. "b" -> 出力なし. ローマ字バッファに「こ」残す
+    //                          濁点に備える.
+    // 語について:
+    //       \x27 16進数2桁。キーコードではなく文字で書くため. "'" の意味.
+    //       \010 8進数3桁.
+    //       \#   エスケープ. "#" など.
+    while (fgets((char *)(r = rule), sizeof(rule), stdin)) {
+        unsigned char roma[256];
 
-    lineNum++;
-    if ( *r == '#' ) {
-      continue;
+        lineNum++;
+        r = skip_sp(r);
+        if ( *r == '\r' || *r == '\n' || *r == '#' )
+            continue;
+
+        // ローマ字
+        if ( getWORD(r, &r, roma, sizeof(roma)) ) {
+            if (nKey >= maxkey) {
+                freeallocs(roman, nKey);
+                free( roman );
+                fatal("More than %d romaji rules are given.", maxkey);
+            }
+
+            for ( i = 0; i < nKey; i++ ) {
+                if ( !strcmp((char *)roman[i].roma, (char *)roma) )
+                    break;
+            }
+            if ( i < nKey ) {
+                alert("multiply defined key <%s>. skip.", roma);
+                continue;
+            }
+            roman[nKey].roma = allocs(roma);
+
+            // 出力かな
+            if ( getWORD(r, &r, roma, sizeof(roma)) ) {
+                roman[nKey].kana = allocs(roma);
+                roman[nKey].temp = NULL;
+                roman[nKey].bang = 0;
+
+                // temp
+                if ( getWORD(r, &r, roma, sizeof(roma)) ) {
+                    roman[nKey].temp = allocs(roma);
+                    if ( getWORD(r, &r, roma, sizeof(roma)) ) {
+                        roman[nKey].bang = 1;
+                    }
+                }
+                size += strlen((char *)roman[nKey].roma) + 1 +
+                     strlen((char *)roman[nKey].kana) + 1 +
+                     (roman[nKey].temp ? strlen((char *)roman[nKey].temp) : 0) +
+                    1;  // bang分
+
+                nKey++;
+            }
+            else {
+                // バックトラックのトリガー文字
+                if (roman[nKey].roma &&
+                    roman[nKey].roma[0] == '!' &&
+                    roman[nKey].roma[1] != '\0' ) {
+                    abort(); // 使われていないように見えるが...
+                    if (bangchars) {
+                        free((char *)bangchars);
+                    }
+                    bangchars = allocs(roman[nKey].roma + 1);
+                }
+                else {
+                    alert("syntax error: %s", rule);
+                }
+
+                free(roman[nKey].roma);
+                roman[nKey].roma = NULL;
+            }
+        }
     }
-    if ( getWORD(r, &r, roma, sizeof(roma)) ) {
-      if (nKey < maxkey) {
-	for ( i = 0; i < nKey; i++ ) {
-	  if ( !strcmp((char *)roman[i].roma, (char *)roma) ) {
-	    break;
-	  }
-	}
-	if ( i < nKey ) {
-	  alert(gettxt("cannacmd:25", "multiply defined key <%s>"), roma);
-	  continue;
-	}
-	roman[nKey].roma = allocs(roma);
-      }
-      else {
-	  freeallocs(roman, nKey);
-	  free((char *)roman);
-	  fatal(gettxt("cannacmd:26",
-	       "More than %d romaji rules are given."), maxkey);
-      }
-      if ( getWORD(r, &r, roma, sizeof(roma)) ) {
-	roman[nKey].kana = allocs(roma);
-	roman[nKey].temp = (unsigned char *)0;
-	roman[nKey].bang = 0;
-	if ( getWORD(r, &r, roma, sizeof(roma)) ) {
-	  roman[nKey].temp = allocs(roma);
-	  if ( getWORD(r, &r, roma, sizeof(roma)) ) {
-	    roman[nKey].bang = 1;
-	  }
-	}
-        size += strlen((char *)roman[nKey].roma) + 1 +
-	        strlen((char *)roman[nKey].kana) + 1 +
-	        (roman[nKey].temp ? strlen((char *)roman[nKey].temp) : 0) + 1;
 
-/*  add  */
-	if (flag_old == 1) {
-	  if (roman[nKey].temp && 0) {
-	    /* free them */
-	    free((char *)roman[nKey].roma);
-	    free((char *)roman[nKey].kana);
-	    free((char *)roman[nKey].temp);
-	    roman[nKey].roma = (unsigned char *)0;
-	    roman[nKey].kana = (unsigned char *)0;
-	    roman[nKey].temp = (unsigned char *)0;
-	    nKey--; /* ひとつ戻しておく */
-
-	    werr = 1;
-	  }
-	  else {
-	    p = chk_dflt((int)(unsigned char)roman[nKey].roma[0]);
-	    if (p--) {
-	      if (def[p].used == 0) { /* if not used */
-		if (nKey < maxkey) {
-		  nKey++ ;
-		  roman[nKey].roma = allocs(def[p].roma);
-		  roman[nKey].kana = allocs(def[p].kana);
-		  roman[nKey].temp = allocs(def[p].intr);
-		  size += strlen((char *)roman[nKey].roma) + 1
-		        + strlen((char *)roman[nKey].kana) + 1
-		        + strlen((char *)roman[nKey].temp) + 1;
-		  def[p].used = 1;
-		}
-		else {
-		  freeallocs(roman, maxkey);
-		  free((char *)roman);
-		  fatal("more than %d romaji rules are given.", maxkey);
-		}
-	      }
-	    }
-	  }
-	}
-
-	nKey++;
-      }
-      else {
-	if (roman[nKey].roma &&
-	    roman[nKey].roma[0] == '!' &&
-	    roman[nKey].roma[1] != (unsigned char)0) {
-	  if (bangchars) {
-	    free((char *)bangchars);
-	  }
-	  bangchars = allocs(roman[nKey].roma + 1);
-	}
-	else {
-	  alert(gettxt("cannacmd:28", "syntax error"), 0);
-	}
-	if (roman[nKey].roma) {
-	  free(roman[nKey].roma);
-	  roman[nKey].roma = (unsigned char *)0;
-	}
-      }
+    if ( errCount ) {
+        freeallocs(roman, nKey);
+        free(roman);
+        fatal(gettxt("cannacmd:29", "Romaji dictionary is not produced."), 0);
     }
-  }
 
-  if ( errCount ) {
+    size += (bangchars ? strlen((char *)bangchars) : 0) + 1;
+    if (size >= maxsize) {
+        freeallocs(roman, nKey);
+        free(roman);
+        fatal(gettxt("cannacmd:32", "Too much rules.  Size exhausted."), 0);
+    }
+
+    fprintf(stderr, "nr_strsz = %d, nr_nkey = %d\n", size, nKey);
+    qsort(roman, nKey, sizeof(struct roman), compar);
+
+    // 出力 - header部
+    if (!flag_large) {
+        putchar('K'); putchar('P'); // RX_KPDIC
+
+        l4[0] = LOMASK(size >> 8); l4[1] = LOMASK(size);
+        l4[2] = LOMASK(nKey >> 8); l4[3] = LOMASK(nKey);
+        putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
+    }
+    else {
+        putchar('P'); putchar('T'); // RX_PTDIC
+
+        l4[0] = LOMASK(size >> 24); l4[1] = LOMASK(size >> 16);
+        l4[2] = LOMASK(size >> 8); l4[3] = LOMASK(size);
+        putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
+        l4[0] = LOMASK(nKey >> 24); l4[1] = LOMASK(nKey >> 16);
+        l4[2] = LOMASK(nKey >> 8); l4[3] = LOMASK(nKey);
+        putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
+    }
+
+    // バックトラックのトリガー文字
+    if (bangchars) {
+        for (pp = bangchars ; pp && *pp ; pp++) {
+            putchar(*pp);
+        }
+        free( bangchars);
+    }
+    putchar('\0');
+
+    // ルール部
+    for ( i = 0; i < nKey; i++ ) {
+        r = roman[i].roma; do { putchar(*r); } while (*r++);
+        r = roman[i].kana; do { putchar(*r); } while (*r++);
+        if (roman[i].temp) {
+            r = roman[i].temp; while (*r) putchar(*r++); // ナル文字書かない.
+        }
+        putchar(roman[i].bang); /* temp がなくて、bang が１はありえない */
+    }
+
     freeallocs(roman, nKey);
     free((char *)roman);
-    fatal(gettxt("cannacmd:29", "Romaji dictionary is not produced."), 0);
-  }
-  qsort((char *)roman, nKey, sizeof(struct roman),
-        (int (*) pro((const void *, const void *)))compar);
-  if (!flag_large) {
-    putchar('K'); putchar('P');
-  }
-  else {
-    putchar('P'); putchar('T');
-  }
-  size += (bangchars ? strlen((char *)bangchars) : 0) + 1;
-
-  if (size >= maxsize) {
-    freeallocs(roman, nKey);
-    free((char *)roman);
-    fatal(gettxt("cannacmd:32", "Too much rules.  Size exhausted."), 0);
-  }
-
-  if (!flag_large) {
-    l4[0] = LOMASK(size >> 8); l4[1] = LOMASK(size);
-    l4[2] = LOMASK(nKey >> 8); l4[3] = LOMASK(nKey);
-    putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
-  }
-  else {
-    l4[0] = LOMASK(size >> 24); l4[1] = LOMASK(size >> 16);
-    l4[2] = LOMASK(size >> 8); l4[3] = LOMASK(size);
-    putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
-    l4[0] = LOMASK(nKey >> 24); l4[1] = LOMASK(nKey >> 16);
-    l4[2] = LOMASK(nKey >> 8); l4[3] = LOMASK(nKey);
-    putchar(l4[0]); putchar(l4[1]); putchar(l4[2]); putchar(l4[3]);
-  }
-
-  if (bangchars) {
-    for (pp = bangchars ; pp && *pp ; pp++) {
-      putchar(*pp);
-    }
-    free((char *)bangchars);
-  }
-  putchar('\0');
-
-  for ( i = 0; i < nKey; i++ ) {
-    r = roman[i].roma; do { putchar(*r); } while (*r++);
-    r = roman[i].kana; do { putchar(*r); } while (*r++);
-    if (roman[i].temp) {
-      r = roman[i].temp; while (*r) putchar(*r++);
-    }
-    putchar(roman[i].bang); /* temp がなくて、bang が１はありえない */
-  };
-  freeallocs(roman, nKey);
-  free((char *)roman);
-  fprintf(stderr, gettxt("cannacmd:30", "SIZE %d KEYS %d\n"), size, nKey);
-  if (werr == 1 )
-    fprintf(stderr,gettxt("cannacmd:31",
+    fprintf(stderr, gettxt("cannacmd:30", "SIZE %d KEYS %d\n"), size, nKey);
+    if (werr == 1 ) {
+        fprintf(stderr,gettxt("cannacmd:31",
 	  "warning: Option -m is specified for new dictionary format.\n")) ;
-  exit(0);
-}
-
-/* sub */
-int
-chk_dflt(c) int c ; {
-    int  i,n ;
-    char cc = (char)c;
-    n = sizeof(def) / sizeof(struct def_tbl) ;
-    for (i=0; i < n ; i++) {
-	if (cc == def[i].intr[0]) {
-	    return(i+1) ;
-	}
     }
-    return(0);
+
+    exit(0);
 }

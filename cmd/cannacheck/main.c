@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,17 +13,17 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 static char rcs_id[] = "@(#) 102.1 $Id: main.c,v 1.6.2.2 2003/12/27 17:15:21 aida_s Exp $";
 
-/* º´∆∞»Ω ÃªŸ±Á•≥•·•Û•»: §≥§Ï§œEUC-JP§¿§æ°£…˝§»§§§¶ª˙§¨§¢§Ï§–¬ÁæÊ…◊°£ */
+/* Ëá™ÂãïÂà§Âà•ÊîØÊè¥„Ç≥„É°„É≥„Éà: „Åì„Çå„ÅØEUC-JP„Å†„Åû„ÄÇÂπÖ„Å®„ÅÑ„ÅÜÂ≠ó„Åå„ÅÇ„Çå„Å∞Â§ß‰∏àÂ§´„ÄÇ */
 
 #include <stdio.h>
 #define CANNA_NEW_WCHAR_AWARE
@@ -32,13 +33,11 @@ static char rcs_id[] = "@(#) 102.1 $Id: main.c,v 1.6.2.2 2003/12/27 17:15:21 aid
 #include "canna/rkcapi.h"
 
 int IROHA_verbose = 0;
-  
-main(argc, argv,envp)
-int argc;
-char *argv[], *envp[];
+
+int main(int argc, char* argv[], char* envp[])
 {
-  char **warn, *cannafile = (char *)0, *servername = (char *)0;
-  int i;
+    char **warn, *cannafile = NULL, *servername = NULL;
+    int i;
 
   for (i = 1 ; i < argc ; i++) {
     if (!strcmp(argv[i], "-v")) {
@@ -73,9 +72,9 @@ char *argv[], *envp[];
 
       p = RkwGetServerName();
       if (p)
-	  printf("•µ°º•– \"%s\" §À¿‹¬≥§∑§ﬁ§π°£\n", p);
+	  printf("„Çµ„Éº„Éê \"%s\" „Å´Êé•Á∂ö„Åó„Åæ„Åô„ÄÇ\n", p);
       else
-	  printf("¿‹¬≥¿Ë§Œ•µ°º•–§¨…‘Ã¿§«§π\n");
+	  printf("Êé•Á∂öÂÖà„ÅÆ„Çµ„Éº„Éê„Åå‰∏çÊòé„Åß„Åô\n");
     }
     if (warn) {
       char **p;

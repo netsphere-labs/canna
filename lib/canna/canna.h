@@ -633,7 +633,7 @@ struct callback {
 /* ローマ字かな変換テーブル */
 
 extern struct RkRxDic *romajidic;
-extern struct RkRxDic *RkwOpenRoma pro((char *));
+extern struct RkRxDic *RkwOpenRoma pro((const char *));
 
 /*
  * 辞書の名前を入れておく変数

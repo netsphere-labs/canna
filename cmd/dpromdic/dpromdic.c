@@ -40,7 +40,6 @@ static char rcsid[]="@(#) 112.1 $Id: dpromdic.c,v 1.3.2.2 2003/12/27 17:15:22 ai
 
 # include	<canna/RK.h>
 
-extern struct RkRxDic  *RkwOpenRoma() ;
 void printch();
 
 int main( int argc, char* argv[] )

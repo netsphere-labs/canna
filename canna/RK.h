@@ -96,7 +96,7 @@ struct RkRxDic	{
 };
 
 #define RX_KPDIC 0 /* new format dictionary */
-#define RX_RXDIC 1 /* old format dictionary */
+//#define RX_RXDIC 1 /* old format dictionary. 促音「っ」が決め打ち. ダメ. */
 #define RX_PTDIC 2 /* large format dictionary (almost equal to KPDIC) */
 
 /* kanakanji henkan */
@@ -228,7 +228,7 @@ canna_export(int) RkwCvtEuc pro((cannawc *, int, const cannawc *, int));
 canna_export(int) RkwCreateDic pro((int, char *, int));
 canna_export(int) RkwQueryDic pro((int, const char *, char *, struct DicInfo *));
 canna_export(void) RkwCloseRoma pro((struct RkRxDic *));
-canna_export(struct) RkRxDic * RkwOpenRoma pro((char *));
+canna_export(struct) RkRxDic * RkwOpenRoma pro((const char *));
 canna_export(int) RkwSetUserInfo pro((char *, char *, char *));
 canna_export(char *) RkwGetServerName pro((void));
 canna_export(int) RkwGetServerVersion pro((int *, int *));
