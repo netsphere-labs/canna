@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: strops.h,v 1.2 2003/09/06 13:59:33 aida_s Exp $ */
@@ -47,17 +47,31 @@ typedef struct {
 extern void RkiStrbuf_init pro((RkiStrbuf *sb));
 extern void RkiStrbuf_destroy pro((RkiStrbuf *sb));
 extern void RkiStrbuf_clear pro((RkiStrbuf *sb));
-#define RKI_STRBUF_RESERVE(sb, size) \
-  (((sb)->sb_curr + (size) < (sb)->sb_end) \
-    ? 0 : RkiStrbuf_reserve(sb, size))
-extern int RkiStrbuf_reserve pro((RkiStrbuf *sb, size_t size));
+
+/**
+ * メモリを確保する.
+ * @param size "追加する" バイト数.
+ * @return If failed, -1
+ */
+extern int RkiStrbuf_reserve(RkiStrbuf *sb, size_t size);
+#define RKI_STRBUF_RESERVE  RkiStrbuf_reserve
+
 extern int RkiStrbuf_term pro((RkiStrbuf *sb));
-extern void RkiStrbuf_pack pro((RkiStrbuf *sb));
+
+// メモリを切り詰める.
+extern void RkiStrbuf_pack(RkiStrbuf *sb);
+
 extern int RkiStrbuf_add pro((RkiStrbuf *sb, const char *src));
 extern int RkiStrbuf_addmem pro((RkiStrbuf *sb, const void *src, size_t size));
-#define RKI_STRBUF_ADDCH(sb, ch) \
-  (RKI_STRBUF_RESERVE(sb, 1) || (*(sb)->sb_curr++ = (char)(ch), 0))
-extern int RkiStrbuf_addch pro((RkiStrbuf *sb, int ch));
+
+inline int RkiStrbuf_addch(RkiStrbuf *sb, int ch) {
+    if (RKI_STRBUF_RESERVE(sb, 1))
+        return -1;
+    *sb->sb_curr++ = (char) ch;
+    return 0;
+}
+#define RKI_STRBUF_ADDCH RkiStrbuf_addch
+
 
 #ifdef __cplusplus
 }

@@ -120,6 +120,7 @@ RkwOpenRoma(const char* romaji)
     unsigned char	*s;
     int	i, sz;
 
+    fprintf(stderr, "romaji path = %s\n", romaji);
     if ( !(dic = fopen(romaji, "rb")) ) {
         free(rdic);
         return NULL;

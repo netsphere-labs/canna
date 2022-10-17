@@ -398,7 +398,6 @@ int main(int argc, char* argv[])
         fatal(gettxt("cannacmd:32", "Too much rules.  Size exhausted."), 0);
     }
 
-    fprintf(stderr, "nr_strsz = %d, nr_nkey = %d\n", size, nKey);
     qsort(roman, nKey, sizeof(struct roman), compar);
 
     // 出力 - header部
@@ -440,8 +439,8 @@ int main(int argc, char* argv[])
     }
 
     freeallocs(roman, nKey);
-    free((char *)roman);
-    fprintf(stderr, gettxt("cannacmd:30", "SIZE %d KEYS %d\n"), size, nKey);
+    free( roman);
+    fprintf(stderr, "STR SIZE = %d, KEYS = %d\n", size, nKey);
     if (werr == 1 ) {
         fprintf(stderr,gettxt("cannacmd:31",
 	  "warning: Option -m is specified for new dictionary format.\n")) ;

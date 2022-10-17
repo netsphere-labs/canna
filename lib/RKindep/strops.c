@@ -23,56 +23,62 @@
 #include "config.h"
 #include "canna/ccompat.h"
 #include "RKindep/strops.h"
+#include <assert.h>
 
 RCSID("$Id: strops.c,v 1.2 2003/09/06 13:59:33 aida_s Exp $");
 
 void
 RkiStrbuf_init(RkiStrbuf* sb)
 {
-  sb->sb_buf = sb->sb_curr = sb->sb_end = NULL;
+    sb->sb_buf = sb->sb_curr = sb->sb_end = NULL;
 }
 
 void
 RkiStrbuf_destroy(RkiStrbuf* sb)
 {
-  free(sb->sb_buf);
+    free(sb->sb_buf);
+    sb->sb_buf = sb->sb_curr = sb->sb_end = NULL;
 }
 
 void
 RkiStrbuf_clear(RkiStrbuf* sb)
 {
-  free(sb->sb_buf);
-  sb->sb_buf = sb->sb_curr = sb->sb_end = NULL;
+    free(sb->sb_buf);
+    sb->sb_buf = sb->sb_curr = sb->sb_end = NULL;
 }
 
+
+// @param size "追加する" バイト数.
 // @return If failed, -1
 int
 RkiStrbuf_reserve(RkiStrbuf* sb, size_t size)
 {
-    size_t oldsize = sb->sb_end - sb->sb_buf, newsize;
+    size_t oldsize = sb->sb_end - sb->sb_buf;
+    size_t newsize;
     size_t used = sb->sb_curr - sb->sb_buf;
     char *tmp;
-  if (used + size < oldsize)
+    if (used + size < oldsize)
+        return 0;
+    newsize = oldsize ? (oldsize * 2 + size) : (size < 20) ? 20 : size;
+    tmp = (char*) realloc(sb->sb_buf, newsize + 1); // +1: for _term()
+    if (!tmp)
+        return -1;
+    sb->sb_buf = tmp;
+    sb->sb_curr = tmp + used;
+    sb->sb_end = tmp + newsize;
     return 0;
-  newsize = oldsize ? (oldsize * 2 + size) : (size < 20) ? 20 : size;
-  tmp = (char*) realloc(sb->sb_buf, newsize);
-  if (!tmp)
-    return -1;
-  sb->sb_buf = tmp;
-  sb->sb_curr = tmp + used;
-  sb->sb_end = tmp + newsize;
-  return 0;
 }
 
 int
 RkiStrbuf_term(RkiStrbuf* sb)
 {
-  if (sb->sb_curr && !*sb->sb_curr)
-    return 0; /* already terminated */
-  if (RKI_STRBUF_RESERVE(sb, 1))
-    return -1;
-  *sb->sb_curr++ = '\0';
-  return 0;
+    assert(sb);
+    if (sb->sb_curr && !*sb->sb_curr) // これ、領域の一つ外を指すことがある.
+        return 0; /* already terminated */
+    //if (RKI_STRBUF_RESERVE(sb, 1))
+    //return -1;
+    *sb->sb_curr = '\0';
+    return 0;
 }
 
 void
@@ -80,11 +86,11 @@ RkiStrbuf_pack(RkiStrbuf* sb)
 {
     size_t used = sb->sb_curr - sb->sb_buf;
     char *tmp;
-    tmp = (char*) realloc(sb->sb_buf, used);
-  if (!tmp)
-    return;
-  sb->sb_buf = tmp;
-  sb->sb_curr = sb->sb_end = tmp + used;
+    tmp = (char*) realloc(sb->sb_buf, used + 1); // +1: for _term()
+    if (!tmp)
+        return;
+    sb->sb_buf = tmp;
+    sb->sb_curr = sb->sb_end = tmp + used;
 }
 
 int
@@ -93,20 +99,16 @@ RkiStrbuf_add(RkiStrbuf* sb, const char* src)
   return RkiStrbuf_addmem(sb, src, strlen(src));
 }
 
+// src のうち size バイトを追加する.
 int
 RkiStrbuf_addmem(RkiStrbuf* sb, const void* src, size_t size)
 {
-  if (RKI_STRBUF_RESERVE(sb, size))
-    return -1;
-  memcpy(sb->sb_curr, src, size);
-  sb->sb_curr += size;
-  return 0;
+    if (RKI_STRBUF_RESERVE(sb, size))
+        return -1;
+    memcpy(sb->sb_curr, src, size);
+    sb->sb_curr += size;
+    return 0;
 }
 
-int
-RkiStrbuf_addch(RkiStrbuf* sb, int ch)
-{
-  return RKI_STRBUF_ADDCH(sb, ch);
-}
 
 /* vim: set sw=2: */

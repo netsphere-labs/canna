@@ -47,30 +47,31 @@ RCSID("$Id: conf.c,v 1.12.2.2 2004/04/26 21:48:37 aida_s Exp $");
 RkcErrorBuf rkc_errors;
 RkcConfMgr rkc_config;
 
+// @return 設定ファイルのフルパス. 呼び出し側が解放すること.
 static char *
 config_path(const char* name)
 {
-  const char *home;
-  RkiStrbuf buf;
+    const char *home;
+    RkiStrbuf buf;
 
-  RkiStrbuf_init(&buf);
-  home = getenv("HOME");
-  if (home) {
-    if (RkiStrbuf_add(&buf, home))
-      goto nomem;
-    if (buf.sb_curr != buf.sb_buf && *(buf.sb_curr - 1) != '/') {
-      if (RKI_STRBUF_ADDCH(&buf, '/'))
-	goto nomem;
+    RkiStrbuf_init(&buf);
+    home = getenv("HOME");
+    if (home && *home) {
+        if (RkiStrbuf_add(&buf, home))
+            goto nomem;
+        if (*(buf.sb_curr - 1) != '/') {
+            if (RKI_STRBUF_ADDCH(&buf, '/'))
+                goto nomem;
+        }
     }
-  }
-  if (RkiStrbuf_add(&buf, CONFIG_DIR) || RkiStrbuf_add(&buf, name)
-      || RkiStrbuf_term(&buf))
-    goto nomem;
-  return buf.sb_buf;
+    if (RkiStrbuf_add(&buf, CONFIG_DIR) || RkiStrbuf_add(&buf, name) ||
+        RkiStrbuf_term(&buf))
+        goto nomem;
+    return buf.sb_buf;
 
 nomem:
-  RkiStrbuf_destroy(&buf);
-  return NULL;
+    RkiStrbuf_destroy(&buf);
+    return NULL;
 }
 
 
@@ -236,19 +237,18 @@ rkc_configure()
   RkcErrorBuf_init(&rkc_errors);
   RkcConfMgr_init(&rkc_config, &rkc_errors);
 
-  preproc = getenv("CANNA_RKC_PREPROCESSOR");
-  if (!preproc || !*preproc)
-    preproc = CPP;
-  path = config_path(CONFIG_FILE);
-  if (!path) {
-    RkcErrorBuf_nomem(&rkc_errors);
-    goto last;
-  }
-#ifdef CONF_DEBUG
-  fprintf(stderr, "path=%s, preproc=%s\n", path, preproc);
-#endif
-  if (stat(path, &st)) {
-    if (errno == ENOENT) {
+    preproc = getenv("CANNA_RKC_PREPROCESSOR");
+    if (!preproc || !*preproc)
+        preproc = CPP;
+    path = config_path(CONFIG_FILE);
+    if (!path) {
+        RkcErrorBuf_nomem(&rkc_errors);
+        goto last;
+    }
+
+    fprintf(stderr, "RKC config path=%s, preproc=%s\n", path, preproc);
+    if (stat(path, &st)) {
+        if (errno == ENOENT) {
       RkcErrorBuf_add(&rkc_errors, "RKC\244\316\300\337\304\352\245\325"
 	  "\245\241\245\244\245\353\244\254\244\242\244\352\244\336\244"
 	  "\273\244\363");
