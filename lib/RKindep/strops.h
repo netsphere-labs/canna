@@ -68,6 +68,7 @@ inline int RkiStrbuf_addch(RkiStrbuf *sb, int ch) {
     if (RKI_STRBUF_RESERVE(sb, 1))
         return -1;
     *sb->sb_curr++ = (char) ch;
+    *sb->sb_curr = '\0';
     return 0;
 }
 #define RKI_STRBUF_ADDCH RkiStrbuf_addch

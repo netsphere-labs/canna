@@ -73,11 +73,11 @@ int
 RkiStrbuf_term(RkiStrbuf* sb)
 {
     assert(sb);
-    if (sb->sb_curr && !*sb->sb_curr) // これ、領域の一つ外を指すことがある.
-        return 0; /* already terminated */
-    //if (RKI_STRBUF_RESERVE(sb, 1))
-    //return -1;
-    *sb->sb_curr = '\0';
+    if (!sb->sb_curr) {
+        if (RKI_STRBUF_RESERVE(sb, 1))
+            return -1;
+    }
+    *sb->sb_curr = '\0'; // これ、領域の一つ外を指すことがある.
     return 0;
 }
 
@@ -107,6 +107,8 @@ RkiStrbuf_addmem(RkiStrbuf* sb, const void* src, size_t size)
         return -1;
     memcpy(sb->sb_curr, src, size);
     sb->sb_curr += size;
+    *sb->sb_curr = '\0';
+
     return 0;
 }
 
