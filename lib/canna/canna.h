@@ -630,9 +630,12 @@ struct callback {
   struct callback *next;
 };
 
-/* ローマ字かな変換テーブル */
+/* ローマ字かな変換テーブル. 2面持てる. */
+extern struct RkRxDic* romajidic;
+#ifndef NOT_ENGLISH_TABLE
+extern struct RkRxDic* englishdic;
+#endif
 
-extern struct RkRxDic *romajidic;
 extern struct RkRxDic *RkwOpenRoma pro((const char *));
 
 /*
@@ -985,7 +988,10 @@ extern int XwcLookupKanji2 pro((unsigned int, unsigned int, cannawc *, int,
 extern int NothingChangedWithBeep pro((uiContext));
 extern int searchfunc pro((uiContext, KanjiMode, int, int, int));
 extern int initRomeStruct pro((uiContext, int));
-/* extern int kanjiControl pro((int, uiContext, caddr_t)); */
+
+// lib/canna/kctrl.c
+extern int kanjiControl(int, uiContext, void* );
+
 extern int getBaseMode pro((yomiContext));
 extern int RkwMapPhonogram
   pro((struct RkRxDic *, cannawc *, int, const cannawc *, int, cannawc, int,

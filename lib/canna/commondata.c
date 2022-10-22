@@ -36,14 +36,14 @@ struct CannaConfig cannaconf;
 int defaultContext = -1;
 int defaultBushuContext = -1;
 
-/* ローマ字かな変換テーブル */
-/*
- * ローマ字かな変換テーブルは１個あれば良いでしょう。複数個必要なので
- * あれば RomeStruct のメンバとして入れておく必要もありましょうが...そ
- * の時はその時で考えましょう。
+/**
+ * ローマ字かな変換テーブル.
+ * 驚くべきことに, ローマ字かな変換テーブルを2面持てる.
  */
-
-struct RkRxDic *romajidic, *englishdic;
+struct RkRxDic* romajidic  = NULL;
+#ifndef NOT_ENGLISH_TABLE
+struct RkRxDic* englishdic = NULL;
+#endif
 
 /* 未定義キー打鍵時の処理のしかた */
 

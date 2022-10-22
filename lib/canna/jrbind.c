@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -30,21 +31,21 @@ static char rcs_id[] = "@(#) 102.1 $Id: jrbind.c,v 1.4 2003/09/17 08:50:53 aida_
 
 #define ACTHASHTABLESIZE 64
 #define KEYHASHTABLESIZE 16
-   
+
 /*
 
-  jrKanjiString ¤Ï TTY ¤Î¥­¡¼ÆþÎÏ¤ò¼õ¤±¼è¤ê¡¢¤½¤Î¥­¡¼¤Ë¤·¤¿¤¬¤Ã¤ÆÉ¬Í×
-  ¤Ê¤é¥«¥Ê´Á»úÊÑ´¹¤ò¹Ô¤¤¡¢¤½¤Î¥­¡¼ÆþÎÏ¤Î·ë²Ì¤È¤·¤ÆÆÀ¤é¤ì¤ëÊ¸»úÎó¤ò 
-  buffer_return ¤ÇÊÖ¤¹¡£buffer_return ¤Ï¥¢¥×¥ê¥±¡¼¥·¥ç¥óÂ¦¤ËÍÑ°Õ¤¹¤ë¥Ð¥Ã
-  ¥Õ¥¡¤Ç¤¢¤ê¡¢¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤Ï¤½¤Î¥Ð¥Ã¥Õ¥¡¤ÎÄ¹¤µ¤ò bytes_buffer ¤ÇÅÏ
-  ¤¹¡£
+  jrKanjiString ã¯ TTY ã®ã‚­ãƒ¼å…¥åŠ›ã‚’å—ã‘å–ã‚Šã€ãã®ã‚­ãƒ¼ã«ã—ãŸãŒã£ã¦å¿…è¦
+  ãªã‚‰ã‚«ãƒŠæ¼¢å­—å¤‰æ›ã‚’è¡Œã„ã€ãã®ã‚­ãƒ¼å…¥åŠ›ã®çµæžœã¨ã—ã¦å¾—ã‚‰ã‚Œã‚‹æ–‡å­—åˆ—ã‚’
+  buffer_return ã§è¿”ã™ã€‚buffer_return ã¯ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å´ã«ç”¨æ„ã™ã‚‹ãƒãƒƒ
+  ãƒ•ã‚¡ã§ã‚ã‚Šã€ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã¯ãã®ãƒãƒƒãƒ•ã‚¡ã®é•·ã•ã‚’ bytes_buffer ã§æ¸¡
+  ã™ã€‚
 
-  kanji_status_return ¤Ï³ÎÄê¤·¤Æ¤¤¤Ê¤¤ÆþÎÏÊ¸»úÎó¤òÉ½¼¨¤¹¤ë¤¿¤á¤Î¥Ç¡¼¥¿
-  ¤Ç¤¢¤ê¡¢Ì¤³ÎÄê¤ÎÆÉ¤ß¤ä¸õÊä´Á»ú¤Ê¤É¤¬ÊÖ¤µ¤ì¤ë¡£kanji_status_return¤Î
-  ¥á¥ó¥Ð¤Ë¤Ï¡¢ echoStr, length, revPos, revLen ¤¬¤¢¤ê¤½¤ì¤¾¤ì¡¢Ì¤³ÎÄê
-  Ê¸»úÎó¤Ø¤Î¥Ý¥¤¥ó¥¿¡¢¤½¤ÎÄ¹¤µ¡¢Ì¤³ÎÄêÊ¸»úÎó¤Î¤¦¤Á¡¢¶¯Ä´¤¹¤ëÉôÊ¬¤Ø¤Î¥ª
-  ¥Õ¥»¥Ã¥È¡¢¶¯Ä´¤¹¤ëÉôÊ¬¤ÎÄ¹¤µ¤òÊÖ¤¹¡£Ì¤³ÎÄêÊ¸»úÎó¤ò³ÊÇ¼¤¹¤ëÎÎ°è¤Ï 
-  jrKanjiString ¤Ç¼«Æ°Åª¤ËÍÑ°Õ¤µ¤ì¤ë¡£
+  kanji_status_return ã¯ç¢ºå®šã—ã¦ã„ãªã„å…¥åŠ›æ–‡å­—åˆ—ã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã®ãƒ‡ãƒ¼ã‚¿
+  ã§ã‚ã‚Šã€æœªç¢ºå®šã®èª­ã¿ã‚„å€™è£œæ¼¢å­—ãªã©ãŒè¿”ã•ã‚Œã‚‹ã€‚kanji_status_returnã®
+  ãƒ¡ãƒ³ãƒã«ã¯ã€ echoStr, length, revPos, revLen ãŒã‚ã‚Šãã‚Œãžã‚Œã€æœªç¢ºå®š
+  æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€ãã®é•·ã•ã€æœªç¢ºå®šæ–‡å­—åˆ—ã®ã†ã¡ã€å¼·èª¿ã™ã‚‹éƒ¨åˆ†ã¸ã®ã‚ª
+  ãƒ•ã‚»ãƒƒãƒˆã€å¼·èª¿ã™ã‚‹éƒ¨åˆ†ã®é•·ã•ã‚’è¿”ã™ã€‚æœªç¢ºå®šæ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹é ˜åŸŸã¯
+  jrKanjiString ã§è‡ªå‹•çš„ã«ç”¨æ„ã•ã‚Œã‚‹ã€‚
 
  */
 
@@ -69,7 +70,7 @@ wcKanjiStatus  *kanji_status_return;
   return res;
 }
 
-/* jrKanjiControl -- ¥«¥Ê´Á»úÊÑ´¹¤ÎÀ©¸æ¤ò¹Ô¤¦ */
+/* jrKanjiControl -- ã‚«ãƒŠæ¼¢å­—å¤‰æ›ã®åˆ¶å¾¡ã‚’è¡Œã† */
 int
 wcKanjiControl(int context, int request, char* arg)
 {
@@ -96,7 +97,6 @@ unsigned int dpy, win;
   return (uiContext)0;
 }
 
-extern int kanjiControl pro((int, uiContext, caddr_t));
 
 XwcLookupKanji2(dpy, win, buffer_return, nbuffer, nbytes, functionalChar,
 		kanji_status_return)
@@ -109,8 +109,8 @@ wcKanjiStatus *kanji_status_return;
   uiContext d, keyToContext();
   int retval;
 
-  /* ½é¤á¤Æ XLookupKanjiString ¤¬¸Æ¤Ð¤ì¤¿»þ¤Ï¼­½ñ¤Î½é´ü²½¤Ê¤É¤Î½èÍý¤¬
-     ¹Ô¤ï¤ì¤ë¡£ */
+  /* åˆã‚ã¦ XLookupKanjiString ãŒå‘¼ã°ã‚ŒãŸæ™‚ã¯è¾žæ›¸ã®åˆæœŸåŒ–ãªã©ã®å‡¦ç†ãŒ
+     è¡Œã‚ã‚Œã‚‹ã€‚ */
 
   if (FirstTime) {
     if (kanjiControl(KC_INITIALIZE, (uiContext)NULL, (char *)NULL) == -1) {
@@ -122,7 +122,7 @@ wcKanjiStatus *kanji_status_return;
   d = keyToContext(dpy, win);
 
   if (d == (uiContext)NULL) {
-    /* ¤³¤Î¥¦¥£¥ó¥É¥¦¤«¤é¥¤¥Ù¥ó¥È¤¬Íè¤¿¤Î¤¬»Ï¤á¤Æ¤À¤Ã¤¿¤ê¤¹¤ë¤ï¤±¤è */
+    /* ã“ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰ã‚¤ãƒ™ãƒ³ãƒˆãŒæ¥ãŸã®ãŒå§‹ã‚ã¦ã ã£ãŸã‚Šã™ã‚‹ã‚ã‘ã‚ˆ */
     d = newUiContext(dpy, win);
     if (d == (uiContext)NULL) {
       return NoMoreMemory();
@@ -131,7 +131,7 @@ wcKanjiStatus *kanji_status_return;
 
 
   bzero(kanji_status_return, sizeof(wcKanjiStatus));
-  
+
   d->ch = (unsigned)*buffer_return;
   d->buffer_return = buffer_return;
   d->n_buffer = nbuffer;
@@ -139,7 +139,7 @@ wcKanjiStatus *kanji_status_return;
 
   debug_message("current_mode(0x%x)\n", d->current_mode,0,0);
 
-  if ( nbytes || functionalChar ) { /* ¥­¥ã¥é¥¯¥¿¥³¡¼¥É¤¬¤È¤ì¤¿¾ì¹ç */
+  if ( nbytes || functionalChar ) { /* ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚³ãƒ¼ãƒ‰ãŒã¨ã‚ŒãŸå ´åˆ */
     int check;
 
     *buffer_return = key2wchar(d->ch, &check);
@@ -155,7 +155,7 @@ wcKanjiStatus *kanji_status_return;
 #endif /* DEBUG */
     return(retval);
   }
-  else { /* ¥­¥ã¥é¥¯¥¿¥³¡¼¥É¤¬¤È¤ì¤Ê¤«¤Ã¤¿¾ì¹ç¡Ê¥·¥Õ¥È¥­¡¼¤Ê¤É¡Ë... */
+  else { /* ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚³ãƒ¼ãƒ‰ãŒã¨ã‚Œãªã‹ã£ãŸå ´åˆï¼ˆã‚·ãƒ•ãƒˆã‚­ãƒ¼ãªã©ï¼‰... */
     d->kanji_status_return->length = -1;
     return 0;
   }
@@ -164,9 +164,8 @@ wcKanjiStatus *kanji_status_return;
 uiContext keyToContext();
 
 int
-XwcKanjiControl2(display, window, request, arg)
-unsigned int display, window, request;
-BYTE *arg;
+XwcKanjiControl2(unsigned int display, unsigned int window,
+                 unsigned int request, BYTE* arg)
 {
   if (request == KC_INITIALIZE || request == KC_FINALIZE ||
       request == KC_SETSERVERNAME || request == KC_SETINITFILENAME ||
@@ -175,11 +174,11 @@ BYTE *arg;
       request == KC_QUERYCUSTOM) {
     return kanjiControl(request, (uiContext)NULL, (char *)arg);
   }
-  else if (/* 0 <= request && (É¬¤º¿¿) */ request < MAX_KC_REQUEST) {
+  else if (/* 0 <= request && (å¿…ãšçœŸ) */ request < MAX_KC_REQUEST) {
     uiContext d;
 
-    /* ½é¤á¤Æ wcKanjiString ¤¬¸Æ¤Ð¤ì¤¿»þ¤Ï¼­½ñ¤Î½é´ü²½¤Ê¤É¤Î½èÍý¤¬
-       ¹Ô¤ï¤ì¤ë¡£ */
+    /* åˆã‚ã¦ wcKanjiString ãŒå‘¼ã°ã‚ŒãŸæ™‚ã¯è¾žæ›¸ã®åˆæœŸåŒ–ãªã©ã®å‡¦ç†ãŒ
+       è¡Œã‚ã‚Œã‚‹ã€‚ */
 
     if (FirstTime) {
       if (kanjiControl(KC_INITIALIZE, (uiContext)NULL, (char *)NULL) == -1) {
@@ -216,12 +215,12 @@ struct map {
 
 /* cfuncdef
 
-  pushCallback -- ¥³¡¼¥ë¥Ð¥Ã¥¯¤Î½¸¹ç¤ò¥×¥Ã¥·¥å¤¹¤ë¡£
+  pushCallback -- ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®é›†åˆã‚’ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹ã€‚
 
-  ¥³¡¼¥ë¥Ð¥Ã¥¯¤Î½¸¹ç¤ò³ÊÇ¼¤¹¤ëÇÛÎó¤¬ malloc ¤µ¤ì¤Æ¡¢¤½¤ì¤¬ uiContext ¤Ë
-  ¥×¥Ã¥·¥å¤µ¤ì¤ë¡£
+  ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®é›†åˆã‚’æ ¼ç´ã™ã‚‹é…åˆ—ãŒ malloc ã•ã‚Œã¦ã€ãã‚ŒãŒ uiContext ã«
+  ãƒ—ãƒƒã‚·ãƒ¥ã•ã‚Œã‚‹ã€‚
 
-  malloc ¤µ¤ì¤¿ÇÛÎó¤¬Ìá¤êÃÍ¤È¤·¤ÆÊÖ¤ë¡£
+  malloc ã•ã‚ŒãŸé…åˆ—ãŒæˆ»ã‚Šå€¤ã¨ã—ã¦è¿”ã‚‹ã€‚
 
  */
 
@@ -256,4 +255,3 @@ uiContext d;
   d->cb = oldCB->next;
   free(oldCB);
 }
-

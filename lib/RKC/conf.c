@@ -47,6 +47,7 @@ RCSID("$Id: conf.c,v 1.12.2.2 2004/04/26 21:48:37 aida_s Exp $");
 RkcErrorBuf rkc_errors;
 RkcConfMgr rkc_config;
 
+// @param name "rkc.conf"
 // @return 設定ファイルのフルパス. 呼び出し側が解放すること.
 static char *
 config_path(const char* name)
@@ -222,6 +223,7 @@ fail:
   RkiStrbuf_destroy(&errbuf);
   return NULL;
 }
+
 
 void
 rkc_configure()

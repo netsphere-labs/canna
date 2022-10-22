@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1994 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -41,7 +42,7 @@ static unsigned long now_context = 0L;
 struct RkGram SG;
 struct RkParam SX;
 
-/* RkInitialize: Ï¢Ê¸ÀáÊÑ´¹½é´ü²½
+/* RkInitialize: é€£æ–‡ç¯€å¤‰æ›åˆæœŸåŒ–
  *	subeteno Renbunsetsu henkan kannsuu wo siyou suru maeni
  *      itido dake call suru koto.
  * returns: -1/0
@@ -316,7 +317,7 @@ _RkEndBun( struct RkContext* cx)
 }
 
 /* RkSetDicPath
- * @return À®¸ù 0, ¼ºÇÔ -1
+ * @return æˆåŠŸ 0, å¤±æ•— -1
  */
 int
 RkwSetDicPath( int cx_num, const char* path )
@@ -335,15 +336,14 @@ RkwSetDicPath( int cx_num, const char* path )
 
 
 /**
-  fillContext -- ¥³¥ó¥Æ¥¯¥¹¥È¹½Â¤ÂÎ¤Î·è¤Ş¤Ã¤¿¤È¤³¤í¤ËÃÍ¤òËä¤á¤Æ¤ä¤ë¡£
+ * ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆæ§‹é€ ä½“ã®æ±ºã¾ã£ãŸã¨ã“ã‚ã«å€¤ã‚’åŸ‹ã‚ã¦ã‚„ã‚‹ã€‚
 
- * @return 0 OK, -1 ¥À¥á
+ * @return 0 OK, -1 ãƒ€ãƒ¡
  */
-static int
-fillContext( int cx_num )
+static int fillContext( int cx_num )
 {
-  struct RkContext *cx = &CX[cx_num];
-  int i;
+    struct RkContext *cx = &CX[cx_num];
+    int i;
 
   /* create mount list headers */
   for (i = 0; i < 4; i++) {
@@ -553,7 +553,7 @@ RkwMountDic(
     struct DM *dm, *qm;
 
     firsttime = (cx->flags & CTX_NODIC) ? 1 : 0;
-    if (firsttime) { /* ºÇ½é¤Ë¥Ş¥¦¥ó¥È*¤·¤è¤¦¤È*¤·¤¿¤é¹ß¤í¤¹ */
+    if (firsttime) { /* æœ€åˆã«ãƒã‚¦ãƒ³ãƒˆ*ã—ã‚ˆã†ã¨*ã—ãŸã‚‰é™ã‚ã™ */
       cx->flags &= ~CTX_NODIC;
     }
 
@@ -751,7 +751,7 @@ RkwGetDicList( int cx_num, char* mdname, int maxmdname)
   int			count = -1;
   struct dics *diclist;
 
-  /* ¤Ş¤º¿ô¤ò¿ô¤¨¤ë */
+  /* ã¾ãšæ•°ã‚’æ•°ãˆã‚‹ */
   if ((cx  = RkGetContext(cx_num)) && (ddp = cx->ddpath)) {
     count = 0;
     for (i = 0; (dd = ddp[i]) != (struct DD *)0 ; i++) {
@@ -763,7 +763,7 @@ RkwGetDicList( int cx_num, char* mdname, int maxmdname)
 	}
       }
     }
-    /* ¼­½ñ¥ê¥¹¥È¤ÎÇÛÎó¤ò malloc ¤¹¤ë */
+    /* è¾æ›¸ãƒªã‚¹ãƒˆã®é…åˆ—ã‚’ malloc ã™ã‚‹ */
     diclist = (struct dics *)malloc(count * sizeof(struct dics));
     if (diclist) {
       struct dics *dicp = diclist, *prevdicp = (struct dics *)0;
@@ -786,7 +786,7 @@ RkwGetDicList( int cx_num, char* mdname, int maxmdname)
       n = count;
       for (i = j = 0, dicp = diclist ; i < n ; i++, dicp++) {
 	if (prevdicp && !strcmp(prevdicp->nickname, dicp->nickname)) {
-	  /* prev ¤Èº£¤Î¼­½ñ¤È¤Ç nickname ¤¬°ìÃ×¤·¤Æ¤¤¤ë¾ì¹ç */
+	  /* prev ã¨ä»Šã®è¾æ›¸ã¨ã§ nickname ãŒä¸€è‡´ã—ã¦ã„ã‚‹å ´åˆ */
 	  count--;
 	}
 	else {
@@ -806,7 +806,7 @@ RkwGetDicList( int cx_num, char* mdname, int maxmdname)
       free((char *)diclist);
     }
     else {
-      count = -1; /* ¤ä¤Ã¤Ñ¤êÀµ³Î¤Ê¿ô¤¬Ê¬¤«¤é¤Ê¤«¤Ã¤¿ */
+      count = -1; /* ã‚„ã£ã±ã‚Šæ­£ç¢ºãªæ•°ãŒåˆ†ã‹ã‚‰ãªã‹ã£ãŸ */
     }
   }
   return(count);
@@ -939,7 +939,8 @@ RkwDeleteDic(int cx_num, char* name, cannawc* word)
   return(-1);
 }
 
-#ifdef STANDALONE /* The following code is as simulating the code in
+
+#if 0 // def STANDALONE /* The following code is as simulating the code in
  lib/RKC API.  In case STANDALONE, it becomes possible for libRK to be
  linked with libcanna directly. */
 
@@ -983,9 +984,9 @@ int *majorp, *minorp;
   return 0;
 }
 
+
 int
-RkwSetUserInfo(user, group, topdir)
-char *user, *group, *topdir;
+RkwSetUserInfo(const char* user, const char* group, const char* topdir)
 {
   return 1;
 }

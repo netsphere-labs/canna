@@ -32,13 +32,10 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.11 2004/03/15 04:33:23 aida
 #include <sys/types.h>
 #include <sys/times.h>
 #endif
+#include <assert.h>
 
-/* Now canna have only cbp files. */
-#if 1
-#define DEFAULT_ROMKANA_TABLE "/dic/default.cbp"
-#else
-#define DEFAULT_ROMKANA_TABLE "/dic/default.kp"
-#endif
+/* Now Canna supports only .cbp files. */
+#define DEFAULT_ROMKANA_TABLE "default.cbp"
 
 
 /*********************************************************************
@@ -52,11 +49,11 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.11 2004/03/15 04:33:23 aida
 int forceRomajiFlushYomi pro((uiContext));
 static int KanaYomiInsert pro((uiContext));
 static int chikujiEndBun pro((uiContext));
-extern void EWStrcat pro((wchar_t *, char *));
+// ulhinshi.c
+extern void EWStrcat(cannawc* buf, const char* x);
 
 extern int yomiInfoLevel;
 
-extern struct RkRxDic *englishdic;
 
 /*
  * int d->rStartp;     ro shu c|h    shi f   ローマ字 スタート インデックス
@@ -165,8 +162,7 @@ extern struct RkRxDic *englishdic;
 #define  doubleByteP(x) ((x) & 0x80)
 
 #ifdef DEBUG
-void debug_yomi(x)
-yomiContext x;
+void debug_yomi( yomiContext x)
 {
   char foo[1024];
   int len, i;
@@ -211,12 +207,9 @@ yomiContext x;
 kanaRepl(d, where, insert, insertlen, mask)
 
 static void
-kanaRepl(d, where, insert, insertlen, mask)
-uiContext d;
-int where, insertlen, mask;
-wchar_t *insert;
+kanaRepl(uiContext d, int where, cannawc* insert, int insertlen, int mask)
 {
-  yomiContext yc = (yomiContext)d->modec;
+    yomiContext yc = (yomiContext)d->modec;
 
   generalReplace(yc->kana_buffer, yc->kAttr, &yc->kRStartp,
 		 &yc->kCurs, &yc->kEndp,
@@ -271,9 +264,9 @@ romajiRepl(uiContext d,
 		 where, insert, insertlen, mask);
 }
 
-/* cfuncdef
 
-   kPos2rPos -- かなバッファのリージョンからローマ字バッファのリージョンを得る
+/**
+ * kPos2rPos -- かなバッファのリージョンからローマ字バッファのリージョンを得る
 
    yc : 読みコンテクスト
    s  : かなバッファのリージョンの開始位置
@@ -281,13 +274,10 @@ romajiRepl(uiContext d,
    rs : ローマ字バッファの対応する開始位置を格納する変数へのポインタ
    rs : ローマ字バッファの対応する終了位置を格納する変数へのポインタ
  */
-
 void
-kPos2rPos(yc, s, e, rs, re)
-yomiContext yc;
-int s, e, *rs, *re;
+kPos2rPos(yomiContext yc, int s, int e, int* rs, int* re)
 {
-  int i, j, k;
+    int i, j, k;
 
   for (i = 0, j = 0 ; i < s ; i++) {
     if (yc->kAttr[i] & SENTOU) {
@@ -307,15 +297,14 @@ int s, e, *rs, *re;
   if (re) *re = k;
 }
 
-/*
-  makeYomiReturnStruct-- 読みをアプリケーションに返す時の構造体を作る関数
+
+/**
+ * makeYomiReturnStruct-- 読みをアプリケーションに返す時の構造体を作る関数
 
   makeYomiReturnStruct は kana_buffer を調べて適当な値を組み立てる。そ
   の時にリバースの領域も設定するが、リバースをどのくらいするかは、
   ReverseWidely という変数を見て決定する。
-
   */
-
 void
 makeYomiReturnStruct(uiContext d)
 {
@@ -324,225 +313,147 @@ makeYomiReturnStruct(uiContext d)
   makeKanjiStatusReturn(d, yc);
 }
 
-extern ckverbose;
 
-static struct RkRxDic *
-OpenRoma(const char* table)
+extern int ckverbose;
+
+// ローマ字かなテーブルを読み込む.
+// @param table ファイル名. "default.cbp" など.
+// @return エラーの場合, NULL.
+static struct RkRxDic* OpenRoma(const char* table)
 {
     struct RkRxDic *retval = NULL;
     char *p;
+    extern jrUserInfoStruct *uinfo; // lib/canna/commondata.c
+
+    if (!table || !*table)
+        return NULL;
+
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char rdic[1024];
+    char rdic[1024];
 #else
     char *rdic = (char*) malloc(1024);
     if (!rdic)
         return NULL;
 #endif
 
-  if (table || *table) {
-    retval = RkwOpenRoma(table);
+    for (int i = 0; i < 3; i++) {
+        switch (i) {
+        case 0:
+            // Full path の場合
+            if (table[0] == '/' || table[0] == '\\' || table[1] == ':') {
+                strcpy(rdic, table);
+                retval = RkwOpenRoma(rdic);
+            }
+            break;
 
-    if (ckverbose == CANNA_FULL_VERBOSE) {
-      if (retval != (struct RkRxDic *)NULL) { /* 辞書がオープンできた */
-        printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", table);
-      }
+        case 1:
+            // $(HOME)/.config/canna/$(table)
+            rdic[0] = '\0';
+/*
+            if (uinfo && uinfo->topdir && uinfo->uname) {
+                strcpy(rdic, uinfo->topdir);
+                strcat(rdic, "/dic/user/");  ｸﾗｲｱﾝﾄ側なので、これはおかしい
+                strcat(rdic, uinfo->uname);
+                strcat(rdic, "/");
+                strcat(rdic, table);
+                retval = RkwOpenRoma(rdic);
+            }
+            else { */
+                p = getenv("HOME");
+                if (!p)
+                    break;
+                strcpy(rdic, p);
+                strcat(rdic, "/.config/canna/");
+                strcat(rdic, table);
+                retval = RkwOpenRoma(rdic);
+//            }
+            break;
+
+        case 2:
+            // グローバル. /usr/share/canna/$(table)
+            /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
+//            rdic[0] = '\0';
+//            if (uinfo && uinfo->topdir) {
+//                strcpy(rdic, uinfo->topdir);
+//            }
+//            else {
+                strcpy(rdic, PACKAGE_DATA_DIR);
+//            }
+            strcat(rdic, "/");
+            strcat(rdic, table);
+            retval = RkwOpenRoma(rdic);
+            break;
+        }
+
+        if (retval) {
+            if (ckverbose == CANNA_FULL_VERBOSE)
+                printf("ローマ字かな変換テーブル: `%s'\n", rdic);
+#ifdef USE_MALLOC_FOR_BIG_ARRAY
+            free( rdic);
+#endif
+            return retval;
+        }
     }
 
-    if (retval == (struct RkRxDic *)NULL) {
-      /* もし辞書がオープンできなければエラー */
-      extern jrUserInfoStruct *uinfo;
-
-      rdic[0] = '\0';
-      if (uinfo && uinfo->topdir && uinfo->uname) {
-	strcpy(rdic, uinfo->topdir);
-	strcat(rdic, "/dic/user/");
-	strcat(rdic, uinfo->uname);
-	strcat(rdic, "/");
-	strcat(rdic, table);
-	retval = RkwOpenRoma(rdic);
-      }
-      else {
-        p = getenv("HOME");
-        if (p) {
-          (void)strcpy(rdic, p);
-          (void)strcat(rdic, "/");
-          (void)strcat(rdic, table);
-          retval = RkwOpenRoma(rdic);
-        }
-      }
-
-      if (ckverbose == CANNA_FULL_VERBOSE) {
-	if (retval != (struct RkRxDic *)NULL) {
-          printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-	}
-      }
-
-      if (retval == (struct RkRxDic *)NULL) { /* これもオープンできない */
-        extern jrUserInfoStruct *uinfo;
-
-        rdic[0] = '\0';
-        if (uinfo && uinfo->topdir) {
-	  strcpy(rdic, uinfo->topdir);
-        }
-        else {
-          strcpy(rdic, CANNALIBDIR);
-        }
-	strcat(rdic, "/dic/");
-	strcat(rdic, table);
-	retval = RkwOpenRoma(rdic);
-
-	if (ckverbose) {
-	  if (retval != (struct RkRxDic *)NULL) {
-	    if (ckverbose == CANNA_FULL_VERBOSE) {
-              printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-	    }
-	  }
-	}
-      }
-
-      if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
-        extern jrUserInfoStruct *uinfo;
-
-        rdic[0] = '\0';
-        if (uinfo && uinfo->topdir) {
-	  strcpy(rdic, uinfo->topdir);
-        }
-        else {
-          strcpy(rdic, CANNALIBDIR);
-        }
-	strcat(rdic, "/");
-	strcat(rdic, table);
-	retval = RkwOpenRoma(rdic);
-
-	if (ckverbose) {
-	  if (retval != (struct RkRxDic *)NULL) {
-	    if (ckverbose == CANNA_FULL_VERBOSE) {
-              printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-	    }
-	  }
-	}
-      }
-
-      if (retval == (struct RkRxDic *)NULL) { /* added for Debian by ISHIKAWA Mutsumi <ishikawa@linux.or.jp> */
-        extern jrUserInfoStruct *uinfo;
-
-        rdic[0] = '\0';
-        if (uinfo && uinfo->topdir) {
-	  strcpy(rdic, uinfo->topdir);
-        }
-        else {
-            strcpy(rdic, PACKAGE_DATA_DIR);
-        }
-	strcat(rdic, "/");
-	strcat(rdic, table);
-	retval = RkwOpenRoma(rdic);
-
-	if (ckverbose) {
-	  if (retval != (struct RkRxDic *)NULL) {
-	    if (ckverbose == CANNA_FULL_VERBOSE) {
-              printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", rdic);
-	    }
-	  }
-	}
-      }
-
-      if (retval == (struct RkRxDic *)NULL) { /* 全部オープンできない */
-	sprintf(rdic,
+    /* 全部オープンできない */
+    assert(!retval);
+    sprintf(rdic,
 #ifndef CODED_MESSAGE
-		"ローマ字かな変換テーブル(%s)がオープンできません。",
+            "ローマ字かな変換テーブル (%s) が読み込めません。",
 #else
 		"\245\355\241\274\245\336\273\372\244\253\244\312"
 		"\312\321\264\271\245\306\241\274\245\326\245\353\50\45\163\51\244\254"
 		"\245\252\241\274\245\327\245\363\244\307\244\255\244\336\244\273"
 		"\244\363\241\243",
 #endif
-		table);
+            table);
 	/* ローマ字かな変換テーブル(%s)がオープンできません。 */
-	addWarningMesg(rdic);
-	retval = (struct RkRxDic *)0;
-      }
-    }
-  }
+    addWarningMesg(rdic);
+
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
-  (void)free((char *)rdic);
+    free( rdic);
 #endif
-  return retval;
+    return retval;
 }
 
-RomkanaInit()
+
+// クライアント側.
+// lib/canna/kctrl.c:KC_initialize() からのみ呼び出される.
+// @return If failed, 0
+int RomkanaInit()
 {
   extern char *RomkanaTable, *EnglishTable;
   extern extraFunc *extrafuncp;
   extraFunc *extrafunc1, *extrafunc2;
   extern jrUserInfoStruct *uinfo;
 
-  /* ローマ字かな変換テーブルのオープン */
-  if (uinfo) {
-    if (uinfo->romkanatable) {
-      if (RomkanaTable) {
-        free(RomkanaTable);
-      }
-      RomkanaTable = malloc(strlen(uinfo->romkanatable) + 1);
-      if (RomkanaTable) {
+    /* ローマ字かな変換テーブルを読み込む */
+    if (uinfo && uinfo->romkanatable) {
+        char* t = (char*) realloc(RomkanaTable, strlen(uinfo->romkanatable) + 1);
+        if (!t)
+            return 0;
+        RomkanaTable = t;
         strcpy(RomkanaTable, uinfo->romkanatable);
-      }
     }
-  }
-  if (RomkanaTable) {
-    romajidic = OpenRoma(RomkanaTable);
-  }
-  else {
-#ifndef USE_MALLOC_FOR_BIG_ARRAY
-    char buf[1024];
-#else
-    char *buf = malloc(1024);
-    if (!buf) {
-      return 0;
-    }
-#endif
-
-    buf[0] = '\0';
-    if (uinfo && uinfo->topdir) {
-      strcpy(buf, uinfo->topdir);
+    if (RomkanaTable) {
+        romajidic = OpenRoma(RomkanaTable);
     }
     else {
-      strcpy(buf, CANNALIBDIR);
-    }
-    strcat(buf, DEFAULT_ROMKANA_TABLE);
-    romajidic = RkwOpenRoma(buf);
+        romajidic = OpenRoma(DEFAULT_ROMKANA_TABLE);
+        if (romajidic != NULL) {
+            RomkanaTable = (char*) malloc(strlen(DEFAULT_ROMKANA_TABLE) + 1);
+            if (!RomkanaTable)
+                return 0;
 
-    if (romajidic != (struct RkRxDic *)NULL) {
-      int len = strlen(buf);
-      RomkanaTable = malloc(len + 1);
-      if (RomkanaTable) {
-	strcpy(RomkanaTable, buf);
-      }
-      if (ckverbose == CANNA_FULL_VERBOSE) {
-        printf("ローマ字かな変換テーブルは \"%s\" を用います。\n", buf);
-      }
+            strcpy(RomkanaTable, DEFAULT_ROMKANA_TABLE);
+        }
     }
-    else { /* オープンできなかった */
-      if (ckverbose) {
-        printf("ローマ字かな変換テーブル \"%s\" がオープンできません。\n",
-               buf);
-      }
-      sprintf(buf, "\245\267\245\271\245\306\245\340\244\316\245\355\241\274"
-	"\245\336\273\372\244\253\244\312\312\321\264\271\245\306\241\274"
-	"\245\326\245\353\244\254\245\252\241\274\245\327\245\363\244\307"
-	"\244\255\244\336\244\273\244\363\241\243");
-         /* システムのローマ字かな変換テーブルがオープンできません。 */
-      addWarningMesg(buf);
-    }
-#ifdef USE_MALLOC_FOR_BIG_ARRAY
-    (void)free(buf);
-#endif
-  }
 
 #ifndef NOT_ENGLISH_TABLE
-  if (EnglishTable && (!RomkanaTable || strcmp(RomkanaTable, EnglishTable))) {
-    /* RomkanaTable と EnglishTable が一緒だったらだめ */
-    englishdic = OpenRoma(EnglishTable);
-  }
+    if (EnglishTable && (!RomkanaTable || strcmp(RomkanaTable, EnglishTable))) {
+        /* RomkanaTable と EnglishTable が一緒だったらダメ */
+        englishdic = OpenRoma(EnglishTable);
+    }
 #endif
 
   /* ユーザモードの初期化 */
@@ -597,31 +508,31 @@ RomkanaInit()
 /* ローマ字かな変換テーブルのクローズ */
 
 extern keySupplement keysup[];
-extern exp(void) RkwCloseRoma pro((struct RkRxDic *));
 
-void
-RomkanaFin()
+void RomkanaFin()
 {
-  extern char *RomkanaTable, *EnglishTable;
-  extern nkeysup;
-  int i;
+    extern char *RomkanaTable, *EnglishTable;
+    extern int nkeysup;
+    int i;
 
-  /* ローマ字かな変換テーブルのクローズ */
-  if (romajidic != (struct RkRxDic *)NULL) {
-    RkwCloseRoma(romajidic);
-  }
-  if (RomkanaTable) {
-    free(RomkanaTable);
-    RomkanaTable = (char *)NULL;
-  }
+    /* ローマ字かな変換テーブルのクローズ */
+    if (romajidic != NULL) {
+        RkwCloseRoma(romajidic);
+        romajidic = NULL;
+    }
+    if (RomkanaTable) {
+        free(RomkanaTable);
+        RomkanaTable = NULL;
+    }
 #ifndef NOT_ENGLISH_TABLE
-  if (englishdic != (struct RkRxDic *)NULL) {
-    RkwCloseRoma(englishdic);
-  }
-  if (EnglishTable) {
-    free(EnglishTable);
-    EnglishTable = (char *)NULL;
-  }
+    if (englishdic != NULL) {
+        RkwCloseRoma(englishdic);
+        englishdic = NULL;
+    }
+    if (EnglishTable) {
+        free(EnglishTable);
+        EnglishTable = NULL;
+    }
 #endif
   /* ローマ字かな変換ルールの補足のための領域の解放 */
   for (i = 0 ; i < nkeysup ; i++) {
@@ -741,15 +652,11 @@ GetKanjiString(d, buf, bufsize, allowedc, chmodinhibit,
   return yc;
 }
 
-/* cfuncdef
 
-   popYomiMode -- 読みモードをポップアップする。
-
+/**
+ * popYomiMode -- 読みモードをポップアップする。
  */
-
-void
-popYomiMode(d)
-uiContext d;
+void popYomiMode(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -764,9 +671,9 @@ uiContext d;
   freeYomiContext(yc);
 }
 
-/* cfuncdef
 
-  checkIfYomiExit -- 読みモードが終了かどうかを調べて値を返すフィルタ
+/**
+ * checkIfYomiExit -- 読みモードが終了かどうかを調べて値を返すフィルタ
 
   このフィルタは読みモードの各関数で値を返そうとする時に呼ぶ。読みモー
   ドでの処理が終了するところであれば、読みモードを終了し、uiContext に
@@ -784,13 +691,9 @@ uiContext d;
   quit で読みモードを終了する時は?他の関数?を呼ぶ。
 
  */
-
-static
-checkIfYomiExit(d, retval)
-uiContext d;
-int retval;
+static int checkIfYomiExit(uiContext d, int retval)
 {
-  yomiContext yc = (yomiContext)d->modec;
+    yomiContext yc = (yomiContext)d->modec;
 
   if (retval <= 0) {
     /* 確定文字列がないかエラーの場合 ≡ exit ではない */
@@ -816,10 +719,8 @@ int retval;
   return retval;
 }
 
-static
-checkIfYomiQuit(d, retval)
-uiContext d;
-int retval;
+
+static int checkIfYomiQuit(uiContext d, int retval)
 /* ARGSUSED */
 {
 #ifdef QUIT_IN_YOMI /* コメントアウトする目的の ifdef */
@@ -842,13 +743,8 @@ int retval;
   return retval;
 }
 
-#ifdef __STDC__
-void fitmarks(yomiContext);
-#endif
 
-void
-fitmarks(yc)
-yomiContext yc;
+void fitmarks(yomiContext yc)
 {
   if (yc->kRStartp < yc->pmark) {
     yc->pmark = yc->kRStartp;
@@ -858,10 +754,9 @@ yomiContext yc;
   }
 }
 
+
 /* 直前に未変換文字列がないかどうか確認 */
-void
-ReCheckStartp(yc)
-yomiContext yc;
+void ReCheckStartp(yomiContext yc)
 {
   int r = yc->rStartp, k = yc->kRStartp, i;
 

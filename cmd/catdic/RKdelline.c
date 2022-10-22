@@ -26,10 +26,7 @@ static	char	rcs_id[] = "@(#) 112.1 $Id: RKdelline.c,v 1.3 2003/10/02 07:40:30 ai
 #include <canna/RK.h>
 #include "canna/ccompat.h"
 
-RkDeleteLine(cx_num, name, line)
-int cx_num;
-char *name;
-char *line;
+int RkDeleteLine(int cx_num, char* name, char* line)
 {
   int linelen = strlen(line);
   int yomilen, yomihinshilen = 0;
@@ -107,10 +104,11 @@ char *word;
   return 0;
 }
 
-main()
+
+int main()
 {
-  char buf[2048], *p;
-  int c;
+    char buf[2048], *p;
+    int c;
 
   p = buf;
   c = getchar();

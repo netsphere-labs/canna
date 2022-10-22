@@ -12,7 +12,11 @@ LISPインタプリタ.
 
 ## ローマ字かなテーブル
 
-ローマ字かなだけではなく、カナ配列, TUT-Code もこのレイヤー.
+ローマ字かなだけではなく、カナ配列, TUT-Code もこのレイヤー. ローマ字かな変換はクライアント側で行われる.
+
+読み込む場所が, いろんな場所を検索していたが, 次に整理した。
+  romaji path = $(HOME)/.config/canna/default.cbp
+  romaji path = /usr/share/canna/default.cbp  -- Debian版, EPEL版と同じ.
 
 ### cmd/forcpp 
 
@@ -40,7 +44,24 @@ Round-trip を確認. Checked.
 
 ## cmd/cannacheck
 
-ローマ字かな変換テーブル(default.cbp)がオープンできません。
-RKCの設定ファイルがありません
-かな漢字変換サーバと通信できません
+```
+$ /opt/canna/bin/cannacheck -v
+カスタマイズファイルとして "/opt/canna/var/lib/canna/default.canna" を用います。
+romaji path = /home/hori/.config/canna/default.cbp
+romaji path = /opt/canna/share/canna/default.cbp
+ローマ字かな変換テーブル: `/opt/canna/share/canna/default.cbp'
+RKC config path=/home/hori/.config/canna/rkc.conf, preproc=/usr/bin/cpp -E -fdirectives-only -nostdinc
+サーバ "unix" に接続します。
+RKC�������ե����뤬�����ޤ���
+���ʴ����Ѵ������Ф��̿��Ǥ��ޤ���
+```
 
+下2行は次の文字列:
+```
+RKCの設定ファイルがありません      -> これはエラーではない.
+かな漢字変換サーバと通信できません
+```
+
+環境変数 `CANNA_RKC_PREPROCESSOR`
+
+●TODO: カスタマイズファイルの場所がおかしい。`/etc/` 以下でないと.

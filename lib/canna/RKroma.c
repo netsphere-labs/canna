@@ -260,8 +260,9 @@ RkwCloseRoma(struct RkRxDic* rdic)
     };
 }
 
+
 struct RkRxDic *
-RkOpenRoma(char* romaji)
+RkOpenRoma(const char* romaji)
 {
     return RkwOpenRoma(romaji);
 }

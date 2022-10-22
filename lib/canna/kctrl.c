@@ -482,10 +482,8 @@ KC_keyconvCallback(uiContext d, char* arg)
 
 extern void restoreBindings();
 
-static
-KC_initialize(d, arg)
-     uiContext d;
-     char *arg;
+static int
+KC_initialize(uiContext d, char* arg)
      /* ARGSUSED */
 {
     extern FirstTime;
@@ -2148,10 +2146,10 @@ char *arg;
   return (int)RkwGetServerName();
 }
 
+
+// @return If error, -1.
 static int
-KC_setUserInfo(d, arg)
-uiContext d;
-jrUserInfoStruct *arg;
+KC_setUserInfo(uiContext d, jrUserInfoStruct* arg)
 /* ARGSUSED */
 {
   extern jrUserInfoStruct *uinfo;
@@ -2314,7 +2312,7 @@ char *arg;
 
 /* KanjiControlの個々の制御関数へのポインタ */
 
-static int (*kctlfunc[MAX_KC_REQUEST])() = {
+static int (*kctlfunc[MAX_KC_REQUEST])(uiContext, void*) = {
   KC_initialize,
   KC_finalize,
   KC_changeMode,
@@ -2357,10 +2355,8 @@ static int (*kctlfunc[MAX_KC_REQUEST])() = {
   KC_attributeInfo,
 };
 
-kanjiControl(request, d, arg)
-int request;
-uiContext d;
-caddr_t arg;
+
+int kanjiControl(int request, uiContext d, void* arg)
 {
-  return kctlfunc[request](d, arg);
+    return kctlfunc[request](d, arg);
 }

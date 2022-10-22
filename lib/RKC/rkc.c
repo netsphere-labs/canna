@@ -140,12 +140,10 @@ static struct {
 /*
  * 新しいコンテクストを作成する。
  */
-static
-RkcContext  *
-newCC()
+static RkcContext* newCC()
 {
-    register RkcContext *cx ;
-    register int i ;
+    RkcContext *cx ;
+    int i ;
 
     for( i = 0; i < MAX_CX; i++) {
 	if( !RkcCX[ i ] ) {
@@ -161,15 +159,13 @@ newCC()
 	    return( cx ) ;
 	}
     }
-    return( (RkcContext *)NULL ) ;
+    return NULL;
 }
 
 /*
  * 指定された文節から最終文節までの先頭候補または、候補列の領域を解放する
  */
-static
-void
-freeBUN( RkcContext* cx, int from)
+static void freeBUN( RkcContext* cx, int from)
 {
     RkcBun *bun ;
 
@@ -188,12 +184,11 @@ freeBUN( RkcContext* cx, int from)
     }
 }
 
+
 /*
  * 指定されたコンテクストを解放する。
  */
-static
-void
-freeCC( int clientcx )
+static void freeCC( int clientcx )
 {
     RkcContext     *cx ;
 
@@ -239,60 +234,62 @@ getCC( int clientcx, int type )
 }
 
 
-static RkUserInfo *uinfo;
+typedef struct {
+    const char* uname;        /* user name */
+    const char* gname;        /* group name */
+    //const char* topdir;       /* install dir */
+} RkUserInfo;
 
-int
-RkwSetUserInfo( char* user, char* group, char* topdir)
+// lib/canna/commondata.c で定義される `uinfo` とは別の変数!
+static RkUserInfo* uinfo = NULL;
+
+// lib/canna/henkan.c, lib/canna/kctrl.c から呼び出される. -> クライアント側
+// @return 成功 1, 失敗 0
+int RkwSetUserInfo( const char* user, const char* group, const char* /*topdir*/)
 {
-    if (user && group && topdir) {
-        uinfo = (RkUserInfo *)malloc(sizeof(RkUserInfo));
-    if (uinfo) {
-      uinfo->uname = user;
-      uinfo->gname = group;
-      uinfo->topdir = topdir;
-      return 1;
+    if ( !user || !group )
+        return 0;
+    if (!uinfo) {
+        uinfo = (RkUserInfo*) malloc(sizeof(RkUserInfo));
+        if (!uinfo)
+            return 0;
     }
-  }
-  return 0;
+    // 参照するだけ.
+    uinfo->uname = user;
+    uinfo->gname = group;
+    //uinfo->topdir = topdir;
+
+    return 1;
 }
 
 
-static char *
-FindLogname()
+static const char* FindUserName()
 {
     if (uinfo)
         return uinfo->uname;
 
-    struct passwd *pass = getpwuid(getuid());
+    struct passwd *pass = getpwuid(getuid()); // 実ユーザ getuid() でよい.
     if( pass )
         return pass->pw_name;
 
+    // logname コマンドは LOGNAME 環境変数を無視する. 使うべきではない.
     char* username = NULL;
-    if ( !(username = getlogin()) ) {
-        if ( !(username = getenv("LOGNAME")) )
-            username = getenv("USER");
-    }
-
-    return username;
+    return getlogin();
 }
 
 
-static char *
-FindGroupname()
+static const char* FindGroupName()
 {
     if (uinfo)
         return uinfo->gname;
-    else {
+
     struct group *gr = getgrgid(getgid()) ;
-    if (gr && gr->gr_name) {
-      return gr->gr_name;
-    }
-    else{
-      return (char *)NULL;
-    }
-  }
-  return (char *)NULL;
+    if (gr && gr->gr_name)
+        return gr->gr_name;
+
+    return NULL;
 }
+
 
 /*
  *  RkwInitialize ()
@@ -340,7 +337,7 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     }
 
     /* ユーザ名を取得する */
-    username = FindLogname() ;
+    username = FindUserName() ;
 
     if( !username ||
         !(data = (char*) malloc( strlen(username) + strlen(W_VERSION)+2 ))) {
@@ -401,7 +398,7 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
 
     /* プロトコルバージョンが 3.2 以上だったらグループ名を通知する */
     if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
-      char *gname = FindGroupname();
+      char *gname = FindGroupName();
 
       if (gname) {
 	(*RKCP->notice_group_name)(cx, gname);
@@ -449,7 +446,8 @@ RkwFinalize()
     ConnectIrohaServerName[0] = '\0';
 
     if (uinfo) {
-      free((char *)uinfo);
+        free( uinfo);
+        uinfo = NULL;
     }
     rkc_config_fin();
 }
@@ -1524,7 +1522,7 @@ RkwListDic( int cxnum, char* dirname, char* dicnames_return, int size )
     }
 
     if( !dirname )
-	if( !(dirname = FindLogname()) )
+	if( !(dirname = FindUserName()) )
 	    return( -1 ) ;
 
     if( !dicnames_return ) {
@@ -1921,7 +1919,7 @@ RkwQueryDic( int cxnum, const char* username, char* dicname, struct
 	return( -1 ) ;
 
     if( !username )
-	if( !(username = FindLogname()) )
+	if( !(username = FindUserName()) )
 	    return( -1 ) ;
 
     if( !status ) {

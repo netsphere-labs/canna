@@ -211,12 +211,6 @@ struct rkcproto {
 
 #define MAX_CX 100
 
-typedef struct {
-  char *uname;        /* user name */
-  char *gname;        /* group name */
-  char *topdir;       /* install dir */
-} RkUserInfo;
-
 /* function prototypes .. */
 
 extern int rkc_Connect_Iroha_Server pro((char *));

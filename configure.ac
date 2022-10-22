@@ -128,7 +128,20 @@ if test "x${datadir}" = 'x${prefix}/share'; then
     AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}")
   fi
 else
-  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
+  # デフォルト値は ${datarootdir}. もう一段展開が必要.
+  if test "x${datadir}" = 'x${datarootdir}'; then
+    if test "x${datarootdir}" = 'x${prefix}/share'; then
+      if test "x${prefix}" = "xNONE"; then
+        AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${ac_default_prefix}/share/${PACKAGE}")
+      else
+        AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}")
+      fi
+    else
+      AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datarootdir}/${PACKAGE}")
+    fi
+  else
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
+  fi
 fi
 
 

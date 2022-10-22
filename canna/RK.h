@@ -229,7 +229,9 @@ canna_export(int) RkwCreateDic pro((int, char *, int));
 canna_export(int) RkwQueryDic pro((int, const char *, char *, struct DicInfo *));
 canna_export(void) RkwCloseRoma pro((struct RkRxDic *));
 canna_export(struct) RkRxDic * RkwOpenRoma pro((const char *));
-canna_export(int) RkwSetUserInfo pro((char *, char *, char *));
+// lib/RKC/rkc.c
+canna_export(int) RkwSetUserInfo(const char * user, const char * group,
+                                 const char *);
 canna_export(char *) RkwGetServerName pro((void));
 canna_export(int) RkwGetServerVersion pro((int *, int *));
 canna_export(int) RkwListDic pro((int, char *, char *, int));

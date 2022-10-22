@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -40,7 +41,7 @@
 #include <canna/keydef.h>
 #include <canna/mfdef.h>
 
-/* ¤É¤Î¤è¤¦¤Ê¾ğÊó¤¬¤¢¤ë¤«¤ò¼¨¤¹¥Õ¥é¥° */
+/* ã©ã®ã‚ˆã†ãªæƒ…å ±ãŒã‚ã‚‹ã‹ã‚’ç¤ºã™ãƒ•ãƒ©ã‚° */
 
 #define KanjiModeInfo   	0x1
 #define KanjiGLineInfo  	0x2
@@ -57,7 +58,7 @@
 #define KanjiAttributeInfo	0x400
 #define KanjiSpecialFuncInfo	0x800
 
-/* KanjiControl ´Ø·¸ */
+/* KanjiControl é–¢ä¿‚ */
 
 #define KC_INITIALIZE		0
 #define KC_FINALIZE		1
@@ -136,14 +137,14 @@ typedef struct {
     int length;		        /* length of echo string */
     int revPos;                 /* reverse position  */
     int revLen;                 /* reverse length    */
-    unsigned long info;		/* ¤½¤ÎÂ¾¤Î¾ğÊó */
-    unsigned char *mode;	/* ¥â¡¼¥É¾ğÊó */
+    unsigned long info;		/* ãã®ä»–ã®æƒ…å ± */
+    unsigned char *mode;	/* ãƒ¢ãƒ¼ãƒ‰æƒ…å ± */
     struct {
       unsigned char *line;
       int           length;
       int           revPos;
       int           revLen;
-    } gline;			/* °ìÍ÷É½¼¨¤Î¤¿¤á¤Î¾ğÊó */
+    } gline;			/* ä¸€è¦§è¡¨ç¤ºã®ãŸã‚ã®æƒ…å ± */
 } jrKanjiStatus;
 
 typedef struct {
@@ -154,23 +155,23 @@ typedef struct {
 } jrKanjiStatusWithValue;
 
 typedef struct {
-  char *uname;		/* ¥æ¡¼¥¶Ì¾ */
-  char *gname;		/* ¥°¥ë¡¼¥×Ì¾ */
-  char *srvname;	/* ¥µ¡¼¥ĞÌ¾ */
-  char *topdir;		/* ¥¤¥ó¥¹¥È¡¼¥ë¥Ç¥£¥ì¥¯¥È¥ê */
-  char *cannafile;	/* ¥«¥¹¥¿¥Ş¥¤¥º¥Õ¥¡¥¤¥ëÌ¾ */
-  char *romkanatable;   /* ¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ëÌ¾ */
-  char *appname;	/* ¥¢¥×¥ê¥±¡¼¥·¥ç¥óÌ¾ */
+    char *uname;		/* ãƒ¦ãƒ¼ã‚¶å */
+    char *gname;		/* ã‚°ãƒ«ãƒ¼ãƒ—å */
+    char *srvname;	/* ã‚µãƒ¼ãƒå */
+    char *topdir;	/* ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª */  // TODO: å‰Šé™¤.
+    char *cannafile;	/* ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºãƒ•ã‚¡ã‚¤ãƒ«å */
+    char *romkanatable;   /* ãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«å */
+    char *appname;	/* ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å */
 } jrUserInfoStruct;
 
 typedef struct {
-  char *codeinput;	/* ¥³¡¼¥É¼ïÊÌ */
-  int  quicklyescape;	/* µ­¹æÏ¢Â³ÆşÎÏ flag */
-  int  indexhankaku;	/* ¥¬¥¤¥É¥é¥¤¥ó¤Î¥¤¥ó¥Ç¥Ã¥¯¥¹»ØÄê */
-  int  indexseparator;	/* ¥¬¥¤¥É¥é¥¤¥ó¤Î¥¤¥ó¥Ç¥Ã¥¯¥¹»ØÄê */
-  int  selectdirect;	/* ¿ô»ú¥­¡¼¤Ë¤è¤ëÁªÂò flag */
-  int  numericalkeysel;	/* ¿ô»ú¥­¡¼¤Ë¤è¤ë¸õÊäÁªÂò»ØÄê */
-  int  kouhocount;	/* ¸õÊä¿ôÉ½¼¨ */
+  char *codeinput;	/* ã‚³ãƒ¼ãƒ‰ç¨®åˆ¥ */
+  int  quicklyescape;	/* è¨˜å·é€£ç¶šå…¥åŠ› flag */
+  int  indexhankaku;	/* ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹æŒ‡å®š */
+  int  indexseparator;	/* ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹æŒ‡å®š */
+  int  selectdirect;	/* æ•°å­—ã‚­ãƒ¼ã«ã‚ˆã‚‹é¸æŠ flag */
+  int  numericalkeysel;	/* æ•°å­—ã‚­ãƒ¼ã«ã‚ˆã‚‹å€™è£œé¸æŠæŒ‡å®š */
+  int  kouhocount;	/* å€™è£œæ•°è¡¨ç¤º */
 } jrCInfoStruct;
 
 #define CANNA_EUC_LISTCALLBACK
@@ -194,14 +195,14 @@ typedef struct {
     int length;		        /* length of echo string */
     int revPos;                 /* reverse position  */
     int revLen;                 /* reverse length    */
-    unsigned long info;		/* ¤½¤ÎÂ¾¤Î¾ğÊó */
-    cannawc  *mode;		/* ¥â¡¼¥É¾ğÊó */
+    unsigned long info;		/* ãã®ä»–ã®æƒ…å ± */
+    cannawc  *mode;		/* ãƒ¢ãƒ¼ãƒ‰æƒ…å ± */
     struct {
       cannawc       *line;
       int           length;
       int           revPos;
       int           revLen;
-    } gline;			/* °ìÍ÷É½¼¨¤Î¤¿¤á¤Î¾ğÊó */
+    } gline;			/* ä¸€è¦§è¡¨ç¤ºã®ãŸã‚ã®æƒ…å ± */
 } wcKanjiStatus;
 
 typedef struct {

@@ -277,7 +277,7 @@ static int RkcConfMgr_set_number pro((RkcConfMgr *cx,
 static int RkcConfMgr_set_yesno pro((RkcConfMgr *cx,
       ConfItem item, int val));
 
-#define CONFIG_DIR ".cannax/"
+#define CONFIG_DIR ".config/canna/"
 #define CONFIG_FILE "rkc.conf"
 #define POSSTR CONFIG_FILE " line "
 #define NOMEM_MSG "\245\341\245\342\245\352\244\254\311\324\302\255\244" \
