@@ -65,3 +65,18 @@ RKCの設定ファイルがありません      -> これはエラーではな�
 環境変数 `CANNA_RKC_PREPROCESSOR`
 
 ●TODO: カスタマイズファイルの場所がおかしい。`/etc/` 以下でないと.
+
+
+
+## server/
+
+```
+$ /opt/canna/sbin/cannaserver 
+mkdir() failed: /opt/canna/var/lib/canna/dic/user
+cannaserver:Initialize failed: RkwInitialize()
+```
+
+root で動かせば, 起動はできる.
+-> cannacheck から接続できない。アカン.
+
+

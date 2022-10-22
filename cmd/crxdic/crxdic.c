@@ -915,14 +915,14 @@ init_dic(name, dictype, maxpage)
   return dic;
 }
 
+
 static void
-makeHeader(dic)
-     struct dictionary	*dic;
+makeHeader( struct dictionary	*dic )
 {
-  unsigned char		*buf;
-  size_t		size;
-  struct HD		hd;
-  canna_uint32_t	crc;
+    unsigned char		*buf;
+    size_t		size;
+    struct HD		hd;
+    uint32_t	crc;
   unsigned		i;
   RkiCksumCalc		calc;
   unsigned		off;

@@ -230,7 +230,7 @@ RkReadGram(int fd, size_t gramsz)
 	    src = (unsigned char *)gram->ng_neg + 4 * (gram->ng_numneg - 1);
 	    dst = gram->ng_neg + (gram->ng_numneg - 1);
 	    for (i = 0; i < gram->ng_numneg; i++, dst--, src -= 4)
-	      *dst = (canna_uint32_t)L4TOL(src);
+	      *dst = (uint32_t) L4TOL(src);
 	    return gram;
 	  error_case:;
 #endif /* LOGIC_HACK */

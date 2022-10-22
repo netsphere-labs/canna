@@ -62,16 +62,14 @@ char saveapname[CANNA_MAXAPPNAME]; /* サーバとの接続を切るときのAP�
 
 int ckverbose = 0;
 
-/*
+/**
  * エラーのメッセージを入れておく変数
  */
+const char* jrKanjiError = "";
 
-char *jrKanjiError = "";
-
-/*
+/**
  * デバグメッセージを出すかどうかのフラグ
  */
-
 int iroha_debug = 0;
 
 /*
@@ -126,7 +124,7 @@ char *server_name = (char *)NULL;
 int chikuji_debug = 0;
 int auto_define = 0;
 
-void (*keyconvCallback)(int, struct stringcell*, struct stringcell*, int) = NULL;
+void (*keyconvCallback)(int, char*, char*, int) = NULL;
 
 extraFunc *extrafuncp = (extraFunc *)NULL;
 struct dicname *kanjidicnames; /* .canna で指定している辞書リスト */
@@ -141,9 +139,7 @@ jrUserInfoStruct *uinfo = (jrUserInfoStruct *)NULL;
  /* マウント処理を行っているかどうか */
 int mountnottry = 1;
 
-void
-InitCannaConfig(cf)
-struct CannaConfig *cf;
+void InitCannaConfig( struct CannaConfig *cf )
 {
   bzero(cf, sizeof(struct CannaConfig));
   cf->CannaVersion = CANNA_MAJOR_MINOR;
@@ -194,11 +190,11 @@ freeUInfo()
   }
 }
 
-/*
+
+/**
   デファールト値にもどす。
 */
-void
-restoreBindings()
+void restoreBindings()
 {
   InitCannaConfig(&cannaconf);
 

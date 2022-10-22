@@ -206,9 +206,8 @@ resetModeNames()
   }
 }
 
-static void
-japaneseMode(d)
-uiContext d;
+
+static void japaneseMode( uiContext d )
 {
   coreContext cc = (coreContext)d->modec;
 
@@ -218,16 +217,12 @@ uiContext d;
   d->status = EXIT_CALLBACK;
 }
 
-/* cfuncdef
 
-  JapaneseMode(d) -- モードを日本語入力モードに変える。
-
+/**
+ * モードを日本語入力モードに変える。
   ※注 この関数はαモードでしか呼んではいけない。
-
  */
-
-JapaneseMode(d)
-uiContext d;
+int JapaneseMode( uiContext d )
 {
   coreContext cc = (coreContext)d->modec;
   yomiContext yc = (yomiContext)cc->next;
@@ -241,8 +236,8 @@ uiContext d;
   return 0;
 }
 
-AlphaMode(d)
-uiContext d;
+
+int AlphaMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 

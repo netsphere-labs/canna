@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -34,9 +35,6 @@ static	char	rcs_id[] = "@(#) 102.1 $Id: henkan.c,v 1.8.2.2 2004/04/26 22:53:02 a
 #include <sys/times.h>
 #endif
 
-#ifdef luna88k
-extern int errno;
-#endif
 
 /*********************************************************************
  *                      wchar_t replace begin                        *
@@ -63,27 +61,24 @@ static yomiContext tanbunToYomi pro((uiContext, tanContext, wchar_t *));
 static void tanbunCommitYomi pro((uiContext, tanContext, yomiContext));
 
 static char dictmp[DICERRORMESGLEN];
-static char *mountErrorMessage = "\244\362\245\336\245\246\245\363\245\310"
+static const char *mountErrorMessage = "\244\362\245\336\245\246\245\363\245\310"
 	"\244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277";
-                                 /* ¤ò¥Ş¥¦¥ó¥È¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿ */
+                                 /* ã‚’ãƒã‚¦ãƒ³ãƒˆã§ãã¾ã›ã‚“ã§ã—ãŸ */
 
-static int
-kanakanError(d)
-uiContext d;
+static int kanakanError( uiContext d )
 {
   return makeRkError(d, "\244\253\244\312\264\301\273\372\312\321\264\271"
 	"\244\313\274\272\307\324\244\267\244\336\244\267\244\277");
-                        /* ¤«¤Ê´Á»úÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                        /* ã‹ãªæ¼¢å­—å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸ */
 }
 
-static void
-dicMesg(s, d)
-char *s, *d;
+
+static void dicMesg(const char* s, char* const d)
 {
   if (ckverbose == CANNA_FULL_VERBOSE) {
     char buf[128];
     sprintf(buf, "\"%s\"", d);
-    printf("%14s %-20s ¤ò»ØÄê¤·¤Æ¤¤¤Ş¤¹¡£\n", s, buf);
+    printf("%14s %-20s ã‚’æŒ‡å®šã—ã¦ã„ã¾ã™ã€‚\n", s, buf);
   }
 }
 
@@ -97,18 +92,17 @@ RkwInitError()
     jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\274\255"
 	"\275\361\244\316\275\351\264\374\262\275\244\313\274\272\307\324"
 	"\244\267\244\336\244\267\244\277";
-                   /* ¤«¤Ê´Á»úÊÑ´¹¼­½ñ¤Î½é´ü²½¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* ã‹ãªæ¼¢å­—å¤‰æ›è¾æ›¸ã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸ */
   }
   addWarningMesg(jrKanjiError);
   RkwFinalize();
 }
 
-static void
-mountError(dic)
-char *dic;
+
+static void mountError(char* dic)
 {
   int mnterrlen;
-  if (DICERRORMESGLEN < 
+  if (DICERRORMESGLEN <
       (unsigned)(strlen(dic) + (mnterrlen = strlen(mountErrorMessage)) + 1)) {
     (void)strncpy(dictmp, dic, DICERRORMESGLEN - mnterrlen - 3/* ... */ - 1);
     (void)strcpy(dictmp + DICERRORMESGLEN - mnterrlen - 3 - 1, "...");
@@ -125,7 +119,7 @@ static void
 autodicError()
 {
 #ifndef CODED_MESSAGE
-  jrKanjiError = "¼«Æ°ÅĞÏ¿ÍÑ¼­½ñ¤¬Â¸ºß¤·¤Ş¤»¤ó";
+  jrKanjiError = "è‡ªå‹•ç™»éŒ²ç”¨è¾æ›¸ãŒå­˜åœ¨ã—ã¾ã›ã‚“";
 #else
   jrKanjiError = "\274\253\306\260\305\320\317\277\315\321\274\255\275\361"
                  "\244\254\302\270\272\337\244\267\244\336\244\273\244\363";
@@ -133,82 +127,84 @@ autodicError()
   addWarningMesg(jrKanjiError);
 }
 
-static void
-warnRKCErrors(errors)
-const char *const *errors;
+
+static void warnRKCErrors( const char *const *errors )
 {
   for (; *errors; ++errors)
     addWarningMesg((char *)*errors);
 }
 
-/*
- * ¤«¤Ê´Á»úÊÑ´¹¤Î¤¿¤á¤Î½é´ü½èÍı
+
+/*+
+ * ã‹ãªæ¼¢å­—å¤‰æ›ã®ãŸã‚ã®åˆæœŸå‡¦ç†
  *
- * ¡¦RkwInitialize¤ò¸Æ¤ó¤Ç¡¢defaultContext ¤òºîÀ®¤¹¤ë
- * ¡¦defaultBushuContext ¤òºîÀ®¤¹¤ë
- * ¡¦¼­½ñ¤Î¥µ¡¼¥Á¥Ñ¥¹¤òÀßÄê¤¹¤ë
- * ¡¦¥·¥¹¥Æ¥à¼­½ñ¡¢Éô¼óÍÑ¼­½ñ¡¢¥æ¡¼¥¶¼­½ñ¤ò¥Ş¥¦¥ó¥È¤¹¤ë
+ * ãƒ»RkwInitializeã‚’å‘¼ã‚“ã§ã€defaultContext ã‚’ä½œæˆã™ã‚‹
+ * ãƒ»defaultBushuContext ã‚’ä½œæˆã™ã‚‹
+ * ãƒ»è¾æ›¸ã®ã‚µãƒ¼ãƒãƒ‘ã‚¹ã‚’è¨­å®šã™ã‚‹
+ * ãƒ»ã‚·ã‚¹ãƒ†ãƒ è¾æ›¸ã€éƒ¨é¦–ç”¨è¾æ›¸ã€ãƒ¦ãƒ¼ã‚¶è¾æ›¸ã‚’ãƒã‚¦ãƒ³ãƒˆã™ã‚‹
  *
- * °ú¤­¿ô	¤Ê¤·
- * Ìá¤êÃÍ	0:¤Ş¤¢Àµ¾ï¡¢ -1:¤È¤³¤È¤óÉÔÎÉ
+ * å¼•ãæ•°	ãªã—
+ * @return  0:ã¾ã‚æ­£å¸¸ã€ -1:ã¨ã“ã¨ã‚“ä¸è‰¯
  */
-KanjiInit()
+int KanjiInit()
 {
-  char *ptr, *getenv(), *kodmesg = ""/* ¼­½ñ¤Î¼ïÊÌËè¤Î¥á¥Ã¥»¡¼¥¸ */;
-  int con;
-  struct dicname *stp;
-  extern struct dicname *kanjidicnames;
-  extern FirstTime;
-  extern jrUserInfoStruct *uinfo;
-  extern char *RkGetServerHost pro((void));
-  int ret = -1;
+    // ã‚µãƒ¼ãƒã®ãƒ›ã‚¹ãƒˆå
+    const char* serv_ptr;
+    const char* kodmesg = "" /* è¾æ›¸ã®ç¨®åˆ¥æ¯ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ */;
+    int con;
+    struct dicname *stp;
+
+    extern struct dicname *kanjidicnames;
+    extern int FirstTime;
+    extern jrUserInfoStruct *uinfo;
+    extern char *RkGetServerHost pro((void));
+
+    int ret = -1;
 #ifndef USE_MALLOC_FOR_BIG_ARRAY
-  char buf[256];
+    char buf[256];
 #else
-  char *buf = malloc(256);
-  if (!buf) {
-    return ret;
-  }
+    char *buf = malloc(256);
+    if (!buf)
+        return ret;
 #endif
 
 #if defined(DEBUG)
-  if (iroha_debug) {
-    fprintf(stderr,"\n¥µ¡¼¥Ğ¤ËÀÜÂ³¤·¤¿ strokelimit = %d (default:%d)\n",
-              cannaconf.strokelimit, STROKE_LIMIT);
-  }
+    if (iroha_debug) {
+        fprintf(stderr,"\nã‚µãƒ¼ãƒã«æ¥ç¶šã—ãŸ strokelimit = %d (default:%d)\n",
+                cannaconf.strokelimit, STROKE_LIMIT);
+    }
 #endif
-  /* Ï¢Ê¸Àá¥é¥¤¥Ö¥é¥ê¤ò½é´ü²½¤¹¤ë */
-  if (uinfo) {
-    RkwSetUserInfo(uinfo->uname, uinfo->gname, uinfo->topdir);
-  }
+    /* é€£æ–‡ç¯€ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’åˆæœŸåŒ–ã™ã‚‹ */
+    if (uinfo)
+        RkwSetUserInfo(uinfo->uname, uinfo->gname, uinfo->topdir);
 
-  if (!(ptr = RkGetServerHost()) &&
-      !(ptr = getenv("IROHADICDIR"))) {
-    if (uinfo && uinfo->topdir) {
-      strcpy(buf, uinfo->topdir);
-      strcat(buf, "/dic");
-      ptr = buf;
+    serv_ptr = RkGetServerHost();
+    if (!serv_ptr && !(serv_ptr = getenv("IROHADICDIR")) ) {
+        /*        if (uinfo && uinfo->topdir) {
+            strcpy(buf, uinfo->topdir);
+            strcat(buf, "/dic");
+            ptr = buf;
+        }
+        else { */
+        serv_ptr = DICHOME;
     }
-    else {
-      ptr = DICHOME;
+
+    if (ckverbose >= CANNA_HALF_VERBOSE)
+        RkcListenConfigErrors(&warnRKCErrors);
+    defaultContext = RkwInitialize(serv_ptr); // ã‚µãƒ¼ãƒã«æ¥ç¶š
+    RkcListenConfigErrors(NULL);
+    if (defaultContext == -1) {
+        RkwInitError();
+        ret = -1;
+        goto return_ret;
     }
-  }
-  if (ckverbose >= CANNA_HALF_VERBOSE)
-    RkcListenConfigErrors(&warnRKCErrors);
-  defaultContext = RkwInitialize(ptr);
-  RkcListenConfigErrors(NULL);
-  if (defaultContext == -1) {
-    RkwInitError();
-    ret = -1;
-    goto return_ret;
-  }
 
   if (defaultContext != -1) {
     if((defaultBushuContext = RkwCreateContext()) == -1) {
       jrKanjiError = "\311\364\274\363\315\321\244\316\245\263\245\363\245\306"
 	"\245\257\245\271\245\310\244\362\272\356\300\256\244\307\244\255"
 	"\244\336\244\273\244\363\244\307\244\267\244\277";
-                     /* Éô¼óÍÑ¤Î¥³¥ó¥Æ¥¯¥¹¥È¤òºîÀ®¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿ */
+                     /* éƒ¨é¦–ç”¨ã®ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆã‚’ä½œæˆã§ãã¾ã›ã‚“ã§ã—ãŸ */
       addWarningMesg(jrKanjiError);
       defaultContext = -1;
       RkwFinalize();
@@ -223,7 +219,7 @@ KanjiInit()
 	"\245\306\245\255\245\271\245\310(%d), \311\364\274\363\245\263"
 	"\245\363\245\306\245\255\245\271\245\310(%d)\n",
 		defaultContext, defaultBushuContext, 0);
-               /* ¥Ç¥Õ¥©¥ë¥È¥³¥ó¥Æ¥­¥¹¥È(%d), Éô¼ó¥³¥ó¥Æ¥­¥¹¥È(%d)\n */
+               /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ(%d), éƒ¨é¦–ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ(%d)\n */
 
   if (defaultContext != -1) {
 
@@ -231,9 +227,9 @@ KanjiInit()
       RkwSetAppName(defaultContext, saveapname);
     }
 
-    if (!FirstTime && !mountnottry) { /* KC_INITIALIZE ¤Ç¸Æ¤Ó½Ğ¤µ¤ì¤Æ¤¤¤Ê¤¯¤Æ¡¢
-					 ´û¤Ë¥Ş¥¦¥ó¥È½èÍı¤ò¹Ô¤Ã¤Æ¤¤¤ë¾ì¹ç */
-      /* Ê¸Ë¡¼­½ñ¤Î¥Ş¥¦¥ó¥È */
+    if (!FirstTime && !mountnottry) { /* KC_INITIALIZE ã§å‘¼ã³å‡ºã•ã‚Œã¦ã„ãªãã¦ã€
+					 æ—¢ã«ãƒã‚¦ãƒ³ãƒˆå‡¦ç†ã‚’è¡Œã£ã¦ã„ã‚‹å ´åˆ */
+      /* æ–‡æ³•è¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
       for (stp = kanjidicnames; stp ; stp = stp->next) {
 	if (stp->dictype == DIC_GRAMMAR) {
 	  if (stp->dicflag == DIC_MOUNTED) {
@@ -245,12 +241,12 @@ KanjiInit()
 	    else {
 	      stp->dicflag = DIC_MOUNTED;
 	      dicMesg("\312\270\313\241\274\255\275\361", stp->name);
-                      /* Ê¸Ë¡¼­½ñ */
+                      /* æ–‡æ³•è¾æ›¸ */
 	    }
 	  }
 	}
       }
-      /* ¥·¥¹¥Æ¥à¼­½ñ¤Î¥Ş¥¦¥ó¥È */
+      /* ã‚·ã‚¹ãƒ†ãƒ è¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
       for (stp = kanjidicnames ; stp ; stp = stp->next) {
         if (stp->dictype != DIC_GRAMMAR) {
           if (stp->dicflag == DIC_MOUNTED) {
@@ -272,21 +268,21 @@ KanjiInit()
 	      mountError(stp->name);
 	    }
 	    dicMesg("saveddicname\244\316\274\255\275\361", stp->name);
-                    /* saveddicname¤Î¼­½ñ */
+                    /* saveddicnameã®è¾æ›¸ */
 	  }
 	}
       }
     }
-    else { /* KC_INITIALIZE ¤«¤é¸Æ¤Ó½Ğ¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡£
-              ¤Ş¤¿¤Ï¡¢¥Ş¥¦¥ó¥È½èÍı¤ò¹Ô¤Ã¤Æ¤¤¤Ê¤¤¾ì¹ç */
+    else { /* KC_INITIALIZE ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã¦ã„ã‚‹å ´åˆã€‚
+              ã¾ãŸã¯ã€ãƒã‚¦ãƒ³ãƒˆå‡¦ç†ã‚’è¡Œã£ã¦ã„ãªã„å ´åˆ */
 #if defined(DEBUG)
       if (iroha_debug) {
-        fprintf(stderr, "¼­½ñ¤Ï.canna¤ÎÄÌ¤ê¤Ë¥Ş¥¦¥ó¥È¤¹¤ë\n");
+        fprintf(stderr, "è¾æ›¸ã¯.cannaã®é€šã‚Šã«ãƒã‚¦ãƒ³ãƒˆã™ã‚‹\n");
       }
 #endif
 
-      mountnottry = 0; /* ¥Ş¥¦¥ó¥È½èÍı¤ò¹Ô¤¦¤Î¤Ç mountnottry = 0 ¤Ë¤¹¤ë */
-      /* Ê¸Ë¡¼­½ñ¤Î¥Ş¥¦¥ó¥È */
+      mountnottry = 0; /* ãƒã‚¦ãƒ³ãƒˆå‡¦ç†ã‚’è¡Œã†ã®ã§ mountnottry = 0 ã«ã™ã‚‹ */
+      /* æ–‡æ³•è¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
       for (stp = kanjidicnames; stp ; stp = stp->next) {
 	if (stp->dictype == DIC_GRAMMAR) {
 	  if (RkwMountDic(defaultContext, stp->name,
@@ -297,48 +293,48 @@ KanjiInit()
 	  else {
 	    stp->dicflag = DIC_MOUNTED;
 	    dicMesg("\312\270\313\241\274\255\275\361", stp->name);
-                    /* Ê¸Ë¡¼­½ñ */
+                    /* æ–‡æ³•è¾æ›¸ */
 	  }
 	}
       }
 
-      /* ¥·¥¹¥Æ¥à¼­½ñ¤Î¥Ş¥¦¥ó¥È */
+      /* ã‚·ã‚¹ãƒ†ãƒ è¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
       for (stp = kanjidicnames ; stp ; stp = stp->next) {
         if (stp->dictype != DIC_GRAMMAR) {
           con = defaultContext;
           if (stp->dictype == DIC_PLAIN) {
             kodmesg = "\245\267\245\271\245\306\245\340\274\255\275\361";
-                      /* "¥·¥¹¥Æ¥à¼­½ñ"; */
+                      /* "ã‚·ã‚¹ãƒ†ãƒ è¾æ›¸"; */
           }
           else if (stp->dictype == DIC_USER) {
-            /* ¥æ¡¼¥¶¼­½ñ¤Î¥Ş¥¦¥ó¥È */    
+            /* ãƒ¦ãƒ¼ã‚¶è¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
            kodmesg = "\303\261\270\354\305\320\317\277\315\321\274\255\275\361";
-                     /* "Ã±¸ìÅĞÏ¿ÍÑ¼­½ñ"; */
+                     /* "å˜èªç™»éŒ²ç”¨è¾æ›¸"; */
           }
           else if (stp->dictype == DIC_RENGO) {
-            /* Ï¢¸ì¼­½ñ¤Î¥Ş¥¦¥ó¥È */
+            /* é€£èªè¾æ›¸ã®ãƒã‚¦ãƒ³ãƒˆ */
             RengoGakushu = stp;
             kodmesg = "\317\242\270\354\274\255\275\361";
-                      /* "Ï¢¸ì¼­½ñ"; */
+                      /* "é€£èªè¾æ›¸"; */
           }
           else if (stp->dictype == DIC_KATAKANA) {
             KatakanaGakushu = stp;
             kodmesg = "\274\253\306\260\305\320\317\277\315\321\274\255\275\361";
-                      /* "¼«Æ°ÅĞÏ¿ÍÑ¼­½ñ"; */
+                      /* "è‡ªå‹•ç™»éŒ²ç”¨è¾æ›¸"; */
           }
           else if (stp->dictype == DIC_HIRAGANA) {
             HiraganaGakushu = stp;
 #ifdef HIRAGANAAUTO
             kodmesg = "\274\253\306\260\305\320\317\277\315\321\274\255\275\361";
-                      /* "¼«Æ°ÅĞÏ¿ÍÑ¼­½ñ"; */
+                      /* "è‡ªå‹•ç™»éŒ²ç”¨è¾æ›¸"; */
 #else
             kodmesg = "\317\242\270\354\274\255\275\361";
-                      /* "Ï¢¸ì¼­½ñ"; */
+                      /* "é€£èªè¾æ›¸"; */
 #endif
           }
           else if (stp->dictype == DIC_BUSHU) {
             kodmesg = "\311\364\274\363\274\255\275\361";
-                      /* "Éô¼ó¼­½ñ"; */
+                      /* "éƒ¨é¦–è¾æ›¸"; */
             con = defaultBushuContext;
           }
           if (RkwMountDic(con, stp->name,
@@ -351,12 +347,12 @@ KanjiInit()
                 || stp->dictype == DIC_HIRAGANA
 #endif
                ) {
-              /* ¼«Æ°ÅĞÏ¿¼­½ñ¤À¤Ã¤¿¤é¡¢¼«Æ°ÅĞÏ¿¤·¤Ê¤¤ */
+              /* è‡ªå‹•ç™»éŒ²è¾æ›¸ã ã£ãŸã‚‰ã€è‡ªå‹•ç™»éŒ²ã—ãªã„ */
               auto_define = 0;
             }
             if (stp->dictype != DIC_USER || strcmp(stp->name, "user")) {
-              /* ¥æ¡¼¥¶¼­½ñ¤Ç user ¤È¤¤¤¦Ì¾Á°¤Î¾ì¹ç¤Ï¥¨¥é¡¼É½¼¨ *
-               * ¤·¤Ê¤¤¤è¤¦¤Ë¤¹¤ë¤¿¤á                           */
+              /* ãƒ¦ãƒ¼ã‚¶è¾æ›¸ã§ user ã¨ã„ã†åå‰ã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼è¡¨ç¤º *
+               * ã—ãªã„ã‚ˆã†ã«ã™ã‚‹ãŸã‚                           */
               int majv, minv;
 
               RkwGetServerVersion(&majv, &minv);
@@ -368,8 +364,8 @@ KanjiInit()
                            strcmp(stp->name, "hiragana"))
 #endif
                   )) {
-                /* V3.3 °ÊÁ°¤Ç¡¢¥«¥¿¥«¥Ê¼­½ñ¤¬ katakana¡¢¤Ò¤é¤¬¤Ê¼­½ñ¤¬
-                   hiragana ¤Î¾ì¹ç¤Ï¥¨¥é¡¼¤Ë¤·¤Ê¤¤¤¿¤á                  */
+                /* V3.3 ä»¥å‰ã§ã€ã‚«ã‚¿ã‚«ãƒŠè¾æ›¸ãŒ katakanaã€ã²ã‚‰ãŒãªè¾æ›¸ãŒ
+                   hiragana ã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã«ã—ãªã„ãŸã‚                  */
                 extern char *kataautodic;
 #ifdef HIRAGANAAUTO
                 extern char *hiraautodic;
@@ -413,16 +409,16 @@ KanjiInit()
   return ret;
 }
 
+
 /*
- * ¤«¤Ê´Á»úÊÑ´¹¤Î¤¿¤á¤Î¸å½èÍı
+ * ã‹ãªæ¼¢å­—å¤‰æ›ã®ãŸã‚ã®å¾Œå‡¦ç†
  *
- * ¡¦¥·¥¹¥Æ¥à¼­½ñ¡¢Éô¼óÍÑ¼­½ñ¡¢¥æ¡¼¥¶¼­½ñ¤ò¥¢¥ó¥Ş¥¦¥ó¥È¤¹¤ë
- * ¡¦RkwFinalize¤ò¸Æ¤Ö
+ * ãƒ»ã‚·ã‚¹ãƒ†ãƒ è¾æ›¸ã€éƒ¨é¦–ç”¨è¾æ›¸ã€ãƒ¦ãƒ¼ã‚¶è¾æ›¸ã‚’ã‚¢ãƒ³ãƒã‚¦ãƒ³ãƒˆã™ã‚‹
+ * ãƒ»RkwFinalizeã‚’å‘¼ã¶
  *
- * °ú¤­¿ô	¤Ê¤·
- * Ìá¤êÃÍ	¤Ê¤·
+ * å¼•ãæ•°	ãªã—
  */
-KanjiFin()
+int KanjiFin()
 {
   struct dicname *dp, *np;
   int con;
@@ -448,7 +444,7 @@ KanjiFin()
 	  "\245\310\244\307\244\255\244\336\244\273\244\363\244\307\244\267"
 	  "\244\277", dp->name);
 #else
-	sprintf(buf, "%s ¤ò¥¢¥ó¥Ş¥¦¥ó¥È¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿¡£", dp->name);
+	sprintf(buf, "%s ã‚’ã‚¢ãƒ³ãƒã‚¦ãƒ³ãƒˆã§ãã¾ã›ã‚“ã§ã—ãŸã€‚", dp->name);
 #endif
 	  addWarningMesg(buf);
 #ifdef USE_MALLOC_FOR_BIG_ARRAY
@@ -463,19 +459,18 @@ KanjiFin()
     dp = np;
   }
   kanjidicnames = (struct dicname *)0;
-	  
+
   defaultContext = -1;
   defaultBushuContext = -1;
   mountnottry = 1;
-  /* Ï¢Ê¸Àá¥é¥¤¥Ö¥é¥ê¤ò½ªÎ»¤µ¤»¤ë */
+  /* é€£æ–‡ç¯€ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’çµ‚äº†ã•ã›ã‚‹ */
   RkwFinalize();
 
   return(0);
 }
 
-static tanContext
-newTanContext(majo, mino)
-int majo, mino;
+
+static tanContext newTanContext(int majo, int mino)
 {
   tanContext tan;
 
@@ -492,9 +487,8 @@ int majo, mino;
   return tan;
 }
 
-void
-freeTanContext(tan)
-tanContext tan;
+
+void freeTanContext( tanContext tan )
 {
   if (tan->kanji) free((char *)tan->kanji);
   if (tan->yomi) free((char *)tan->yomi);
@@ -504,10 +498,8 @@ tanContext tan;
   free((char *)tan);
 }
 
-static wchar_t *
-DUpwstr(w, l)
-wchar_t *w;
-int l;
+
+static wchar_t * DUpwstr( wchar_t *w, int l )
 {
   wchar_t *res;
 
@@ -519,10 +511,8 @@ int l;
   return res;
 }
 
-static BYTE *
-DUpattr(a, l)
-BYTE *a;
-int l;
+
+static BYTE * DUpattr( BYTE *a, int l )
 {
   BYTE *res;
 
@@ -533,10 +523,8 @@ int l;
   return res;
 }
 
-static void
-copyYomiinfo2Tan(yc, tan)
-yomiContext yc;
-tanContext tan;
+
+static void copyYomiinfo2Tan( yomiContext yc, tanContext tan )
 {
   tan->next = yc->next;
   tan->prevMode = yc->prevMode;
@@ -551,12 +539,10 @@ tanContext tan;
   tan->henkanInhibition = yc->henkanInhibition;
 }
 
-static void
-copyTaninfo2Yomi(tan, yc)
-tanContext tan;
-yomiContext yc;
+
+static void copyTaninfo2Yomi( tanContext tan, yomiContext yc)
 {
-  /* next ¤È prevMode ¤Ï´û¤ËÀßÄêºÑ¤ß */
+  /* next ã¨ prevMode ã¯æ—¢ã«è¨­å®šæ¸ˆã¿ */
   yc->generalFlags = tan->generalFlags;
   yc->savedFlags = tan->savedFlags;
 
@@ -574,16 +560,14 @@ extern void setMode pro((uiContext, tanContext, int));
 extern void trimYomi pro((uiContext, int, int, int, int));
 
 /*
- * ³Ø½¬¤ò²ÄÇ½¤Ë¤¹¤ë¤¿¤átanContext¤òyomiContext¤Ë¤¹¤ë¡£
- * ¼ºÇÔ¤·¤¿¤étanContext¤Î¤Ş¤Ş¤Ë¤·¤Æ¤ª¤¯¡£
- * ËÜÅö¤ÏtanContext¤ÏÇÑ»ß¤¹¤Ù¤­¤À¤¬¡¢¤È¤ê¤¢¤¨¤ºquick hack¡£
- * DO_MERGE¤Ë¤âÁ´¤¯ÂĞ±ş¤·¤Æ¤¤¤Ê¤¤¡£
+ * å­¦ç¿’ã‚’å¯èƒ½ã«ã™ã‚‹ãŸã‚tanContextã‚’yomiContextã«ã™ã‚‹ã€‚
+ * å¤±æ•—ã—ãŸã‚‰tanContextã®ã¾ã¾ã«ã—ã¦ãŠãã€‚
+ * æœ¬å½“ã¯tanContextã¯å»ƒæ­¢ã™ã¹ãã ãŒã€ã¨ã‚Šã‚ãˆãšquick hackã€‚
+ * DO_MERGEã«ã‚‚å…¨ãå¯¾å¿œã—ã¦ã„ãªã„ã€‚
  */
-static void
-tanbunToYomiAll(d, st, et)
-uiContext d;
-tanContext st;
-tanContext et;
+static void tanbunToYomiAll( uiContext d,
+                             tanContext st,
+                             tanContext et )
 {
   tanContext tan;
   for (tan = st; tan != et; tan = tan->right) {
@@ -598,14 +582,11 @@ tanContext et;
   }
 }
 
-/*
-  Á´Ê¸Àá¤ò tanContext ¤ËÊÑ´¹¤¹¤ë
- */
 
-int
-doTanConvertTb(d, yc)
-uiContext d;
-yomiContext yc;
+/*
+  å…¨æ–‡ç¯€ã‚’ tanContext ã«å¤‰æ›ã™ã‚‹
+ */
+int doTanConvertTb( uiContext d, yomiContext yc )
 {
   int cur = yc->curbun, i, len, ylen = 0, rlen = 0, ret = 0;
   int scuryomi, ecuryomi, scurroma, ecurroma;
@@ -624,10 +605,10 @@ yomiContext yc;
   yc->kouhoCount = 0;
   scuryomi = ecuryomi = scurroma = ecurroma = 0;
 
-/*  jrKanjiError = "¥á¥â¥ê¤¬Â­¤ê¤Ş¤»¤ó"; */
+/*  jrKanjiError = "ãƒ¡ãƒ¢ãƒªãŒè¶³ã‚Šã¾ã›ã‚“"; */
   jrKanjiError = "malloc (doTanBubunMuhenkan) \244\307\244\255\244\336\244\273"
 	"\244\363\244\307\244\267\244\277\241\243";
-                 /* malloc (doTanBubunMuhenkan) ¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿ */ 
+                 /* malloc (doTanBubunMuhenkan) ã§ãã¾ã›ã‚“ã§ã—ãŸ */
   for (i = 0 ; i < yc->nbunsetsu ; i++) {
     tan = newTanContext(yc->majorMode, CANNA_MODE_TankouhoMode);
     if (tan) {
@@ -653,13 +634,13 @@ yomiContext yc;
 		  }
 		}
 		ylen += len;
-		len = r - yc->rAttr - rlen; /* ¥í¡¼¥Ş»ú¤ÎÄ¹¤µ */
+		len = r - yc->rAttr - rlen; /* ãƒ­ãƒ¼ãƒå­—ã®é•·ã• */
 		tan->roma = DUpwstr(yc->romaji_buffer + rlen, len);
 		if (tan->roma) {
 		  tan->rAttr = DUpattr(yc->rAttr + rlen, len);
 		  if (tan->rAttr) {
 		    rlen += len;
-		    /* ¤È¤ê¤¢¤¨¤ºº¸¤Ë¤Ä¤Ê¤²¤ë */
+		    /* ã¨ã‚Šã‚ãˆãšå·¦ã«ã¤ãªã’ã‚‹ */
 		    tan->right = (tanContext)yc;
 		    tan->left = yc->left;
 		    if (yc->left) {
@@ -691,7 +672,7 @@ yomiContext yc;
       }
       freeTanContext(tan);
     }
-    /* ¥¨¥é¡¼½èÍı¤ò¤¹¤ë */
+    /* ã‚¨ãƒ©ãƒ¼å‡¦ç†ã‚’ã™ã‚‹ */
   procerror:
     while ((tan = yc->left) != prevLeft) {
       yc->left = tan->left;
@@ -705,11 +686,11 @@ yomiContext yc;
     int rpos;
     yomiContext lyc = dupYomiContext(yc);
 
-    if (!lyc) { /* ¥¨¥é¡¼½èÍı¤ò¤¹¤ë */
+    if (!lyc) { /* ã‚¨ãƒ©ãƒ¼å‡¦ç†ã‚’ã™ã‚‹ */
       goto procerror;
     }
 
-    if (yc->right) { /* Ãà¼¡¤Î¾ì¹ç¤Ê¤¤¤Ï¤º¤À¤¬Ç°¤Î¤¿¤á */
+    if (yc->right) { /* é€æ¬¡ã®å ´åˆãªã„ã¯ãšã ãŒå¿µã®ãŸã‚ */
       yc->right->left = (tanContext)lyc;
     }
     lyc->right = yc->right;
@@ -730,7 +711,7 @@ yomiContext yc;
     jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\316"
 	"\275\252\316\273\244\313\274\272\307\324\244\267\244\336\244\267"
 	"\244\277";
-                   /* ¤«¤Ê´Á»úÊÑ´¹¤Î½ªÎ»¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* ã‹ãªæ¼¢å­—å¤‰æ›ã®çµ‚äº†ã«å¤±æ•—ã—ã¾ã—ãŸ */
     if (errno == EPIPE) {
       jrKanjiPipeError();
     }
@@ -741,7 +722,7 @@ yomiContext yc;
   makeKanjiStatusReturn(d, (yomiContext)curtan);
 
   et = yc->right;
-  /* yc ¤ò¥ê¥ó¥¯¤«¤éÈ´¤¯ */
+  /* yc ã‚’ãƒªãƒ³ã‚¯ã‹ã‚‰æŠœã */
   if (yc->left) {
     yc->left->right = yc->right;
   }
@@ -760,10 +741,9 @@ yomiContext yc;
   return ret;
 }
 
+
 static int
-doTanBubunMuhenkan(d, yc)
-uiContext d;
-yomiContext yc;
+doTanBubunMuhenkan( uiContext d, yomiContext yc )
 {
   int cur = yc->curbun, i, len, ylen = 0, rlen = 0, ret = 0;
   int scuryomi, ecuryomi, scurroma, ecurroma;
@@ -781,10 +761,10 @@ yomiContext yc;
   yc->kouhoCount = 0;
   scuryomi = ecuryomi = scurroma = ecurroma = 0;
 
-/*  jrKanjiError = "¥á¥â¥ê¤¬Â­¤ê¤Ş¤»¤ó"; */
+/*  jrKanjiError = "ãƒ¡ãƒ¢ãƒªãŒè¶³ã‚Šã¾ã›ã‚“"; */
   jrKanjiError = "malloc (doTanBubunMuhenkan) \244\307\244\255\244\336\244\273"
 	"\244\363\244\307\244\267\244\277\241\243";
-                 /* malloc (doTanBubunMuhenkan) ¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿ */ 
+                 /* malloc (doTanBubunMuhenkan) ã§ãã¾ã›ã‚“ã§ã—ãŸ */
   for (i = 0 ; i < yc->nbunsetsu ; i++) {
     tan = (tanContext)0;
     if (i == cur ||
@@ -814,7 +794,7 @@ yomiContext yc;
 		  ecuryomi = ylen + len;
 		}
 		ylen += len;
-		len = r - yc->rAttr - rlen; /* ¥í¡¼¥Ş»ú¤ÎÄ¹¤µ */
+		len = r - yc->rAttr - rlen; /* ãƒ­ãƒ¼ãƒå­—ã®é•·ã• */
 		if (!tan ||
 		    (tan->roma = DUpwstr(yc->romaji_buffer + rlen, len))) {
 		  if (!tan || (tan->rAttr = DUpattr(yc->rAttr + rlen, len))) {
@@ -825,7 +805,7 @@ yomiContext yc;
 		    rlen += len;
 		    if (tan) {
 		      if (i != cur) {
-			/* ¤È¤ê¤¢¤¨¤ºº¸¤Ë¤Ä¤Ê¤²¤ë */
+			/* ã¨ã‚Šã‚ãˆãšå·¦ã«ã¤ãªã’ã‚‹ */
 			tan->right = (tanContext)yc;
 			tan->left = yc->left;
 			if (yc->left) {
@@ -865,7 +845,7 @@ yomiContext yc;
       }
       if (tan) freeTanContext(tan);
     }
-    /* ¥¨¥é¡¼½èÍı¤ò¤¹¤ë */
+    /* ã‚¨ãƒ©ãƒ¼å‡¦ç†ã‚’ã™ã‚‹ */
     while ((tan = yc->left) != prevLeft) {
       yc->left = tan->left;
       freeTanContext(tan);
@@ -878,7 +858,7 @@ yomiContext yc;
     int rpos;
     yomiContext lyc = dupYomiContext(yc);
 
-    if (!lyc) { /* ¥¨¥é¡¼½èÍı¤ò¤¹¤ë */
+    if (!lyc) { /* ã‚¨ãƒ©ãƒ¼å‡¦ç†ã‚’ã™ã‚‹ */
       while ((tan = yc->left) != prevLeft) {
 	yc->left = tan->left;
 	freeTanContext(tan);
@@ -887,7 +867,7 @@ yomiContext yc;
       goto return_ret;
     }
 
-    if (yc->right) { /* ¤Ê¤¤¤Ï¤º */
+    if (yc->right) { /* ãªã„ã¯ãš */
       yc->right->left = (tanContext)lyc;
     }
     lyc->right = yc->right;
@@ -903,14 +883,14 @@ yomiContext yc;
     lyc->cStartp = lyc->cRStartp = lyc->ys = lyc->ye = 0;
   }
 
-  if (cur + 1 < yc->nbunsetsu) { /* yc ¤¬ºÇ¸å¤¸¤ã¤Ê¤¤¾ì¹ç */
+  if (cur + 1 < yc->nbunsetsu) { /* yc ãŒæœ€å¾Œã˜ã‚ƒãªã„å ´åˆ */
     int n = yc->nbunsetsu - cur - 1;
     tan = yc->left;
     tan->right = yc->right;
     if (yc->right) {
       yc->right->left = tan;
     }
-    for (i = 1 ; i < n ; i++) { /* yomi ¤Î right ¤ËÍè¤ë¤Ù¤­ tan ¤òÆÀ¤¿¤¤ */
+    for (i = 1 ; i < n ; i++) { /* yomi ã® right ã«æ¥ã‚‹ã¹ã tan ã‚’å¾—ãŸã„ */
       tan = tan->left;
     }
     if (tan->left) {
@@ -925,7 +905,7 @@ yomiContext yc;
     jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\316"
 	"\275\252\316\273\244\313\274\272\307\324\244\267\244\336\244\267"
 	"\244\277";
-                   /* ¤«¤Ê´Á»úÊÑ´¹¤Î½ªÎ»¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* ã‹ãªæ¼¢å­—å¤‰æ›ã®çµ‚äº†ã«å¤±æ•—ã—ã¾ã—ãŸ */
     if (errno == EPIPE) {
       jrKanjiPipeError();
     }
@@ -937,7 +917,7 @@ yomiContext yc;
   yc->cStartp = yc->kCurs = yc->kRStartp =
     yc->ys = yc->ye = 0;
   yc->status &= CHIKUJI_NULL_STATUS;
-  /* ¤Ê¤ó¤ÈÃà¼¡¤Ç¤Ê¤¯¤Ê¤ë */
+  /* ãªã‚“ã¨é€æ¬¡ã§ãªããªã‚‹ */
   if (chikujip(yc)) {
     yc->generalFlags &= ~CANNA_YOMI_CHIKUJI_MODE;
     yc->generalFlags |= CANNA_YOMI_BASE_CHIKUJI;
@@ -946,10 +926,10 @@ yomiContext yc;
   d->current_mode = yc->curMode = &yomi_mode;
   yc->minorMode = getBaseMode(yc);
 
-  /* Á´ÉôÌµÊÑ´¹¤Ë¤¹¤ë */
+  /* å…¨éƒ¨ç„¡å¤‰æ›ã«ã™ã‚‹ */
   yc->nbunsetsu = 0;
 
-  /* Ã±¸õÊä¾õÂÖ¤«¤éÆÉ¤ß¤ËÌá¤ë¤È¤­¤Ë¤ÏÌµ¾ò·ï¤Ëmark¤òÀèÆ¬¤ËÌá¤¹ */
+  /* å˜å€™è£œçŠ¶æ…‹ã‹ã‚‰èª­ã¿ã«æˆ»ã‚‹ã¨ãã«ã¯ç„¡æ¡ä»¶ã«markã‚’å…ˆé ­ã«æˆ»ã™ */
   yc->cmark = yc->pmark = 0;
 
   abandonContext(d, yc);
@@ -974,31 +954,28 @@ extern void restoreChikujiIfBaseChikuji pro((yomiContext));
 extern void ReCheckStartp pro((yomiContext));
 extern void fitmarks pro((yomiContext));
 
-int YomiBubunKakutei pro((uiContext));
 
-int
-YomiBubunKakutei(d)
-uiContext d;
+int YomiBubunKakutei( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   tanContext tan;
   int len;
 
   if (yc->id != YOMI_CONTEXT) {
-    /* ¤¢¤êÆÀ¤Ê¤¤¤Î¤Ç¤Ï? */
+    /* ã‚ã‚Šå¾—ãªã„ã®ã§ã¯? */
   }
   else /* if (yc->left) */ {
-    /* yomiContext ¤Çºï½ü¤¹¤ëÉôÊ¬¤ò¤Ş¤º tanContext ¤ËÀÚ¤ê½Ğ¤·¡¢yc ¤Îº¸
-       Â¦¤ËÁŞÆş¤¹¤ë¡£¼¡¤Ë yc ¤Îº¸¤ò¤Ğ¤Ã¤µ¤ê¤È³ÎÄê¤¹¤ë¡£
-       Á´¤Æ¤³¤Î¥í¥¸¥Ã¥¯¤Ç¤ä¤í¤¦¤«¤·¤é¡£
+    /* yomiContext ã§å‰Šé™¤ã™ã‚‹éƒ¨åˆ†ã‚’ã¾ãš tanContext ã«åˆ‡ã‚Šå‡ºã—ã€yc ã®å·¦
+       å´ã«æŒ¿å…¥ã™ã‚‹ã€‚æ¬¡ã« yc ã®å·¦ã‚’ã°ã£ã•ã‚Šã¨ç¢ºå®šã™ã‚‹ã€‚
+       å…¨ã¦ã“ã®ãƒ­ã‚¸ãƒƒã‚¯ã§ã‚„ã‚ã†ã‹ã—ã‚‰ã€‚
        */
     tan = newTanContext(yc->majorMode, CANNA_MODE_TankouhoMode);
     if (tan) {
       copyYomiinfo2Tan(yc, tan);
-      /* ¤«¤Ê¤ò¥³¥Ô¡¼¤¹¤ë */
+      /* ã‹ãªã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
       tan->kanji = DUpwstr(yc->kana_buffer, yc->kCurs);
       if (tan->kanji) {
-	/* ¤³¤³¤âÆ±¤¸¤«¤Ê¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* ã“ã“ã‚‚åŒã˜ã‹ãªã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	tan->yomi = DUpwstr(yc->kana_buffer, yc->kCurs);
 	if (tan->yomi) {
 	  tan->kAttr = DUpattr(yc->kAttr, yc->kCurs);
@@ -1039,12 +1016,12 @@ uiContext d;
     }
   }
 #if 0
-  /* ËÜÍè¤³¤³¤Î½èÍı¤ò¤¤¤ì¤¿Êı¤¬¸úÎ¨¤¬ÎÉ¤¤¤È»×¤ï¤ì¤ë¤¬¡¢ÆÉ¤ß¤Î°ìÉô¤ò³Î
-  Äê¤µ¤»¤Æ¡¢¤·¤«¤â¥í¡¼¥Ş»ú¾ğÊó¤Ê¤É¤â¤¤¤ì¤ë¤Î¤ÏÌÌÅİ¤Ê¤Î¤Ç¤¢¤È¤Ş¤ï¤·¤È¤¹¤ë */
+  /* æœ¬æ¥ã“ã“ã®å‡¦ç†ã‚’ã„ã‚ŒãŸæ–¹ãŒåŠ¹ç‡ãŒè‰¯ã„ã¨æ€ã‚ã‚Œã‚‹ãŒã€èª­ã¿ã®ä¸€éƒ¨ã‚’ç¢º
+  å®šã•ã›ã¦ã€ã—ã‹ã‚‚ãƒ­ãƒ¼ãƒå­—æƒ…å ±ãªã©ã‚‚ã„ã‚Œã‚‹ã®ã¯é¢å€’ãªã®ã§ã‚ã¨ã¾ã‚ã—ã¨ã™ã‚‹ */
   else {
-    
-    /* ³ÎÄê¤µ¤»¤ë¡£
-       ¼¡¤Ë trim ¤¹¤ë*/
+
+    /* ç¢ºå®šã•ã›ã‚‹ã€‚
+       æ¬¡ã« trim ã™ã‚‹*/
   }
 #endif
 
@@ -1058,7 +1035,7 @@ uiContext d;
       yc = (yomiContext)0;
     }
     else {
-      /* Ì¤³ÎÄêÊ¸»úÎó¤¬Á´¤¯¤Ê¤¯¤Ê¤Ã¤¿¤Î¤Ê¤é¡¢¦Õ¥â¡¼¥É¤ËÁ«°Ü¤¹¤ë */
+      /* æœªç¢ºå®šæ–‡å­—åˆ—ãŒå…¨ããªããªã£ãŸã®ãªã‚‰ã€Ï†ãƒ¢ãƒ¼ãƒ‰ã«é·ç§»ã™ã‚‹ */
       restoreChikujiIfBaseChikuji(yc);
       d->current_mode = yc->curMode = yc->myEmptyMode;
       d->kanji_status_return->info |= KanjiEmptyInfo;
@@ -1079,14 +1056,12 @@ uiContext d;
   return len;
 }
 
-yomiContext
-newFilledYomiContext(next, prev)
-mode_context next;
-KanjiMode prev;
+
+yomiContext newFilledYomiContext( mode_context next, KanjiMode prev )
 {
   yomiContext yc;
 
-  yc = newYomiContext((wchar_t *)NULL, 0, /* ·ë²Ì¤Ï³ÊÇ¼¤·¤Ê¤¤ */
+  yc = newYomiContext((wchar_t *)NULL, 0, /* çµæœã¯æ ¼ç´ã—ãªã„ */
 		      CANNA_NOTHING_RESTRICTED,
 		      (int)!CANNA_YOMI_CHGMODE_INHIBITTED,
 		      (int)!CANNA_YOMI_END_IF_KAKUTEI,
@@ -1103,10 +1078,7 @@ KanjiMode prev;
 }
 
 #ifdef DO_MERGE
-static
-yomiContext
-mergeYomiContext(yc)
-yomiContext yc;
+static yomiContext mergeYomiContext( yomiContext yc )
 {
   yomiContext res, a, b;
 
@@ -1126,7 +1098,7 @@ yomiContext yc;
     if (res->right) {
       res->right->left = (tanContext)res;
     }
-    /* yc->context ¤Î close ¤Ï¤¤¤é¤Ê¤¤¤Î¤«¤Ê¤¢¡£1996.10.30 º£ */
+    /* yc->context ã® close ã¯ã„ã‚‰ãªã„ã®ã‹ãªã‚ã€‚1996.10.30 ä»Š */
     freeYomiContext(a);
   }
   return res;
@@ -1134,19 +1106,16 @@ yomiContext yc;
 #endif
 
 /*
-  tanContext ¤ò yomiContext ¤Ë¤·¤Æ¡¢ÆÉ¤ßÆşÎÏ¾õÂÖ¤Ë¤¹¤ë
+  tanContext ã‚’ yomiContext ã«ã—ã¦ã€èª­ã¿å…¥åŠ›çŠ¶æ…‹ã«ã™ã‚‹
 
-   0          ¼ºÇÔ(jrKanjiError¤¬ÀßÄê¤µ¤ì¤ë¡£¥¬¥¤¥É¥é¥¤¥ó¤ÏÉÔÄê¤Ç¤¢¤ë¡£)
-   otherwise  ¤¢¤¿¤é¤·¤¤ÆÉ¤ß¥³¥ó¥Æ¥­¥¹¥È¤¬ÊÖ¤ë
-   ´ğËÜÅª¤ËÉûºîÍÑ¤Ï¤Ê¤¤¡£
-   yc¤Ïkanji¤ò»ØÄê¤¹¤ì¤Ğtankouho_mode, »ØÄê¤·¤Ê¤±¤ì¤Ğyomi_mode¤Ë¤Ê¤ë¡£
+   0          å¤±æ•—(jrKanjiErrorãŒè¨­å®šã•ã‚Œã‚‹ã€‚ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã¯ä¸å®šã§ã‚ã‚‹ã€‚)
+   otherwise  ã‚ãŸã‚‰ã—ã„èª­ã¿ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆãŒè¿”ã‚‹
+   åŸºæœ¬çš„ã«å‰¯ä½œç”¨ã¯ãªã„ã€‚
+   ycã¯kanjiã‚’æŒ‡å®šã™ã‚Œã°tankouho_mode, æŒ‡å®šã—ãªã‘ã‚Œã°yomi_modeã«ãªã‚‹ã€‚
  */
 
 static yomiContext
-tanbunToYomi(d, tan, kanji)
-uiContext d;
-tanContext tan;
-wchar_t *kanji;
+tanbunToYomi( uiContext d, tanContext tan, wchar_t *kanji )
 {
   yomiContext yc;
 
@@ -1171,7 +1140,7 @@ wchar_t *kanji;
       yc->minorMode = yc->myMinorMode;
     }
 
-    if (chikujip(yc)) { /* Ãà¼¡¤Ë¤Ï¤·¤Ê¤¤ */
+    if (chikujip(yc)) { /* é€æ¬¡ã«ã¯ã—ãªã„ */
       yc->generalFlags &= ~CANNA_YOMI_CHIKUJI_MODE;
       yc->generalFlags |= CANNA_YOMI_BASE_CHIKUJI;
     }
@@ -1180,39 +1149,35 @@ wchar_t *kanji;
   }
   jrKanjiError = "\245\341\245\342\245\352\244\254\302\255\244\352\244\336"
 	"\244\273\244\363";
-                 /* ¥á¥â¥ê¤¬Â­¤ê¤Ş¤»¤ó */
+                 /* ãƒ¡ãƒ¢ãƒªãŒè¶³ã‚Šã¾ã›ã‚“ */
   return (yomiContext)0;
 }
 
 /*
- * tanbunToYomi¤Çºî¤é¤ì¤¿yc¤òÍ­¸ú¤Ë¤¹¤ë¡£
- * ¶ñÂÎÅª¤Ë¤Ï¡¢Ê¸Àá¥ê¥¹¥È¤ÎÆş¤ì´¹¤¨¡¢¥â¡¼¥ÉÁ«°Ü¡¢¸Å¤¤tanContext¤ÎÇË´ş
- * ¤ò¹Ô¤¦¡£Ê¸Àá¥ê¥¹¥È¤ÏtanbunToYomi¤Î»şÅÀ¤«¤éÊÑ¹¹¤µ¤ì¤Æ¤¤¤Æ¤Ï¤Ê¤é¤Ê¤¤¤¬¡¢
- * yc->curMode¤ÏÊÑ¹¹¤µ¤ì¤Æ¤¤¤Æ¤â¤è¤¤¡£
+ * tanbunToYomiã§ä½œã‚‰ã‚ŒãŸycã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚
+ * å…·ä½“çš„ã«ã¯ã€æ–‡ç¯€ãƒªã‚¹ãƒˆã®å…¥ã‚Œæ›ãˆã€ãƒ¢ãƒ¼ãƒ‰é·ç§»ã€å¤ã„tanContextã®ç ´æ£„
+ * ã‚’è¡Œã†ã€‚æ–‡ç¯€ãƒªã‚¹ãƒˆã¯tanbunToYomiã®æ™‚ç‚¹ã‹ã‚‰å¤‰æ›´ã•ã‚Œã¦ã„ã¦ã¯ãªã‚‰ãªã„ãŒã€
+ * yc->curModeã¯å¤‰æ›´ã•ã‚Œã¦ã„ã¦ã‚‚ã‚ˆã„ã€‚
  */
 static void
-tanbunCommitYomi(d, tan, yc)
-uiContext d;
-tanContext tan;
-yomiContext yc;
+tanbunCommitYomi( uiContext d, tanContext tan, yomiContext yc )
 {
   if (yc->left)
     yc->left->right = (tanContext)yc;
   if (yc->right)
     yc->right->left = (tanContext)yc;
-#ifdef DO_MERGE /* ÄêµÁ¤·¤Æ¤¤¤Ê¤¤ */
+#ifdef DO_MERGE /* å®šç¾©ã—ã¦ã„ãªã„ */
   yc = mergeYomiContext(yc);
 #endif
   if (d && d->modec == (mode_context)tan) {
-    d->current_mode = yc->curMode; 
+    d->current_mode = yc->curMode;
     d->modec = (mode_context)yc;
   }
   freeTanContext(tan);
 }
 
-static int
-TbBubunMuhenkan(d)
-uiContext d;
+
+static int TbBubunMuhenkan( uiContext d )
 {
   tanContext tan = (tanContext)d->modec;
   yomiContext yc;
@@ -1228,15 +1193,12 @@ uiContext d;
   return NothingChangedWithBeep(d);
 }
 
-/*
-  TanBubunMuhenkan -- ÊÑ´¹Ãæ¤ÎÊ¸»úÎó¤òÊ¸ÀáËè¤ËÊ¬³ä¤¹¤ë¡£
 
-    ¤½¤Îºİ¡¢ÆÉ¤ß¤ä¥í¡¼¥Ş»ú¤âÊ¬³ä¤¹¤ë
+/**
+ * å¤‰æ›ä¸­ã®æ–‡å­—åˆ—ã‚’æ–‡ç¯€æ¯ã«åˆ†å‰²ã™ã‚‹ã€‚
+    ãã®éš›ã€èª­ã¿ã‚„ãƒ­ãƒ¼ãƒå­—ã‚‚åˆ†å‰²ã™ã‚‹
  */
-
-int
-TanBubunMuhenkan(d)
-uiContext d;
+int TanBubunMuhenkan( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1257,9 +1219,8 @@ uiContext d;
   return 0;
 }
 
-int
-prepareHenkanMode(d)
-uiContext d;
+
+int prepareHenkanMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1271,45 +1232,41 @@ uiContext d;
   return 1;
 }
 
-doHenkan(d, len, kanji)
-uiContext d;
-int len;
-wchar_t *kanji;
+
+int doHenkan( uiContext d, int len, wchar_t *kanji )
 {
-  /* ¤è¤ß¤ò´Á»ú¤ËÊÑ´¹¤¹¤ë */
+  /* ã‚ˆã¿ã‚’æ¼¢å­—ã«å¤‰æ›ã™ã‚‹ */
   if(doYomiHenkan(d, len, kanji, (yomiContext)d->modec) == NG) {
     return -1;
   }
 
-  /* kanji_status_return¤òºî¤ë */
+  /* kanji_status_returnã‚’ä½œã‚‹ */
   makeKanjiStatusReturn(d, (yomiContext)d->modec);
   return 0;
 }
 
 
-/*
- * ¤«¤Ê´Á»úÊÑ´¹¤ò¹Ô¤¦
- * ¡¦yc->kana_buffer¤ÎÆÉ¤ß¤Ç¡¢RkwBgnBun¤ò¸Æ¤ó¤Ç¤«¤Ê´Á»úÊÑ´¹¤ò³«»Ï¤¹¤ë
- * ¡¦d->genbuf,contextCache¤ò»È¤¦Â¾¡¢jrKanjiError¤¬ÀßÄê¤µ¤ì¤ë
- * ¡¦¡Ö¤«¤Ê´Á»úÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡×¤Î¾ì¹ç¤À¤±¥¬¥¤¥É¥é¥¤¥ó¤âÀ¸À®¤µ¤ì¤ë¤¬¡¢
- * ¡¡¥¬¥¤¥É¥é¥¤¥ó¤ÏºÆÀßÄê¤·¤Æ¤âÎÉ¤¤¤Î¤Ç¡¢Ã±¤ËÌ¤ÀßÄê¤È¤·¤Æ°·¤¨¤ĞÎÉ¤¤
- * ¡¦¤½¤ì°Ê³°¤ËÉûºîÍÑ¤Ï¤Ê¤¤¤Ï¤º
+/**
+ * ã‹ãªæ¼¢å­—å¤‰æ›ã‚’è¡Œã†
+ * ãƒ»yc->kana_bufferã®èª­ã¿ã§ã€RkwBgnBunã‚’å‘¼ã‚“ã§ã‹ãªæ¼¢å­—å¤‰æ›ã‚’é–‹å§‹ã™ã‚‹
+ * ãƒ»d->genbuf,contextCacheã‚’ä½¿ã†ä»–ã€jrKanjiErrorãŒè¨­å®šã•ã‚Œã‚‹
+ * ãƒ»ã€Œã‹ãªæ¼¢å­—å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸã€ã®å ´åˆã ã‘ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã‚‚ç”Ÿæˆã•ã‚Œã‚‹ãŒã€
+ * ã€€ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã¯å†è¨­å®šã—ã¦ã‚‚è‰¯ã„ã®ã§ã€å˜ã«æœªè¨­å®šã¨ã—ã¦æ‰±ãˆã°è‰¯ã„
+ * ãƒ»ãã‚Œä»¥å¤–ã«å‰¯ä½œç”¨ã¯ãªã„ã¯ãš
  *
- * °ú¤­¿ô	uiContext
- *		len       len ¤¬»ØÄê¤µ¤ì¤Æ¤¤¤¿¤éÊ¸ÀáÄ¹¤ò¤½¤ÎÄ¹¤µ¤Ë¤¹¤ë¡£
- *		kanji	  kanji ¤¬»ØÄê¤µ¤ì¤Æ¤¤¤¿¤éÃ±Ê¸ÀáÊÑ´¹¤·¤Æ¡¢
- *			  ¥«¥ì¥ó¥È¸õÊä¤ò kanji ¤Ç¼¨¤µ¤ì¤¿¸õÊä¤Ë¹ç¤ï¤»¤ë¡£
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * @param d      uiContext
+ * @param len    len ãŒæŒ‡å®šã•ã‚Œã¦ã„ãŸã‚‰æ–‡ç¯€é•·ã‚’ãã®é•·ã•ã«ã™ã‚‹ã€‚
+ * @param kanji  kanji ãŒæŒ‡å®šã•ã‚Œã¦ã„ãŸã‚‰å˜æ–‡ç¯€å¤‰æ›ã—ã¦ã€
+ *			  ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã‚’ kanji ã§ç¤ºã•ã‚ŒãŸå€™è£œã«åˆã‚ã›ã‚‹ã€‚
+ * @return æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-static
-doYomiHenkan(d, len, kanji, yc)
-uiContext	d;
-int len;
-wchar_t *kanji;
-yomiContext yc;
+static int
+doYomiHenkan( uiContext	d,
+              int len,
+              wchar_t *kanji,
+              yomiContext yc )
 {
-  unsigned int mode;
-  extern defaultContext;
+    unsigned int mode;
 
 #if defined(DEBUG)
   if (iroha_debug) {
@@ -1318,7 +1275,7 @@ yomiContext yc;
   }
 #endif
 
-  /* Ï¢Ê¸ÀáÊÑ´¹¤ò³«»Ï¤¹¤ë *//* ¼­½ñ¤Ë¤Ê¤¤ ¥«¥¿¥«¥Ê ¤Ò¤é¤¬¤Ê ¤òÉÕ²Ã¤¹¤ë */
+  /* é€£æ–‡ç¯€å¤‰æ›ã‚’é–‹å§‹ã™ã‚‹ *//* è¾æ›¸ã«ãªã„ ã‚«ã‚¿ã‚«ãƒŠ ã²ã‚‰ãŒãª ã‚’ä»˜åŠ ã™ã‚‹ */
   mode = 0;
   mode = (RK_XFER<<RK_XFERBITS) | RK_KFER;
   if (kanji) {
@@ -1327,7 +1284,7 @@ yomiContext yc;
 			  RK_MAKE_EISUUJI |
 			  RK_MAKE_KANSUUJI) << (2 * RK_XFERBITS);
   }
-  
+
   if (confirmContext(d, yc) < 0) {
     return NG;
   }
@@ -1345,7 +1302,7 @@ yomiContext yc;
       yc->nbunsetsu = 0;
       return kanakanError(d);
     }
-    
+
     if (len > 0 && (yc->nbunsetsu = RkwResize(yc->context, len)) == -1) {
       RkwEndBun(yc->context, 0);
       yc->nbunsetsu = 0;
@@ -1353,7 +1310,7 @@ yomiContext yc;
     }
 
     if (kanji) {
-      /* kanji ¤¬»ØÄê¤µ¤ì¤Æ¤¤¤¿¤é¡¢Æ±¤¸¸õÊä¤¬¤Ç¤ë¤Ş¤Ç RkwNext ¤ò¤¹¤ë */
+      /* kanji ãŒæŒ‡å®šã•ã‚Œã¦ã„ãŸã‚‰ã€åŒã˜å€™è£œãŒã§ã‚‹ã¾ã§ RkwNext ã‚’ã™ã‚‹ */
       int i, n;
 
       n = RkwGetKanjiList(yc->context, d->genbuf, ROMEBUFSIZE);
@@ -1382,19 +1339,18 @@ yomiContext yc;
   }
 #endif /* MEASURE_TIME */
 
-  /* ¥«¥ì¥ó¥ÈÊ¸Àá¤ÏÀèÆ¬Ê¸Àá */
+  /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã¯å…ˆé ­æ–‡ç¯€ */
   yc->curbun = 0;
 
   return(0);
 }
 
-int
-TanNop(d)
-uiContext	d;
+
+int TanNop( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
-  /* currentModeInfo ¤Ç¥â¡¼¥É¾ğÊó¤¬É¬¤ºÊÖ¤ë¤è¤¦¤Ë¥À¥ß¡¼¤Î¥â¡¼¥É¤òÆş¤ì¤Æ¤ª¤¯ */
+  /* currentModeInfo ã§ãƒ¢ãƒ¼ãƒ‰æƒ…å ±ãŒå¿…ãšè¿”ã‚‹ã‚ˆã†ã«ãƒ€ãƒŸãƒ¼ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å…¥ã‚Œã¦ãŠã */
   d->majorMode = d->minorMode = CANNA_MODE_AlphaMode;
   currentModeInfo(d);
 
@@ -1402,33 +1358,29 @@ uiContext	d;
   return 0;
 }
 
-static int
-doGoTo(d, yc)
-uiContext d;
-yomiContext yc;
+
+static int doGoTo( uiContext d, yomiContext yc )
 {
   if (RkwGoTo(yc->context, yc->curbun) == -1) {
     return makeRkError(d, "\312\270\300\341\244\316\260\334\306\260\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                          /* Ê¸Àá¤Î°ÜÆ°¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                          /* æ–‡ç¯€ã®ç§»å‹•ã«å¤±æ•—ã—ã¾ã—ãŸ */
   }
   yc->status |= CHIKUJI_OVERWRAP;
 
-  /* kanji_status_return¤òºî¤ë */
+  /* kanji_status_returnã‚’ä½œã‚‹ */
   makeKanjiStatusReturn(d, yc);
   return 0;
 }
 
-/*
- * ¼¡Ê¸Àá¤Ë°ÜÆ°¤¹¤ë
- *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
- */
 
-int
-TanForwardBunsetsu(d)
-uiContext	d;
+/**
+ * æ¬¡æ–‡ç¯€ã«ç§»å‹•ã™ã‚‹
+ *
+ * @param d  uiContext
+ * @return æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
+ */
+int TanForwardBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1440,7 +1392,7 @@ uiContext	d;
   if (yc->curbun + 1 < yc->nbunsetsu) {
     yc->curbun++;
   }
-  else if (yc->cStartp && yc->cStartp < yc->kEndp) { /* Ãà¼¡¤ÎÆÉ¤ß¤¬±¦¤Ë¤¢¤ë */
+  else if (yc->cStartp && yc->cStartp < yc->kEndp) { /* é€æ¬¡ã®èª­ã¿ãŒå³ã«ã‚ã‚‹ */
     yc->kRStartp = yc->kCurs = yc->cStartp;
     yc->rStartp = yc->rCurs = yc->cRStartp;
     moveToChikujiYomiMode(d);
@@ -1450,7 +1402,7 @@ uiContext	d;
   }
   else if (cannaconf.kakuteiIfEndOfBunsetsu) {
     d->nbytes = TanKakutei(d);
-    d->kanji_status_return->length 
+    d->kanji_status_return->length
      = d->kanji_status_return->revPos
        = d->kanji_status_return->revLen = 0;
     return d->nbytes;
@@ -1465,21 +1417,20 @@ uiContext	d;
     yc->curbun = 0;
   }
 
-  /* ¥«¥ì¥ó¥ÈÊ¸Àá¤ò£±¤Ä±¦¤Ë°Ü¤¹ */
-  /* ¥«¥ì¥ó¥ÈÊ¸Àá¤¬ºÇ±¦¤À¤Ã¤¿¤é¡¢
-     ºÇº¸¤ò¥«¥ì¥ó¥ÈÊ¸Àá¤Ë¤¹¤ë   */
+  /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‚’ï¼‘ã¤å³ã«ç§»ã™ */
+  /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ãŒæœ€å³ã ã£ãŸã‚‰ã€
+     æœ€å·¦ã‚’ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã«ã™ã‚‹   */
   return doGoTo(d, yc);
 }
 
+
 /*
- * Á°Ê¸Àá¤Ë°ÜÆ°¤¹¤ë
+ * å‰æ–‡ç¯€ã«ç§»å‹•ã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-int
-TanBackwardBunsetsu(d)
-uiContext	d;
+int TanBackwardBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1500,7 +1451,7 @@ uiContext	d;
   else if (yc->right) {
     return TbEndOfLine(d);
   }
-  else if (yc->cStartp && yc->cStartp < yc->kEndp) { /* Ãà¼¡¤ÎÆÉ¤ß¤¬±¦¤Ë¤¢¤ë */
+  else if (yc->cStartp && yc->cStartp < yc->kEndp) { /* é€æ¬¡ã®èª­ã¿ãŒå³ã«ã‚ã‚‹ */
     yc->kCurs = yc->kRStartp = yc->kEndp;
     yc->rCurs = yc->rStartp = yc->rEndp;
     moveToChikujiYomiMode(d);
@@ -1512,17 +1463,15 @@ uiContext	d;
   return doGoTo(d, yc);
 }
 
+
 /*
- * ¼¡¸õÊä¤ò¥«¥ì¥ó¥È¸õÊä¤Ë¤¹¤ë
+ * æ¬¡å€™è£œã‚’ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã«ã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
 
-static
-tanNextKouho(d, yc)
-uiContext	d;
-yomiContext   yc;
+static int tanNextKouho( uiContext	d, yomiContext   yc )
 {
 #ifdef MEASURE_TIME
   struct tms timebuf;
@@ -1531,12 +1480,12 @@ yomiContext   yc;
   proctime = times(&timebuf);
 #endif /* MEASURE_TIME */
 
-  /* ¼¡¤Î¸õÊä¤ò¥«¥ì¥ó¥È¸õÊä¤È¤¹¤ë */
+  /* æ¬¡ã®å€™è£œã‚’ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã¨ã™ã‚‹ */
   if (RkwNext(yc->context) == -1) {
     makeRkError(d, "\245\253\245\354\245\363\245\310\270\365\312\344\244\362"
 	"\274\350\244\352\275\320\244\273\244\336\244\273\244\363\244\307"
 	"\244\267\244\277");
-                   /* ¥«¥ì¥ó¥È¸õÊä¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿ */
+                   /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸ */
     return TanMuhenkan(d);
   }
 
@@ -1545,7 +1494,7 @@ yomiContext   yc;
   yc->rktime -= proctime;
 #endif /* MEASURE_TIME */
 
-  /* kanji_status_return¤òºî¤ë */
+  /* kanji_status_returnã‚’ä½œã‚‹ */
   makeKanjiStatusReturn(d, yc);
 
 #ifdef MEASURE_TIME
@@ -1556,14 +1505,11 @@ yomiContext   yc;
   return(0);
 }
 
-/*
-  enterTanHenkanMode -- tanContext ¤ò yomiContext ¤Ë¤·¤ÆÊÑ´¹¤Î½àÈ÷¤ò¤¹¤ë
 
+/**
+ * tanContext ã‚’ yomiContext ã«ã—ã¦å¤‰æ›ã®æº–å‚™ã‚’ã™ã‚‹
  */
-
-static int
-enterTanHenkanMode(d, fnum)
-uiContext d;
+static int enterTanHenkanMode(uiContext d, int fnum)
 {
   tanContext tan = (tanContext)d->modec;
   yomiContext yc;
@@ -1576,8 +1522,8 @@ uiContext d;
   free((char *)prevkanji);
   if (yc) {
 
-    /*¤³¤³¤Ç
-      Ã±¸õÊä¥â¡¼¥É¤Î·Á¤Ë¤¹¤ë
+    /*ã“ã“ã§
+      å˜å€™è£œãƒ¢ãƒ¼ãƒ‰ã®å½¢ã«ã™ã‚‹
       */
     if (confirmContext(d, yc) >= 0) { /* really needed? */
       tanbunCommitYomi(d, tan, yc);
@@ -1594,18 +1540,17 @@ uiContext d;
   return NothingChangedWithBeep(d);
 }
 
-/*
- * ¸õÊä°ìÍ÷¹Ô¤òÉ½¼¨¤¹¤ë
- *
- * ¡¦¸õÊä°ìÍ÷É½¼¨¤Î¤¿¤á¤Î¥Ç¡¼¥¿¤ò¥Æ¡¼¥Ö¥ë¤ËºîÀ®¤¹¤ë
- * ¡¦¸õÊä°ìÍ÷É½¼¨¹Ô¤¬¶¹¤¤¤È¤­¤Ï¡¢°ìÍ÷¤òÉ½¼¨¤·¤Ê¤¤¤Ç¼¡¸õÊä¤ò¤½¤Î¾ì¤ËÉ½¼¨¤¹¤ë
- *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
- */
 
-TanKouhoIchiran(d)
-uiContext d;
+/*
+ * å€™è£œä¸€è¦§è¡Œã‚’è¡¨ç¤ºã™ã‚‹
+ *
+ * ãƒ»å€™è£œä¸€è¦§è¡¨ç¤ºã®ãŸã‚ã®ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ†ãƒ¼ãƒ–ãƒ«ã«ä½œæˆã™ã‚‹
+ * ãƒ»å€™è£œä¸€è¦§è¡¨ç¤ºè¡ŒãŒç‹­ã„ã¨ãã¯ã€ä¸€è¦§ã‚’è¡¨ç¤ºã—ãªã„ã§æ¬¡å€™è£œã‚’ãã®å ´ã«è¡¨ç¤ºã™ã‚‹
+ *
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
+ */
+int TanKouhoIchiran( uiContext d )
 {
   if (d->modec->id != YOMI_CONTEXT) {
     return enterTanHenkanMode(d, CANNA_FN_KouhoIchiran);
@@ -1613,8 +1558,8 @@ uiContext d;
   return tanKouhoIchiran(d, 1);
 }
 
-TanNextKouho(d)
-uiContext d;
+
+int TanNextKouho( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1626,16 +1571,12 @@ uiContext d;
   return tanNextKouho(d, yc);
 }
 
-/*
 
-  TanHenkan -- ²ó¿ô¤ò¥Á¥§¥Ã¥¯¤¹¤ë°Ê³°¤Ï TanNextKouho ¤È¤Û¤ÜÆ±¤¸
+/*
+  TanHenkan -- å›æ•°ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ä»¥å¤–ã¯ TanNextKouho ã¨ã»ã¼åŒã˜
 
  */
-static TanHenkan pro((uiContext));
-
-static int
-TanHenkan(d)
-uiContext d;
+static int TanHenkan(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1652,14 +1593,14 @@ uiContext d;
   }
 }
 
+
 /*
- * Á°¸õÊä¤ò¥«¥ì¥ó¥È¸õÊä¤Ë¤¹¤ë
+ * å‰å€™è£œã‚’ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã«ã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-TanPreviousKouho(d)
-uiContext	d;
+int TanPreviousKouho( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1669,31 +1610,26 @@ uiContext	d;
 
   yc->status |= CHIKUJI_OVERWRAP;
   yc->kouhoCount = 0;
-  /* Á°¤Î¸õÊä¤ò¥«¥ì¥ó¥È¸õÊä¤È¤¹¤ë */
+  /* å‰ã®å€™è£œã‚’ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã¨ã™ã‚‹ */
   if (RkwPrev(yc->context) == -1) {
     makeRkError(d, "\245\253\245\354\245\363\245\310\270\365\312\344\244\362"
 	"\274\350\244\352\275\320\244\273\244\336\244\273\244\363\244\307"
 	"\244\267\244\277");
-                   /* ¥«¥ì¥ó¥È¸õÊä¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿ */
+                   /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸ */
     return TanMuhenkan(d);
   }
 
-  /* kanji_status_return¤òºî¤ë */
+  /* kanji_status_returnã‚’ä½œã‚‹ */
   makeKanjiStatusReturn(d, yc);
 
   return 0;
 }
 
+
 /*
-  tanJishuHenkan -- ÆÃÄê¤ÎÊ¸Àá¤À¤±»ú¼ïÊÑ´¹¤¹¤ë
+  tanJishuHenkan -- ç‰¹å®šã®æ–‡ç¯€ã ã‘å­—ç¨®å¤‰æ›ã™ã‚‹
  */
-
-static int tanJishuHenkan pro((uiContext, int));
-
-static int
-tanJishuHenkan(d, fn)
-uiContext d;
-int fn;
+static int tanJishuHenkan(uiContext d, int fn)
 {
   d->nbytes = TanBubunMuhenkan(d);
   d->more.todo = 1;
@@ -1702,100 +1638,87 @@ int fn;
   return d->nbytes;
 }
 
-TanHiragana(d)
-uiContext	d;
+
+int TanHiragana( uiContext	d )
 {
   return tanJishuHenkan(d, CANNA_FN_Hiragana);
 }
 
-TanKatakana(d)
-uiContext	d;
+
+int TanKatakana( uiContext	d )
 {
   return tanJishuHenkan(d, CANNA_FN_Katakana);
 }
 
-TanRomaji(d)
-uiContext	d;
+int TanRomaji( uiContext	d )
 {
   return tanJishuHenkan(d, CANNA_FN_Romaji);
 }
 
-TanUpper(d)
-uiContext	d;
+
+int TanUpper( uiContext	d )
 {
   return tanJishuHenkan(d, CANNA_FN_ToUpper);
 }
 
-TanCapitalize(d)
-uiContext	d;
+int TanCapitalize( uiContext	d )
 {
   return tanJishuHenkan(d, CANNA_FN_Capitalize);
 }
 
-TanZenkaku(d)
-uiContext d;
+
+int TanZenkaku( uiContext d )
 {
   return tanJishuHenkan(d, CANNA_FN_Zenkaku);
 }
 
-TanHankaku(d)
-uiContext d;
+int TanHankaku( uiContext d )
 {
   return tanJishuHenkan(d, CANNA_FN_Hankaku);
 }
 
-int TanKanaRotate pro((uiContext));
 
-TanKanaRotate(d)
-uiContext d;
+int TanKanaRotate(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_KanaRotate);
 }
 
-int TanRomajiRotate pro((uiContext));
-
-TanRomajiRotate(d)
-uiContext d;
+int TanRomajiRotate(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_RomajiRotate);
 }
 
-int TanCaseRotateForward pro((uiContext));
 
-TanCaseRotateForward(d)
-uiContext d;
+int TanCaseRotateForward(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_CaseRotate);
 }
 
-static int
-gotoBunsetsu(yc, n)
-yomiContext yc;
-int n;
+
+static int gotoBunsetsu( yomiContext yc, int n )
 {
-  /* ¥«¥ì¥ó¥ÈÊ¸Àá¤ò°ÜÆ°¤¹¤ë */
+  /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‚’ç§»å‹•ã™ã‚‹ */
   if (RkwGoTo(yc->context, n) == -1) {
     if (errno == EPIPE) {
       jrKanjiPipeError();
     }
     jrKanjiError = "\312\270\300\341\244\316\260\334\306\260\244\313\274\272"
 	"\307\324\244\267\244\336\244\267\244\277";
-                   /* Ê¸Àá¤Î°ÜÆ°¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* æ–‡ç¯€ã®ç§»å‹•ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return NG;
   }
   yc->curbun = n;
   return 0;
 }
 
+
 /*
- * ºÇº¸Ê¸Àá¤Ë°ÜÆ°¤¹¤ë
+ * æœ€å·¦æ–‡ç¯€ã«ç§»å‹•ã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-int
-TanBeginningOfBunsetsu(d)
-uiContext	d;
+int TanBeginningOfBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1810,15 +1733,14 @@ uiContext	d;
   return 0;
 }
 
+
 /*
- * ºÇ±¦Ê¸Àá¤Ë°ÜÆ°¤¹¤ë
+ * æœ€å³æ–‡ç¯€ã«ç§»å‹•ã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-int
-TanEndOfBunsetsu(d)
-uiContext	d;
+int TanEndOfBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1840,10 +1762,9 @@ uiContext	d;
   return 0;
 }
 
+
 int
-tanMuhenkan(d, kCurs)
-uiContext d;
-int kCurs;
+tanMuhenkan( uiContext d, int kCurs )
 {
   extern KanjiModeRec yomi_mode;
   yomiContext yc = (yomiContext)d->modec;
@@ -1876,10 +1797,10 @@ int kCurs;
     yc->rCurs = yc->rStartp = rpos;
   }
 
-  /* Á´ÉôÌµÊÑ´¹¤Ë¤¹¤ë */
+  /* å…¨éƒ¨ç„¡å¤‰æ›ã«ã™ã‚‹ */
   yc->nbunsetsu = 0;
 
-  /* Ã±¸õÊä¾õÂÖ¤«¤éÆÉ¤ß¤ËÌá¤ë¤È¤­¤Ë¤ÏÌµ¾ò·ï¤Ëmark¤òÀèÆ¬¤ËÌá¤¹ */
+  /* å˜å€™è£œçŠ¶æ…‹ã‹ã‚‰èª­ã¿ã«æˆ»ã‚‹ã¨ãã«ã¯ç„¡æ¡ä»¶ã«markã‚’å…ˆé ­ã«æˆ»ã™ */
   yc->cmark = yc->pmark = 0;
 
   abandonContext(d, yc);
@@ -1888,14 +1809,12 @@ int kCurs;
 }
 
 /*
- * Á´¤Æ¤ÎÊ¸Àá¤òÆÉ¤ß¤ËÌá¤·¡¢YomiInputMode ¤ËÌá¤ë
+ * å…¨ã¦ã®æ–‡ç¯€ã‚’èª­ã¿ã«æˆ»ã—ã€YomiInputMode ã«æˆ»ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-
-TanMuhenkan(d)
-uiContext	d;
+int TanMuhenkan( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec, newyc;
   tanContext tan;
@@ -1923,7 +1842,7 @@ uiContext	d;
       else {
 	jrKanjiError = "\245\341\245\342\245\352\244\254\302\255\244\352"
 	"\244\336\244\273\244\363";
-                       /* ¥á¥â¥ê¤¬Â­¤ê¤Ş¤»¤ó */
+                       /* ãƒ¡ãƒ¢ãƒªãŒè¶³ã‚Šã¾ã›ã‚“ */
 	makeGLineMessageFromString(d, jrKanjiError);
 	return NothingChangedWithBeep(d);
       }
@@ -1935,7 +1854,7 @@ uiContext	d;
 
     if (newyc->generalFlags &
 	(CANNA_YOMI_CHIKUJI_MODE | CANNA_YOMI_BASE_CHIKUJI)) {
-      /* ¡Ö¿´¤ÏÃà¼¡¤À¤Ã¤¿¡×¤Î¤Ç¤¢¤ì¤Ğ¡¢Ãà¼¡¥â¡¼¥É¤ËÌá¤¹ */
+      /* ã€Œå¿ƒã¯é€æ¬¡ã ã£ãŸã€ã®ã§ã‚ã‚Œã°ã€é€æ¬¡ãƒ¢ãƒ¼ãƒ‰ã«æˆ»ã™ */
       newyc->generalFlags |= CANNA_YOMI_CHIKUJI_MODE;
       newyc->generalFlags &= ~CANNA_YOMI_BASE_CHIKUJI;
       newyc->minorMode = getBaseMode(newyc);
@@ -1947,12 +1866,12 @@ uiContext	d;
     return 0;
   }
 
-  if (yc->generalFlags & 
+  if (yc->generalFlags &
       (CANNA_YOMI_CHIKUJI_MODE | CANNA_YOMI_BASE_CHIKUJI)) {
-    /* ¡Ö¿´¤ÏÃà¼¡¤À¤Ã¤¿¡×¤Î¤Ç¤¢¤ì¤Ğ¡¢Ãà¼¡¥â¡¼¥É¤ËÌá¤¹ */
+    /* ã€Œå¿ƒã¯é€æ¬¡ã ã£ãŸã€ã®ã§ã‚ã‚Œã°ã€é€æ¬¡ãƒ¢ãƒ¼ãƒ‰ã«æˆ»ã™ */
     yc->generalFlags |= CANNA_YOMI_CHIKUJI_MODE;
     yc->generalFlags &= ~CANNA_YOMI_BASE_CHIKUJI;
-    /* ¥Ì¥ë¥¹¥Æ¡¼¥¿¥¹¤ËÌá¤¹ */
+    /* ãƒŒãƒ«ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã«æˆ»ã™ */
     yc->status &= CHIKUJI_NULL_STATUS;
   }
 
@@ -1962,9 +1881,8 @@ uiContext	d;
   return 0;
 }
 
-int
-TanDeletePrevious(d)
-uiContext	d;
+
+int TanDeletePrevious( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int i, j, l = -1, ret = 0;
@@ -2013,17 +1931,14 @@ uiContext	d;
 
 #if 0
 /*
-  doTanKakutei -- ³ÎÄê¤µ¤»¤ëÆ°ºî¤ò¤¹¤ë
+  doTanKakutei -- ç¢ºå®šã•ã›ã‚‹å‹•ä½œã‚’ã™ã‚‹
 
-  retval 0 -- ÌäÂêÌµ¤¯³ÎÄê¤·¤¿¡£
-         1 -- ³ÎÄê¤·¤¿¤é¤Ê¤¯¤Ê¤Ã¤¿¡£
-        -1 -- ¥¨¥é¡¼¡©
+  retval 0 -- å•é¡Œç„¡ãç¢ºå®šã—ãŸã€‚
+         1 -- ç¢ºå®šã—ãŸã‚‰ãªããªã£ãŸã€‚
+        -1 -- ã‚¨ãƒ©ãƒ¼ï¼Ÿ
  */
 
-static
-doTanKakutei(d, yc)
-uiContext	d;
-yomiContext yc;
+static int doTanKakutei( uiContext	d, yomiContext yc)
 {
   if ((yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE) &&
       (yc->cStartp < yc->kEndp)) {
@@ -2034,9 +1949,8 @@ yomiContext yc;
 }
 #endif /* 0 */
 
-void
-finishTanKakutei(d)
-uiContext d;
+
+void finishTanKakutei( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int autoconvert = yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE;
@@ -2045,7 +1959,7 @@ uiContext d;
 #define RENGOBUFSIZE 256
 
   /* BIGARRAY */
-  if (RengoGakushu && hc->nbunsetsu > 1) { /* Ï¢¸ì³Ø½¬¤ò¤·¤è¤¦¤«¤Ê¤¡ */
+  if (RengoGakushu && hc->nbunsetsu > 1) { /* é€£èªå­¦ç¿’ã‚’ã—ã‚ˆã†ã‹ãªã */
     RkLex  lex[2][RENGOBUFSIZE];
     wchar_t yomi[2][RENGOBUFSIZE];
     wchar_t kanji[2][RENGOBUFSIZE];
@@ -2059,7 +1973,7 @@ uiContext d;
     RkwGoTo(hc->context, 0);
     nword[0] = RkwGetLex(hc->context, lex[0], RENGOBUFSIZE);
     yomi[0][0] =
-      (wchar_t) '\0'; /* yomi[current][0]¤Î¿¿ÍıÃÍ ¢á RkwGetYomi¤·¤¿¤« */
+      (wchar_t) '\0'; /* yomi[current][0]ã®çœŸç†å€¤ â‰¡ RkwGetYomiã—ãŸã‹ */
 
     for (i = 1 ; i < hc->nbunsetsu ; i++) {
       int current, previous, mighter;
@@ -2101,7 +2015,7 @@ uiContext d;
 
 #ifdef NAGASADEBUNPOUWOKIMEYOU
 	  if (lex[previous][0].klen >= lex[current][0].klen) {
-	    /* Á°¤Î´Á»ú¤ÎÄ¹¤µ       >=    ¸å¤í¤Î´Á»ú¤ÎÄ¹¤µ */
+	    /* å‰ã®æ¼¢å­—ã®é•·ã•       >=    å¾Œã‚ã®æ¼¢å­—ã®é•·ã• */
 	    mighter = previous;
 	  }
 	  else {
@@ -2129,7 +2043,7 @@ uiContext d;
   }
 
 #ifdef DO_RENGO_LEARNING
-  if (RengoGakushu && yc->nbunsetsu > 1) { /* Ï¢¸ì³Ø½¬¤ò¤·¤è¤¦¤«¤Ê¤¡ */
+  if (RengoGakushu && yc->nbunsetsu > 1) { /* é€£èªå­¦ç¿’ã‚’ã—ã‚ˆã†ã‹ãªã */
     for (w = word ; *w ; w += WStrlen(w) + 1) {
       RkwDefineDic(yc->context, RengoGakushu, w);
     }
@@ -2141,16 +2055,16 @@ uiContext d;
     yc->ys = yc->ye = yc->cStartp = yc->cRStartp = 0;
     clearHenkanContext(yc);
     yc->kEndp = yc->rEndp = yc->kCurs = yc->rCurs =
-      yc->cStartp = yc->cRStartp = 
+      yc->cStartp = yc->cRStartp =
 	yc->rStartp = yc->kRStartp = 0;
     yc->kAttr[0] = yc->rAttr[0] = SENTOU;
     yc->kana_buffer[0] = yc->romaji_buffer[0] = 0;
-/*    d->kanji_status_return->info |= KanjiEmptyInfo; Â¿Ê¬Í×¤é¤Ê¤¤¤Î¤Ç.. */
+/*    d->kanji_status_return->info |= KanjiEmptyInfo; å¤šåˆ†è¦ã‚‰ãªã„ã®ã§.. */
     d->current_mode = yc->curMode = yc->myEmptyMode;
   }
   yc->minorMode = getBaseMode(yc);
-  
-  /* Ã±¸õÊä¾õÂÖ¤«¤éÆÉ¤ß¤ËÌá¤ë¤È¤­¤Ë¤ÏÌµ¾ò·ï¤Ëmark¤òÀèÆ¬¤ËÌá¤¹ */
+
+  /* å˜å€™è£œçŠ¶æ…‹ã‹ã‚‰èª­ã¿ã«æˆ»ã‚‹ã¨ãã«ã¯ç„¡æ¡ä»¶ã«markã‚’å…ˆé ­ã«æˆ»ã™ */
   yc->nbunsetsu = 0;
   yc->cmark = yc->pmark = 0;
 
@@ -2161,27 +2075,22 @@ uiContext d;
   }
 }
 
-TanKakutei(d)
-uiContext d;
+
+int TanKakutei( uiContext d )
 {
   return YomiKakutei(d);
 }
 
 /*
- * ´Á»ú¸õÊä¤ò³ÎÄê¤µ¤»¡¢¥í¡¼¥Ş»ú¤ò¥¤¥ó¥µ¡¼¥È¤¹¤ë
+ * æ¼¢å­—å€™è£œã‚’ç¢ºå®šã•ã›ã€ãƒ­ãƒ¼ãƒå­—ã‚’ã‚¤ãƒ³ã‚µãƒ¼ãƒˆã™ã‚‹
  *
- * renbun-continue ¤¬ t ¤Î¤È¤­¤Ï¡¢¼Âºİ¤Ë¤Ï³ÎÄê¤·¤Ê¤¤¤Î¤Ç½èÍı¤¬
- * ÌÌÅİ¤À¤Ã¤¿¤ê¤¹¤ë¡£
+ * renbun-continue ãŒ t ã®ã¨ãã¯ã€å®Ÿéš›ã«ã¯ç¢ºå®šã—ãªã„ã®ã§å‡¦ç†ãŒ
+ * é¢å€’ã ã£ãŸã‚Šã™ã‚‹ã€‚
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-
-static TanKakuteiYomiInsert pro((uiContext));
-
-static int
-TanKakuteiYomiInsert(d)
-uiContext d;
+static int TanKakuteiYomiInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   tanContext tan;
@@ -2191,7 +2100,7 @@ uiContext d;
     d->nbytes = 0;
     for (tan = (tanContext)yc ; tan->right ; tan = tan->right)
       /* bodyless 'for' */;
-    yc = (yomiContext)0; /* Ç°¤Î¤¿¤á */
+    yc = (yomiContext)0; /* å¿µã®ãŸã‚ */
     d->modec = (mode_context)tan;
     setMode(d, tan, 1);
 
@@ -2199,7 +2108,7 @@ uiContext d;
       yc = (yomiContext)tan;
 
       if (yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE) {
-	/* Ãà¼¡¤Ê¤éÉáÄÌ¤ËÂ³¤±¤ë¤À¤±¤À¤«¤é¤Ê¤¢ */
+	/* é€æ¬¡ãªã‚‰æ™®é€šã«ç¶šã‘ã‚‹ã ã‘ã ã‹ã‚‰ãªã‚ */
 	yc->minorMode = CANNA_MODE_ChikujiTanMode;
 	d->current_mode = yc->curMode = &cb_mode;
 	currentModeInfo(d);
@@ -2211,9 +2120,9 @@ uiContext d;
 	yc->ys = yc->ye = yc->cStartp;
 	return YomiInsert(d);
       }
-      else { /* Ãà¼¡¤¸¤ã¤Ê¤¤¾ì¹ç */
-	extern nKouhoBunsetsu;
-    
+      else { /* é€æ¬¡ã˜ã‚ƒãªã„å ´åˆ */
+          extern int nKouhoBunsetsu;
+
 	yc->curbun = yc->nbunsetsu;
 	if (doTanBubunMuhenkan(d, yc) < 0) {
 	  makeGLineMessageFromString(d, jrKanjiError);
@@ -2226,7 +2135,7 @@ uiContext d;
     }
     else {
       yc = newFilledYomiContext(tan->next, tan->prevMode);
-      /* ¤¢¤êÆÀ¤Ê¤¤ if (tan->right) yc->right = tan->right;
+      /* ã‚ã‚Šå¾—ãªã„ if (tan->right) yc->right = tan->right;
 	 yc->right->left = yc; */
       tan->right = (tanContext)yc;
       yc->left = tan;
@@ -2237,7 +2146,7 @@ uiContext d;
   else {
     d->nbytes = YomiKakutei(d);
   }
-  /* YomiKakutei(d) ¤Ç d->modec ¤¬ÊÑ¹¹¤µ¤ì¤¿²ÄÇ½À­¤¬¤¢¤ë¤Î¤ÇºÆÆÉ¤ß¹ş¤ß¤¹¤ë */
+  /* YomiKakutei(d) ã§ d->modec ãŒå¤‰æ›´ã•ã‚ŒãŸå¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§å†èª­ã¿è¾¼ã¿ã™ã‚‹ */
   yc = (yomiContext)d->modec;
 
   if (yc->id == YOMI_CONTEXT) {
@@ -2246,22 +2155,18 @@ uiContext d;
   currentModeInfo(d);
   d->more.todo = 1;
   d->more.ch = d->ch;
-  d->more.fnum = 0;    /* ¾å¤Î ch ¤Ç¼¨¤µ¤ì¤ë½èÍı¤ò¤»¤è */
+  d->more.fnum = 0;    /* ä¸Šã® ch ã§ç¤ºã•ã‚Œã‚‹å‡¦ç†ã‚’ã›ã‚ˆ */
   return d->nbytes;
 }
 
 
 /* cfuncdef
 
-  pos ¤Ç»ØÄê¤µ¤ì¤¿Ê¸Àá¤ª¤è¤Ó¤½¤ì¤è¤ê¸å¤ÎÊ¸Àá¤Î»ú¼ïÊÑ´¹¾ğÊó¤ò
-  ¥¯¥ê¥¢¤¹¤ë¡£
+  pos ã§æŒ‡å®šã•ã‚ŒãŸæ–‡ç¯€ãŠã‚ˆã³ãã‚Œã‚ˆã‚Šå¾Œã®æ–‡ç¯€ã®å­—ç¨®å¤‰æ›æƒ…å ±ã‚’
+  ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚
 */
 
-static int
-doTbResize(d, yc, n)
-uiContext d;
-yomiContext yc;
-int n;
+static int doTbResize( uiContext d, yomiContext yc, int n )
 {
   int len;
 
@@ -2270,7 +2175,7 @@ int n;
     return NothingChangedWithBeep(d);
   }
   len = yc->kEndp;
-  doMuhenkan(d, yc); /* yc ¤«¤é±¦¤ò¤ß¤ó¤ÊÌµÊÑ´¹¤Ë¤·¤Æ yc ¤Ë¤Ä¤Ê¤²¤ë */
+  doMuhenkan(d, yc); /* yc ã‹ã‚‰å³ã‚’ã¿ã‚“ãªç„¡å¤‰æ›ã«ã—ã¦ yc ã«ã¤ãªã’ã‚‹ */
   if (!prepareHenkanMode(d)) {
     makeGLineMessageFromString(d, jrKanjiError);
     makeYomiReturnStruct(d);
@@ -2291,16 +2196,12 @@ int n;
 }
 
 /*
- * Ê¸Àá¤ò¿­¤Ğ¤¹
+ * æ–‡ç¯€ã‚’ä¼¸ã°ã™
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-static TanExtendBunsetsu pro((uiContext));
-
-static int
-TanExtendBunsetsu(d)
-uiContext	d;
+static int TanExtendBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -2316,7 +2217,7 @@ uiContext	d;
   if ((yc->nbunsetsu = RkwEnlarge(yc->context)) <= 0) {
     makeRkError(d, "\312\270\300\341\244\316\263\310\302\347\244\313\274\272"
 	"\307\324\244\267\244\336\244\267\244\277");
-                   /* Ê¸Àá¤Î³ÈÂç¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* æ–‡ç¯€ã®æ‹¡å¤§ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return TanMuhenkan(d);
   }
   makeKanjiStatusReturn(d, yc);
@@ -2324,16 +2225,12 @@ uiContext	d;
 }
 
 /*
- * Ê¸Àá¤ò½Ì¤á¤ë
+ * æ–‡ç¯€ã‚’ç¸®ã‚ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-static TanShrinkBunsetsu pro((uiContext));
-
-static int
-TanShrinkBunsetsu(d)
-uiContext	d;
+static int TanShrinkBunsetsu( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -2348,15 +2245,15 @@ uiContext	d;
     return doTbResize(d, yc, -1);
   }
 
-  /* Ê¸Àá¤ò½Ì¤á¤ë */
+  /* æ–‡ç¯€ã‚’ç¸®ã‚ã‚‹ */
   if ((yc->nbunsetsu = RkwShorten(yc->context)) <= 0) {
     makeRkError(d, "\312\270\300\341\244\316\275\314\276\256\244\313\274\272"
 	"\307\324\244\267\244\336\244\267\244\277");
-                   /* Ê¸Àá¤Î½Ì¾®¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* æ–‡ç¯€ã®ç¸®å°ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return TanMuhenkan(d);
   }
   makeKanjiStatusReturn(d, yc);
-  
+
   return(d->nbytes);
 }
 
@@ -2364,13 +2261,12 @@ uiContext	d;
 
 #ifdef BUNPOU_DISPLAY
 /*
- * Ê¸Ë¡¾ğÊó¤ò¥×¥ê¥ó¥È¤¹¤ë
+ * æ–‡æ³•æƒ…å ±ã‚’ãƒ—ãƒªãƒ³ãƒˆã™ã‚‹
  *
- * °ú¤­¿ô	uiContext
- * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»ş 0	°Û¾ï½ªÎ»»ş -1
+ * å¼•ãæ•°	uiContext
+ * æˆ»ã‚Šå€¤	æ­£å¸¸çµ‚äº†æ™‚ 0	ç•°å¸¸çµ‚äº†æ™‚ -1
  */
-TanPrintBunpou(d)
-uiContext	d;
+int TanPrintBunpou( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
   static wchar_t mesg[512]; /* static! */
@@ -2386,7 +2282,7 @@ uiContext	d;
       jrKanjiPipeError();
       TanMuhenkan(d);
     }
-    fprintf(stderr, "¥«¥ì¥ó¥È¸õÊä¤ÎÆÉ¤ß¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿¡£\n");
+    fprintf(stderr, "ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã®èª­ã¿ã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸã€‚\n");
   }
   Wfprintf(stderr, "%s\n", buf);
 #endif /* DO_GETYOMI */
@@ -2398,7 +2294,7 @@ uiContext	d;
     jrKanjiError = "\245\253\245\354\245\363\245\310\270\365\312\344\244\362"
 	"\274\350\244\352\275\320\244\273\244\336\244\273\244\363\244\307"
 	"\244\267\244\277";
-                   /* ¥«¥ì¥ó¥È¸õÊä¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿ */
+                   /* ã‚«ãƒ¬ãƒ³ãƒˆå€™è£œã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸ */
     return NG;
   }
 #endif
@@ -2406,7 +2302,7 @@ uiContext	d;
   if (RkwGetHinshi(yc->context, mesg, sizeof(mesg) / sizeof(wchar_t)) < 0) {
     jrKanjiError = "\311\312\273\354\276\360\312\363\244\362\274\350\244\352"
 	"\275\320\244\273\244\336\244\273\244\363\244\307\244\267\244\277";
-                   /* ÉÊ»ì¾ğÊó¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿ */
+                   /* å“è©æƒ…å ±ã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸ */
     makeGLineMessageFromString(d, jrKanjiError);
     makeKanjiStatusReturn(d, yc);
     return 0;
@@ -2425,9 +2321,7 @@ uiContext	d;
 #endif /* BUNPOU_DISPLAY */
 
 #ifdef MEASURE_TIME
-static
-TanPrintTime(d)
-uiContext	d;
+static int TanPrintTime( uiContext	d )
 {
   /* BIGARRAY */
   unsgined char tmpbuf[1024];
@@ -2435,11 +2329,11 @@ uiContext	d;
   yomiContext yc = (yomiContext)d->modec;
 
   ycc->kouhoCount = 0;
-  sprintf(tmpbuf, "\312\321\264\271\273\376\264\326 %d [ms]¡¢\244\246\244\301"
+  sprintf(tmpbuf, "\312\321\264\271\273\376\264\326 %d [ms]ã€\244\246\244\301"
 	" UI \311\364\244\317 %d [ms]",
 	   (yc->proctime) * 50 / 3,
 	   (yc->proctime - yc->rktime) * 50 / 3);
-               /* ÊÑ´¹»ş´Ö %d [ms]¡¢¤¦¤Á UI Éô¤Ï %d [ms] */
+               /* å¤‰æ›æ™‚é–“ %d [ms]ã€ã†ã¡ UI éƒ¨ã¯ %d [ms] */
   MBstowcs(buf, tmpbuf, 1024);
   d->kanji_status_return->info |= KanjiGLineInfo;
   d->kanji_status_return->gline.line = buf;
@@ -2456,7 +2350,7 @@ uiContext	d;
 void
 jrKanjiPipeError()
 {
-  extern defaultContext, defaultBushuContext;
+    extern int defaultBushuContext;
 
   defaultContext = -1;
   defaultBushuContext = -1;
@@ -2467,22 +2361,17 @@ jrKanjiPipeError()
 #if defined(DEBUG)
   if (iroha_debug) {
     fprintf(stderr, "\300\334\302\263\244\254\300\332\244\354\244\277\n");
-                    /* ÀÜÂ³¤¬ÀÚ¤ì¤¿ */
+                    /* æ¥ç¶šãŒåˆ‡ã‚ŒãŸ */
   }
 #endif
 }
 
 /* cfuncdef
 
-  TanBunsetsuMode -- Ã±¸õÊä¥â¡¼¥É¤«¤éÊ¸Àá¿­¤Ğ¤·½Ì¤á¥â¡¼¥É¤Ø°Ü¹Ô¤¹¤ë
+  TanBunsetsuMode -- å˜å€™è£œãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰æ–‡ç¯€ä¼¸ã°ã—ç¸®ã‚ãƒ¢ãƒ¼ãƒ‰ã¸ç§»è¡Œã™ã‚‹
 
  */
-
-static TanBunsetsuMode pro((uiContext));
-
-static
-TanBunsetsuMode(d)
-uiContext	d;
+static int TanBunsetsuMode( uiContext	d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -2501,15 +2390,13 @@ uiContext	d;
   return 0;
 }
 
-static void
-chikujiSetCursor(d, forw)
-uiContext d;
-int forw;
+
+static void chikujiSetCursor(uiContext d, int forw)
 {
   yomiContext yc = (yomiContext)d->modec;
 
-  if (forw) { /* °ìÈÖº¸¤Ø¹Ô¤¯ */
-    if (yc->nbunsetsu) { /* Ê¸Àá¤¬¤¢¤ë¡© */
+  if (forw) { /* ä¸€ç•ªå·¦ã¸è¡Œã */
+    if (yc->nbunsetsu) { /* æ–‡ç¯€ãŒã‚ã‚‹ï¼Ÿ */
       gotoBunsetsu(yc, 0);
       moveToChikujiTanMode(d);
     }
@@ -2519,8 +2406,8 @@ int forw;
       moveToChikujiYomiMode(d);
     }
   }
-  else { /* °ìÈÖ±¦¤Ø¹Ô¤¯ */
-    if (yc->cStartp < yc->kEndp) { /* ÆÉ¤ß¤¬¤¢¤ë¡© */
+  else { /* ä¸€ç•ªå³ã¸è¡Œã */
+    if (yc->cStartp < yc->kEndp) { /* èª­ã¿ãŒã‚ã‚‹ï¼Ÿ */
       yc->kRStartp = yc->kCurs = yc->kEndp;
       yc->rStartp = yc->rCurs = yc->rEndp;
       moveToChikujiYomiMode(d);
@@ -2533,11 +2420,7 @@ int forw;
 }
 
 
-void
-setMode(d, tan, forw)
-uiContext d;
-tanContext tan;
-int forw;
+void setMode(uiContext d, tanContext tan, int forw)
 {
   yomiContext yc = (yomiContext)tan;
 
@@ -2555,7 +2438,7 @@ int forw;
 	gotoBunsetsu(yc, yc->nbunsetsu - 1);
       }
     }
-    else /* ÆÉ¤ß¥â¡¼¥É */ if (forw) {
+    else /* èª­ã¿ãƒ¢ãƒ¼ãƒ‰ */ if (forw) {
       yc->kCurs = yc->kRStartp = yc->cStartp;
       yc->rCurs = yc->rStartp = yc->cRStartp;
     }
@@ -2566,9 +2449,8 @@ int forw;
   }
 }
 
-int
-TbForward(d)
-uiContext d;
+
+int TbForward( uiContext d )
 {
   tanContext tan = (tanContext)d->modec;
 
@@ -2590,9 +2472,8 @@ uiContext d;
   return 0;
 }
 
-int
-TbBackward(d)
-uiContext d;
+
+int TbBackward( uiContext d )
 {
   tanContext tan = (tanContext)d->modec;
 
@@ -2614,9 +2495,8 @@ uiContext d;
   return 0;
 }
 
-int
-TbBeginningOfLine(d)
-uiContext d;
+
+int TbBeginningOfLine( uiContext d )
 {
   tanContext tan = (tanContext)d->modec;
 
@@ -2629,9 +2509,8 @@ uiContext d;
   return 0;
 }
 
-int
-TbEndOfLine(d)
-uiContext d;
+
+int TbEndOfLine( uiContext d )
 {
   tanContext tan = (tanContext)d->modec;
 
@@ -2644,12 +2523,8 @@ uiContext d;
   return 0;
 }
 
-static TbChooseChar pro((uiContext, int));
 
-static
-TbChooseChar(d, head)
-uiContext d;
-int head;
+static int TbChooseChar( uiContext d, int head )
 {
   tanContext tan = (tanContext)d->modec;
 
@@ -2667,10 +2542,8 @@ int head;
   return 0;
 }
 
-static int
-TanChooseChar(d, head)
-uiContext d;
-int head;
+
+static int TanChooseChar( uiContext d, int head )
 {
   int retval, len;
   yomiContext yc = (yomiContext)d->modec;
@@ -2722,19 +2595,13 @@ int head;
   return retval;
 }
 
-static TanChooseHeadChar pro((uiContext));
-static TanChooseTailChar pro((uiContext));
 
-static
-TanChooseHeadChar(d)
-uiContext d;
+static int TanChooseHeadChar( uiContext d )
 {
   return TanChooseChar(d, 1);
 }
 
-static
-TanChooseTailChar(d)
-uiContext d;
+static int TanChooseTailChar( uiContext d )
 {
   return TanChooseChar(d, 0);
 }

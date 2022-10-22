@@ -40,12 +40,10 @@
 #include <canna/RK.h>
 #include <canna/jrkanji.h>
 
-#define POINTERINT canna_intptr_t
+#define POINTERINT intptr_t
 #define exp(x) x
 
-#if 0
-#define USE_MALLOC_FOR_BIG_ARRAY
-#endif
+//#define USE_MALLOC_FOR_BIG_ARRAY
 
 #define	WCHARSIZE	(sizeof(cannawc))
 
@@ -611,10 +609,9 @@ typedef struct _uiContext {
  * カナ漢字変換のための様々なキーマップテーブル
  * キーマップテーブルは処理関数へのポインタの配列となっている。
  */
-
 struct funccfunc {
-  BYTE funcid;
-  int (*cfunc) pro((struct _uiContext *));
+    BYTE funcid;
+    int (*cfunc)(struct _uiContext*);
 };
 
 typedef struct _kanjiMode {
@@ -665,16 +662,14 @@ struct dicname {
 
 extern struct dicname *kanjidicnames;
 
-/*
+/**
  * エラーのメッセージを入れておく変数
  */
+extern const char *jrKanjiError;
 
-extern char *jrKanjiError;
-
-/*
+/**
  * デバグ文を表示するかどうかのフラグ
  */
-
 extern int iroha_debug;
 
 /*
@@ -794,8 +789,9 @@ typedef struct _extra_func {
 #define freeYomiContext(yc) free((char *)yc)
 #define freeCoreContext(cc) free((char *)cc)
 
+// 名前に反して, サーバのホスト名
 #ifndef DICHOME
-#define DICHOME "/usr/lib/canna/dic"
+  #define DICHOME "localhost"
 #endif
 
 #define DEFAULT_CANNA_SERVER_NAME "cannaserver"
@@ -869,9 +865,11 @@ extern void InitCannaConfig pro((struct CannaConfig *));
 typedef int (* canna_callback_t) pro((uiContext, int, mode_context));
 
 extern void makeGLineMessage pro((uiContext, cannawc *, int));
-extern void makeGLineMessageFromStrings pro((uiContext, char *));
+
 extern newmode *findExtraKanjiMode pro((int));
-extern int setWStrings pro((cannawc **, char **, int));
+
+// lib/canna/util.c
+extern int setWStrings(cannawc **, const char **, int);
 
 extern size_t WStrlen pro((const cannawc* s));
 
@@ -909,8 +907,8 @@ extern void popCallback pro((uiContext));
 extern void makeYomiReturnStruct pro((uiContext));
 extern void moveToChikujiTanMode pro((uiContext));
 extern void moveToChikujiYomiMode pro((uiContext));
-extern void makeGLineMessageFromString pro((uiContext, char *));
-extern void addWarningMesg pro((char *));
+extern void makeGLineMessageFromString pro((uiContext, const char *));
+extern void addWarningMesg(const char *);
 extern int prepareHenkanMode pro((uiContext));
 extern void makeAllContextToBeClosed pro((int));
 extern void CannaBeep pro((void));
@@ -989,9 +987,6 @@ extern int NothingChangedWithBeep pro((uiContext));
 extern int searchfunc pro((uiContext, KanjiMode, int, int, int));
 extern int initRomeStruct pro((uiContext, int));
 
-// lib/canna/kctrl.c
-extern int kanjiControl(int, uiContext, void* );
-
 extern int getBaseMode pro((yomiContext));
 extern int RkwMapPhonogram
   pro((struct RkRxDic *, cannawc *, int, const cannawc *, int, cannawc, int,
@@ -1016,7 +1011,7 @@ extern int ChikujiSubstYomi pro((uiContext));
 extern int TanMuhenkan pro((uiContext));
 extern size_t CANNA_mbstowcs pro((cannawc* dest, const char* src, size_t n));
 extern size_t CANNA_wcstombs pro((char* dest, const cannawc* src, size_t n));
-extern int makeRkError pro((uiContext, char *));
+extern int makeRkError pro((uiContext, const char *));
 extern void moveStrings pro((cannawc *, BYTE *, int, int, int));
 extern int TanBackwardBunsetsu pro((uiContext));
 extern int TbBackward pro((uiContext));
@@ -1152,8 +1147,12 @@ extern int changeKeyfuncOfAll(int key, int fnum, unsigned char* actbuff,
 extern menustruct* allocMenu(int n, int nc);
 
 // commondata.c
-struct stringcell;
-extern void (*keyconvCallback)(int, struct stringcell*, struct stringcell*, int);
+//struct stringcell;
+extern void (*keyconvCallback)(int, char*, char*, int);
+
+// kctrl.c
+extern int ToggleChikuji(uiContext d, int flg);
+extern int kanjiControl(int, uiContext, void* );
 
 #endif /* _UTIL_FUNCTIONS_DEF_ */
 

@@ -177,8 +177,8 @@ RkiCksumCRCAdd(RkiCksumCalc* cx, const void* data, size_t len)
   cx->len += len;
 }
 
-canna_uint32_t
-RkiCksumCRCFinish(RkiCksumCalc* cx)
+
+uint32_t RkiCksumCRCFinish(RkiCksumCalc* cx)
 {
   for (; cx->len != 0; cx->len >>= 8) /* LSB first, variable length */
     CRC(&cx->curr, cx->len & 0xff);

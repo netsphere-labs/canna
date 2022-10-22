@@ -291,16 +291,10 @@ static const char* FindGroupName()
 }
 
 
-/*
- *  RkwInitialize ()
+/**
+ * かな漢字変換の初期化: サーバに接続する.
  *
- *  Description:
- *  -----------
- *  かな漢字変換の初期化
- *
- *  Returns:
- *  -------
- *  0 or -1
+ * @return   0 or -1
  */
 int
 RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き数を無視する */
@@ -308,7 +302,8 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     int    i;
     long  server ;
     RkcContext *cx ;
-    char *username, *data ;
+    const char* username;
+    char *data ;
 
     if( rkc_call_flag == BUSY )
         return 0;
@@ -338,7 +333,6 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
 
     /* ユーザ名を取得する */
     username = FindUserName() ;
-
     if( !username ||
         !(data = (char*) malloc( strlen(username) + strlen(W_VERSION)+2 ))) {
         goto init_err;
@@ -398,9 +392,8 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
 
     /* プロトコルバージョンが 3.2 以上だったらグループ名を通知する */
     if (canna_version(ProtocolMajor, ProtocolMinor) > canna_version(3, 1)) {
-      char *gname = FindGroupName();
-
-      if (gname) {
+        const char *gname = FindGroupName();
+        if (gname) {
 	(*RKCP->notice_group_name)(cx, gname);
       }
     }
@@ -1509,21 +1502,22 @@ int CheckRemoteToolProtoVersion(int mode)
   return 0;
 }
 
+
+// @return If failed, -1.
 int
-RkwListDic( int cxnum, char* dirname, char* dicnames_return, int size )
+RkwListDic( int cxnum, const char* dirname, char* dicnames_return, int size )
 {
     RkcContext *cx = getCC( cxnum, NOCHECK ) ;
+    if (!cx)
+        return -1;
 
-    if (!cx) {
-      return -1;
-    }
-    if (CheckRemoteToolProtoVersion(0)) {
-      return ACCES;
-    }
+    if (CheckRemoteToolProtoVersion(0))
+        return ACCES;
 
-    if( !dirname )
-	if( !(dirname = FindUserName()) )
-	    return( -1 ) ;
+    if( !dirname ) {
+        if( !(dirname = FindUserName()) )
+            return -1 ;
+    }
 
     if( !dicnames_return ) {
 #ifndef USE_MALLOC_FOR_BIG_ARRAY

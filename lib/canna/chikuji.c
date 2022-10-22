@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -50,20 +51,16 @@ int forceRomajiFlushYomi pro((uiContext));
 void moveToChikujiTanMode pro((uiContext));
 void moveToChikujiYomiMode pro((uiContext));
 
-static void clearHenkanContent pro((yomiContext));
 
-static void
-clearHenkanContent(yc)
-yomiContext yc;
+static void clearHenkanContent( yomiContext yc )
 {
   yc->allkouho = 0;
   yc->kouhoCount = yc->curIkouho = 0;
   return;
 }
 
-void
-clearHenkanContext(yc)
-yomiContext yc;
+
+void clearHenkanContext( yomiContext yc )
 {
   if (yc->context >= 0) {
     RkwCloseContext(yc->context);
@@ -74,26 +71,18 @@ yomiContext yc;
   return;
 }
 
-extern NothingChanged pro((uiContext));
 
-/*
-  restoreChikujiYomi
+/**
+ * @param d   uiContext
+ * @param old å‰ã®æ–‡ç¯€æ•°
 
-  °ú¿ô:
-    d   : uiContext
-    old : Á°¤ÎÊ¸Àá¿ô
-
-  ¤ä¤ë¤³¤È:
-   (1) Ê¸Àá¿ô¤¬Áı¤¨¤¿¤éµ¬Äê¿ô°Ê¾å¤ÎÊ¸Àá¤ò³ÎÄê¤µ¤»¤ë¡£
-   (2) ¤½¤Î¤È¤­¡¢RkwRemoveBun ¤â¤¹¤ë¡£
-   (3) ¤½¤ÎÊ¬¡¢ÆÉ¤ß¤âºï¤ë¡£
-   (4) Ê¸Àá¤Ë¤Ê¤Ã¤¿Ê¬¤ÎÆÉ¤ß¤ò¥«¥¦¥ó¥È¡£
+  ã‚„ã‚‹ã“ã¨:
+   (1) æ–‡ç¯€æ•°ãŒå¢—ãˆãŸã‚‰è¦å®šæ•°ä»¥ä¸Šã®æ–‡ç¯€ã‚’ç¢ºå®šã•ã›ã‚‹ã€‚
+   (2) ãã®ã¨ãã€RkwRemoveBun ã‚‚ã™ã‚‹ã€‚
+   (3) ãã®åˆ†ã€èª­ã¿ã‚‚å‰Šã‚‹ã€‚
+   (4) æ–‡ç¯€ã«ãªã£ãŸåˆ†ã®èª­ã¿ã‚’ã‚«ã‚¦ãƒ³ãƒˆã€‚
  */
-
-static int
-restoreChikujiYomi(d, old)
-     uiContext d;
-     int old;
+static int restoreChikujiYomi( uiContext d, int old )
 {
   yomiContext yc = (yomiContext)d->modec;
   wchar_t *s = d->buffer_return, *e = s + d->n_buffer;
@@ -112,11 +101,11 @@ restoreChikujiYomi(d, old)
       if (nKouhoBunsetsu < yc->nbunsetsu) {
 	n = yc->nbunsetsu - nKouhoBunsetsu;
 	if (n > old) {
-	  n = old; /* Á°¤Ë¤Ş¤À´Á»ú¤Ë¤Ê¤Ã¤Æ¤¤¤Ê¤«¤Ã¤¿Ê¬¤Ş¤Ç¤Ï³ÎÄê¤µ¤»¤Ê¤¤ */
+	  n = old; /* å‰ã«ã¾ã æ¼¢å­—ã«ãªã£ã¦ã„ãªã‹ã£ãŸåˆ†ã¾ã§ã¯ç¢ºå®šã•ã›ãªã„ */
 	}
       }
     }
-    if (n > 0) { /* ³ÎÄê¤µ¤»¤ëÊ¸Àá¿ô */
+    if (n > 0) { /* ç¢ºå®šã•ã›ã‚‹æ–‡ç¯€æ•° */
 
       recalc = 1;
       for (i = 0 ; i < n ; i++) {
@@ -139,7 +128,7 @@ restoreChikujiYomi(d, old)
 	return -1;
       }
 
-      /* ¤«¤Ê¥Ğ¥Ã¥Õ¥¡¤È¤«¤âºï¤ë */
+      /* ã‹ãªãƒãƒƒãƒ•ã‚¡ã¨ã‹ã‚‚å‰Šã‚‹ */
       kPos2rPos(yc, 0, ll, (int *)0, &j);
 
       if (yomiInfoLevel > 0) {
@@ -157,7 +146,7 @@ restoreChikujiYomi(d, old)
 	  *s++ = (wchar_t)'\0';
 	}
       }
-      
+
       removeKana(d, yc, ll, j);
 
       yc->nbunsetsu -= n;
@@ -165,7 +154,7 @@ restoreChikujiYomi(d, old)
     if (RkwGoTo(yc->context, yc->nbunsetsu - 1) == -1)
       return(-1);
     yc->curbun = yc->nbunsetsu - 1;
-    if (old < yc->curbun) { /* ¤»¤á¤ÆÁ°¤Î¤ä¤Ä¤Î±¦¤Ë¹Ô¤¯ */
+    if (old < yc->curbun) { /* ã›ã‚ã¦å‰ã®ã‚„ã¤ã®å³ã«è¡Œã */
       yc->curbun = old;
     }
   }
@@ -175,7 +164,7 @@ restoreChikujiYomi(d, old)
     if (yomilen == -1) {
       return -1;
     }
-    if (yomilen < yc->kEndp) { /* É¬¤º¿¿¤Ç¤Ï¡© */
+    if (yomilen < yc->kEndp) { /* å¿…ãšçœŸã§ã¯ï¼Ÿ */
       kPos2rPos(yc, 0, yc->kEndp - yomilen, (int *)0, &j);
       yc->cStartp = yc->kEndp - yomilen;
       yc->cRStartp = j;
@@ -189,8 +178,8 @@ restoreChikujiYomi(d, old)
   return(0);
 }
 
-static int
-doesSupportChikuji()
+
+static int doesSupportChikuji()
 {
   int a, b;
 
@@ -205,16 +194,14 @@ doesSupportChikuji()
 }
 
 #ifndef NO_EXTEND_MENU
-int
-chikujiInit(d)
-uiContext d;
+int chikujiInit( uiContext d )
 {
   int chikuji_f;
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
 
   d->status = 0;
   killmenu(d);
@@ -226,12 +213,12 @@ uiContext d;
       jrKanjiError = "\245\265\241\274\245\320\244\254\303\340\274\241\274\253"
 	"\306\260\312\321\264\271\244\362\245\265\245\335\241\274\245\310"
 	"\244\267\244\306\244\244\244\336\244\273\244\363";
-                     /* ¥µ¡¼¥Ğ¤¬Ãà¼¡¼«Æ°ÊÑ´¹¤ò¥µ¥İ¡¼¥È¤·¤Æ¤¤¤Ş¤»¤ó */
+                     /* ã‚µãƒ¼ãƒãŒé€æ¬¡è‡ªå‹•å¤‰æ›ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“ */
     else
       jrKanjiError = "\303\340\274\241\274\253\306\260\312\321\264\271\244\313"
 	"\300\332\302\330\244\250\244\353\244\263\244\310\244\254\244\307"
-	"\244\255\244\336\244\273\244\363";    
-                     /* Ãà¼¡¼«Æ°ÊÑ´¹¤ËÀÚÂØ¤¨¤ë¤³¤È¤¬¤Ç¤­¤Ş¤»¤ó */
+	"\244\255\244\336\244\273\244\363";
+                     /* é€æ¬¡è‡ªå‹•å¤‰æ›ã«åˆ‡æ›¿ãˆã‚‹ã“ã¨ãŒã§ãã¾ã›ã‚“ */
     makeGLineMessageFromString(d, jrKanjiError);
     currentModeInfo(d);
     return(-1);
@@ -241,25 +228,24 @@ uiContext d;
       makeGLineMessageFromString(d, "\245\265\241\274\245\320\244\254\303\340"
 	"\274\241\274\253\306\260\312\321\264\271\244\362\245\265\245\335"
 	"\241\274\245\310\244\267\244\306\244\244\244\336\244\273\244\363");
-                /* ¥µ¡¼¥Ğ¤¬Ãà¼¡¼«Æ°ÊÑ´¹¤ò¥µ¥İ¡¼¥È¤·¤Æ¤¤¤Ş¤»¤ó */
+                /* ã‚µãƒ¼ãƒãŒé€æ¬¡è‡ªå‹•å¤‰æ›ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“ */
     else
       makeGLineMessageFromString(d, "\303\340\274\241\274\253\306\260\312\321"
 	"\264\271\244\313\300\332\302\330\244\250\244\336\244\267\244\277");
-                /* Ãà¼¡¼«Æ°ÊÑ´¹¤ËÀÚÂØ¤¨¤Ş¤·¤¿ */
+                /* é€æ¬¡è‡ªå‹•å¤‰æ›ã«åˆ‡æ›¿ãˆã¾ã—ãŸ */
     currentModeInfo(d);
     return 0;
   }
 }
 #endif /* not NO_EXTEND_MENU */
 
-static int
-chikujiSubstYomi(d)
-uiContext d;
+
+static int chikujiSubstYomi( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int n = yc->nbunsetsu, ret;
 
-  if (yc->context == -1) { /* ¡Ö½Ğ¤À¤·¤À¤Ã¤¿¤é¡×¤Î°ÕÌ£¤â¤¢¤ë */
+  if (yc->context == -1) { /* ã€Œå‡ºã ã—ã ã£ãŸã‚‰ã€ã®æ„å‘³ã‚‚ã‚ã‚‹ */
     if (confirmContext(d, yc) < 0) {
       return -1;
     }
@@ -267,7 +253,7 @@ uiContext d;
       jrKanjiError = "\245\265\241\274\245\320\244\254\303\340\274\241\274\253"
 	"\306\260\312\321\264\271\244\362\245\265\245\335\241\274\245\310"
 	"\244\267\244\306\244\244\244\336\244\273\244\363";
-                     /* ¥µ¡¼¥Ğ¤¬Ãà¼¡¼«Æ°ÊÑ´¹¤ò¥µ¥İ¡¼¥È¤·¤Æ¤¤¤Ş¤»¤ó */     
+                     /* ã‚µãƒ¼ãƒãŒé€æ¬¡è‡ªå‹•å¤‰æ›ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“ */
       abandonContext(d, yc);
       return(-1);
     }
@@ -276,8 +262,8 @@ uiContext d;
     substError:
       jrKanjiError = "\303\340\274\241\274\253\306\260\312\321\264\271\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277";
-                     /* Ãà¼¡¼«Æ°ÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
-      /* °Ê²¼¤Ï²¿¤ò¤ä¤Ã¤Æ¤¤¤ë¤Î¤«¤·¤é¡© */
+                     /* é€æ¬¡è‡ªå‹•å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸ */
+      /* ä»¥ä¸‹ã¯ä½•ã‚’ã‚„ã£ã¦ã„ã‚‹ã®ã‹ã—ã‚‰ï¼Ÿ */
       if (TanMuhenkan(d) == -1) {
 	return -2;
       }
@@ -294,58 +280,57 @@ uiContext d;
   return(ret);
 }
 
-ChikujiSubstYomi(d)
-  uiContext d;
+
+int ChikujiSubstYomi( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if ((yc->ys == yc->ye && yc->kEndp == yc->ye)
       || yc->kEndp != yc->kCurs
       || !(yc->kAttr[yc->kEndp - 1] & HENKANSUMI)) {
-    /* ¿·¤·¤¤ÆşÎÏ¤¬¤Ê¤«¤Ã¤¿¤ê¡¢
-       ºÇ¸å¤Ø¤ÎÆşÎÏ¤¸¤ã¤Ê¤«¤Ã¤¿¤ê¡¢
-       ºÇ¸å¤Î»ú¤¬¥í¡¼¥Ş»ú¤«¤ÊÊÑ´¹¤µ¤ì¤Ä¤¯¤·¤Æ¤¤¤Ê¤«¤Ã¤¿¤ê¤·¤¿¤é */
-    return 0; /* ¤Ê¤Ë¤â¤·¤Ê¤¤ */
+    /* æ–°ã—ã„å…¥åŠ›ãŒãªã‹ã£ãŸã‚Šã€
+       æœ€å¾Œã¸ã®å…¥åŠ›ã˜ã‚ƒãªã‹ã£ãŸã‚Šã€
+       æœ€å¾Œã®å­—ãŒãƒ­ãƒ¼ãƒå­—ã‹ãªå¤‰æ›ã•ã‚Œã¤ãã—ã¦ã„ãªã‹ã£ãŸã‚Šã—ãŸã‚‰ */
+    return 0; /* ãªã«ã‚‚ã—ãªã„ */
   }
   return chikujiSubstYomi(d);
 }
 
-int
-ChikujiTanDeletePrevious(d)
-     uiContext d;
+
+int ChikujiTanDeletePrevious( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int i, j, l = 0, flg = 0;
   RkStat stat;
 
-  if (yc->cRStartp < yc->rEndp) { /* ¥í¡¼¥Ş»ú¤¬Æş¤Ã¤Æ¤¤¤ë */
+  if (yc->cRStartp < yc->rEndp) { /* ãƒ­ãƒ¼ãƒå­—ãŒå…¥ã£ã¦ã„ã‚‹ */
     flg = 1;
   }
   d->nbytes = 0;
 
-  /* ¤Ş¤º¥«¥ì¥ó¥ÈÊ¸Àá¤«¤é¸å¤í¤òÆÉ¤ß¤ËÌá¤¹ */
+  /* ã¾ãšã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰å¾Œã‚ã‚’èª­ã¿ã«æˆ»ã™ */
   if (forceRomajiFlushYomi(d)) {
     return d->nbytes;
   }
   if (RkwSubstYomi(yc->context, 0, yc->ye - yc->cStartp,
                                     (wchar_t *)0, 0) == NG) {
-    /* ÆÉ¤ß¤Ç»Ä¤Ã¤Æ¤¤¤ëÊ¬¤òÃà¼¡¤Î¥Ç¡¼¥¿¤«¤é¾Ã¤¹ */
+    /* èª­ã¿ã§æ®‹ã£ã¦ã„ã‚‹åˆ†ã‚’é€æ¬¡ã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰æ¶ˆã™ */
     (void)makeRkError(d, "\306\311\244\337\244\313\314\341\244\271\244\263"
 	"\244\310\244\254\244\307\244\255\244\336\244\273\244\363");
-                         /* ÆÉ¤ß¤ËÌá¤¹¤³¤È¤¬¤Ç¤­¤Ş¤»¤ó */
-    (void)TanMuhenkan(d); /* ¤³¤ìÍ×¤ë¤Î¡© */
+                         /* èª­ã¿ã«æˆ»ã™ã“ã¨ãŒã§ãã¾ã›ã‚“ */
+    (void)TanMuhenkan(d); /* ã“ã‚Œè¦ã‚‹ã®ï¼Ÿ */
     return 0;
   }
   yc->ys = yc->ye = yc->cStartp;
   for (i = yc->nbunsetsu - 1 ; i >= yc->curbun ; i--) {
-    /* ¥«¥ì¥ó¥ÈÊ¸Àá¤«¤é¸å¤í¤òÆÉ¤ß¤ËÌá¤¹¤¿¤á¤Î½àÈ÷ */
+    /* ã‚«ãƒ¬ãƒ³ãƒˆæ–‡ç¯€ã‹ã‚‰å¾Œã‚ã‚’èª­ã¿ã«æˆ»ã™ãŸã‚ã®æº–å‚™ */
     if (RkwGoTo(yc->context, i) == NG
 	|| RkwGetStat(yc->context, &stat) == NG
 	|| RkwStoreYomi(yc->context, (wchar_t *)0, 0) == NG) {
       (void)makeRkError(d, "\306\311\244\337\244\313\314\341\244\271\244\263"
 	"\244\310\244\254\244\307\244\255\244\336\244\273\244\363");
-                           /* ÆÉ¤ß¤ËÌá¤¹¤³¤È¤¬¤Ç¤­¤Ş¤»¤ó */
-      TanMuhenkan(d); /* ¤³¤ì¡¢Í×¤ë¤Î¡© */
+                           /* èª­ã¿ã«æˆ»ã™ã“ã¨ãŒã§ãã¾ã›ã‚“ */
+      TanMuhenkan(d); /* ã“ã‚Œã€è¦ã‚‹ã®ï¼Ÿ */
       return 0;
     }
     l += stat.ylen;
@@ -385,20 +370,16 @@ ChikujiTanDeletePrevious(d)
     d->more.todo = 1;
     d->more.ch = 0;
     d->more.fnum = CANNA_FN_DeletePrevious;
-    /* Æ±¤¸¤³¤È¤ò¤Ş¤¿¤ä¤ë¤Ã¤Æ´¶¤¸¤À¤¾ */
+    /* åŒã˜ã“ã¨ã‚’ã¾ãŸã‚„ã‚‹ã£ã¦æ„Ÿã˜ã ã */
   }
   return 0;
 }
 
-/*
-  chikuji_restore_yomi
 
-    cStartp, cRStartp ¤òÄ´À°¤¹¤ë
+/**
+ * cStartp, cRStartp ã‚’èª¿æ•´ã™ã‚‹
  */
-
-static int
-chikuji_restore_yomi(d)
-     uiContext d;
+static int chikuji_restore_yomi( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int l, j;
@@ -407,9 +388,9 @@ chikuji_restore_yomi(d)
     return makeRkError(d, "\314\244\267\350\312\270\300\341\244\362\274\350"
 	"\244\352\275\320\244\273\244\336\244\273\244\363\244\307\244\267"
 	"\244\277");
-                          /* Ì¤·èÊ¸Àá¤ò¼è¤ê½Ğ¤»¤Ş¤»¤ó¤Ç¤·¤¿ */
+                          /* æœªæ±ºæ–‡ç¯€ã‚’å–ã‚Šå‡ºã›ã¾ã›ã‚“ã§ã—ãŸ */
   }
-  if (l != yc->kEndp - yc->cStartp) { /* ÊÑ¤ï¤Ã¤¿¤é */
+  if (l != yc->kEndp - yc->cStartp) { /* å¤‰ã‚ã£ãŸã‚‰ */
     kPos2rPos(yc, 0, yc->kEndp - l, (int *)0, &j);
     yc->cStartp = yc->kEndp - l;
     yc->cRStartp = j;
@@ -419,36 +400,32 @@ chikuji_restore_yomi(d)
   return 0;
 }
 
-static int
-chikuji_subst_yomi(d)
-     uiContext d;
+
+static int chikuji_subst_yomi( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int l, n = yc->nbunsetsu;
 
-  /* ÆÉ¤ß¤òÁ´Éô¿©¤ï¤»¤ë */
+  /* èª­ã¿ã‚’å…¨éƒ¨é£Ÿã‚ã›ã‚‹ */
   l = RkwSubstYomi(yc->context, yc->ys - yc->cStartp, yc->ye - yc->cStartp,
 		   yc->kana_buffer + yc->ys, yc->kEndp - yc->ys);
   yc->ys = yc->ye = yc->kEndp;
   if (l == -1) {
     jrKanjiError = "\312\321\264\271\244\313\274\272\307\324\244\267\244\336"
 	"\244\267\244\277";
-                   /* ÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸ */
     (void)TanMuhenkan(d);
     return -1;
   }
   yc->nbunsetsu = l;
   if (l > n) {
-    yc->curbun = n; /* Á°¤ÎÊ¸Àá¤¬¥«¥ì¥ó¥È */
+    yc->curbun = n; /* å‰ã®æ–‡ç¯€ãŒã‚«ãƒ¬ãƒ³ãƒˆ */
   }
   return chikuji_restore_yomi(d);
 }
 
-static ChikujiTanExtend pro((uiContext));
 
-static int
-ChikujiTanExtend(d)
-     uiContext d;
+static int ChikujiTanExtend( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int i;
@@ -457,7 +434,7 @@ ChikujiTanExtend(d)
   yc->kouhoCount = 0;
 
   if (yc->ys < yc->kEndp || yc->ye != yc->kEndp) {
-    i = yc->curbun; /* ¤È¤Ã¤È¤¯ */
+    i = yc->curbun; /* ã¨ã£ã¨ã */
     if (chikuji_subst_yomi(d) == -1) {
       makeGLineMessageFromString(d, jrKanjiError);
       return TanMuhenkan(d);
@@ -465,7 +442,7 @@ ChikujiTanExtend(d)
     if (RkwGoTo(yc->context, i) == -1) {
       (void)makeRkError(d, "\312\270\300\341\244\316\260\334\306\260\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                           /* Ê¸Àá¤Î°ÜÆ°¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                           /* æ–‡ç¯€ã®ç§»å‹•ã«å¤±æ•—ã—ã¾ã—ãŸ */
       return TanMuhenkan(d);
     }
     yc->curbun = i;
@@ -473,7 +450,7 @@ ChikujiTanExtend(d)
   if ((yc->nbunsetsu = RkwEnlarge(yc->context)) <= 0) {
     (void)makeRkError(d, "\312\270\300\341\244\316\263\310\302\347\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                         /* Ê¸Àá¤Î³ÈÂç¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                         /* æ–‡ç¯€ã®æ‹¡å¤§ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return TanMuhenkan(d);
   }
   if (chikuji_restore_yomi(d) == NG) {
@@ -484,11 +461,8 @@ ChikujiTanExtend(d)
   return d->nbytes;
 }
 
-static ChikujiTanShrink pro((uiContext));
 
-static int
-ChikujiTanShrink(d)
-     uiContext d;
+static int ChikujiTanShrink( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   RkStat stat;
@@ -505,21 +479,21 @@ ChikujiTanShrink(d)
     if (RkwGoTo(yc->context, i) == -1) {
       (void)makeRkError(d, "\312\270\300\341\244\316\275\314\276\256\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                           /* Ê¸Àá¤Î½Ì¾®¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                           /* æ–‡ç¯€ã®ç¸®å°ã«å¤±æ•—ã—ã¾ã—ãŸ */
       return TanMuhenkan(d);
     }
     yc->curbun = i;
   }
 
   if (RkwGetStat(yc->context, &stat) < 0 || stat.ylen == 1) {
-    /* ¤³¤ì°Ê¾åÃ»¤¯¤Ç¤­¤ë¤«¤É¤¦¤«³ÎÇ§¡£Í×¤ë¡© */
+    /* ã“ã‚Œä»¥ä¸ŠçŸ­ãã§ãã‚‹ã‹ã©ã†ã‹ç¢ºèªã€‚è¦ã‚‹ï¼Ÿ */
     return NothingForGLine(d);
   }
   yc->nbunsetsu = RkwShorten(yc->context);
-  if (yc->nbunsetsu <= 0) { /* 0 ¤Ã¤Æ¤³¤È¤¢¤ó¤Î¤«¤Ê¤¢¡© */
+  if (yc->nbunsetsu <= 0) { /* 0 ã£ã¦ã“ã¨ã‚ã‚“ã®ã‹ãªã‚ï¼Ÿ */
     (void)makeRkError(d, "\312\270\300\341\244\316\275\314\276\256\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                         /* Ê¸Àá¤Î½Ì¾®¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                         /* æ–‡ç¯€ã®ç¸®å°ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return TanMuhenkan(d);
   }
   if (chikuji_restore_yomi(d) == NG) {
@@ -530,19 +504,16 @@ ChikujiTanShrink(d)
   return d->nbytes;
 }
 
-static ChikujiYomiDeletePrevious pro((uiContext));
 
-static int
-ChikujiYomiDeletePrevious(d)
-     uiContext d;
+static int ChikujiYomiDeletePrevious( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   RkStat stat;
   int i, j, l = 0;
 
   d->nbytes = 0;
-  if (!(yc->cStartp < yc->kCurs)) { /* ÆÉ¤ß¤¬¤Ê¤¤¤Ê¤é */
-    if (!yc->nbunsetsu) { /* Ê¸Àá¤â¤Ê¤¤ */
+  if (!(yc->cStartp < yc->kCurs)) { /* èª­ã¿ãŒãªã„ãªã‚‰ */
+    if (!yc->nbunsetsu) { /* æ–‡ç¯€ã‚‚ãªã„ */
       return NothingChanged(d);
     }
     else {
@@ -550,19 +521,19 @@ ChikujiYomiDeletePrevious(d)
                                         (wchar_t *)0, 0) == NG) {
 	(void)makeRkError(d, "\306\311\244\337\244\313\314\341\244\271\244\263"
 	"\244\310\244\254\244\307\244\255\244\336\244\273\244\363");
-                             /* ÆÉ¤ß¤ËÌá¤¹¤³¤È¤¬¤Ç¤­¤Ş¤»¤ó */
+                             /* èª­ã¿ã«æˆ»ã™ã“ã¨ãŒã§ãã¾ã›ã‚“ */
 	(void)TanMuhenkan(d);
 	return 0;
       }
       yc->ys = yc->ye = yc->cStartp;
-      yc->curbun = yc->nbunsetsu - 1; /* ¤Ò¤È¤ÄÆÉ¤ß¤ËÌá¤¹ */
+      yc->curbun = yc->nbunsetsu - 1; /* ã²ã¨ã¤èª­ã¿ã«æˆ»ã™ */
       for (i = yc->nbunsetsu - 1; i >= yc->curbun; i--) {
 	if (RkwGoTo(yc->context, i) == NG ||
 	    RkwGetStat(yc->context, &stat) == NG ||
 	    RkwStoreYomi(yc->context, (wchar_t *)0, 0) == NG) {
 	  return makeRkError(d, "\306\311\244\337\244\313\314\341\244\271"
 	"\244\263\244\310\244\254\244\307\244\255\244\336\244\273\244\363");
-                                /* ÆÉ¤ß¤ËÌá¤¹¤³¤È¤¬¤Ç¤­¤Ş¤»¤ó */
+                                /* èª­ã¿ã«æˆ»ã™ã“ã¨ãŒã§ãã¾ã›ã‚“ */
 	}
 	l += stat.ylen;
 	yc->nbunsetsu--;
@@ -600,11 +571,11 @@ ChikujiYomiDeletePrevious(d)
   KanaDeletePrevious(d);
   yc->status |= CHIKUJI_OVERWRAP;
   if (yc->kCurs <= yc->cStartp && yc->kEndp <= yc->cStartp && yc->nbunsetsu) {
-    /* Ê¸Àá¤Ï¤¢¤ë¤Î¤ËÆÉ¤ß¤¬¤Ê¤¤¤Ê¤é */
+    /* æ–‡ç¯€ã¯ã‚ã‚‹ã®ã«èª­ã¿ãŒãªã„ãªã‚‰ */
     if (RkwGoTo(yc->context, yc->nbunsetsu - 1) == -1) {
       return makeRkError(d, "\312\270\300\341\244\316\260\334\306\260\244\313"
 	"\274\272\307\324\244\267\244\336\244\267\244\277");
-                            /* Ê¸Àá¤Î°ÜÆ°¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                            /* æ–‡ç¯€ã®ç§»å‹•ã«å¤±æ•—ã—ã¾ã—ãŸ */
     }
     yc->kouhoCount = 0;
     yc->curbun = yc->nbunsetsu - 1;
@@ -615,7 +586,7 @@ ChikujiYomiDeletePrevious(d)
     moveToChikujiYomiMode(d);
     makeYomiReturnStruct(d);
     if (yc->kEndp <= yc->cStartp && !yc->nbunsetsu) {
-      /* ²¿¤Ë¤â¤Ê¤¤ */
+      /* ä½•ã«ã‚‚ãªã„ */
       d->current_mode = yc->curMode = yc->myEmptyMode;
       d->kanji_status_return->info |= KanjiEmptyInfo;
     }
@@ -623,11 +594,8 @@ ChikujiYomiDeletePrevious(d)
   return 0;
 }
 
-static ChikujiHenkan pro((uiContext));
 
-static int
-ChikujiHenkan(d)
-     uiContext d;
+static int ChikujiHenkan( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   int n, tmp, idx;
@@ -641,7 +609,7 @@ ChikujiHenkan(d)
     jrKanjiError = "\245\265\241\274\245\320\244\254\303\340\274\241\274\253"
 	"\306\260\312\321\264\271\244\362\245\265\245\335\241\274\245\310"
 	"\244\267\244\306\244\244\244\336\244\273\244\363";
-                   /* ¥µ¡¼¥Ğ¤¬Ãà¼¡¼«Æ°ÊÑ´¹¤ò¥µ¥İ¡¼¥È¤·¤Æ¤¤¤Ş¤»¤ó */     
+                   /* ã‚µãƒ¼ãƒãŒé€æ¬¡è‡ªå‹•å¤‰æ›ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“ */
     makeGLineMessageFromString(d, jrKanjiError);
     makeKanjiStatusReturn(d, yc);
     d->nbytes = 0;
@@ -675,7 +643,7 @@ ChikujiHenkan(d)
   yc->kRStartp = yc->kCurs = yc->kEndp;
   yc->rStartp  = yc->rCurs = yc->rEndp;
 
-  if (yc->cStartp < yc->kEndp) { /* ÆÉ¤ß¤¬¤¢¤ì¤Ğ */
+  if (yc->cStartp < yc->kEndp) { /* èª­ã¿ãŒã‚ã‚Œã° */
     yc->kCurs = yc->kEndp;
     if (chikujiSubstYomi(d) < 0) {
       makeGLineMessageFromString(d, jrKanjiError);
@@ -686,7 +654,7 @@ ChikujiHenkan(d)
     if (n == -1) {
       (void)makeRkError(d, "\312\321\264\271\244\313\274\272\307\324\244\267"
 	"\244\336\244\267\244\277");
-                           /* ÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                           /* å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸ */
       (void)TanMuhenkan(d);
       return 0;
     }
@@ -702,7 +670,7 @@ ChikujiHenkan(d)
   if (RkwGoTo(yc->context, tmp) == -1) {
     makeRkError(d, "\303\340\274\241\312\321\264\271\244\313\274\272\307\324"
 	"\244\267\244\336\244\267\244\277");
-                   /* Ãà¼¡ÊÑ´¹¤Ë¼ºÇÔ¤·¤Ş¤·¤¿ */
+                   /* é€æ¬¡å¤‰æ›ã«å¤±æ•—ã—ã¾ã—ãŸ */
     return 0;
   }
   yc->curbun = tmp;
@@ -718,9 +686,8 @@ ChikujiHenkan(d)
   return d->nbytes;
 }
 
-void
-moveToChikujiTanMode(d)
-     uiContext d;
+
+void moveToChikujiTanMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -730,9 +697,8 @@ moveToChikujiTanMode(d)
   currentModeInfo(d);
 }
 
-void
-moveToChikujiYomiMode(d)
-     uiContext d;
+
+void moveToChikujiYomiMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -741,10 +707,8 @@ moveToChikujiYomiMode(d)
   EmptyBaseModeInfo(d, yc);
 }
 
-static int
-generalNaive(d, fn)
-uiContext d;
-int (*fn)();
+
+static int generalNaive( uiContext d, int (*fn)(uiContext) )
 {
   if ((((yomiContext)d->modec)->generalFlags) &
       (CANNA_YOMI_HANKAKU | CANNA_YOMI_ROMAJI | CANNA_YOMI_BASE_HANKAKU)) {
@@ -757,29 +721,20 @@ int (*fn)();
 
 extern int YomiInsert();
 
-static ChikujiHenkanNaive pro((uiContext));
 
-static int
-ChikujiHenkanNaive(d)
-uiContext d;
+static int ChikujiHenkanNaive( uiContext d )
 {
   return generalNaive(d, YomiInsert);
 }
 
-static ChikujiHenkanOrNothing pro((uiContext));
 
-static int
-ChikujiHenkanOrNothing(d)
-     uiContext d;
+static int ChikujiHenkanOrNothing( uiContext d )
 {
   return generalNaive(d, NothingChanged);
 }
 
-static ChikujiMuhenkan pro((uiContext));
 
-static int
-ChikujiMuhenkan(d)
-uiContext d;
+static int ChikujiMuhenkan( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 

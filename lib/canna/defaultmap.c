@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -31,25 +32,24 @@ extern int howToBehaveInCaseOfUndefKey;
 
 #define DEFAULTBEHAVIOR 0
 
-static int (*getfunc(tbl, f))()
-struct funccfunc *tbl;
-unsigned char f;
+// @return Ë¶ã„Å§„Åã„Çâ„Å™„Åã„Å£„Åü„Å®„Åç NULL.
+static int (*getfunc(struct funccfunc* tbl, unsigned char f))(uiContext)
 {
-  struct funccfunc *p;
+    struct funccfunc *p;
 
-  for (p = tbl ; p->funcid || p->cfunc ; p++) {
-    if (p->funcid == (unsigned char)f) {
-      return p->cfunc;
+    for (p = tbl ; p->funcid || p->cfunc ; p++) {
+        if (p->funcid == f) {
+            return p->cfunc;
+        }
     }
-  }
-  return (int (*)())0;
+
+    return NULL;
 }
 
-static
-simpleUndefBehavior(d)
-uiContext d;
+
+static int simpleUndefBehavior( uiContext d)
 {
-  switch (howToBehaveInCaseOfUndefKey)
+    switch (howToBehaveInCaseOfUndefKey)
     {
     case kc_through:
       d->kanji_status_return->length = -1;
@@ -82,22 +82,22 @@ uiContext d;
     }
 }
 
-searchfunc(d, mode, whattodo, key, fnum)
-uiContext d;
-KanjiMode mode;
-int whattodo;
-int key;
-int fnum;
+
+int searchfunc( uiContext d,
+                KanjiMode mode,
+                int whattodo,
+                int key,
+                int fnum)
 {
-  int (*func)();
+    int (*func)(uiContext);
 
   if (fnum == 0) {
     fnum = mode->keytbl[key];
   }
   switch (whattodo) {
   case KEY_CALL:
-    /* •¢•Î•’•°•Ÿ•√•»•‚°º•…§¨ strokelimit •π•»•Ì°º•Ø∞ æÂ¬≥§§§ø§È
-       •µ°º•–§»§Œ¿‹¬≥§Ú¿⁄§Î */
+    /* „Ç¢„É´„Éï„Ç°„Éô„ÉÉ„Éà„É¢„Éº„Éâ„Åå strokelimit „Çπ„Éà„É≠„Éº„ÇØ‰ª•‰∏äÁ∂ö„ÅÑ„Åü„Çâ
+       „Çµ„Éº„Éê„Å®„ÅÆÊé•Á∂ö„ÇíÂàá„Çã */
     if (cannaconf.strokelimit > 0) {
       extern KanjiModeRec alpha_mode;
       if (mode == &alpha_mode) {
@@ -109,7 +109,7 @@ int fnum;
 #endif
 	if (d->strokecounter == cannaconf.strokelimit + 1) {
 	  jrKanjiPipeError();
-	}	
+	}
       }
       else {
 	d->strokecounter = 0;
@@ -120,29 +120,28 @@ int fnum;
 #endif
       }
     }
-    /* §§§Ë§§§ËÀ‹≥ ≈™§ ΩËÕ˝(§≥§≥§ﬁ§«§œ¡∞ΩËÕ˝) */
+    /* „ÅÑ„Çà„ÅÑ„ÇàÊú¨Ê†ºÁöÑ„Å™Âá¶ÁêÜ(„Åì„Åì„Åæ„Åß„ÅØÂâçÂá¶ÁêÜ) */
     if (fnum < CANNA_FN_MAX_FUNC) {
       func = getfunc(mode->ftbl, fnum);
-      if (func) {
-	return (*func)(d);
-      }
+      if (func)
+          return (*func)(d);
     }
     else {
       func = getfunc(mode->ftbl, CANNA_FN_UserMode);
       if (func) {
-	/* func §Œ•ø•§•◊§¨æÂ§»∞„§√§∆§∆±¯§§§ §¢... */
-	return (*func)(d, fnum);
+	/* func „ÅÆ„Çø„Ç§„Éó„Åå‰∏ä„Å®ÈÅï„Å£„Å¶„Å¶Ê±ö„ÅÑ„Å™„ÅÇ... */
+          abort();  // TODO: „Å©„ÅÜ„Åô„Çå„Å∞„ÅÑ„ÅÑ?
+	return (*func)(d);
       }
     }
-    /* §Ω§Œ•‚°º•…§« fnum §À¬–±˛§π§Îµ°«Ω§¨§ §§°£§∑§´§ø§¨§ §§§Œ§«°¢
-       •«•’•©•Î•»µ°«Ω§Ú√µ§π */
+    /* „Åù„ÅÆ„É¢„Éº„Éâ„Åß fnum „Å´ÂØæÂøú„Åô„ÇãÊ©üËÉΩ„Åå„Å™„ÅÑ„ÄÇ„Åó„Åã„Åü„Åå„Å™„ÅÑ„ÅÆ„Åß„ÄÅ
+       „Éá„Éï„Ç©„É´„ÉàÊ©üËÉΩ„ÇíÊé¢„Åô */
     func = getfunc(mode->ftbl, DEFAULTBEHAVIOR);
-    if (func) {
-      return (*func)(d);
-    }
-    else {
+    if (func)
+        return (*func)(d);
+    else
       return simpleUndefBehavior(d);
-    }
+
     /* NOTREACHED */
     break;
   case KEY_CHECK:
@@ -160,17 +159,16 @@ int fnum;
   /* NOTREACHED */
 }
 
-/* √‡º°∆…§ﬂ•‚°º•…Õ— */
 
-CYsearchfunc(d, mode, whattodo, key, fnum)
-uiContext d;
-KanjiMode mode;
-int whattodo;
-int key;
-int fnum;
+/* ÈÄêÊ¨°Ë™≠„Åø„É¢„Éº„ÉâÁî® */
+int CYsearchfunc( uiContext d,
+                  KanjiMode mode,
+                  int whattodo,
+                  int key,
+                  int fnum)
 {
-  int (*func)();
-  extern KanjiModeRec yomi_mode;
+    int (*func)(uiContext);
+    extern KanjiModeRec yomi_mode;
 
   if (fnum == 0) {
     fnum = mode->keytbl[key];
@@ -182,12 +180,11 @@ int fnum;
     func = getfunc(yomi_mode.ftbl, fnum);
     switch (whattodo) {
     case KEY_CALL:
-      if (func) {
-	return (*func)(d);
-      }
-      else {
-	return Yomisearchfunc(d, mode, whattodo, key, fnum);
-      }
+      if (func)
+          return (*func)(d);
+      else
+          return Yomisearchfunc(d, mode, whattodo, key, fnum);
+
       /* NOTREACHED */
       break;
     case KEY_CHECK:
@@ -207,7 +204,7 @@ int fnum;
 #define NONE CANNA_FN_Undefined
 
 BYTE default_kmap[256] =
-{               
+{
 /* C-@ */       CANNA_FN_Mark,
 /* C-a */       CANNA_FN_BeginningOfLine,
 /* C-b */       CANNA_FN_Backward,
@@ -369,69 +366,69 @@ BYTE default_kmap[256] =
 /* KP-/ */      NONE,
 /* KP-- */      NONE,
 /* S-space */   NONE,
-/* °£ */        CANNA_FN_FunctionalInsert,
-/* °÷ */        CANNA_FN_FunctionalInsert,
-/* °◊ */        CANNA_FN_FunctionalInsert,
-/* °¢ */        CANNA_FN_FunctionalInsert,
-/* °¶ */        CANNA_FN_FunctionalInsert,
-/* •Ú */        CANNA_FN_FunctionalInsert,
-/* •° */        CANNA_FN_FunctionalInsert,
-/* •£ */        CANNA_FN_FunctionalInsert,
-/* •• */        CANNA_FN_FunctionalInsert,
-/* •ß */        CANNA_FN_FunctionalInsert,
-/* •© */        CANNA_FN_FunctionalInsert,
-/* •„ */        CANNA_FN_FunctionalInsert,
-/* •Â */        CANNA_FN_FunctionalInsert,
-/* •Á */        CANNA_FN_FunctionalInsert,
-/* •√ */        CANNA_FN_FunctionalInsert,
-/* °º */        CANNA_FN_FunctionalInsert,
-/* •¢ */        CANNA_FN_FunctionalInsert,
-/* •§ */        CANNA_FN_FunctionalInsert,
-/* •¶ */        CANNA_FN_FunctionalInsert,
-/* •® */        CANNA_FN_FunctionalInsert,
-/* •™ */        CANNA_FN_FunctionalInsert,
-/* •´ */        CANNA_FN_FunctionalInsert,
-/* •≠ */        CANNA_FN_FunctionalInsert,
-/* •Ø */        CANNA_FN_FunctionalInsert,
-/* •± */        CANNA_FN_FunctionalInsert,
-/* •≥ */        CANNA_FN_FunctionalInsert,
-/* •µ */        CANNA_FN_FunctionalInsert,
-/* •∑ */        CANNA_FN_FunctionalInsert,
-/* •π */        CANNA_FN_FunctionalInsert,
-/* •ª */        CANNA_FN_FunctionalInsert,
-/* •Ω */        CANNA_FN_FunctionalInsert,
-/* •ø */        CANNA_FN_FunctionalInsert,
-/* •¡ */        CANNA_FN_FunctionalInsert,
-/* •ƒ */        CANNA_FN_FunctionalInsert,
-/* •∆ */        CANNA_FN_FunctionalInsert,
-/* •» */        CANNA_FN_FunctionalInsert,
-/* •  */        CANNA_FN_FunctionalInsert,
-/* •À */        CANNA_FN_FunctionalInsert,
-/* •Ã */        CANNA_FN_FunctionalInsert,
-/* •Õ */        CANNA_FN_FunctionalInsert,
-/* •Œ */        CANNA_FN_FunctionalInsert,
-/* •œ */        CANNA_FN_FunctionalInsert,
-/* •“ */        CANNA_FN_FunctionalInsert,
-/* •’ */        CANNA_FN_FunctionalInsert,
-/* •ÿ */        CANNA_FN_FunctionalInsert,
-/* •€ */        CANNA_FN_FunctionalInsert,
-/* •ﬁ */        CANNA_FN_FunctionalInsert,
-/* •ﬂ */        CANNA_FN_FunctionalInsert,
-/* •‡ */        CANNA_FN_FunctionalInsert,
-/* •· */        CANNA_FN_FunctionalInsert,
-/* •‚ */        CANNA_FN_FunctionalInsert,
-/* •‰ */        CANNA_FN_FunctionalInsert,
-/* •Ê */        CANNA_FN_FunctionalInsert,
-/* •Ë */        CANNA_FN_FunctionalInsert,
-/* •È */        CANNA_FN_FunctionalInsert,
-/* •Í */        CANNA_FN_FunctionalInsert,
-/* •Î */        CANNA_FN_FunctionalInsert,
-/* •Ï */        CANNA_FN_FunctionalInsert,
-/* •Ì */        CANNA_FN_FunctionalInsert,
-/* •Ô */        CANNA_FN_FunctionalInsert,
-/* •Û */        CANNA_FN_FunctionalInsert,
-/* °´ */        CANNA_FN_FunctionalInsert,
-/* °¨ */        CANNA_FN_FunctionalInsert,
+/* „ÄÇ */        CANNA_FN_FunctionalInsert,
+/* „Äå */        CANNA_FN_FunctionalInsert,
+/* „Äç */        CANNA_FN_FunctionalInsert,
+/* „ÄÅ */        CANNA_FN_FunctionalInsert,
+/* „Éª */        CANNA_FN_FunctionalInsert,
+/* „É≤ */        CANNA_FN_FunctionalInsert,
+/* „Ç° */        CANNA_FN_FunctionalInsert,
+/* „Ç£ */        CANNA_FN_FunctionalInsert,
+/* „Ç• */        CANNA_FN_FunctionalInsert,
+/* „Çß */        CANNA_FN_FunctionalInsert,
+/* „Ç© */        CANNA_FN_FunctionalInsert,
+/* „É£ */        CANNA_FN_FunctionalInsert,
+/* „É• */        CANNA_FN_FunctionalInsert,
+/* „Éß */        CANNA_FN_FunctionalInsert,
+/* „ÉÉ */        CANNA_FN_FunctionalInsert,
+/* „Éº */        CANNA_FN_FunctionalInsert,
+/* „Ç¢ */        CANNA_FN_FunctionalInsert,
+/* „Ç§ */        CANNA_FN_FunctionalInsert,
+/* „Ç¶ */        CANNA_FN_FunctionalInsert,
+/* „Ç® */        CANNA_FN_FunctionalInsert,
+/* „Ç™ */        CANNA_FN_FunctionalInsert,
+/* „Ç´ */        CANNA_FN_FunctionalInsert,
+/* „Ç≠ */        CANNA_FN_FunctionalInsert,
+/* „ÇØ */        CANNA_FN_FunctionalInsert,
+/* „Ç± */        CANNA_FN_FunctionalInsert,
+/* „Ç≥ */        CANNA_FN_FunctionalInsert,
+/* „Çµ */        CANNA_FN_FunctionalInsert,
+/* „Ç∑ */        CANNA_FN_FunctionalInsert,
+/* „Çπ */        CANNA_FN_FunctionalInsert,
+/* „Çª */        CANNA_FN_FunctionalInsert,
+/* „ÇΩ */        CANNA_FN_FunctionalInsert,
+/* „Çø */        CANNA_FN_FunctionalInsert,
+/* „ÉÅ */        CANNA_FN_FunctionalInsert,
+/* „ÉÑ */        CANNA_FN_FunctionalInsert,
+/* „ÉÜ */        CANNA_FN_FunctionalInsert,
+/* „Éà */        CANNA_FN_FunctionalInsert,
+/* „Éä */        CANNA_FN_FunctionalInsert,
+/* „Éã */        CANNA_FN_FunctionalInsert,
+/* „Éå */        CANNA_FN_FunctionalInsert,
+/* „Éç */        CANNA_FN_FunctionalInsert,
+/* „Éé */        CANNA_FN_FunctionalInsert,
+/* „Éè */        CANNA_FN_FunctionalInsert,
+/* „Éí */        CANNA_FN_FunctionalInsert,
+/* „Éï */        CANNA_FN_FunctionalInsert,
+/* „Éò */        CANNA_FN_FunctionalInsert,
+/* „Éõ */        CANNA_FN_FunctionalInsert,
+/* „Éû */        CANNA_FN_FunctionalInsert,
+/* „Éü */        CANNA_FN_FunctionalInsert,
+/* „É† */        CANNA_FN_FunctionalInsert,
+/* „É° */        CANNA_FN_FunctionalInsert,
+/* „É¢ */        CANNA_FN_FunctionalInsert,
+/* „É§ */        CANNA_FN_FunctionalInsert,
+/* „É¶ */        CANNA_FN_FunctionalInsert,
+/* „É® */        CANNA_FN_FunctionalInsert,
+/* „É© */        CANNA_FN_FunctionalInsert,
+/* „É™ */        CANNA_FN_FunctionalInsert,
+/* „É´ */        CANNA_FN_FunctionalInsert,
+/* „É¨ */        CANNA_FN_FunctionalInsert,
+/* „É≠ */        CANNA_FN_FunctionalInsert,
+/* „ÉØ */        CANNA_FN_FunctionalInsert,
+/* „É≥ */        CANNA_FN_FunctionalInsert,
+/* „Çõ */        CANNA_FN_FunctionalInsert,
+/* „Çú */        CANNA_FN_FunctionalInsert,
 /* F1 */        NONE,
 /* F2 */        NONE,
 /* F3 */        NONE,

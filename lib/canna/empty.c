@@ -30,7 +30,8 @@ static char rcs_id[] = "@(#) 102.1 $Id: empty.c,v 1.2 2003/09/17 08:50:53 aida_s
 
 extern KanjiModeRec yomi_mode, cy_mode;
 
-/* EmptySelfInsert -- 自分自身を確定文字列として返す関数。
+/**
+ *    EmptySelfInsert -- 自分自身を確定文字列として返す関数。
  *
  */
 
@@ -48,7 +49,6 @@ static int inEmptySelfInsert(uiContext d)
   return res;
 }
 
-static EmptySelfInsert pro((uiContext));
 
 static int EmptySelfInsert(uiContext d)
 {
@@ -71,15 +71,11 @@ static int EmptySelfInsert(uiContext d)
   return res;
 }
 
-/* EmptyYomiInsert -- ○モードに移行し、読みを入力する関数
- *
+
+/**
+ * ○モードに移行し、読みを入力する関数
  */
-
-static EmptyYomiInsert pro((uiContext));
-
-static
-EmptyYomiInsert(d)
-uiContext d;
+static int EmptyYomiInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -99,11 +95,7 @@ uiContext d;
   するなんてことは必要ないのではないのかなぁ。
  */
 
-static EmptyQuotedInsert pro((uiContext));
-
-static
-EmptyQuotedInsert(d)
-uiContext d;
+static int EmptyQuotedInsert( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -112,15 +104,11 @@ uiContext d;
   return YomiQuotedInsert(d);
 }
 
-/*
-  AlphaSelfInsert -- 自分自身を確定文字列として返す関数。
+
+/**
+ * 自分自身を確定文字列として返す関数。
  */
-
-static AlphaSelfInsert pro((uiContext));
-
-static
-AlphaSelfInsert(d)
-uiContext d;
+static int AlphaSelfInsert( uiContext d )
 {
   unsigned kanap = (unsigned)d->ch;
 
@@ -140,11 +128,8 @@ uiContext d;
   }
 }
 
-static AlphaNop pro((uiContext));
 
-static
-AlphaNop(d)
-uiContext d;
+static int AlphaNop( uiContext d )
 {
   /* currentModeInfo でモード情報が必ず返るようにダミーのモードを入れておく */
   d->majorMode = d->minorMode = CANNA_MODE_KigoMode;
@@ -152,11 +137,8 @@ uiContext d;
   return 0;
 }
 
-static EmptyQuit pro((uiContext));
 
-static
-EmptyQuit(d)
-uiContext d;
+static int EmptyQuit( uiContext d )
 {
   int res;
 
@@ -169,11 +151,8 @@ uiContext d;
   return res;
 }
 
-static EmptyKakutei pro((uiContext));
 
-static
-EmptyKakutei(d)
-uiContext d;
+static int EmptyKakutei( uiContext d )
 {
   int res;
 
@@ -186,10 +165,8 @@ uiContext d;
   return res;
 }
 
-static EmptyDeletePrevious pro((uiContext));
 
-static int
-EmptyDeletePrevious(uiContext d)
+static int EmptyDeletePrevious(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -214,10 +191,8 @@ extraFunc* FindExtraFunc(int fnum)
   return (extraFunc *)0;
 }
 
-static
-UserMode(d, estruct)
-uiContext d;
-extraFunc *estruct;
+
+static int UserMode( uiContext d, extraFunc *estruct )
 {
   newmode *nmode = estruct->u.modeptr;
   yomiContext yc = (yomiContext)d->modec;
@@ -246,14 +221,17 @@ extraFunc *estruct;
 }
 
 #ifndef NO_EXTEND_MENU /* continues to the bottom of this file */
-static
-UserSelect(d, estruct)
-uiContext d;
-extraFunc *estruct;
+static int
+UserSelect( uiContext d, extraFunc *estruct )
 {
   int curkigo = 0, *posp = (int *)0;
   kigoIchiran *kigop = (kigoIchiran *)0;
-  extern int uuKigoGeneralExitCatch(), uuKigoMake();
+
+  extern int uuKigoGeneralExitCatch( uiContext d, int retval, mode_context env );
+  extern int uuKigoMake( uiContext d, cannawc** allkouho, int size, char cur,
+                    char mode, int (*exitfunc)(uiContext, int, mode_context),
+                    int *posp );
+
   selectinfo *selinfo = (selectinfo *)0, *info;
   yomiContext yc = (yomiContext)d->modec;
 
@@ -293,10 +271,9 @@ extraFunc *estruct;
                     curkigo, kigop->kigo_mode, uuKigoGeneralExitCatch, posp);
 }
 
-static
-UserMenu(d, estruct)
-uiContext d;
-extraFunc *estruct;
+
+static int
+UserMenu( uiContext d, extraFunc *estruct )
 {
   return showmenu(d, estruct->u.menuptr);
 }
@@ -304,10 +281,9 @@ extraFunc *estruct;
 
 /* デフォルト以外のモード使用時に呼び出す関数を切り分ける */
 
-static
-ProcExtraFunc(d, fnum)
-uiContext d;
-int fnum;
+
+static int
+ProcExtraFunc( uiContext d, int fnum )
 {
   extraFunc *extrafunc;
 
@@ -329,8 +305,8 @@ int fnum;
   return NothingChangedWithBeep(d);
 }
 
-getBaseMode(yc)
-yomiContext yc;
+
+int getBaseMode( yomiContext yc )
 {
   int res;
   long fl = yc->generalFlags;
@@ -364,12 +340,10 @@ yomiContext yc;
   return res;
 }
 
+
 /* ベース文字の切り替え */
 
-void
-EmptyBaseModeInfo(d, yc)
-uiContext d;
-yomiContext yc;
+void EmptyBaseModeInfo( uiContext d, yomiContext yc )
 {
   coreContext cc = (coreContext)d->modec;
 
@@ -377,8 +351,8 @@ yomiContext yc;
   currentModeInfo(d);
 }
 
-EmptyBaseHira(d)
-uiContext d;
+
+int EmptyBaseHira( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -391,8 +365,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseKata(d)
-uiContext d;
+
+int EmptyBaseKata( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -408,8 +382,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseEisu(d)
-uiContext d;
+
+int EmptyBaseEisu( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -423,8 +397,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseZen(d)
-uiContext d;
+
+int EmptyBaseZen( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -444,8 +418,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseHan(d)
-uiContext d;
+
+int EmptyBaseHan( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -472,8 +446,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseKana(d)
-uiContext d;
+
+int EmptyBaseKana( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -495,8 +469,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseKakutei(d)
-uiContext d;
+
+int EmptyBaseKakutei( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -509,8 +483,8 @@ uiContext d;
   return 0;
 }
 
-EmptyBaseHenkan(d)
-uiContext d;
+
+int EmptyBaseHenkan( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -525,8 +499,7 @@ uiContext d;
 
 #ifndef NO_EXTEND_MENU
 static int
-renbunInit(d)
-uiContext d;
+renbunInit( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -553,9 +526,8 @@ uiContext d;
   }
 }
 
-static int
-showVersion(d)
-uiContext d;
+
+static int showVersion( uiContext d )
 {
   int retval = 0;
   char s[512];
@@ -578,14 +550,13 @@ uiContext d;
   return (retval);
 }
 
-static int
-showServer(d)
-uiContext d;
+
+static int showServer( uiContext d )
 {
 #ifndef STANDALONE /* This is not used in Windows environment 1996.7.30 kon */
   int retval = 0;
   char s[512];
-  extern defaultContext;
+  extern int defaultContext;
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
@@ -615,9 +586,8 @@ uiContext d;
 #endif /* STANDALONE */
 }
 
-static int
-showGakushu(d)
-uiContext d;
+
+static int showGakushu( uiContext d )
 {
   int retval = 0;
   yomiContext yc = (yomiContext)d->modec;
@@ -643,9 +613,8 @@ uiContext d;
   return (retval);
 }
 
-static int
-showInitFile(d)
-uiContext d;
+
+static int showInitFile( uiContext d )
 {
   int retval = 0;
   char s[512];
@@ -677,9 +646,8 @@ uiContext d;
   return (retval);
 }
 
-static int
-showRomkanaFile(d)
-uiContext d;
+
+static int showRomkanaFile( uiContext d )
 {
   int retval = 0;
   char s[512];
@@ -712,13 +680,12 @@ uiContext d;
   return (retval);
 }
 
-static int
-dicSync(d)
-uiContext d;
+
+static int dicSync( uiContext d )
 {
   int retval = 0;
   char s[512];
-  extern defaultContext;
+  extern int defaultContext;
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {

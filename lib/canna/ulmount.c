@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -106,7 +106,7 @@ uiContext d;
 #endif
     return(NG);
   }
-  
+
   if((mc = newMountContext()) == (mountContext)NULL) {
     popCallback(d);
     return(NG);
@@ -280,7 +280,7 @@ mode_context env;
     MBstowcs(d->genbuf, "\274\255\275\361\244\316\245\336\245\246\245\363"
 	"\245\310\241\277\245\242\245\363\245\336\245\246\245\363\245\310"
 	"\244\362\271\324\244\244\244\336\244\267\244\277", 512);
-           /* 辞書のマウント／アンマウントを行いました */ 
+           /* 辞書のマウント／アンマウントを行いました */
   else
     MBstowcs(d->genbuf, "\274\255\275\361\244\316\245\336\245\246\245\363"
 	"\245\310\241\277\245\242\245\363\245\336\245\246\245\363\245\310"
@@ -493,8 +493,8 @@ uiContext d;
   return(dicLc);
 }
 
-dicMount(d)
-uiContext d;
+
+int dicMount( uiContext d )
 {
   ichiranContext oc;
   mountContext mc;
@@ -504,7 +504,7 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
 
   if((retval = getMountContext(d)) == NG) {

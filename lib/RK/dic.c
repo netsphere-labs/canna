@@ -365,21 +365,20 @@ int copyFile(struct DM* src, struct DM* dst)
   return ecount ? -1 : 0;
 }
 
-/*
- * RkwListDic(cx_num, dirname, buf, size)
- * int  cx_num;             コンテクストナンバー
- * unsigned char *dirname;  辞書リストを出力したいディレクトリ名
- * unsigned char *buf;      辞書リストが返ってくるバッファ
- * int  size;               バッファのサイズ
+
+/**
+ * @param cx_num;             コンテクストナンバー
+ * @param dirname;  辞書リストを出力したいディレクトリ名
+ * @param buf;      辞書リストが返ってくるバッファ
+ * @param size;               バッファのサイズ
  *
- * リターン値
- *             成功した場合                      辞書の数
+ * @return     成功した場合                      辞書の数
  *             コンテクストナンバーが負の場合          BADCONT
  *             RkwCreateContextに失敗した場合           BADCONT
  *             RkwSetDicPathに失敗した場合              NOTALC
  */
 int
-RkwListDic( int cx_num, char* dirname, char* buf, int size )
+RkwListDic( int cx_num, const char* dirname, char* buf, int size )
 {
   int dicscnt;
   int new_cx_num;

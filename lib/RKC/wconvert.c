@@ -237,7 +237,7 @@ connect_inet( const char* hostname, int number )
     struct addrinfo hints, *infolist, *info;
     struct servent *sp ;
     char portbuf[10];
-    canna_uint16_t port;
+    uint16_t port;
 
     sp = getservbyname( IR_SERVICE_NAME, "tcp" );
     port = ( sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT ) + number;
@@ -1920,8 +1920,8 @@ Query_Extension()
 /* ARGSUSED */
 
 
-static
-int rkcw_list_dictionary( RkcContext* cx, char* dirname, char* dicnames_return,
+static int
+rkcw_list_dictionary( RkcContext* cx, const char* dirname, char* dicnames_return,
                           int size )
 {
     int extension_base = Query_Extension(), n;
@@ -2372,7 +2372,7 @@ int rkcw_set_app_name( RkcContext* cx, char* apname )
   このチェックは rkc.c で行なうこと。
  */
 static
-int rkcw_notice_group_name( RkcContext* cx, char* groupname)
+int rkcw_notice_group_name( RkcContext* cx, const char* groupname)
 {
   return mount_dictionary(wNoticeGroupName, 0, (int)cx->server, groupname, 0);
 }

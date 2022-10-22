@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -28,7 +29,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: hex.c,v 1.2 2003/01/10 13:08:44 aida_s E
 #include "canna.h"
 
 #define HEXPROMPT "\245\263\241\274\245\311: "
-#define HEXPROMPTLEN  5 /* "¥³¡¼¥É: " ¤ÎÄ¹¤µ¤Ï5¥Ð¥¤¥È */
+#define HEXPROMPTLEN  5 /* "ã‚³ãƒ¼ãƒ‰: " ã®é•·ã•ã¯5ãƒã‚¤ãƒˆ */
 
 /*********************************************************************
  *                      wchar_t replace begin                        *
@@ -38,25 +39,22 @@ static char rcs_id[] = "@(#) 102.1 $Id: hex.c,v 1.2 2003/01/10 13:08:44 aida_s E
 #endif
 #define wchar_t cannawc
 
-static int quitHex();
 
-/* cfuncdef
+extern int convertAsHex( uiContext d );
+extern int cvtAsHex( uiContext d, cannawc* buf, cannawc* hexbuf, int hexlen );
+extern int checkGLineLen( uiContext d );
 
-  hexEveryTimeCatch -- ÆÉ¤ß¤ò£±£¶¿ÊÆþÎÏ¥â¡¼¥É¤ÇÉ½¼¨¤¹¤ë´Ø¿ô
-
+/**
+ * èª­ã¿ã‚’ï¼‘ï¼–é€²å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã§è¡¨ç¤ºã™ã‚‹é–¢æ•°
  */
-
-static
-hexEveryTimeCatch(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
+static int
+hexEveryTimeCatch( uiContext d, int retval, mode_context env )
      /* ARGSUSED */
 {
   yomiContext yc = (yomiContext)d->modec;
   static wchar_t buf[256];
-  /* ??? ¤³¤Î¤è¤¦¤Ê¥Ð¥Ã¥Õ¥¡¤ò¤¤¤í¤¤¤í¤ÊÉôÊ¬¤Ç»ý¤Ä¤Î¤Ï¹¥¤Þ¤·¤¯¤Ê¤¤¤Î¤Ç¡¢
-     uiContext ¤Ë¤Þ¤È¤á¤Æ»ý¤Ã¤Æ¶¦Í­¤·¤Æ»È¤Ã¤¿Êý¤¬ÎÉ¤¤ */
+  /* ??? ã“ã®ã‚ˆã†ãªãƒãƒƒãƒ•ã‚¡ã‚’ã„ã‚ã„ã‚ãªéƒ¨åˆ†ã§æŒã¤ã®ã¯å¥½ã¾ã—ããªã„ã®ã§ã€
+     uiContext ã«ã¾ã¨ã‚ã¦æŒã£ã¦å…±æœ‰ã—ã¦ä½¿ã£ãŸæ–¹ãŒè‰¯ã„ */
   int codelen = d->kanji_status_return->length;
 
   d->kanji_status_return->info &= ~(KanjiThroughInfo | KanjiEmptyInfo);
@@ -71,7 +69,7 @@ hexEveryTimeCatch(d, retval, env)
     d->kanji_status_return->gline.revLen = d->kanji_status_return->revLen;
     d->kanji_status_return->info |= KanjiGLineInfo;
     echostrClear(d);
-    if (codelen == 4) { /* £´Ê¸»ú¤Ë¤Ê¤Ã¤¿¤È¤­¤Ë¤Ï.... */
+    if (codelen == 4) { /* ï¼”æ–‡å­—ã«ãªã£ãŸã¨ãã«ã¯.... */
       if (convertAsHex(d)) {
 	yc->allowedChars = CANNA_NOTHING_ALLOWED;
 	*(d->kanji_status_return->echoStr = yc->kana_buffer + yc->kEndp + 1)
@@ -100,11 +98,18 @@ hexEveryTimeCatch(d, retval, env)
   return retval;
 }
 
-static
-exitHex(d, retval, env)
-uiContext d;
-int retval;
-mode_context env;
+
+static int quitHex( uiContext d, int retval, mode_context env )
+     /* ARGSUSED */
+{
+  GlineClear(d);
+  popCallback(d);
+  currentModeInfo(d);
+  return prevMenuIfExist(d);
+}
+
+
+static int exitHex( uiContext d, int retval, mode_context env )
 {
   killmenu(d);
   if (cvtAsHex(d, d->buffer_return, d->buffer_return, d->nbytes)) {
@@ -119,25 +124,8 @@ mode_context env;
   }
 }
 
-static
-quitHex(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
-     /* ARGSUSED */
-{
-  GlineClear(d);
-  popCallback(d);
-  currentModeInfo(d);
-  return prevMenuIfExist(d);
-}
 
-yomiContext GetKanjiString();
-
-static
-hexMode(d, major_mode)
-uiContext d;
-int major_mode;
+static int hexMode( uiContext d, int major_mode )
 {
   yomiContext yc;
 
@@ -156,20 +144,17 @@ int major_mode;
   return 0;
 }
 
-/* cfuncdef
 
-  HexMode -- £±£¶¿ÊÆþÎÏ¥â¡¼¥É¤Ë¤Ê¤ë¤È¤­¤Ë¸Æ¤Ð¤ì¤ë¡£
-
+/**
+ * ï¼‘ï¼–é€²å…¥åŠ›ãƒ¢ãƒ¼ãƒ‰ã«ãªã‚‹ã¨ãã«å‘¼ã°ã‚Œã‚‹ã€‚
  */
-
-HexMode(d)
-uiContext d;
+int HexMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
 
   return hexMode(d, CANNA_MODE_HexMode);
 }

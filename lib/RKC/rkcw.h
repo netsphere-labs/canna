@@ -36,6 +36,7 @@
 #define UNIXCONN
 
 #include "canna/ccompat.h"
+#include <stdint.h>
 
 #ifndef CANNAWC_DEFINED
   #define CANNAWC_DEFINED

@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,34 +13,30 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
 static char emptymap_id[] = "@(#) 102.1 $Id: emptymap.h,v 1.3 2003/09/17 08:50:53 aida_s Exp $";
 #endif /* lint */
 
-extern AlphaMode(), HenkanNyuryokuMode(), ZenHiraKakuteiMode();
-extern ZenKataKakuteiMode(), HanKataKakuteiMode(), ZenAlphaKakuteiMode();
-extern HanAlphaKakuteiMode(), KigoIchiran();
 #ifndef NO_EXTEND_MENU
-extern HexMode(), BushuMode();
+extern int HexMode( uiContext d );
+extern int BushuMode( uiContext d );
 #endif
-extern KigoIchiran(), UiUtilMode();
-extern YomiBaseHiraKataToggle(), YomiBaseZenHanToggle();
-extern YomiBaseKanaEisuToggle(), YomiBaseKakuteiHenkanToggle();
-extern YomiBaseRotateForw(), YomiBaseRotateBack();
-extern DoFuncSequence(),UseOtherKeymap(), YomiModeBackup();
-extern dicTouroku pro((uiContext)), dicSakujo pro((uiContext));
+extern int dicTouroku( uiContext d );
+extern int dicSakujo( uiContext d );
 #ifndef NO_EXTEND_MENU
-extern kigoRussia(), kigoGreek(), kigoKeisen();
-extern dicMount(), serverChange(), serverFin();
-extern chikujiInit();
+extern int kigoRussia( uiContext d );
+extern int kigoGreek( uiContext d );
+extern int kigoKeisen( uiContext d );
+extern int dicMount( uiContext d ), serverChange(uiContext d), serverFin(uiContext d);
+extern int chikujiInit( uiContext d );
 #endif
 
 #define NONE CANNA_FN_Undefined
@@ -102,7 +99,7 @@ static struct funccfunc empty_funcs[] = {
 };
 
 BYTE empty_kmap[256] =
-{               
+{
 /* C-@ */       CANNA_FN_SelfInsert,
 /* C-a */       CANNA_FN_SelfInsert,
 /* C-b */       CANNA_FN_SelfInsert,
@@ -264,69 +261,69 @@ BYTE empty_kmap[256] =
 /* 9e */        NONE,
 /* 9f */        NONE,
 /* KANASPACE */ NONE,
-/* °£ */        CANNA_FN_FunctionalInsert,
-/* °÷ */        CANNA_FN_FunctionalInsert,
-/* °◊ */        CANNA_FN_FunctionalInsert,
-/* °¢ */        CANNA_FN_FunctionalInsert,
-/* °¶ */        CANNA_FN_FunctionalInsert,
-/* •Ú */        CANNA_FN_FunctionalInsert,
-/* •° */        CANNA_FN_FunctionalInsert,
-/* •£ */        CANNA_FN_FunctionalInsert,
-/* •• */        CANNA_FN_FunctionalInsert,
-/* •ß */        CANNA_FN_FunctionalInsert,
-/* •© */        CANNA_FN_FunctionalInsert,
-/* •„ */        CANNA_FN_FunctionalInsert,
-/* •Â */        CANNA_FN_FunctionalInsert,
-/* •Á */        CANNA_FN_FunctionalInsert,
-/* •√ */        CANNA_FN_FunctionalInsert,
-/* °º */        CANNA_FN_FunctionalInsert,
-/* •¢ */        CANNA_FN_FunctionalInsert,
-/* •§ */        CANNA_FN_FunctionalInsert,
-/* •¶ */        CANNA_FN_FunctionalInsert,
-/* •® */        CANNA_FN_FunctionalInsert,
-/* •™ */        CANNA_FN_FunctionalInsert,
-/* •´ */        CANNA_FN_FunctionalInsert,
-/* •≠ */        CANNA_FN_FunctionalInsert,
-/* •Ø */        CANNA_FN_FunctionalInsert,
-/* •± */        CANNA_FN_FunctionalInsert,
-/* •≥ */        CANNA_FN_FunctionalInsert,
-/* •µ */        CANNA_FN_FunctionalInsert,
-/* •∑ */        CANNA_FN_FunctionalInsert,
-/* •π */        CANNA_FN_FunctionalInsert,
-/* •ª */        CANNA_FN_FunctionalInsert,
-/* •Ω */        CANNA_FN_FunctionalInsert,
-/* •ø */        CANNA_FN_FunctionalInsert,
-/* •¡ */        CANNA_FN_FunctionalInsert,
-/* •ƒ */        CANNA_FN_FunctionalInsert,
-/* •∆ */        CANNA_FN_FunctionalInsert,
-/* •» */        CANNA_FN_FunctionalInsert,
-/* •  */        CANNA_FN_FunctionalInsert,
-/* •À */        CANNA_FN_FunctionalInsert,
-/* •Ã */        CANNA_FN_FunctionalInsert,
-/* •Õ */        CANNA_FN_FunctionalInsert,
-/* •Œ */        CANNA_FN_FunctionalInsert,
-/* •œ */        CANNA_FN_FunctionalInsert,
-/* •“ */        CANNA_FN_FunctionalInsert,
-/* •’ */        CANNA_FN_FunctionalInsert,
-/* •ÿ */        CANNA_FN_FunctionalInsert,
-/* •€ */        CANNA_FN_FunctionalInsert,
-/* •ﬁ */        CANNA_FN_FunctionalInsert,
-/* •ﬂ */        CANNA_FN_FunctionalInsert,
-/* •‡ */        CANNA_FN_FunctionalInsert,
-/* •· */        CANNA_FN_FunctionalInsert,
-/* •‚ */        CANNA_FN_FunctionalInsert,
-/* •‰ */        CANNA_FN_FunctionalInsert,
-/* •Ê */        CANNA_FN_FunctionalInsert,
-/* •Ë */        CANNA_FN_FunctionalInsert,
-/* •È */        CANNA_FN_FunctionalInsert,
-/* •Í */        CANNA_FN_FunctionalInsert,
-/* •Î */        CANNA_FN_FunctionalInsert,
-/* •Ï */        CANNA_FN_FunctionalInsert,
-/* •Ì */        CANNA_FN_FunctionalInsert,
-/* •Ô */        CANNA_FN_FunctionalInsert,
-/* •Û */        CANNA_FN_FunctionalInsert,
-/* °´ */        CANNA_FN_FunctionalInsert,
-/* °¨ */        CANNA_FN_FunctionalInsert,
+/* „ÄÇ */        CANNA_FN_FunctionalInsert,
+/* „Äå */        CANNA_FN_FunctionalInsert,
+/* „Äç */        CANNA_FN_FunctionalInsert,
+/* „ÄÅ */        CANNA_FN_FunctionalInsert,
+/* „Éª */        CANNA_FN_FunctionalInsert,
+/* „É≤ */        CANNA_FN_FunctionalInsert,
+/* „Ç° */        CANNA_FN_FunctionalInsert,
+/* „Ç£ */        CANNA_FN_FunctionalInsert,
+/* „Ç• */        CANNA_FN_FunctionalInsert,
+/* „Çß */        CANNA_FN_FunctionalInsert,
+/* „Ç© */        CANNA_FN_FunctionalInsert,
+/* „É£ */        CANNA_FN_FunctionalInsert,
+/* „É• */        CANNA_FN_FunctionalInsert,
+/* „Éß */        CANNA_FN_FunctionalInsert,
+/* „ÉÉ */        CANNA_FN_FunctionalInsert,
+/* „Éº */        CANNA_FN_FunctionalInsert,
+/* „Ç¢ */        CANNA_FN_FunctionalInsert,
+/* „Ç§ */        CANNA_FN_FunctionalInsert,
+/* „Ç¶ */        CANNA_FN_FunctionalInsert,
+/* „Ç® */        CANNA_FN_FunctionalInsert,
+/* „Ç™ */        CANNA_FN_FunctionalInsert,
+/* „Ç´ */        CANNA_FN_FunctionalInsert,
+/* „Ç≠ */        CANNA_FN_FunctionalInsert,
+/* „ÇØ */        CANNA_FN_FunctionalInsert,
+/* „Ç± */        CANNA_FN_FunctionalInsert,
+/* „Ç≥ */        CANNA_FN_FunctionalInsert,
+/* „Çµ */        CANNA_FN_FunctionalInsert,
+/* „Ç∑ */        CANNA_FN_FunctionalInsert,
+/* „Çπ */        CANNA_FN_FunctionalInsert,
+/* „Çª */        CANNA_FN_FunctionalInsert,
+/* „ÇΩ */        CANNA_FN_FunctionalInsert,
+/* „Çø */        CANNA_FN_FunctionalInsert,
+/* „ÉÅ */        CANNA_FN_FunctionalInsert,
+/* „ÉÑ */        CANNA_FN_FunctionalInsert,
+/* „ÉÜ */        CANNA_FN_FunctionalInsert,
+/* „Éà */        CANNA_FN_FunctionalInsert,
+/* „Éä */        CANNA_FN_FunctionalInsert,
+/* „Éã */        CANNA_FN_FunctionalInsert,
+/* „Éå */        CANNA_FN_FunctionalInsert,
+/* „Éç */        CANNA_FN_FunctionalInsert,
+/* „Éé */        CANNA_FN_FunctionalInsert,
+/* „Éè */        CANNA_FN_FunctionalInsert,
+/* „Éí */        CANNA_FN_FunctionalInsert,
+/* „Éï */        CANNA_FN_FunctionalInsert,
+/* „Éò */        CANNA_FN_FunctionalInsert,
+/* „Éõ */        CANNA_FN_FunctionalInsert,
+/* „Éû */        CANNA_FN_FunctionalInsert,
+/* „Éü */        CANNA_FN_FunctionalInsert,
+/* „É† */        CANNA_FN_FunctionalInsert,
+/* „É° */        CANNA_FN_FunctionalInsert,
+/* „É¢ */        CANNA_FN_FunctionalInsert,
+/* „É§ */        CANNA_FN_FunctionalInsert,
+/* „É¶ */        CANNA_FN_FunctionalInsert,
+/* „É® */        CANNA_FN_FunctionalInsert,
+/* „É© */        CANNA_FN_FunctionalInsert,
+/* „É™ */        CANNA_FN_FunctionalInsert,
+/* „É´ */        CANNA_FN_FunctionalInsert,
+/* „É¨ */        CANNA_FN_FunctionalInsert,
+/* „É≠ */        CANNA_FN_FunctionalInsert,
+/* „ÉØ */        CANNA_FN_FunctionalInsert,
+/* „É≥ */        CANNA_FN_FunctionalInsert,
+/* „Çõ */        CANNA_FN_FunctionalInsert,
+/* „Çú */        CANNA_FN_FunctionalInsert,
 /* F1 */        NONE,
 /* F2 */        NONE,
 /* F3 */        NONE,

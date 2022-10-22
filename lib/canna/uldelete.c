@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -337,8 +337,8 @@ int *num_return;
   return tourokup;
 }
 
-dicSakujo(d)
-uiContext d;
+
+int dicSakujo( uiContext d )
 {
   wchar_t **mp, **p;
   tourokuContext tc;
@@ -347,7 +347,7 @@ uiContext d;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
   d->status = 0;
 
   /* マウントされている辞書で WRITE 権のあるものを取ってくる */
@@ -359,9 +359,9 @@ uiContext d;
       if(!*mp) {
         makeGLineMessageFromString(d, "\303\261\270\354\272\357\275\374"
 	"\262\304\307\275\244\312\274\255\275\361\244\254\302\270\272\337"
-	"\244\267\244\336\244\273\244\363");           
+	"\244\267\244\336\244\273\244\363");
 			/* 単語削除可能な辞書が存在しません */
-     
+
         freeAndPopTouroku(d);
         deleteEnd(d);
         currentModeInfo(d);
@@ -682,7 +682,7 @@ RkStat *st;
     CloseDeleteContext(tc);
     return(NG);
   }
-  
+
   if(RkwGetStat(tc->delContext, st) == -1) {
     RkwEndBun(tc->delContext, 0); /* 0:学習しない */
     if(errno == EPIPE)
@@ -733,7 +733,7 @@ uiContext d;
   if(tc->yomi_len < 1) {
     return canna_alert(d, "\306\311\244\337\244\362\306\376\316\317\244\267"
 	"\244\306\244\257\244\300\244\265\244\244", acDicSakujoYomi);
-		/* 読みを入力してください */ 
+		/* 読みを入力してください */
   }
 
   if((nbunsetsu = dicSakujoBgnBun(d, &st)) == NG) {
@@ -762,7 +762,7 @@ uiContext d;
   }
 
   /* すべての候補を取り出す */
-  if((allDelCands = 
+  if((allDelCands =
       getIchiranList(tc->delContext, &nelem, &currentkouho)) == 0) {
     freeDic(tc);
     dicSakujoEndBun(d);
@@ -772,7 +772,7 @@ uiContext d;
   }
 
   if (dicSakujoEndBun(d) == NG) {
-    freeDic(tc); 
+    freeDic(tc);
     CloseDeleteContext(tc);
     deleteEnd(d);
     return GLineNGReturnTK(d);
@@ -1001,7 +1001,7 @@ uiContext d;
             }
             if ((retval = selectOnOff(d, xxxx, &mc->curIkouho, upnelem,
 		            BANGOMAX, 0, mc->mountOldStatus,
-		            NO_CALLBACK, uuSDicExitCatch, 
+		            NO_CALLBACK, uuSDicExitCatch,
                             uuSDicQuitCatch, uiUtilIchiranTooSmall)) == NG) {
               popMountMode(d);
               popCallback(d);
@@ -1109,7 +1109,7 @@ mode_context env;
     bufcnt = l + WStrlen(dic->hcode);
     d->genbuf[bufcnt] = (wchar_t)' ';
     bufcnt += 1;
-    WStraddbcpy(d->genbuf + bufcnt, tc->tango_buffer, 
+    WStraddbcpy(d->genbuf + bufcnt, tc->tango_buffer,
                                                  ROMEBUFSIZE - bufcnt);
 
     WCstombs(dicname, dic->name, sizeof(dicname));

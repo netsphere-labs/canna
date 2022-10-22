@@ -48,15 +48,4 @@
 #endif
 #endif
 
-#ifdef HAVE_IN_ADDR_T
-typedef in_addr_t canna_in_addr_t;
-#else
-typedef canna_uint32_t canna_in_addr_t;
-#endif
-#ifdef HAVE_SOCKLEN_T
-typedef socklen_t canna_socklen_t;
-#else
-typedef int canna_socklen_t;
-#endif
-
 #endif /* NET_H */

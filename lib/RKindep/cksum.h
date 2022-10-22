@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: cksum.h,v 1.3 2003/09/25 14:37:24 aida_s Exp $ */
@@ -29,13 +29,15 @@
 # include "RKindep/cksum.sub"
 #endif
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-  canna_uint32_t curr;
-  size_t len;
+    uint32_t curr;
+    size_t len;
 } RkiCksumCalc;
 
 /*
@@ -44,7 +46,7 @@ typedef struct {
 
 extern int RkiCksumCRCInit pro((RkiCksumCalc *cx));
 extern int RkiCksumAdd pro((RkiCksumCalc *cx, const void *data, size_t len));
-extern canna_uint32_t RkiCksumCRCFinish pro((RkiCksumCalc *cx));
+extern uint32_t RkiCksumCRCFinish pro((RkiCksumCalc *cx));
 
 #ifdef __cplusplus
 }

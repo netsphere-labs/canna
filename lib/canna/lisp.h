@@ -77,7 +77,7 @@
 #define alreadycopied(x) (gcfield(x) & GC_MASK)
 #define newaddr(x)	((x) & ~GC_MASK)
 
-typedef	POINTERINT	list;
+typedef intptr_t list;
 typedef POINTERINT	pointerint;
 
 /* cell area */

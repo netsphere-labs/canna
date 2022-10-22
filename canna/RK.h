@@ -35,7 +35,8 @@
   #define pro(x) x
 #endif
 
-#include <canna/sysdep.h>
+//#include <canna/sysdep.h>
+#include <stdint.h>
 
 typedef	struct {
    int		ylen;		/* yomigana no nagasa (in byte) */
@@ -234,7 +235,7 @@ canna_export(int) RkwSetUserInfo(const char * user, const char * group,
                                  const char *);
 canna_export(char *) RkwGetServerName pro((void));
 canna_export(int) RkwGetServerVersion pro((int *, int *));
-canna_export(int) RkwListDic pro((int, char *, char *, int));
+canna_export(int) RkwListDic pro((int, const char *, char *, int));
 canna_export(int) RkwCopyDic pro((int, char *, char *, char *, int));
 canna_export(int) RkwRemoveDic pro((int, char *, int));
 canna_export(int) RkwRenameDic pro((int, char *, char *, int));

@@ -12,20 +12,20 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
 static char alphamap_id[] = "@(#) 102.1 $Id: alphamap.h,v 1.3 2003/09/17 08:50:53 aida_s Exp $";
 #endif /* lint */
 
-extern int JapaneseMode();
-extern DoFuncSequence(),UseOtherKeymap();
+extern int JapaneseMode(uiContext d);
+extern int DoFuncSequence(uiContext d), UseOtherKeymap(uiContext d);
 
 static struct funccfunc alpha_funcs[] = {
   {CANNA_FN_SelfInsert		,AlphaSelfInsert	},
@@ -40,7 +40,7 @@ static struct funccfunc alpha_funcs[] = {
 };
 
 BYTE alpha_kmap[256] =
-{               
+{
 /* C-@ */       CANNA_FN_SelfInsert,
 /* C-a */       CANNA_FN_SelfInsert,
 /* C-b */       CANNA_FN_SelfInsert,

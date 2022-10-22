@@ -108,11 +108,11 @@ typedef int (*get_hinshi_t) pro((RkcContext *, cannawc*, int));
 typedef int (*store_range_t) pro((RkcContext *, cannawc*, int));
 typedef int (*set_locale_t) pro((RkcContext *, char *));
 typedef int (*set_app_name_t) pro((RkcContext *, char *));
-typedef int (*notice_group_name_t) pro((RkcContext *, char *));
+typedef int (*notice_group_name_t) pro((RkcContext *, const char *));
 typedef int (*through_t) pro((RkcContext *, int, char *, int, int));
 typedef int (*killserver_t) pro((void));
 #ifdef EXTENSION
-typedef int (*list_dictionary_t) pro((RkcContext *, char *, char *, int));
+typedef int (*list_dictionary_t) pro((RkcContext *, const char *, char *, int));
 typedef int (*create_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*remove_dictionary_t) pro((RkcContext *, char *, int));
 typedef int (*rename_dictionary_t) pro((RkcContext *, char *, char *, int));

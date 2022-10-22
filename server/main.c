@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -35,13 +36,11 @@ const char *CallFuncName;
 int (*CallFunc) pro((ClientPtr *clientp));
 
 
-main(argc, argv)
-int argc ;
-char *argv[] ;
+int main(int argc, char* argv[])
 {
-  int parentid;
-  SockHolder *sock_holder = NULL;
-  int status;
+    int parentid;
+    SockHolder *sock_holder = NULL;
+    int status;
 
   EarlyInit(argc, argv);
   if (!(global_user_table = UserTable_new())
@@ -53,13 +52,13 @@ char *argv[] ;
   if (SockHolder_tie(sock_holder, global_event_mgr))
     goto genfail;
 
-  /* ¥µ¡¼¥Ğ¤ò»Ò¥×¥í¥»¥¹(¥Ç¡¼¥â¥ó)¤È¤·¤Æµ¯Æ°¤¹¤ë */
+  /* ã‚µãƒ¼ãƒã‚’å­ãƒ—ãƒ­ã‚»ã‚¹(ãƒ‡ãƒ¼ãƒ¢ãƒ³)ã¨ã—ã¦èµ·å‹•ã™ã‚‹ */
   parentid = BecomeDaemon();
 
-  /* ¥¨¥é¡¼½ĞÎÏ¤ÎÀÚ¤êÂØ¤¨¡¢TTY¤ÎÀÚ¤êÎ¥¤· */
+  /* ã‚¨ãƒ©ãƒ¼å‡ºåŠ›ã®åˆ‡ã‚Šæ›¿ãˆã€TTYã®åˆ‡ã‚Šé›¢ã— */
   DetachTTY();
 
-  /* ¥Ç¡¼¥â¥ó¤Ë¤Ê¤ë¾ì¹ç¤Ï¤³¤³¤Ç¤Îstatus¤Ï¼Âºİ¤Ë¤Ï°ÕÌ£¤ò»ı¤¿¤Ê¤¤ */
+  /* ãƒ‡ãƒ¼ãƒ¢ãƒ³ã«ãªã‚‹å ´åˆã¯ã“ã“ã§ã®statusã¯å®Ÿéš›ã«ã¯æ„å‘³ã‚’æŒãŸãªã„ */
   status = EventMgr_run(global_event_mgr);
   goto last;
 

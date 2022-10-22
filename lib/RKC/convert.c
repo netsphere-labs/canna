@@ -1027,8 +1027,8 @@ int Query_Extension()
 }
 
 #ifdef EXTENSION
-static
-int rkc_list_dictionary( RkcContext* cx, char* dirname, char* dicnames_return,
+static int
+rkc_list_dictionary( RkcContext* cx, const char* dirname, char* dicnames_return,
                          int size )
 {
   int reply, datalen = strlen(dirname) + 1;

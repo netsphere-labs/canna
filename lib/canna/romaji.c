@@ -3331,20 +3331,16 @@ mapAsHex(d)
   return 1;
 }
 
-/* ConvertAsHex -- １６進とみなしての変換
+
+/**
+ * １６進とみなしての変換
 
   ローマ字入力されて反転表示されている文字列を１６進で表示されているコードと
   みなして変換する。
 
   (MSBは０でも１でも良い)
-
   */
-
-static ConvertAsHex pro((uiContext));
-
-static
-ConvertAsHex(d)
-uiContext d;
+static int ConvertAsHex( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
   extern struct CannaConfig cannaconf;
@@ -3391,11 +3387,7 @@ uiContext d;
     正しく１６進に変換できた場合は１そうでない時は０が返る。
 */
 
-int
-cvtAsHex(d, buf, hexbuf, hexlen)
-uiContext d;
-wchar_t *buf, *hexbuf;
-int hexlen;
+int cvtAsHex( uiContext d, cannawc* buf, cannawc* hexbuf, int hexlen )
 {
   int i;
   char tmpbuf[5], *a, *b;
@@ -3438,8 +3430,8 @@ int hexlen;
   }
 }
 
-convertAsHex(d)
-uiContext d;
+
+int convertAsHex( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 

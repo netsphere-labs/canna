@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1993 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -24,13 +25,15 @@
 
 #define canna_version(majv, minv) ((majv) * 1024 + (minv))
 
-typedef canna_uint16_t Ushort;
+#include <stdint.h>
+
+typedef uint16_t Ushort;
 typedef unsigned char BYTE;
 #ifndef CBUFSIZE
 #define CBUFSIZE     512
 #define CBIGBUFSIZE 4096
 #endif
-/* ¤³¤³¤Ş¤Ç */
+/* ã“ã“ã¾ã§ */
 
 #define OLD_MAX_CX  100
 
@@ -70,7 +73,7 @@ typedef unsigned char BYTE;
 	(s2)[0] = LOMASK((s)>> 8); (s2)[1] = LOMASK((s));\
 }
 
-/* IXXtoIXX ¤ÏÉ¬Í×À­¤ò¹Í¤¨¤Æ¤¢¤È¤Çºï¤ì¤ë¤Ê¤éºï¤ë */
+/* IXXtoIXX ã¯å¿…è¦æ€§ã‚’è€ƒãˆã¦ã‚ã¨ã§å‰Šã‚Œã‚‹ãªã‚‰å‰Šã‚‹ */
 #if 0
 #define I16toI32(x) (((x) & 0x8000) ? ((x) | 0xffff8000) : (x))
 #endif
@@ -84,7 +87,7 @@ typedef unsigned char BYTE;
 #define BUFSIZE 	4096
 #define MAXDATA 	1024
 
-/* ¤«¤ó¤Ê¥µ¡¼¥Ğ¥×¥í¥È¥³¥ë */
+/* ã‹ã‚“ãªã‚µãƒ¼ãƒãƒ—ãƒ­ãƒˆã‚³ãƒ« */
 
 #define wInitialize 	   0x01
 #define wFinalize	   0x02
@@ -142,7 +145,7 @@ typedef unsigned char BYTE;
 #define W_MAXEXTREQUESTNO  0x0b /* the max number plus 1 */
 
 
-/* ¤¤¤í¤Ï¥µ¡¼¥Ğ¥×¥í¥È¥³¥ë */
+/* ã„ã‚ã¯ã‚µãƒ¼ãƒãƒ—ãƒ­ãƒˆã‚³ãƒ« */
 #define OLD_MAXREQUESTNO    0x18
 
 #define MAXREQUESTNO	   0x1b

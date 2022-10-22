@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: ccompat.h,v 1.10 2003/09/25 07:38:11 aida_s Exp $ */
@@ -41,7 +41,7 @@
 #endif
 #include <errno.h>
 
-#include "sysdep.h"
+//#include "sysdep.h"
 
 #if defined(HAVE_STRCHR) && !defined(HAVE_INDEX) && !defined(index)
 # define index(s, c) strchr(s, c)

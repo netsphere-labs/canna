@@ -1,3 +1,4 @@
+Ôªø// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -27,9 +28,6 @@ static char rcs_id[] = "@(#) 102.1 $Id: bushu.c,v 1.3 2003/09/17 08:50:53 aida_s
 #include	<errno.h>
 #include "canna.h"
 
-#ifdef luna88k
-extern int errno;
-#endif
 
 /*********************************************************************
  *                      wchar_t replace begin                        *
@@ -43,167 +41,169 @@ extern wchar_t *WString();
 
 extern int uuslQuitCatch();
 extern int uuslIchiranQuitCatch();
-static int bushuHenkan(), makeBushuIchiranQuit();
-static int vBushuExitCatch(), bushuQuitCatch();
+
+static int makeBushuIchiranQuit( uiContext d, int flag );
+static int vBushuExitCatch( uiContext d, int retval, mode_context env );
+static int bushuQuitCatch( uiContext d, int retval, mode_context env );
+static int bushuHenkan(uiContext d, int flag, int ext, int cur,
+                       int (*quitfunc)(uiContext, int, mode_context) );
 
 
 #define	BUSHU_SZ	150
 
-static
-char *bushu_schar[] = 
-{ 
-  /* "∞Ï", "–®", "—·", "ΩΩ", "“«", "≈·", */
+static const char *bushu_schar[] =
+{
+  /* "‰∏Ä", "‰∏ø", "Âáµ", "ÂçÅ", "Âç©", "ÂàÄ", */
   "\260\354", "\320\250", "\321\341", "\275\275", "\322\307", "\305\341",
-  
-  /* "¥¢° §Í§√§»§¶°À", "Œœ", "“Ã", "“±", "—ƒ“π”¯", "–µ", */
+
+  /* "ÂààÔºà„Çä„Å£„Å®„ÅÜÔºâ", "Âäõ", "ÂéÇ", "Âãπ", "ÂÜÇÂåöÂõó", "‰∫†", */
   "\264\242\241\312\244\352\244\303\244\310\244\246\241\313", "\316\317", "\322\314", "\322\261", "\321\304\322\271\323\370", "\320\265",
-  
-  /* "—“", "øÕ°øøŒ° §À§Û§Ÿ§Û°À", "ÀÙ", "—‹", "»¨", "—π", */
+
+  /* "ÂÜ´", "‰∫∫Ôºè‰ªÅÔºà„Å´„Çì„Åπ„ÇìÔºâ", "Âèà", "Âá†", "ÂÖ´", "ÂÑø", */
   "\321\322", "\277\315\241\277\277\316\241\312\244\313\244\363\244\331\244\363\241\313", "\313\364", "\321\334", "\310\254", "\321\271",
-  
-  /* "—Ã", "’ﬂ", "◊Æ", "∞Í° §™§™§∂§»)", "∏ ", "Ω˜", */
+
+  /* "ÂÜñ", "ÂÆÄ", "Âª¥", "ÈÉÅÔºà„Åä„Åä„Åñ„Å®)", "Â∑±", "Â•≥", */
   "\321\314", "\325\337", "\327\256", "\260\352\241\312\244\252\244\252\244\266\244\310\51", "\270\312", "\275\367",
-  
-  /* "◊∆", "∏˝", "¡° §Ø§µ§´§Û§‡§Í)", "∆»° §±§‚§Œ§ÿ§Û°À", */
+
+  /* "ÂΩ≥", "Âè£", "ËçâÔºà„Åè„Åï„Åã„Çì„ÇÄ„Çä)", "Áã¨Ôºà„Åë„ÇÇ„ÅÆ„Å∏„ÇìÔºâ", */
   "\327\306", "\270\375", "\301\360\241\312\244\257\244\265\244\253\244\363\244\340\244\352\51", "\306\310\241\312\244\261\244\342\244\316\244\330\244\363\241\313",
 
-  /* "ª“", "Ô˙° §≥§∂§»°À", "ªŒ", "πæ° §µ§Û§∫§§°À", "◊µ", */
+  /* "Â≠ê", "ÈôèÔºà„Åì„Åñ„Å®Ôºâ", "Â£´", "Ê±üÔºà„Åï„Çì„Åö„ÅÑÔºâ", "Âºã", */
   "\273\322", "\357\372\241\312\244\263\244\266\244\310\241\313", "\273\316", "\271\276\241\312\244\265\244\363\244\272\244\244\241\313", "\327\265",
-  
-  /* "’˘", "æÆ°ø√±° §ƒ°À", "ÌË° §∑§Û§À§Á§¶°À", "¿£", "¬Á", */
+
+  /* "Â∞∏", "Â∞èÔºèÂçòÔºà„Å§Ôºâ", "Ëæ∑Ôºà„Åó„Çì„Å´„Çá„ÅÜÔºâ", "ÂØ∏", "Â§ß", */
   "\325\371", "\276\256\241\277\303\261\241\312\244\304\241\313", "\355\350\241\312\244\267\244\363\244\313\244\347\244\246\241\313", "\300\243", "\302\347",
-  
-  /* "≈⁄", "ºÍ° §∆§ÿ§Û°À", "∂“", "÷¯", "ª≥", "Õº", */
+
+  /* "Âúü", "ÊâãÔºà„Å¶„Å∏„ÇìÔºâ", "Â∑æ", "Âπø", "Â±±", "Â§ï", */
   "\305\332", "\274\352\241\312\244\306\244\330\244\363\241\313", "\266\322", "\326\370", "\273\263", "\315\274",
-  
-  /* "µ›", "Àª° §Í§√§∑§Û§Ÿ§Û°À", "∑Á", "›∆", "∏§", */
+
+  /* "Âºì", "ÂøôÔºà„Çä„Å£„Åó„Çì„Åπ„ÇìÔºâ", "Ê¨†", "Ê≠π", "Áä¨", */
   "\265\335", "\313\273\241\312\244\352\244\303\244\267\244\363\244\331\244\363\241\313", "\267\347", "\335\306", "\270\244",
-  
-  /* "µÌ°ø≤¥° §¶§∑§ÿ§Û°À", " “", "Ã⁄", "›„", "Ã”", "ø¥", */
+
+  /* "ÁâõÔºèÁâ°Ôºà„ÅÜ„Åó„Å∏„ÇìÔºâ", "Áâá", "Êú®", "Ê∞î", "ÊØõ", "ÂøÉ", */
   "\265\355\241\277\262\264\241\312\244\246\244\267\244\330\244\363\241\313", "\312\322", "\314\332", "\335\343", "\314\323", "\277\264",
-  
-  /* "øÂ", "∑Ó", "ƒﬁ", "∆¸", "⁄æ", "≤–", */
+
+  /* "Ê∞¥", "Êúà", "Áà™", "Êó•", "Êîµ", "ÁÅ´", */
   "\277\345", "\267\356", "\304\336", "\306\374", "\332\276", "\262\320",
-  
-  /* " ˝", "ÿ˘", "≈¿° §Ï§√§´°À", "›’", "∑Í", "¿–", */
+
+  /* "Êñπ", "Êàà", "ÁÇπÔºà„Çå„Å£„ÅãÔºâ", "ÊÆ≥", "Á©¥", "Áü≥", */
   "\312\375", "\330\371", "\305\300\241\312\244\354\244\303\244\253\241\313", "\335\325", "\267\352", "\300\320",
 
-  /* "∂Ã", "»È", "¥§", "ªÆ", "º®", "ø¿° §∑§·§π§ÿ§Û°À", "«Ú", */
+  /* "Áéâ", "ÁöÆ", "Áì¶", "Áöø", "Á§∫", "Á•ûÔºà„Åó„ÇÅ„Åô„Å∏„ÇìÔºâ", "ÁôΩ", */
   "\266\314", "\310\351", "\264\244", "\273\256", "\274\250", "\277\300\241\312\244\267\244\341\244\271\244\330\244\363\241\313", "\307\362",
-  
-  /* "≈ƒ", "Œ©", "≤”", "Ã‹", "‚¢", "Ã", */
+
+  /* "Áî∞", "Á´ã", "Á¶æ", "ÁõÆ", "Áô∂", "Áü¢", */
   "\305\304", "\316\251", "\262\323", "\314\334", "\342\242", "\314\360",
-  
-  /* "·À° §‰§ﬁ§§§¿§Ï°À", "ªÕ", "ªÂ", "±±", "±ª", "œ∑", */
+
+  /* "ÁñîÔºà„ÇÑ„Åæ„ÅÑ„Å†„ÇåÔºâ", "Âõõ", "Á≥∏", "Ëáº", "Áìú", "ËÄÅ", */
   "\341\313\241\312\244\344\244\336\244\244\244\300\244\354\241\313", "\273\315", "\273\345", "\261\261", "\261\273", "\317\267",
-  
-  /* "¥Ã", "∞·", "ΩÈ° §≥§Ì§‚§ÿ§Û°À", " ∆", "¿Â", "Ê–", */
+
+  /* "Áº∂", "Ë°£", "ÂàùÔºà„Åì„Çç„ÇÇ„Å∏„ÇìÔºâ", "Á±≥", "Ëàå", "ËÄí", */
   "\264\314", "\260\341", "\275\351\241\312\244\263\244\355\244\342\244\330\244\363\241\313", "\312\306", "\300\345", "\346\320",
-  
-  /* "√›° §ø§±§´§Û§‡§Í°À", "∑Ï", "∏◊° §»§È§´§Û§‡§Í°À", "∆˘", */
+
+  /* "Á´πÔºà„Åü„Åë„Åã„Çì„ÇÄ„ÇäÔºâ", "Ë°Ä", "ËôéÔºà„Å®„Çâ„Åã„Çì„ÇÄ„ÇäÔºâ", "ËÇâ", */
   "\303\335\241\312\244\277\244\261\244\253\244\363\244\340\244\352\241\313", "\267\354", "\270\327\241\312\244\310\244\351\244\253\244\363\244\340\244\352\241\313", "\306\371",
-  
-  /* "¿æ", "±©", "Õ”", "ÊÊ", "ΩÆ", "º™", */
+
+  /* "Ë•ø", "ÁæΩ", "Áæä", "ËÅø", "Ëàü", "ËÄ≥", */
   "\300\276", "\261\251", "\315\323", "\346\346", "\275\256", "\274\252",
-  
-  /* "√Ó", "¿÷", "¬≠°ø…•", "Ïµ", "ø√", */
+
+  /* "Ëô´", "Ëµ§", "Ë∂≥ÔºèÁñã", "Ë±ï", "Ëá£", */
   "\303\356", "\300\326", "\302\255\241\277\311\245", "\354\265", "\277\303",
-  
-  /* "≥≠", "ø…", "º÷", "∏´", "∏¿", "∆”", "¡ˆ", "√´", */
+
+  /* "Ë≤ù", "Ëæõ", "Ëªä", "Ë¶ã", "Ë®Ä", "ÈÖâ", "Ëµ∞", "Ë∞∑", */
   "\263\255", "\277\311", "\274\326", "\270\253", "\270\300", "\306\323", "\301\366", "\303\253",
-  
-  /* "≥—", "»–", "«˛", "∆¶", "ø»", "Ï∏", "±´", "»Û", */
+
+  /* "Ëßí", "ÈáÜ", "È∫¶", "Ë±Ü", "Ë∫´", "Ë±∏", "Èõ®", "Èùû", */
   "\263\321", "\310\320", "\307\376", "\306\246", "\277\310", "\354\270", "\261\253", "\310\363",
-  
-  /* "∂‚", "ÃÁ", "≤", " «", "≤ª", "π·", "≥◊", "…˜", */
+
+  /* "Èáë", "ÈñÄ", "Èöπ", "È†Å", "Èü≥", "È¶ô", "Èù©", "È¢®", */
   "\266\342", "\314\347", "\360\262", "\312\307", "\262\273", "\271\341", "\263\327", "\311\367",
-  
-  /* "ºÛ", "ø©", "Í", "ÃÃ", "«œ", "µ¥", "Òı", "π‚", */
+
+  /* "È¶ñ", "È£ü", "Èüã", "Èù¢", "È¶¨", "È¨º", "È´ü", "È´ò", */
   "\274\363", "\277\251", "\360\352", "\314\314", "\307\317", "\265\264", "\361\365", "\271\342",
-  
-  /* "Ú®", "π¸", "µ˚", "µµ", "ƒª", "πı", "ºØ", "…°", */
+
+  /* "È¨•", "È™®", "È≠ö", "‰∫Ä", "È≥•", "Èªí", "Èπø", "Èºª", */
   "\362\250", "\271\374", "\265\373", "\265\265", "\304\273", "\271\365", "\274\257", "\311\241",
 
-  /* "ÛÔ", "µ≠πÊ", "§Ω§Œ¬æ" */
+  /* "ÈΩí", "Ë®òÂè∑", "„Åù„ÅÆ‰ªñ" */
   "\363\357", "\265\255\271\346", "\244\275\244\316\302\276"
 };
 
-static
-char *bushu_skey[] =  
-{ 
-/* "§§§¡", "§Œ", "§¶§±§–§≥", "§∏§Â§¶", "§’§∑", "§´§ø§ ", */
+static const char *bushu_skey[] =
+{
+/* "„ÅÑ„Å°", "„ÅÆ", "„ÅÜ„Åë„Å∞„Åì", "„Åò„ÇÖ„ÅÜ", "„Åµ„Åó", "„Åã„Åü„Å™", */
 "\244\244\244\301", "\244\316", "\244\246\244\261\244\320\244\263", "\244\270\244\345\244\246", "\244\325\244\267", "\244\253\244\277\244\312",
 
-/* "§Í§√§»§¶", "§´", "§¨§Û", "§Ø", "§´§ﬁ§®", "§ §Ÿ", "§À", */
+/* "„Çä„Å£„Å®„ÅÜ", "„Åã", "„Åå„Çì", "„Åè", "„Åã„Åæ„Åà", "„Å™„Åπ", "„Å´", */
 "\244\352\244\303\244\310\244\246", "\244\253", "\244\254\244\363", "\244\257", "\244\253\244\336\244\250", "\244\312\244\331", "\244\313",
 
-/* "§“§»", "§Ã", "§ƒ§Ø§®", "§œ§¡", "§Î", "§Ô", */
+/* "„Å≤„Å®", "„Å¨", "„Å§„Åè„Åà", "„ÅØ„Å°", "„Çã", "„Çè", */
 "\244\322\244\310", "\244\314", "\244\304\244\257\244\250", "\244\317\244\301", "\244\353", "\244\357",
 
-/* "§¶", "§®§Û", "§™§™§∂§»", "§™§Œ§Ï", "§™§Û§ ", "§Æ§Á§¶", */
+/* "„ÅÜ", "„Åà„Çì", "„Åä„Åä„Åñ„Å®", "„Åä„ÅÆ„Çå", "„Åä„Çì„Å™", "„Åé„Çá„ÅÜ", */
 "\244\246", "\244\250\244\363", "\244\252\244\252\244\266\244\310", "\244\252\244\316\244\354", "\244\252\244\363\244\312", "\244\256\244\347\244\246",
 
-/* "§Ì", "§Ø§µ", "§±§‚§Œ", "§≥", "§≥§∂§»", "§µ§‡§È§§", */
+/* "„Çç", "„Åè„Åï", "„Åë„ÇÇ„ÅÆ", "„Åì", "„Åì„Åñ„Å®", "„Åï„ÇÄ„Çâ„ÅÑ", */
 "\244\355", "\244\257\244\265", "\244\261\244\342\244\316", "\244\263", "\244\263\244\266\244\310", "\244\265\244\340\244\351\244\244",
 
-/* "§∑", "§∑§≠", "§∑§„§Ø", "§ƒ", "§∑§Û", "§π§Û", */
+/* "„Åó", "„Åó„Åç", "„Åó„ÇÉ„Åè", "„Å§", "„Åó„Çì", "„Åô„Çì", */
 "\244\267", "\244\267\244\255", "\244\267\244\343\244\257", "\244\304", "\244\267\244\363", "\244\271\244\363",
 
-/* "§¿§§", "§…", "§∆", "§œ§–", "§ﬁ", "§‰§ﬁ", */
+/* "„Å†„ÅÑ", "„Å©", "„Å¶", "„ÅØ„Å∞", "„Åæ", "„ÇÑ„Åæ", */
 "\244\300\244\244", "\244\311", "\244\306", "\244\317\244\320", "\244\336", "\244\344\244\336",
 
-/* "§Ê§¶", "§Ê§ﬂ", "§Í§√§∑§Û", "§±§ƒ", "§§§¡§ø", "§§§Ã", */
+/* "„ÇÜ„ÅÜ", "„ÇÜ„Åø", "„Çä„Å£„Åó„Çì", "„Åë„Å§", "„ÅÑ„Å°„Åü", "„ÅÑ„Å¨", */
 "\244\346\244\246", "\244\346\244\337", "\244\352\244\303\244\267\244\363", "\244\261\244\304", "\244\244\244\301\244\277", "\244\244\244\314",
 
-/* "§¶§∑", "§´§ø", "§≠", "§≠§¨§ﬁ§®", "§±", "§≥§≥§Ì", */
+/* "„ÅÜ„Åó", "„Åã„Åü", "„Åç", "„Åç„Åå„Åæ„Åà", "„Åë", "„Åì„Åì„Çç", */
 "\244\246\244\267", "\244\253\244\277", "\244\255", "\244\255\244\254\244\336\244\250", "\244\261", "\244\263\244\263\244\355",
 
-/* "§π§§", "§ƒ§≠", "§ƒ§·", "§À§¡", "§Œ§÷§Û", "§“", */
+/* "„Åô„ÅÑ", "„Å§„Åç", "„Å§„ÇÅ", "„Å´„Å°", "„ÅÆ„Å∂„Çì", "„Å≤", */
 "\244\271\244\244", "\244\304\244\255", "\244\304\244\341", "\244\313\244\301", "\244\316\244\326\244\363", "\244\322",
 
-/* "§€§¶", "§€§≥", "§Ë§ƒ§∆§Û", "§Î§ﬁ§ø", "§¢§ ", "§§§∑", */
+/* "„Åª„ÅÜ", "„Åª„Åì", "„Çà„Å§„Å¶„Çì", "„Çã„Åæ„Åü", "„ÅÇ„Å™", "„ÅÑ„Åó", */
 "\244\333\244\246", "\244\333\244\263", "\244\350\244\304\244\306\244\363", "\244\353\244\336\244\277", "\244\242\244\312", "\244\244\244\267",
 
-/* "§™§¶", "§´§Ô", "§´§Ô§È", "§µ§È", "§∑§·§π", "§Õ", */
+/* "„Åä„ÅÜ", "„Åã„Çè", "„Åã„Çè„Çâ", "„Åï„Çâ", "„Åó„ÇÅ„Åô", "„Å≠", */
 "\244\252\244\246", "\244\253\244\357", "\244\253\244\357\244\351", "\244\265\244\351", "\244\267\244\341\244\271", "\244\315",
 
-/* "§∑§Ì", "§ø", "§ø§ƒ", "§Œ§Æ", "§·", "§œ§ƒ", "§‰", */
+/* "„Åó„Çç", "„Åü", "„Åü„Å§", "„ÅÆ„Åé", "„ÇÅ", "„ÅØ„Å§", "„ÇÑ", */
 "\244\267\244\355", "\244\277", "\244\277\244\304", "\244\316\244\256", "\244\341", "\244\317\244\304", "\244\344",
 
-/* "§‰§ﬁ§§", "§Ë§Û", "§§§»", "§¶§π", "§¶§Í", "§™§§", */
+/* "„ÇÑ„Åæ„ÅÑ", "„Çà„Çì", "„ÅÑ„Å®", "„ÅÜ„Åô", "„ÅÜ„Çä", "„Åä„ÅÑ", */
 "\244\344\244\336\244\244", "\244\350\244\363", "\244\244\244\310", "\244\246\244\271", "\244\246\244\352", "\244\252\244\244",
 
-/* "§´§Û", "§≠§Ã", "§≥§Ì§‚", "§≥§·", "§∑§ø", "§π§≠", */
+/* "„Åã„Çì", "„Åç„Å¨", "„Åì„Çç„ÇÇ", "„Åì„ÇÅ", "„Åó„Åü", "„Åô„Åç", */
 "\244\253\244\363", "\244\255\244\314", "\244\263\244\355\244\342", "\244\263\244\341", "\244\267\244\277", "\244\271\244\255",
 
-/* "§ø§±", "§¡", "§»§È", "§À§Ø", "§À§∑", "§œ§Õ", "§“§ƒ§∏", */
+/* "„Åü„Åë", "„Å°", "„Å®„Çâ", "„Å´„Åè", "„Å´„Åó", "„ÅØ„Å≠", "„Å≤„Å§„Åò", */
 "\244\277\244\261", "\244\301", "\244\310\244\351", "\244\313\244\257", "\244\313\244\267", "\244\317\244\315", "\244\322\244\304\244\270",
 
-/* "§’§«", "§’§Õ", "§ﬂ§ﬂ", "§‡§∑", "§¢§´", "§¢§∑", */
+/* "„Åµ„Åß", "„Åµ„Å≠", "„Åø„Åø", "„ÇÄ„Åó", "„ÅÇ„Åã", "„ÅÇ„Åó", */
 "\244\325\244\307", "\244\325\244\315", "\244\337\244\337", "\244\340\244\267", "\244\242\244\253", "\244\242\244\267",
 
-/* "§§§Œ§≥", "§™§ﬂ", "§´§§", "§´§È§§", "§Ø§Î§ﬁ", "§±§Û", */
+/* "„ÅÑ„ÅÆ„Åì", "„Åä„Åø", "„Åã„ÅÑ", "„Åã„Çâ„ÅÑ", "„Åè„Çã„Åæ", "„Åë„Çì", */
 "\244\244\244\316\244\263", "\244\252\244\337", "\244\253\244\244", "\244\253\244\351\244\244", "\244\257\244\353\244\336", "\244\261\244\363",
 
-/* "§¥§Û", "§µ§±", "§Ω§¶", "§ø§À", "§ƒ§Œ", "§Œ§¥§·", */
+/* "„Åî„Çì", "„Åï„Åë", "„Åù„ÅÜ", "„Åü„Å´", "„Å§„ÅÆ", "„ÅÆ„Åî„ÇÅ", */
 "\244\264\244\363", "\244\265\244\261", "\244\275\244\246", "\244\277\244\313", "\244\304\244\316", "\244\316\244\264\244\341",
 
-/* "§–§Ø", "§ﬁ§·", "§ﬂ", "§‡§∏§ ", "§¢§·", "§¢§È§∫", */
+/* "„Å∞„Åè", "„Åæ„ÇÅ", "„Åø", "„ÇÄ„Åò„Å™", "„ÅÇ„ÇÅ", "„ÅÇ„Çâ„Åö", */
 "\244\320\244\257", "\244\336\244\341", "\244\337", "\244\340\244\270\244\312", "\244\242\244\341", "\244\242\244\351\244\272",
 
-/* "§´§Õ", "§‚§Û", "§’§Î§»§Í", "§⁄°º§∏", "§™§»", "§≥§¶", */
+/* "„Åã„Å≠", "„ÇÇ„Çì", "„Åµ„Çã„Å®„Çä", "„Å∫„Éº„Åò", "„Åä„Å®", "„Åì„ÅÜ", */
 "\244\253\244\315", "\244\342\244\363", "\244\325\244\353\244\310\244\352", "\244\332\241\274\244\270", "\244\252\244\310", "\244\263\244\246",
 
-/* "§´§Ø", "§´§º", "§Ø§”", "§∑§Á§Ø", "§ §·§∑", "§·§Û", */
+/* "„Åã„Åè", "„Åã„Åú", "„Åè„Å≥", "„Åó„Çá„Åè", "„Å™„ÇÅ„Åó", "„ÇÅ„Çì", */
 "\244\253\244\257", "\244\253\244\274", "\244\257\244\323", "\244\267\244\347\244\257", "\244\312\244\341\244\267", "\244\341\244\363",
 
-/* "§¶§ﬁ", "§™§À", "§´§ﬂ", "§ø§´§§", "§»§¶", "§€§Õ", */
+/* "„ÅÜ„Åæ", "„Åä„Å´", "„Åã„Åø", "„Åü„Åã„ÅÑ", "„Å®„ÅÜ", "„Åª„Å≠", */
 "\244\246\244\336", "\244\252\244\313", "\244\253\244\337", "\244\277\244\253\244\244", "\244\310\244\246", "\244\333\244\315",
 
-/* "§¶§™", "§´§·", "§»§Í", "§Ø§Ì", "§∑§´", "§œ§ ", */
+/* "„ÅÜ„Åä", "„Åã„ÇÅ", "„Å®„Çä", "„Åè„Çç", "„Åó„Åã", "„ÅØ„Å™", */
 "\244\246\244\252", "\244\253\244\341", "\244\310\244\352", "\244\257\244\355", "\244\267\244\253", "\244\317\244\312",
 
-/* "§œ", "§≠§¥§¶", "§Ω§Œ§ø" */
+/* "„ÅØ", "„Åç„Åî„ÅÜ", "„Åù„ÅÆ„Åü" */
 "\244\317", "\244\255\244\264\244\246", "\244\275\244\316\244\277"
 };
 
@@ -227,35 +227,31 @@ initBushuTable()
 
 
 /*
- * …ÙºÛ∏ı ‰§Œ•®•≥°ºÕ—§Œ ∏ª˙ŒÛ§Ú∫Ó§Î
+ * ÈÉ®È¶ñÂÄôË£ú„ÅÆ„Ç®„Ç≥„ÉºÁî®„ÅÆÊñáÂ≠óÂàó„Çí‰Ωú„Çã
  *
- * ∞˙§≠øÙ	RomeStruct
- * Ã·§Í√Õ	¿µæÔΩ™Œªª˛ 0
+ * Âºï„ÅçÊï∞	RomeStruct
+ * Êàª„ÇäÂÄ§	Ê≠£Â∏∏ÁµÇ‰∫ÜÊôÇ 0
  */
-static int
-makeBushuEchoStr(d)
-uiContext d;
+static int makeBushuEchoStr( uiContext d )
 {
-  ichiranContext ic = (ichiranContext)d->modec;
+    ichiranContext ic = (ichiranContext)d->modec;
 
   d->kanji_status_return->echoStr = ic->allkouho[*(ic->curIkouho)];
   d->kanji_status_return->length = 1;
   d->kanji_status_return->revPos = 0;
   d->kanji_status_return->revLen = 1;
 
-  return(0);
+    return 0;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * forichiranContextÕ—¥ÿøÙ                                                   *
+ * forichiranContextÁî®Èñ¢Êï∞                                                   *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
- * forichiranContext §ŒΩÈ¥¸≤Ω
+ * forichiranContext „ÅÆÂàùÊúüÂåñ
  */
-static
-clearForIchiranContext(p)
-forichiranContext p;
+static int clearForIchiranContext( forichiranContext p)
 {
   p->id = FORICHIRAN_CONTEXT;
   p->curIkouho = 0;
@@ -263,18 +259,18 @@ forichiranContext p;
 
   return(0);
 }
-  
-static forichiranContext
-newForIchiranContext()
+
+
+static forichiranContext newForIchiranContext()
 {
   forichiranContext fcxt;
 
   if ((fcxt = (forichiranContext)malloc(sizeof(forichiranContextRec)))
                                              == (forichiranContext)NULL) {
 #ifndef CODED_MESSAGE
-    jrKanjiError = "malloc (newForIchiranContext) §«§≠§ﬁ§ª§Û§«§∑§ø";
+    jrKanjiError = "malloc (newForIchiranContext) „Åß„Åç„Åæ„Åõ„Çì„Åß„Åó„Åü";
 #else
-    jrKanjiError = "malloc (newForIchiranContext) \244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277";  /* §«§≠§ﬁ§ª§Û§«§∑§ø */
+    jrKanjiError = "malloc (newForIchiranContext) \244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277";  /* „Åß„Åç„Åæ„Åõ„Çì„Åß„Åó„Åü */
 #endif
     return (forichiranContext)NULL;
   }
@@ -283,8 +279,8 @@ newForIchiranContext()
   return fcxt;
 }
 
-getForIchiranContext(d)
-uiContext d;
+
+int getForIchiranContext( uiContext d )
 {
   forichiranContext fc;
   int retval = 0;
@@ -292,13 +288,13 @@ uiContext d;
   if (pushCallback(d, d->modec, NO_CALLBACK, NO_CALLBACK,
                                   NO_CALLBACK, NO_CALLBACK) == 0) {
 #ifndef CODED_MESSAGE
-    jrKanjiError = "malloc (pushCallback) §«§≠§ﬁ§ª§Û§«§∑§ø";
+    jrKanjiError = "malloc (pushCallback) „Åß„Åç„Åæ„Åõ„Çì„Åß„Åó„Åü";
 #else
-    jrKanjiError = "malloc (pushCallback) \244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277"; /* §«§≠§ﬁ§ª§Û§«§∑§ø */
+    jrKanjiError = "malloc (pushCallback) \244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277"; /* „Åß„Åç„Åæ„Åõ„Çì„Åß„Åó„Åü */
 #endif
     return(NG);
   }
-  
+
   if((fc = newForIchiranContext()) == NULL) {
     popCallback(d);
     return(NG);
@@ -312,9 +308,8 @@ uiContext d;
   return(retval);
 }
 
-void
-popForIchiranMode(d)
-uiContext d;
+
+void popForIchiranMode( uiContext d )
 {
   forichiranContext fc = (forichiranContext)d->modec;
 
@@ -325,13 +320,10 @@ uiContext d;
 
 #ifndef NO_EXTEND_MENU
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * …ÙºÛ•‚°º•…∆˛Œœ                                                            *
+ * ÈÉ®È¶ñ„É¢„Éº„ÉâÂÖ•Âäõ                                                            *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static
-vBushuMode(d, major_mode)
-uiContext d;
-int major_mode;
+static int vBushuMode( uiContext d, int major_mode )
 {
   forichiranContext fc;
   ichiranContext ic;
@@ -347,7 +339,7 @@ int major_mode;
 
   fc = (forichiranContext)d->modec;
 
-  /* selectOne §Ú∏∆§÷§ø§·§ŒΩ‡»˜ */
+  /* selectOne „ÇíÂëº„Å∂„Åü„ÇÅ„ÅÆÊ∫ñÂÇô */
   fc->allkouho = bushu_char;
   fc->curIkouho = 0;
   if (!cannaconf.HexkeySelect)
@@ -370,7 +362,7 @@ int major_mode;
 
   *(ic->curIkouho) = d->curbushu;
 
-  /* ∏ı ‰∞ÏÕ˜π‘§¨∂π§Ø§∆∏ı ‰∞ÏÕ˜§¨Ω–§ª§ §§ */
+  /* ÂÄôË£ú‰∏ÄË¶ßË°å„ÅåÁã≠„Åè„Å¶ÂÄôË£ú‰∏ÄË¶ß„ÅåÂá∫„Åõ„Å™„ÅÑ */
   if(ic->tooSmall) {
     d->status = AUX_CALLBACK;
     killmenu(d);
@@ -385,18 +377,14 @@ int major_mode;
   return(retval);
 }
 
-static
-vBushuIchiranQuitCatch(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
+static int vBushuIchiranQuitCatch( uiContext d, int retval, mode_context env )
      /* ARGSUSED */
 {
-  popCallback(d); /* ∞ÏÕ˜§Ú•›•√•◊ */
+  popCallback(d); /* ‰∏ÄË¶ß„Çí„Éù„ÉÉ„Éó */
 
   if (((forichiranContext)env)->allkouho != (wchar_t **)bushu_char) {
-    /* bushu_char §œ static §Œ«€ŒÛ§¿§´§È free §∑§∆§œ§§§±§ §§°£
-       §≥§¶∏¿§¶§Œ§√§∆§ §Û§´±¯§§§ §¢ */
+    /* bushu_char „ÅØ static „ÅÆÈÖçÂàó„Å†„Åã„Çâ free „Åó„Å¶„ÅØ„ÅÑ„Åë„Å™„ÅÑ„ÄÇ
+       „Åì„ÅÜË®Ä„ÅÜ„ÅÆ„Å£„Å¶„Å™„Çì„ÅãÊ±ö„ÅÑ„Å™„ÅÇ */
     freeGetIchiranList(((forichiranContext)env)->allkouho);
   }
   popForIchiranMode(d);
@@ -405,17 +393,14 @@ vBushuIchiranQuitCatch(d, retval, env)
   return(vBushuMode(d, CANNA_MODE_BushuMode));
 }
 
-static
-vBushuExitCatch(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
+
+static int vBushuExitCatch( uiContext d, int retval, mode_context env )
      /* ARGSUSED */
 {
   forichiranContext fc;
   int cur, res;
 
-  popCallback(d); /* ∞ÏÕ˜§Ú•›•√•◊ */
+  popCallback(d); /* ‰∏ÄË¶ß„Çí„Éù„ÉÉ„Éó */
 
   fc = (forichiranContext)d->modec;
   cur = fc->curIkouho;
@@ -431,31 +416,25 @@ vBushuExitCatch(d, retval, env)
   return res;
 }
 
-BushuMode(d)
-uiContext d;
+
+int BushuMode( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     killmenu(d);
     return NothingChangedWithBeep(d);
-  }    
+  }
 
   return(vBushuMode(d, CANNA_MODE_BushuMode));
 }
 #endif /* not NO_EXTEND_MENU */
 
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * …ÙºÛ•‚°º•…∆˛Œœ§Œ∞ÏÕ˜…Ωº®                                                  *
+ * ÈÉ®È¶ñ„É¢„Éº„ÉâÂÖ•Âäõ„ÅÆ‰∏ÄË¶ßË°®Á§∫                                                  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-static bushuEveryTimeCatch pro((uiContext, int, mode_context));
-
-static
-bushuEveryTimeCatch(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
+static int bushuEveryTimeCatch( uiContext d, int retval, mode_context env )
      /* ARGSUSED */
 {
   makeBushuEchoStr(d);
@@ -463,21 +442,16 @@ bushuEveryTimeCatch(d, retval, env)
   return(retval);
 }
 
-static bushuExitCatch pro((uiContext, int, mode_context));
 
-static
-bushuExitCatch(d, retval, env)
-uiContext d;
-int retval;
-mode_context env;
+static int bushuExitCatch( uiContext d, int retval, mode_context env )
 {
   yomiContext yc;
 
-  popCallback(d); /* ∞ÏÕ˜§Ú•›•√•◊ */
+  popCallback(d); /* ‰∏ÄË¶ß„Çí„Éù„ÉÉ„Éó */
 
   if (((forichiranContext)env)->allkouho != bushu_char) {
-    /* bushu_char §œ static §Œ«€ŒÛ§¿§´§È free §∑§∆§œ§§§±§ §§°£
-       §≥§¶∏¿§¶§Œ§√§∆§ §Û§´±¯§§§ §¢ */
+    /* bushu_char „ÅØ static „ÅÆÈÖçÂàó„Å†„Åã„Çâ free „Åó„Å¶„ÅØ„ÅÑ„Åë„Å™„ÅÑ„ÄÇ
+       „Åì„ÅÜË®Ä„ÅÜ„ÅÆ„Å£„Å¶„Å™„Çì„ÅãÊ±ö„ÅÑ„Å™„ÅÇ */
     freeGetIchiranList(((forichiranContext)env)->allkouho);
   }
   popForIchiranMode(d);
@@ -494,18 +468,14 @@ mode_context env;
 }
 
 #ifndef NO_EXTEND_MENU
-static
-bushuQuitCatch(d, retval, env)
-     uiContext d;
-     int retval;
-     mode_context env;
+static int bushuQuitCatch( uiContext d, int retval, mode_context env )
      /* ARGSUSED */
 {
-  popCallback(d); /* ∞ÏÕ˜§Ú•›•√•◊ */
+  popCallback(d); /* ‰∏ÄË¶ß„Çí„Éù„ÉÉ„Éó */
 
   if (((forichiranContext)env)->allkouho != (wchar_t **)bushu_char) {
-    /* bushu_char §œ static §Œ«€ŒÛ§¿§´§È free §∑§∆§œ§§§±§ §§°£
-       §≥§¶∏¿§¶§Œ§√§∆§ §Û§´±¯§§§ §¢ */
+    /* bushu_char „ÅØ static „ÅÆÈÖçÂàó„Å†„Åã„Çâ free „Åó„Å¶„ÅØ„ÅÑ„Åë„Å™„ÅÑ„ÄÇ
+       „Åì„ÅÜË®Ä„ÅÜ„ÅÆ„Å£„Å¶„Å™„Çì„ÅãÊ±ö„ÅÑ„Å™„ÅÇ */
     freeGetIchiranList(((forichiranContext)env)->allkouho);
   }
   popForIchiranMode(d);
@@ -517,21 +487,17 @@ bushuQuitCatch(d, retval, env)
 }
 #endif /* not NO_EXTEND_MENU */
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * …ÙºÛ§»§∑§∆§Œ —¥π§Œ∞ÏÕ˜…Ωº®                                                *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static
-convBushuQuitCatch(d, retval, env)
-uiContext d;
-int retval;
-mode_context env;
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * ÈÉ®È¶ñ„Å®„Åó„Å¶„ÅÆÂ§âÊèõ„ÅÆ‰∏ÄË¶ßË°®Á§∫                                                *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+static int convBushuQuitCatch( uiContext d, int retval, mode_context env )
 {
-  popCallback(d); /* ∞ÏÕ˜§Ú•›•√•◊ */
+  popCallback(d); /* ‰∏ÄË¶ß„Çí„Éù„ÉÉ„Éó */
 
   if (((forichiranContext)env)->allkouho != (wchar_t **)bushu_char) {
-    /* bushu_char §œ static §Œ«€ŒÛ§¿§´§È free §∑§∆§œ§§§±§ §§°£
-       §≥§¶∏¿§¶§Œ§√§∆§ §Û§´±¯§§§ §¢ */
+    /* bushu_char „ÅØ static „ÅÆÈÖçÂàó„Å†„Åã„Çâ free „Åó„Å¶„ÅØ„ÅÑ„Åë„Å™„ÅÑ„ÄÇ
+       „Åì„ÅÜË®Ä„ÅÜ„ÅÆ„Å£„Å¶„Å™„Çì„ÅãÊ±ö„ÅÑ„Å™„ÅÇ */
     freeGetIchiranList(((forichiranContext)env)->allkouho);
   }
   popForIchiranMode(d);
@@ -543,22 +509,20 @@ mode_context env;
   return(retval);
 }
 
-/*
- * ∆…§ﬂ§Ú…ÙºÛ§»§∑§∆ —¥π§π§Î
- *
- * ∞˙§≠øÙ	uiContext
- * Ã·§Í√Õ	¿µæÔΩ™Œªª˛ 0	∞€æÔΩ™Œªª˛ -1
- */
-int ConvertAsBushu pro((uiContext));
 
-ConvertAsBushu(d)
-uiContext	d;
+/**
+ * Ë™≠„Åø„ÇíÈÉ®È¶ñ„Å®„Åó„Å¶Â§âÊèõ„Åô„Çã
+ *
+ * @param d uiContext
+ * @return Ê≠£Â∏∏ÁµÇ‰∫ÜÊôÇ 0	Áï∞Â∏∏ÁµÇ‰∫ÜÊôÇ -1
+ */
+int ConvertAsBushu(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   int res;
 
   d->status = 0; /* clear status */
-  
+
   if (yc->henkanInhibition & CANNA_YOMI_INHIBIT_ASBUSHU ||
       yc->right || yc->left) {
     return NothingChangedWithBeep(d);
@@ -577,7 +541,7 @@ uiContext	d;
   d->nbytes = yc->kEndp;
   WStrncpy(d->buffer_return, yc->kana_buffer, d->nbytes);
 
-  /* 0 §œ°¢ConvertAsBushu §´§È∏∆§–§Ï§ø§≥§»§Úº®§π */
+  /* 0 „ÅØ„ÄÅConvertAsBushu „Åã„ÇâÂëº„Å∞„Çå„Åü„Åì„Å®„ÇíÁ§∫„Åô */
   res = bushuHenkan(d, 0, 1, 0, convBushuQuitCatch);
   if (res < 0) {
     makeYomiReturnStruct(d);
@@ -587,22 +551,18 @@ uiContext	d;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * ∂¶ƒÃ…Ù                                                                    *
+ * ÂÖ±ÈÄöÈÉ®                                                                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/*
- * ∆…§ﬂ§Ú…ÙºÛº≠ΩÒ§´§È…ÙºÛ —¥π§π§Î
+/**
+ * Ë™≠„Åø„ÇíÈÉ®È¶ñËæûÊõ∏„Åã„ÇâÈÉ®È¶ñÂ§âÊèõ„Åô„Çã
  */
-static
-bushuBgnBun(st, yomi, length)
-RkStat *st;
-wchar_t *yomi;
-int length;
+static int bushuBgnBun( RkStat *st, wchar_t *yomi, int length )
 {
-  int nbunsetsu;
-  extern defaultBushuContext;
+    int nbunsetsu;
+    extern int defaultBushuContext;
 
-  /* œ¢ ∏¿· —¥π§Ú≥´ªœ§π§Î *//* º≠ΩÒ§À§¢§Î∏ı ‰§Œ§ﬂºË§ÍΩ–§π */
+  /* ÈÄ£ÊñáÁØÄÂ§âÊèõ„ÇíÈñãÂßã„Åô„Çã *//* ËæûÊõ∏„Å´„ÅÇ„ÇãÂÄôË£ú„ÅÆ„ÅøÂèñ„ÇäÂá∫„Åô */
   if ((defaultBushuContext == -1)) {
     if (KanjiInit() == -1 || defaultBushuContext == -1) {
       jrKanjiError = KanjiInitError();
@@ -614,49 +574,45 @@ int length;
   if(nbunsetsu == -1) {
     if(errno == EPIPE)
       jrKanjiPipeError();
-    jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\313\274\272\307\324\244\267\244\336\244\267\244\277"; 
-	    /* §´§ ¥¡ª˙ —¥π§Àº∫«‘§∑§ﬁ§∑§ø */
+    jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\313\274\272\307\324\244\267\244\336\244\267\244\277";
+	    /* „Åã„Å™Êº¢Â≠óÂ§âÊèõ„Å´Â§±Êïó„Åó„Åæ„Åó„Åü */
     return(NG);
   }
-  
+
   if(RkwGetStat(defaultBushuContext, st) == -1) {
     if(errno == EPIPE)
       jrKanjiPipeError();
     jrKanjiError = "\245\271\245\306\245\244\245\277\245\271\244\362\274\350\244\352\275\320\244\273\244\336\244\273\244\363\244\307\244\267\244\277";
-                  /* •π•∆•§•ø•π§ÚºË§ÍΩ–§ª§ﬁ§ª§Û§«§∑§ø */
+                  /* „Çπ„ÉÜ„Ç§„Çø„Çπ„ÇíÂèñ„ÇäÂá∫„Åõ„Åæ„Åõ„Çì„Åß„Åó„Åü */
     return(NG);
   }
 
   return(nbunsetsu);
 }
 
-/*
- * ∆…§ﬂ§À»æ¬˘≈¿§Ú…’≤√§∑§∆∏ı ‰∞ÏÕ˜π‘§Ú…Ωº®§π§Î
- *
- * ∞˙§≠øÙ	uiContext
- *		flag	ConvertAsBushu§´§È∏∆§–§Ï§ø 0
- *			BushuYomiHenkan§´§È∏∆§–§Ï§ø 1
- * Ã·§Í√Õ	¿µæÔΩ™Œªª˛ 0	∞€æÔΩ™Œªª˛ -1
- *
- *
- * §≥§≥§ÀÕË§Îª˛§œ§ﬁ§¿ getForIchiranContext §¨∏∆§–§Ï§∆§§§ §§§‚§Œ§»§π§Î
- */
 
-static
-bushuHenkan(d, flag, ext, cur, quitfunc)
-uiContext	d;
-int             flag, cur;
-int             (*quitfunc) pro((uiContext, int, mode_context));
+/**
+ * Ë™≠„Åø„Å´ÂçäÊøÅÁÇπ„Çí‰ªòÂä†„Åó„Å¶ÂÄôË£ú‰∏ÄË¶ßË°å„ÇíË°®Á§∫„Åô„Çã
+ *
+ * @param d     uiContext
+ * @param flag  ConvertAsBushu„Åã„ÇâÂëº„Å∞„Çå„Åü 0
+ *              BushuYomiHenkan„Åã„ÇâÂëº„Å∞„Çå„Åü 1
+ * @return Ê≠£Â∏∏ÁµÇ‰∫ÜÊôÇ 0	Áï∞Â∏∏ÁµÇ‰∫ÜÊôÇ -1
+ *
+ * „Åì„Åì„Å´Êù•„ÇãÊôÇ„ÅØ„Åæ„Å† getForIchiranContext „ÅåÂëº„Å∞„Çå„Å¶„ÅÑ„Å™„ÅÑ„ÇÇ„ÅÆ„Å®„Åô„Çã
+ */
+static int bushuHenkan(uiContext d, int flag, int ext, int cur,
+                       int (*quitfunc)(uiContext, int, mode_context) )
 {
-  forichiranContext fc;
-  ichiranContext ic;
-  unsigned inhibit = 0;
-  wchar_t *yomi, **allBushuCands;
-  RkStat	st;
-  int nelem, currentkouho, nbunsetsu, length, retval = 0;
-  extern defaultBushuContext;
-  
-  wchar_t **getIchiranList();
+    forichiranContext fc;
+    ichiranContext ic;
+    unsigned inhibit = 0;
+    wchar_t *yomi, **allBushuCands;
+    RkStat	st;
+    int nelem, currentkouho, nbunsetsu, length, retval = 0;
+
+    extern int defaultBushuContext;
+    extern wchar_t** getIchiranList(int context, int* nelem, int* currentkouho);
 
   if(flag) {
     yomi = (wchar_t *)bushu_key[cur];
@@ -675,7 +631,7 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
   }
 
   if((nbunsetsu != 1) || (st.klen > 1) || (st.maxcand == 0)) {
-    /* …ÙºÛ§»§∑§∆§Œ∏ı ‰§¨§ §§ */
+    /* ÈÉ®È¶ñ„Å®„Åó„Å¶„ÅÆÂÄôË£ú„Åå„Å™„ÅÑ */
 
     d->kanji_status_return->length = -1;
 
@@ -685,15 +641,15 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
     killmenu(d);
     if(flag) {
       makeGLineMessageFromString(d, "\244\263\244\316\311\364\274\363\244\316\270\365\312\344\244\317\244\242\244\352\244\336\244\273\244\363");
-                                  /* §≥§Œ…ÙºÛ§Œ∏ı ‰§œ§¢§Í§ﬁ§ª§Û */
+                                  /* „Åì„ÅÆÈÉ®È¶ñ„ÅÆÂÄôË£ú„ÅØ„ÅÇ„Çä„Åæ„Åõ„Çì */
     } else {
       return(NothingChangedWithBeep(d));
     }
     return(0);
   }
 
-  /* ∏ı ‰∞ÏÕ˜π‘§Ú…Ωº®§π§Î */
-  /* 0 §œ°¢•´•Ï•Û•»∏ı ‰ + 0 §Ú•´•Ï•Û•»∏ı ‰§À§π§Î§≥§»§Úº®§π */
+  /* ÂÄôË£ú‰∏ÄË¶ßË°å„ÇíË°®Á§∫„Åô„Çã */
+  /* 0 „ÅØ„ÄÅ„Ç´„É¨„É≥„ÉàÂÄôË£ú + 0 „Çí„Ç´„É¨„É≥„ÉàÂÄôË£ú„Å´„Åô„Çã„Åì„Å®„ÇíÁ§∫„Åô */
 
   if((allBushuCands
       = getIchiranList(defaultBushuContext, &nelem, &currentkouho)) == 0) {
@@ -702,12 +658,12 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
     return -1;
   }
 
-  /* …ÙºÛ —¥π§œ≥ÿΩ¨§∑§ §§°£ */
-  if(RkwEndBun(defaultBushuContext, 0) == -1) { /* 0:≥ÿΩ¨§∑§ §§ */
+  /* ÈÉ®È¶ñÂ§âÊèõ„ÅØÂ≠¶Áøí„Åó„Å™„ÅÑ„ÄÇ */
+  if(RkwEndBun(defaultBushuContext, 0) == -1) { /* 0:Â≠¶Áøí„Åó„Å™„ÅÑ */
     if(errno == EPIPE)
       jrKanjiPipeError();
     jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\316\275\252\316\273\244\313\274\272\307\324\244\267\244\336\244\267\244\277";
-                   /* §´§ ¥¡ª˙ —¥π§ŒΩ™Œª§Àº∫«‘§∑§ﬁ§∑§ø */
+                   /* „Åã„Å™Êº¢Â≠óÂ§âÊèõ„ÅÆÁµÇ‰∫Ü„Å´Â§±Êïó„Åó„Åæ„Åó„Åü */
     freeGetIchiranList(allBushuCands);
     killmenu(d);
     (void)GLineNGReturn(d);
@@ -726,8 +682,8 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
 
   if (!cannaconf.HexkeySelect)
     inhibit |= (unsigned char)NUMBERING;
-  fc->curIkouho = currentkouho;	/* ∏Ω∫ﬂ§Œ•´•Ï•Û•»∏ı ‰»÷πÊ§Ú ›¬∏§π§Î */
-  currentkouho = 0;	/* •´•Ï•Û•»∏ı ‰§´§È≤ø»÷Ã‹§Ú•´•Ï•Û•»∏ı ‰§»§π§Î§´ */
+  fc->curIkouho = currentkouho;	/* ÁèæÂú®„ÅÆ„Ç´„É¨„É≥„ÉàÂÄôË£úÁï™Âè∑„Çí‰øùÂ≠ò„Åô„Çã */
+  currentkouho = 0;	/* „Ç´„É¨„É≥„ÉàÂÄôË£ú„Åã„Çâ‰ΩïÁï™ÁõÆ„Çí„Ç´„É¨„É≥„ÉàÂÄôË£ú„Å®„Åô„Çã„Åã */
 
   if((retval = selectOne(d, fc->allkouho, &fc->curIkouho, nelem, BANGOMAX,
 			 inhibit, currentkouho, WITH_LIST_CALLBACK,
@@ -753,7 +709,7 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
   }
   currentModeInfo(d);
 
-  /* ∏ı ‰∞ÏÕ˜π‘§¨∂π§Ø§∆∏ı ‰∞ÏÕ˜§¨Ω–§ª§ §§ */
+  /* ÂÄôË£ú‰∏ÄË¶ßË°å„ÅåÁã≠„Åè„Å¶ÂÄôË£ú‰∏ÄË¶ß„ÅåÂá∫„Åõ„Å™„ÅÑ */
   if(ic->tooSmall) {
     d->status = AUX_CALLBACK;
     killmenu(d);
@@ -768,35 +724,33 @@ int             (*quitfunc) pro((uiContext, int, mode_context));
   return(retval);
 }
 
-/*
- * ∏ı ‰π‘§Úæ√µÓ§∑°¢…ÙºÛ•‚°º•…§´§È»¥§±°¢∆…§ﬂ§¨§ §§•‚°º•…§À∞‹π‘§π§Î
- *
- * ∞˙§≠øÙ	uiContext
- *		flag	ConvertAsBushu§´§È∏∆§–§Ï§ø 0
- *			BushuYomiHenkan§´§È∏∆§–§Ï§ø 1
- * Ã·§Í√Õ	¿µæÔΩ™Œªª˛ 0	∞€æÔΩ™Œªª˛ -1
- */
-static
-makeBushuIchiranQuit(d, flag)
-uiContext	d;
-int              flag;
-{
-  extern defaultBushuContext;
 
-  /* …ÙºÛ —¥π§œ≥ÿΩ¨§∑§ §§°£ */
-  if(RkwEndBun(defaultBushuContext, 0) == -1) { /* 0:≥ÿΩ¨§∑§ §§ */
+/**
+ * ÂÄôË£úË°å„ÇíÊ∂àÂéª„Åó„ÄÅÈÉ®È¶ñ„É¢„Éº„Éâ„Åã„ÇâÊäú„Åë„ÄÅË™≠„Åø„Åå„Å™„ÅÑ„É¢„Éº„Éâ„Å´ÁßªË°å„Åô„Çã
+ *
+ * @param d     uiContext
+ * @param flag  ConvertAsBushu„Åã„ÇâÂëº„Å∞„Çå„Åü 0
+ *              BushuYomiHenkan„Åã„ÇâÂëº„Å∞„Çå„Åü 1
+ * @return Ê≠£Â∏∏ÁµÇ‰∫ÜÊôÇ 0	Áï∞Â∏∏ÁµÇ‰∫ÜÊôÇ -1
+ */
+static int makeBushuIchiranQuit( uiContext d, int flag )
+{
+    extern int defaultBushuContext;
+
+  /* ÈÉ®È¶ñÂ§âÊèõ„ÅØÂ≠¶Áøí„Åó„Å™„ÅÑ„ÄÇ */
+  if(RkwEndBun(defaultBushuContext, 0) == -1) { /* 0:Â≠¶Áøí„Åó„Å™„ÅÑ */
     if(errno == EPIPE)
       jrKanjiPipeError();
     jrKanjiError = "\244\253\244\312\264\301\273\372\312\321\264\271\244\316\275\252\316\273\244\313\274\272\307\324\244\267\244\336\244\267\244\277";
-                   /* §´§ ¥¡ª˙ —¥π§ŒΩ™Œª§Àº∫«‘§∑§ﬁ§∑§ø */
+                   /* „Åã„Å™Êº¢Â≠óÂ§âÊèõ„ÅÆÁµÇ‰∫Ü„Å´Â§±Êïó„Åó„Åæ„Åó„Åü */
     return(NG);
   }
 
   if(flag) {
-    /* kanji_status_return §Ú•Ø•Í•¢§π§Î */
+    /* kanji_status_return „Çí„ÇØ„É™„Ç¢„Åô„Çã */
     d->kanji_status_return->length  = 0;
     d->kanji_status_return->revLen  = 0;
-    
+
 /*
     d->status = QUIT_CALLBACK;
 */
@@ -804,8 +758,8 @@ int              flag;
     makeYomiReturnStruct(d);
   }
   GlineClear(d);
-  
-  return(0);
+
+    return 0;
 }
 
 

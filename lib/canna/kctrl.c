@@ -449,9 +449,8 @@ initWarningMesg()
   nWarningMesg = 0;
 }
 
-void
-addWarningMesg(s)
-char *s;
+
+void addWarningMesg(const char* s)
 {
   int n;
   char *work;
@@ -1863,10 +1862,8 @@ jrKanjiStatusWithValue *ksva;
   return  XKanjiControl2(0, context, KC_CLOSEUICONTEXT, (BYTE *)ksva);
 }
 
-int
-ToggleChikuji(d, flg)
-     uiContext d;
-     int flg;
+
+int ToggleChikuji(uiContext d, int flg)
 {
   yomiContext	yc = (yomiContext)d->modec;
   extern KanjiModeRec empty_mode;

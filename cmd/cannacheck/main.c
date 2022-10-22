@@ -64,7 +64,7 @@ int main(int argc, char* argv[], char* envp[])
     jrKanjiControl(0, KC_SETSERVERNAME, servername);
   }
   jrKanjiControl(0, KC_SETVERBOSE,
-		 (char *)(canna_intptr_t)(IROHA_verbose ?
+                 (char *)(intptr_t)(IROHA_verbose ?
 				CANNA_FULL_VERBOSE : CANNA_HALF_VERBOSE));
   if (jrKanjiControl(0, KC_INITIALIZE, (char *)&warn) != -1) {
     if (IROHA_verbose) {

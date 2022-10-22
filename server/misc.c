@@ -624,7 +624,7 @@ const char   *hostname;
 #ifdef HAVE_INET_ATON
 	inet_aton(hostname, &numaddr)
 #else
-	((numaddr.s_addr = inet_addr(hostname)) != (canna_in_addr_t)-1)
+	((numaddr.s_addr = inet_addr(hostname)) != (in_addr_t)-1)
 #endif
        ) {
       res = calloc(1, sizeof(AddrList));

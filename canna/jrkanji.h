@@ -37,7 +37,8 @@
   #define pro(x) x
 #endif
 
-#include <canna/sysdep.h>
+//#include <canna/sysdep.h>
+#include <stdint.h>
 #include <canna/keydef.h>
 #include <canna/mfdef.h>
 
@@ -251,7 +252,9 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern char *jrKanjiError;
+
+extern const char* jrKanjiError;
+
 #ifdef CANNA_NEW_WCHAR_AWARE /* to avoid problems in old programs */
 extern int (*jrBeepFunc) pro((void));
 # define CANNA_JR_BEEP_FUNC_DECLARED

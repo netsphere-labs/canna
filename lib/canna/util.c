@@ -178,16 +178,12 @@ int     len;
 }
 
 
-/* cfuncdef
-
-  checkGLineLen -- 一覧行に表示できる長さを越えているかをチェック
+/**
+ * 一覧行に表示できる長さを越えているかをチェック
 
   長さが越えていたら、カーソル部分に表示されるようにする。
-
  */
-
-checkGLineLen(d)
-uiContext d;
+int checkGLineLen( uiContext d )
 {
   if (d->kanji_status_return->info & KanjiGLineInfo) {
     if (colwidth(d->kanji_status_return->gline.line,
@@ -707,10 +703,8 @@ int sz;
   checkGLineLen(d);
 }
 
-void
-makeGLineMessageFromString(d, msg)
-uiContext d;
-char  *msg;
+
+void makeGLineMessageFromString( uiContext d, const char  *msg )
 {
   int len;
 
@@ -718,10 +712,8 @@ char  *msg;
   makeGLineMessage(d, d->genbuf, len);
 }
 
-setWStrings(ws, s, sz)
-wchar_t **ws;
-char **s;
-int sz;
+
+int setWStrings(cannawc** ws, const char** s, int sz)
 {
   int f = sz;
   wchar_t *WString();
@@ -860,9 +852,9 @@ unsigned int dpy, win;
 }
 #endif /* DEBUG */
 
-extern char *jrKanjiError;
+extern const char* jrKanjiError;
 
-NoMoreMemory()
+int NoMoreMemory()
 {
   jrKanjiError = "\245\341\245\342\245\352\244\254\311\324\302\255\244\267\244\306\244\244\244\336\244\271\241\243";
                 /* メモリが不足しています。 */
@@ -1263,10 +1255,8 @@ yomiContext yc;
   return yc->context;
 }
 
-int
-abandonContext(d, yc)
-uiContext d;
-yomiContext yc;
+
+int abandonContext( uiContext d, yomiContext yc )
 {
   extern defaultContext;
 
@@ -1282,10 +1272,8 @@ yomiContext yc;
   return 0;
 }
 
-int
-makeRkError(d, str)
-uiContext d;
-char *str;
+
+int makeRkError( uiContext d, const char* str )
 {
   if (errno == EPIPE) {
     jrKanjiPipeError();
@@ -1297,9 +1285,7 @@ char *str;
 
 /* 以下メッセージを gline に出すための仕組み */
 
-static
-ProcAnyKey(d)
-uiContext d;
+static int ProcAnyKey( uiContext d )
 {
   coreContext cc = (coreContext)d->modec;
 
@@ -1311,15 +1297,13 @@ uiContext d;
   return 0;
 }
 
-static wait_anykey_func pro((uiContext, KanjiMode, int, int, int));
 
-static
-wait_anykey_func(d, mode, whattodo, key, fnum)
-uiContext d;
-KanjiMode mode;
-int whattodo;
-int key;
-int fnum;
+static int
+wait_anykey_func( uiContext d,
+                  KanjiMode mode,
+                  int whattodo,
+                  int key,
+                  int fnum )
 /* ARGSUSED */
 {
   switch (whattodo) {
@@ -1338,10 +1322,9 @@ static KanjiModeRec canna_message_mode = {
   0, 0, 0,
 };
 
+
 static void
-cannaMessageMode(d, cnt)
-uiContext d;
-canna_callback_t cnt;
+cannaMessageMode( uiContext d, canna_callback_t cnt )
 {
   coreContext cc;
   extern coreContext newCoreContext pro((void));
@@ -1367,24 +1350,18 @@ canna_callback_t cnt;
   return;
 }
 
-/*
-  canna_alert(d, message, cnt) -- メッセージを gline に出す
 
+/**
+ * メッセージを gline に出す
   何かキーが入力されたら cnt と言う関数を呼び出す。
 
-  引数:
-    d        UI Context
-    message  メッセージ
-    cnt      次の処理を行う関数
+ * @param d        UI Context
+ * @param message  メッセージ
+ * @param cnt      次の処理を行う関数
 
   cnt では popCallback(d) をやらなければならないことに注意！
-
  */
-
-canna_alert(d, message, cnt)
-uiContext d;
-char *message;
-canna_callback_t cnt;
+int canna_alert( uiContext d, char *message, canna_callback_t cnt )
 {
   d->nbytes = 0;
 

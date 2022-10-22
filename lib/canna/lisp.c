@@ -1371,7 +1371,7 @@ rstring()
     if (strp < BUFSIZE) {
       if (c == '\\') {
 	untyi(c);
-	c = (char)(((canna_uintptr_t)rcharacter()) & 0xff);
+	c = (char)(((uintptr_t)rcharacter()) & 0xff);
       }
       strb[strp++] = (char)c;
     }
@@ -3956,10 +3956,10 @@ ObtainVersion()
   extern int protocol_version, server_version;
   extern char *server_name;
 
+  // サーバのホスト名.
   serv = RkGetServerHost();
-  if (!serv) {
-    serv = DICHOME;
-  }
+  if (!serv)
+      serv = DICHOME;
   RkwInitialize(serv);
 
   /* プロトコルバージョン */

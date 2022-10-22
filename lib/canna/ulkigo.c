@@ -12,12 +12,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -39,31 +39,31 @@ static char rcs_id[] = "@(#) 102.1 $Id: ulkigo.c,v 1.2 2003/01/10 13:08:45 aida_
 extern int uiUtilIchiranTooSmall();
 
 static
-char *srussia_data[] = 
+const char *srussia_data[] =
 {
   /*"§¡", "§¢", "§£", "§¤", "§¥", "§¦", "§§", "§¨",*/
-  "\247\241", "\247\242", "\247\243", "\247\244", "\247\245", "\247\246", "\247\247", "\247\250", 
+  "\247\241", "\247\242", "\247\243", "\247\244", "\247\245", "\247\246", "\247\247", "\247\250",
 
   /*"§©", "§ª", "§«", "§¬", "§­", "§®", "§¯", "§°", */
   "\247\251", "\247\252", "\247\253", "\247\254", "\247\255", "\247\256", "\247\257", "\247\260",
 
   /*"§±", "§²", "§³", "§´", "§µ", "§¶", "§·", "§¸",*/
-  "\247\261", "\247\262", "\247\263", "\247\264", "\247\265", "\247\266", "\247\267", "\247\270", 
+  "\247\261", "\247\262", "\247\263", "\247\264", "\247\265", "\247\266", "\247\267", "\247\270",
 
   /*"§¹", "§º", "§»", "§¼", "§½", "§¾", "§¿", "§À", */
-  "\247\271", "\247\272", "\247\273", "\247\274", "\247\275", "\247\276", "\247\277", "\247\300", 
+  "\247\271", "\247\272", "\247\273", "\247\274", "\247\275", "\247\276", "\247\277", "\247\300",
 
   /*"§Á", "§Ñ", "§Ò", "§Ó", "§Ô", "§Õ", "§Ö", "§×",*/
-  "\247\301", "\247\321", "\247\322", "\247\323", "\247\324", "\247\325", "\247\326", "\247\327", 
+  "\247\301", "\247\321", "\247\322", "\247\323", "\247\324", "\247\325", "\247\326", "\247\327",
 
   /*"§Ø", "§Ù", "§Ú", "§Û", "§Ü", "§Ý", "§Þ", "§ß",*/
   "\247\330", "\247\331", "\247\332", "\247\333", "\247\334", "\247\335", "\247\336", "\247\337",
 
   /*"§à", "§á", "§â", "§ã", "§ä", "§å", "§æ", "§ç",*/
-  "\247\340", "\247\341", "\247\342", "\247\343", "\247\344", "\247\345", "\247\346", "\247\347", 
+  "\247\340", "\247\341", "\247\342", "\247\343", "\247\344", "\247\345", "\247\346", "\247\347",
 
   /*"§è", "§é", "§ê", "§ë", "§ì", "§í", "§î", "§ï",*/
-  "\247\350", "\247\351", "\247\352", "\247\353", "\247\354", "\247\355", "\247\356", "\247\357", 
+  "\247\350", "\247\351", "\247\352", "\247\353", "\247\354", "\247\355", "\247\356", "\247\357",
 
   /*"§ð", "§ñ", */
   "\247\360", "\247\361",
@@ -72,7 +72,7 @@ char *srussia_data[] =
 #define	UURD_SZ	(sizeof(srussia_data) / sizeof(char *))
 
 static
-char *sgreek_data[] =  
+const char *sgreek_data[] =
 {
   /* "¦¡", "¦¢", "¦£", "¦¤", "¦¥", "¦¦", "¦§", "¦¨", */
   "\246\241", "\246\242", "\246\243", "\246\244", "\246\245", "\246\246", "\246\247", "\246\250",
@@ -110,53 +110,53 @@ initUlKigoTable()
   return retval;
 }
 
-#ifdef pcux_r32 
+#ifdef pcux_r32
 static
-char *skeisen_data[] =  
-{ 
+const char *skeisen_data[] =
+{
   /* "¬¤", "¬¥", "¬¦", "¬§", "¬¨", "¬©", "¬ª", "¬«", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
 
   /* "¬¬", "¬­", "¬®", "¬¯", "¬°", "¬±", "¬²", "¬³", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬´", "¬µ", "¬¶", "¬·", "¬¸", "¬¹", "¬º", "¬»", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬¼", "¬½", "¬¾", "¬¿", "¬À", "¬Á", "¬Â", "¬Ã", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬Ä", "¬Å", "¬Æ", "¬Ç", "¬È", "¬É", "¬Ê", "¬Ë", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬Ì", "¬Í", "¬Î", "¬Ï", "¬Ð", "¬Ñ", "¬Ò", "¬Ó", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬Ô", "¬Õ", "¬Ö", "¬×", "¬Ø", "¬Ù", "¬Ú", "¬Û", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬Ü", "¬Ý", "¬Þ", "¬ß", "¬à", "¬á", "¬â", "¬ã", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /* "¬ä", "¬å", "¬æ", "¬ç", "¬è", "¬é", "¬ê", "¬ë", */
   "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244", "\254\244",
-  
+
   /*  "¬ì", "¬í", "¬î", "¬ï", */
   "\254\244", "\254\244", "\254\244", "\254\244",
 };
 #else /* EWS-UX/V */
 static
-char *skeisen_data[] =  
-{ 
+const char *skeisen_data[] =
+{
   /* "¨¡", "¨¢", "¨£", "¨¤", "¨¥", "¨¦", "¨§", "¨¨", */
   "\250\241", "\250\242", "\250\243", "\250\244", "\250\245", "\250\246", "\250\247", "\250\250",
-  
+
   /* "¨©", "¨ª", "¨«", "¨¬", "¨­", "¨®", "¨¯", "¨°", */
   "\250\251", "\250\252", "\250\253", "\250\254", "\250\255", "\250\256", "\250\257", "\250\260",
-  
+
   /* "¨±", "¨²", "¨³", "¨´", "¨µ", "¨¶", "¨·", "¨¸", */
   "\250\261", "\250\262", "\250\263", "\250\264", "\250\265", "\250\266", "\250\267", "\250\270",
-  
+
   /* "¨¹", "¨º", "¨»", "¨¼", "¨½", "¨¾", "¨¿", "¨À", */
   "\250\271", "\250\272", "\250\273", "\250\274", "\250\275", "\250\276", "\250\277", "\250\300",
 };
@@ -239,10 +239,8 @@ mode_context env;
   return(uuKigoExitDo(d, retval));
 }
 
-uuKigoGeneralExitCatch(d, retval, env)
-uiContext d;
-int retval;
-mode_context env;
+
+int uuKigoGeneralExitCatch( uiContext d, int retval, mode_context env )
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -273,12 +271,14 @@ mode_context env;
   return prevMenuIfExist(d);
 }
 
-uuKigoMake(d, allkouho, size, cur, mode, exitfunc, posp)
-uiContext d;
-wchar_t **allkouho;
-int size, *posp;
-char cur, mode;
-int (*exitfunc)();
+
+int uuKigoMake( uiContext d,
+                cannawc** allkouho,
+                int size,
+                char cur,
+                char mode,
+                int (*exitfunc)(uiContext, int, mode_context),
+                int *posp )
 {
   forichiranContext fc;
   ichiranContext ic;
@@ -348,15 +348,13 @@ uiContext	d;
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * ¥í¥·¥¢Ê¸»ú¤ÎÆþÎÏ                                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-kigoRussia(d)
-uiContext d;
+int kigoRussia( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
 #ifdef NO_EXTEND_MENU
   d->kanji_status_return->info |= KanjiRussianInfo;
   return 0;
@@ -370,14 +368,13 @@ uiContext d;
  * ¥®¥ê¥·¥ãÊ¸»ú¤ÎÆþÎÏ                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-kigoGreek(d)
-uiContext d;
+int kigoGreek( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {
     return NothingChangedWithBeep(d);
-  }    
+  }
 #ifdef NO_EXTEND_MENU
   d->kanji_status_return->info |= KanjiGreekInfo;
   return 0;
@@ -387,12 +384,11 @@ uiContext d;
 #endif
 }
 
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * ·ÓÀþ¤ÎÆþÎÏ                                                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-kigoKeisen(d)
-uiContext d;
+int kigoKeisen( uiContext d )
 {
   yomiContext yc = (yomiContext)d->modec;
 
