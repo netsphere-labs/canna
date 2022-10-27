@@ -244,8 +244,8 @@ _Rkpclose(struct DM* dm, char* dfnm, struct RkKxGram* gram)
   if (dm->dm_gram) {
     dm->dm_gram->refcount--;
     if (dm->dm_gram->refcount == 0) {
-      (void)RkCloseGram(dm->dm_gram->gramdic);
-      free((char *)dm->dm_gram);
+        RkCloseGram(dm->dm_gram->gramdic);
+        free( dm->dm_gram);
     }
   }
   if (xdm) {
@@ -254,16 +254,16 @@ _Rkpclose(struct DM* dm, char* dfnm, struct RkKxGram* gram)
 	if (xdm->pgs[i].flags & RK_PG_LOADED) {
 #ifdef MMAP
 	  if (((int) (xdm->pgs[i].buf)) != -1)
-	    munmap((caddr_t)xdm->pgs[i].buf, xdm->pgsz);
+	    munmap( xdm->pgs[i].buf, xdm->pgsz);
 #else
 	  if (xdm->pgs[i].buf) {
-	    (void)free((char *)xdm->pgs[i].buf);
+              free( xdm->pgs[i].buf);
 	  }
 #endif
 	  xdm->pgs[i].flags &= ~RK_PG_LOADED;
 	}
-      (void)free((char *)xdm->pgs);
-      xdm->pgs = (struct NP *)0;
+      free( xdm->pgs);
+      xdm->pgs = NULL;
     }
     if (xdm->buf) {
       (void)free((char *) xdm->buf);
@@ -742,7 +742,7 @@ _Rkpsync(struct RkContext* cx, struct DM* dm, struct DM* qm)
           if (isLoadedPage(dic->pgs + j))
             if (_RkDoInvalidateCache(dic->pgs[j].buf, dic->pgsz) == 1) {
 	      if (((int) (dic->pgs[j].buf)) != -1)
-	        munmap((caddr_t)dic->pgs[j].buf, dic->pgsz);
+                  munmap( dic->pgs[j].buf, dic->pgsz);
               dic->pgs[j].buf = (unsigned char *)0;
               dic->pgs[j].lnksz = (unsigned) 0;
               dic->pgs[j].ndsz = (unsigned) 0;

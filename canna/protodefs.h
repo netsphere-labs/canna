@@ -25,6 +25,7 @@
 
 #define canna_version(majv, minv) ((majv) * 1024 + (minv))
 
+#include <config.h>
 #include <stdint.h>
 
 typedef uint16_t Ushort;
@@ -44,9 +45,15 @@ typedef unsigned char BYTE;
 #define E_VERSION           "1.2"
 #define W_VERSION           "3.3"
 
+// /etc/services ファイル
 #define IR_SERVICE_NAME	    "canna"
 #define IR_DEFAULT_PORT	    5680
-#define IR_UNIX_PATH    "/tmp/.iroha_unix/IROHA"
+
+// UNIX ドメインソケット
+#ifdef USE_UNIX_SOCKET
+  #define IR_UNIX_PATH  IR_UNIX_DIR "/IROHA.sock"
+#endif // USE_UNIX_SOCKET
+
 #define NAME_LENGTH	    15
 #define HOST_NAME	    15
 

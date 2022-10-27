@@ -64,7 +64,7 @@ RKCの設定ファイルがありません      -> これはエラーではな�
 
 環境変数 `CANNA_RKC_PREPROCESSOR`
 
-●TODO: カスタマイズファイルの場所がおかしい。`/etc/` 以下でないと.
+●TODO: カスタマイズファイルの場所が /var/lib/ 以下ではおかしい。`/etc/` 以下でないと.
 
 
 
@@ -79,4 +79,9 @@ cannaserver:Initialize failed: RkwInitialize()
 root で動かせば, 起動はできる.
 -> cannacheck から接続できない。アカン.
 
-
+UNIX ドメインソケット
+  -p オプションで, ソケットファイルに ":1" などを追加.
+IPソケット
+  -- ポート番号は   -p port  .. Original はポート番号に加算する数字. 謎過ぎる.
+  指定がない場合, `/etc/services` からポート番号を取得.
+  それもない場合, default port number 5680

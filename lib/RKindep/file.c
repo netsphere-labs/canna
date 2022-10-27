@@ -38,28 +38,42 @@
 
 RCSID("$Id: file.c,v 1.3 2003/09/24 14:50:40 aida_s Exp $");
 
+// @param mode  非0 = into non-blocking mode.
+// @return If failed, -1.
+static int non_blocking( SOCKET sock, int mode )
+{
+    assert( sock != INVALID_SOCKET );
+#ifndef _WIN32
+    // UNIX
+    int oldflags = fcntl(sock, F_GETFL, 0 /* dummy */);
+    return fcntl(sock, F_SETFL,
+                 mode ? (oldflags | O_NONBLOCK) : (oldflags & ~O_NONBLOCK) );
+#else
+    // Windows では「現在のモード」を得る方法はない!
+    u_long iMode = mode ? 1 : 0;
+    int iResult = ioctlsocket( sock, FIONBIO, &iMode);
+    if ( iResult != NO_ERROR )
+        return -1;
+    return 0;
+#endif
+}
+
+
+// 一定時間でタイムアウトする connect().
 // lib/RKC/wconvert.c:try_connect() から呼び出される.
 // @return If error, -1
 int
 RkiConnect( SOCKET fd, struct sockaddr* addrp, size_t len,
             const struct timeval* timeout)
 {
-    int flags;
+    //int flags;
     int res = -1, r;
     socklen_t optlen;
-  struct timeval tval = *timeout;
-  rki_fd_set wfds;
+    struct timeval tval = *timeout;
+    rki_fd_set wfds;
 
-#ifndef _WIN32
-    flags = fcntl(fd, F_GETFL, 0);
-    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK))
+    if ( non_blocking(fd, 1) == -1 )
         return -1;
-#else
-    u_long iMode = 1; // non-blocking
-    int iResult = ioctlsocket( fd, FIONBIO, &iMode);
-    if ( iResult != NO_ERROR )
-        return -1;
-#endif
 
   if (!connect(fd, addrp, len)) {
     res = 0; /* succeeded at once */
@@ -81,10 +95,8 @@ RkiConnect( SOCKET fd, struct sockaddr* addrp, size_t len,
     res = 0;
 
 finish:
-#ifndef _WIN32
-    fcntl(fd, F_SETFL, flags);
-#endif
-  return res;
+    non_blocking(fd, 0);
+    return res;
 }
 
 /*

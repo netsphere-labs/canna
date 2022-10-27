@@ -44,9 +44,7 @@ static void freeBuffer pro((void));
 static void freeExtra pro((void));
 extern int ckverbose;
 
-static
-doInitializeFunctions(d)
-uiContext d;
+static int doInitializeFunctions( uiContext d )
 {
   BYTE *p;
   int res = 0;
@@ -71,11 +69,9 @@ uiContext d;
   return res;
 }
 
-/* uiContext の初期化 */
 
-initRomeStruct(d, flg)
-     uiContext	d;
-     int	flg;
+/* uiContext の初期化 */
+int initRomeStruct( uiContext	d, int	flg )
 {
   extern KanjiModeRec alpha_mode, empty_mode;
   extern KanjiModeRec kzhr_mode, kzkt_mode, kzal_mode;
@@ -101,15 +97,13 @@ initRomeStruct(d, flg)
   }
   alphaMode(d);
 
-  /* 初期 func を実行する */
-
-  (void)doInitializeFunctions(d);
-  return 0;
+    /* 初期 func を実行する */
+    doInitializeFunctions(d);
+    return 0;
 }
 
-static void
-freeModec(modec)
-mode_context modec;
+
+static void freeModec( mode_context modec )
 {
   coreContext cc;
   union {
@@ -161,9 +155,8 @@ mode_context modec;
   }
 }
 
-static void
-freeCallbacks(cb)
-struct callback *cb;
+
+static void freeCallbacks( struct callback *cb )
 {
   struct callback *nextcb;
 
@@ -173,9 +166,8 @@ struct callback *cb;
   }
 }
 
-void
-freeRomeStruct(d)
-uiContext d;
+
+void freeRomeStruct( uiContext d )
 {
   freeModec(d->modec);
   if (d->cb) {
@@ -208,9 +200,8 @@ uiContext d;
   free(d);
 }
 
-static
-insertEmptySlots(d)
-uiContext d;
+
+static int insertEmptySlots( uiContext d )
 {
   extern KanjiModeRec	empty_mode;
   struct callback	*pushCallback();
@@ -262,9 +253,7 @@ static struct bukRec {
 } *conHash[HASHTABLESIZE];
 
 /* ハッシュテーブルを調べてコンテクストがあるかどうか調べる関数 */
-
-static
-countContext()
+static int countContext()
 {
   struct bukRec *hash;
 
@@ -285,11 +274,9 @@ countContext()
   }
 }
 
-/* ハッシュキーを作る関数(いい加減) */
 
-static unsigned int
-makeKey(data1, data2)
-unsigned int data1, data2;
+/* ハッシュキーを作る関数(いい加減) */
+static unsigned int makeKey(unsigned int data1, unsigned int data2 )
 {
   unsigned int key;
 
@@ -309,10 +296,7 @@ unsigned int data1, data2;
   持っていないのであれば、NULL を返す。
 
   */
-
-uiContext
-keyToContext(data1, data2)
-unsigned int data1, data2;
+uiContext keyToContext( unsigned int data1, unsigned int data2 )
 {
   unsigned int key;
   struct bukRec *p;
@@ -336,9 +320,7 @@ unsigned int data1, data2;
 */
 
 struct bukRec *
-internContext(data1, data2, context)
-unsigned int data1, data2;
-uiContext context;
+internContext( unsigned int data1, unsigned int data2, uiContext context )
 {
   unsigned int key;
   struct bukRec *p, **pp;
@@ -362,13 +344,10 @@ uiContext context;
 }
 
 
-/* rmContext -- ハッシュテーブルから削除する
-
-*/
-
-void
-rmContext(data1, data2)
-unsigned int data1, data2;
+/**
+ * ハッシュテーブルから削除する
+ */
+void rmContext( unsigned int data1, unsigned int data2 )
 {
   unsigned int key;
   struct bukRec *p, *q, **pp;
@@ -387,18 +366,13 @@ unsigned int data1, data2;
   }
 }
 
-/* cfuncdef
 
-  freeBukRecs() -- ポイントされている先のバケットのフリー
-
+/**
+ * ポイントされている先のバケットのフリー
   バケットによってポイントされているデータをすべてフリーする。
   フリーの対象には uiContext も含まれる。
-
 */
-
-static void
-freeBukRecs(p)
-struct bukRec *p;
+static void freeBukRecs( struct bukRec *p )
 {
   struct bukRec *nextp;
 
@@ -752,19 +726,15 @@ KC_finalize(d, arg)
   }
 }
 
-static
-KC_setWidth(d, arg)
-uiContext d;
-caddr_t arg;
+
+static int KC_setWidth( uiContext d, void* arg )
 {
   d->ncolumns = (int)(POINTERINT)arg;
   return 0;
 }
 
-static
-KC_setBunsetsuKugiri(d, arg)
-     uiContext d;
-     caddr_t arg;
+
+static int KC_setBunsetsuKugiri( uiContext d, void* arg )
      /* ARGSUSED */
 {
   cannaconf.BunsetsuKugiri = (int)(POINTERINT)arg;
@@ -947,10 +917,8 @@ int how;
   return totallen;
 }
 
-static
-KC_setUFunc(d, arg)
-     uiContext d;
-     caddr_t arg;
+
+static int KC_setUFunc( uiContext d, void* arg )
      /* ARGSUSED */
 {
   extern howToBehaveInCaseOfUndefKey;
@@ -959,10 +927,8 @@ KC_setUFunc(d, arg)
   return 0;
 }
 
-static
-KC_setModeInfoStyle(d, arg)
-     uiContext d;
-     caddr_t arg;
+
+static int KC_setModeInfoStyle( uiContext d, void* arg )
      /* ARGSUSED */
 {
   int	tmpval;
@@ -974,20 +940,16 @@ KC_setModeInfoStyle(d, arg)
   return 0;
 }
 
-static
-KC_setHexInputStyle(d, arg)
-     uiContext d;
-     caddr_t arg;
+
+static int KC_setHexInputStyle( uiContext d, void* arg )
      /* ARGSUSED */
 {
   cannaconf.hexCharacterDefiningStyle = (int)(POINTERINT)arg;
   return 0;
 }
 
-static
-KC_inhibitHankakuKana(d, arg)
-     uiContext d;
-     caddr_t arg;
+
+static int KC_inhibitHankakuKana( uiContext d, void* arg )
      /* ARGSUSED */
 {
   cannaconf.InhibitHankakuKana = (int)(POINTERINT)arg;

@@ -28,23 +28,16 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 /* LINTLIBRARY */
 
 #include "server.h"
-#ifdef HAVE_SYSLOG /* !__EMX__ */
+
 # include <syslog.h>
-#endif
 #include <grp.h> // initgroups()
-
-#ifdef USE_VARARGS
-#ifdef __STDC__
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
-#endif
-
 #include <fcntl.h>
 #include <signal.h>
 #include <pwd.h>
-#include <sys/ioctl.h>
+#ifdef HAVE_SYS_IOCTL_H
+  #include <sys/ioctl.h>
+#endif
 
 #ifndef DICHOME
   #define DICHOME  LOCALSTATE_DIR "/lib/canna/dic"
@@ -124,7 +117,7 @@ extern void getserver_version pro((void));
 void
 EarlyInit ( int argc, char* argv[] )
 {
-    char *ddname = (char *)NULL;
+    char *ddname = NULL;
     char buf[ MAXDATA ];
     int     i;
     int     context;
@@ -133,20 +126,20 @@ EarlyInit ( int argc, char* argv[] )
     strcpy( Name, argv[ 0 ] );
 
     for( i = 1; i < argc; i++ ) {
-	if( argv[i][0] == '/' ) {
+        if( argv[i][0] == '/' ) {
             ddname = (char*) malloc(strlen(argv[i]) + 1);
 	    if( ddname )
                 strcpy( ddname, argv[ i ] );
 	}
 
-	if( !strcmp( argv[i], "-p") ) {
-	  if (++i < argc) {
-	    PortNumberPlus = atoi( argv[i] ) ;
-	    if (PortNumberPlus < 0 || PortNumberPlus >= 100) {
-		fprintf(stderr, "valid port number range is 0 <= num < 100\n");
-		exit(2);
-	    }
-	  }
+        if( !strcmp( argv[i], "-p") ) {
+            if (++i < argc) {
+                PortNumberPlus = atoi( argv[i] ) ;
+                if ( PortNumberPlus < 1 || PortNumberPlus > 65535 ) {
+                    fprintf(stderr, "valid port number range is 1 <= num < 65535\n");
+                    exit(2);
+                }
+            }
 	  else {
 	    fprintf(stderr, "%s\n", USAGE);
 	    exit(2);

@@ -28,24 +28,19 @@
 
 #include "ccompat.h"
 
-#if defined(nec_ews_svr2) || defined(pcux)
 #include <sys/types.h>
-#include <net/socket.h>
-#include <net/in.h>
-#include <net/netdb.h>
-#include <net/un.h>
-#else
-  #ifndef _WIN32
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <netdb.h>
-  #endif
+//#include <net/socket.h>
+//#include <net/in.h>
+//#include <net/netdb.h>
+//#include <net/un.h>
+#ifndef _WIN32
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netdb.h>
+#endif
 #ifdef UNIXCONN
-#include <sys/un.h>
+  #include <sys/un.h>
 #endif
-#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
-#endif
-#endif
 
 #endif /* NET_H */

@@ -23,7 +23,7 @@
 /* sccs_id[]="@(#) NEC UNIX( PC-UX/EWS-UX ) rkw.h 2.3 91/11/11 12:01:34"; */
 /* $Id: rkcw.h,v 1.9 2003/09/17 08:50:53 aida_s Exp $ */
 
-#include "config.h"
+#include <config.h>
 
 #define exp(x) x
 
@@ -33,7 +33,11 @@
 
 #define EXTENSION
 #define DEBUG
-#define UNIXCONN
+
+#ifdef USE_UNIX_SOCKET
+  // UNIX ドメインで通信.
+  #define UNIXCONN 1
+#endif
 
 #include "canna/ccompat.h"
 #include <stdint.h>

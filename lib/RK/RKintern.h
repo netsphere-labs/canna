@@ -76,13 +76,8 @@ typedef cannawc Wchar; // For compatibility
 #endif
 
 #include <unistd.h>
-#ifdef HAVE_FCNTL_H
-# include <fcntl.h>
-#endif
-
-#ifndef AIXV3
-#include	<ctype.h>
-#endif
+#include <fcntl.h>
+#include <ctype.h>
 
 #ifdef NOT_DEF
 #include <errno.h>
@@ -133,10 +128,12 @@ typedef unsigned char   Wrec;
 
 #define RK_ESC_CHAR ((Wchar)'\\')
 
+/*
 #define	euc_iscodeG0(c)	isascii(c)
 #define	euc_iscodeG1(c)	(((c) & 0x80) && !((c) & RK_SS2) && !((c) & RK_SS3))
 #define	euc_iscodeG2(c)	((c) == RK_SS2)
 #define	euc_iscodeG3(c)	((c) == RK_SS3)
+*/
 
 /* RkUnion
  *	private data at each class.

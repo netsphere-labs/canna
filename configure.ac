@@ -18,10 +18,8 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 AC_PROG_CXX
 AC_PROG_CC
-# AC_PROG_CC_STDC is obsolete; use AC_PROG_CC
-AC_PROG_CC
+AC_PROG_CPP
 AM_PROG_AR
-# AC_PROG_LIBTOOL and AM_PROG_LIBTOOL are deprecated.
 LT_INIT
 AC_PROG_LN_S
 
@@ -30,7 +28,9 @@ AC_PROG_LN_S
 
 # Checks for header files.
 # The preprocessor macro `STDC_HEADERS' is obsolete.
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h locale.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h])
+# 標準ヘッダは確認しない.
+# AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h locale.h  netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h   sys/socket.h sys/time.h syslog.h unistd.h])
+AC_CHECK_HEADERS([memory.h sys/ioctl.h sys/param.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -39,14 +39,14 @@ AC_TYPE_SIZE_T
 AC_CHECK_HEADERS_ONCE([sys/time.h])
 
 AC_STRUCT_TM
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_INT8_T
+#AC_TYPE_INT16_T
+#AC_TYPE_INT32_T
+#AC_TYPE_INT8_T
 AC_TYPE_PID_T
 AC_TYPE_SSIZE_T
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_UINT8_T
+#AC_TYPE_UINT16_T
+#AC_TYPE_UINT32_T
+#AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
@@ -59,7 +59,9 @@ AC_FUNC_SETPGRP
 AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([dup2 gethostname inet_ntoa memchr memset mkdir munmap select setlocale socket strchr strrchr strspn strtol strtoul])
+
+# BSD only
+AC_CHECK_FUNCS([strlcpy strlcat])
 
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF(wchar_t)
@@ -69,6 +71,7 @@ AC_MSG_CHECKING([for native Win32])
 case "$host" in
   *-*-mingw*)
     native_win32=yes
+    LDFLAGS="$LDFLAGS -no-undefined"
     ;;
   *)
     native_win32=no
@@ -80,7 +83,7 @@ AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 AC_ENABLE_STATIC(no)
 
 # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
-test -z "$GCC" || CFLAGS="$CFLAGS -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong "  
+test -z "$GCC" || CFLAGS="$CFLAGS -std=c11 -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong -fstack-clash-protection"  
 
 
 dnl ----------------------------------------------------------------------------
@@ -102,6 +105,21 @@ else
 fi
 # `config.h` に値を埋め込むには, `AC_DEFINE()`.
 AC_DEFINE_UNQUOTED(LOCALSTATE_DIR, "${LOCALSTATE_DIR}")
+
+
+# ソケットファイル: Linux = /run 以下, FreeBSD = /var/run
+AC_ARG_ENABLE([unix-socket],
+  AS_HELP_STRING([--disable-unix-socket],
+      [Disable UNIX domain socket. If use, the argument is the directory they are in. (default:${LOCALSTATE_DIR}/run/canna)]))
+AS_IF([test "x$enable_unix_socket" != "xno"], [
+  AC_DEFINE(USE_UNIX_SOCKET, 1, [Enable UNIX domain socket.])
+  AS_IF([test "x$enable_unix_socket" = "x"], [
+    AC_DEFINE_UNQUOTED(IR_UNIX_DIR, ["${LOCALSTATE_DIR}/run/canna"], [UNIX domain socket directory.])
+  ], [
+    AC_DEFINE_UNQUOTED(IR_UNIX_DIR, ["$enable_unix_socket"])
+  ])
+])
+
 
 dnl Set PACKAGE_SYSCONF_DIR in config.h.
 AH_TEMPLATE(PACKAGE_SYSCONF_DIR, [Configuration directory of the package.])

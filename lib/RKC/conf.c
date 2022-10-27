@@ -65,6 +65,7 @@ config_path(const char* name)
                 goto nomem;
         }
     }
+    // CONFIG_DIR = ".config/canna/"
     if (RkiStrbuf_add(&buf, CONFIG_DIR) || RkiStrbuf_add(&buf, name) ||
         RkiStrbuf_term(&buf))
         goto nomem;

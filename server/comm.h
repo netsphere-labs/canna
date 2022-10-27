@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright (c) 2003 Canna Project. All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -17,7 +18,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: comm.h,v 1.1 2003/09/21 12:56:29 aida_s Exp $ */
@@ -26,13 +27,16 @@
 #define COMM_H
 
 /*
- * ÆÃ¤Ë½ñ¤¤¤Æ¤¤¤Ê¤¤¤â¤Î¤Ï,À®¸ù»ş¤Ë0¤Ş¤¿¤ÏÍ­¸ú¤Ê¥İ¥¤¥ó¥¿,¥á¥â¥êÉÔÂ­
- * ¤Ê¤É¤Ë¤è¤ë¼ºÇÔ»ş¤Ë-1¤Ş¤¿¤ÏNULL¤òÊÖ¤¹¡£
+ * ç‰¹ã«æ›¸ã„ã¦ã„ãªã„ã‚‚ã®ã¯,æˆåŠŸæ™‚ã«0ã¾ãŸã¯æœ‰åŠ¹ãªãƒã‚¤ãƒ³ã‚¿,ãƒ¡ãƒ¢ãƒªä¸è¶³
+ * ãªã©ã«ã‚ˆã‚‹å¤±æ•—æ™‚ã«-1ã¾ãŸã¯NULLã‚’è¿”ã™ã€‚
  */
-typedef int sock_type;
-#define INVALID_SOCK -1
+#ifndef _WIN32
+  typedef int SOCKET;
+  #define INVALID_SOCKET -1
+#endif
+
 typedef int (*GetConnectionInfoProc) pro((void *obj,
-      sock_type connfd, Address *addr, char **hostname));
+                      SOCKET connfd, Address *addr, char **hostname));
 
 typedef struct {
   /* public */
@@ -47,13 +51,13 @@ int ClientBuf_store_reply pro((ClientBuf *obj,
       const BYTE *data, size_t len));
 int ClientBuf_get_connection_info pro((ClientBuf *obj,
       Address *addr, char **hostname));
-sock_type ClientBuf_getfd pro((ClientBuf *obj));
+SOCKET ClientBuf_getfd pro((ClientBuf *obj));
 ClientPtr ClientBuf_getclient pro((ClientBuf *obj));
 
 EventMgr *EventMgr_new pro((void));
 void EventMgr_delete pro((EventMgr *obj));
 int EventMgr_add_listener_sock pro((EventMgr *obj,
-      sock_type listenerfd, GetConnectionInfoProc info_proc, void *info_obj));
+        SOCKET listenerfd, GetConnectionInfoProc info_proc, void *info_obj));
 void EventMgr_quit_later pro((EventMgr *obj, int status));
 void EventMgr_finalize_notify pro((EventMgr *obj, const ClientBuf *clibuf));
 int EventMgr_run pro((EventMgr *obj));

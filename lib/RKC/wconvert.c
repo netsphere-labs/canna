@@ -55,6 +55,7 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 
 /* LINTLIBRARY */
 
+#define _POSIX_C_SOURCE 200809L // これがないと struct addrinfo が有効にならない
 #include <stdio.h>
 
 #include "canna/sglobal.h"
@@ -66,6 +67,8 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 
 #include <sys/types.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <netdb.h> // AI_NUMERICSERV
 
 #include "canna/net.h"
 
@@ -100,7 +103,7 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 #define SENDBUFSIZE 1024
 #define RECVBUFSIZE 1024
 
-int ServerFD ;
+SOCKET ServerFD ;
 unsigned int ServerTimeout;
 
 static
@@ -114,6 +117,7 @@ DoSomething( int sig)
 }
 
 
+// @return 成功 0, 失敗 -1
 static int
 try_connect( SOCKET fd, struct sockaddr* addrp, size_t len )
 {
@@ -126,54 +130,41 @@ try_connect( SOCKET fd, struct sockaddr* addrp, size_t len )
 }
 
 #ifdef UNIXCONN
-#if !defined(__EMX__)
-/* UNIXドメインでお話する */
-static int
-connect_unix( int number )
+/**
+ * UNIXドメインでお話する
+ * @param number 接続先ファイル名に付加する.
+ * @return If failed, INVALID_SOCKET.
+ */
+static SOCKET connect_unix( int number )
 {
     struct sockaddr_un unaddr;	    /* UNIX socket address. */
     struct sockaddr *addr;	    /* address to connect to */
 
-    /* いろはサーバと、ＵＮＩＸドメインで接続 */
+    /* いろはサーバと UNIX ドメインで接続 */
     unaddr.sun_family = AF_UNIX;
-    if( number )
-	sprintf( unaddr.sun_path,"%s:%d", IR_UNIX_PATH, number ) ;
+    if ( number >= 1)
+        sprintf( unaddr.sun_path, "%s:%d", IR_UNIX_PATH, number ) ;
     else
-	strcpy( unaddr.sun_path, IR_UNIX_PATH ) ;
+        strcpy( unaddr.sun_path, IR_UNIX_PATH ) ;
 
     addr = (struct sockaddr *)&unaddr;
     /*
      * Open the network connection.
      */
-    if ((ServerFD = socket((int) addr->sa_family, SOCK_STREAM, 0)) >= 0){
-	if( try_connect( ServerFD, addr, sizeof unaddr ) < 0 ) {
-	    close( ServerFD ) ;
-	    ServerFD = -1;
-	}
-    }
-    if (ServerFD < 0) {
-	/* for the backward compatibility */
-#define OLD_IR_UNIX_PATH	"/tmp/.iroha_unix/IROHA"
+    ServerFD = socket(addr->sa_family, SOCK_STREAM, 0);
+    if ( ServerFD == INVALID_SOCKET )
+        return ServerFD;
 
-	if (number)
-	    sprintf (unaddr.sun_path, "%s:%d", OLD_IR_UNIX_PATH, number);
-	else
-	    strcpy (unaddr.sun_path, OLD_IR_UNIX_PATH);
-
-	if ((ServerFD = socket ((int) addr->sa_family, SOCK_STREAM, 0)) >= 0) {
-	    if (try_connect (ServerFD, addr, sizeof (unaddr)) < 0) {
-		close (ServerFD);
-		return -1;
-	    }
-	}
-#undef OLD_IR_UNIX_PATH
+    if( try_connect(ServerFD, addr, sizeof unaddr) < 0 ) {
+        close( ServerFD ) ;
+        return INVALID_SOCKET;
     }
-    return( ServerFD ) ;
+
+    return ServerFD;
 }
-#endif
 #endif /* UNIXCONN */
 
-#ifdef STREAMCONN
+#ifdef STREAMCONN // どこにも定義されていない!
 /* ストリームパイプで いろはサーバとお話する */
 static int
 connect_stream_pipe( int number )
@@ -231,42 +222,59 @@ connect_stream_pipe( int number )
 #endif /* STREAMCONN */
 
 
-static int
-connect_inet( const char* hostname, int number )
+// @param hostname    NULL の場合は localhost.
+// @param port_number ポート番号を指定する場合, >= 1.
+static SOCKET
+connect_inet( const char* hostname, int port_number )
 {
-    struct addrinfo hints, *infolist, *info;
-    struct servent *sp ;
-    char portbuf[10];
+    struct addrinfo hints, *info;
+    struct addrinfo* infolist = NULL;
+    //const struct servent *sp ;
+    char portbuf[11];
     uint16_t port;
 
-    sp = getservbyname( IR_SERVICE_NAME, "tcp" );
-    port = ( sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT ) + number;
-    sprintf( portbuf, "%u", (unsigned int)port );
-
-    bzero( &hints, sizeof(hints) );
-    hints.ai_flags = 0;
-    hints.ai_family = PF_UNSPEC;
+    memset( &hints, 0, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC; // IPv4/IPv6 両対応
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = 0;
 
-    if( getaddrinfo( hostname, portbuf, &hints, &infolist ) ) {
-	errno = EINVAL;
-	return( -1 );
+    if ( port_number >= 1) {
+        hints.ai_flags = AI_NUMERICSERV;
+        sprintf( portbuf, "%d", port_number );
+    }
+    else {
+        // getservbyname() は廃れた. デフォルトポートを使うかどうかの判定.
+        if ( getservbyname(IR_SERVICE_NAME, "tcp") )
+            strcpy(portbuf, IR_SERVICE_NAME);
+        else {
+            sprintf(portbuf, "%d", IR_DEFAULT_PORT);
+            hints.ai_flags = AI_NUMERICSERV;
+        }
     }
 
-    for( info = infolist; info; info = info->ai_next ) {
-	ServerFD = socket( info->ai_family,
-		info->ai_socktype, info->ai_protocol );
-	if( ServerFD != -1 ) {
-	    if ( !try_connect( ServerFD, info->ai_addr, info->ai_addrlen ) ) {
-		freeaddrinfo( infolist );
-		return( ServerFD );
-	    }
-	    close( ServerFD );
-	}
+    int err = getaddrinfo( hostname, portbuf, &hints, &infolist );
+    if ( err != 0 ) {
+        fprintf(stderr, "getaddrinfo() failed: %s\n", gai_strerror(err));
+        errno = EINVAL;
+        return INVALID_SOCKET;
     }
+
+    for (info = infolist; info; info = info->ai_next ) {
+        ServerFD = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
+        if( ServerFD == INVALID_SOCKET ) {
+            freeaddrinfo( infolist );
+            return INVALID_SOCKET;
+        }
+        // 接続しないと正解か分からない.
+        if ( !try_connect(ServerFD, info->ai_addr, info->ai_addrlen) ) {
+            // 正解!
+            freeaddrinfo( infolist );
+            return ServerFD ;
+        }
+        close( ServerFD );
+    }
+
     freeaddrinfo( infolist );
-    return( -1 );
+    return INVALID_SOCKET;
 }
 
 
@@ -351,7 +359,7 @@ rkc_build_cannaserver_list( char** list )
 
 /* 引数に NULL ポインタを渡してはいけません。*/
 /* それどころか、十分おおきな配列を渡さなければならないのだ */
-int rkc_Connect_Iroha_Server( char* hostname )
+SOCKET rkc_Connect_Iroha_Server( char* hostname )
 {
     char *serverlist[ MAX_LIST ], **listp ;
     int num ;
@@ -430,11 +438,7 @@ int rkc_Connect_Iroha_Server( char* hostname )
 #if defined(UNIXCONN) || defined(STREAMCONN)
 	if ( (strcmp( "unix", *listp ) == 0) ) {
 #ifdef UNIXCONN
-#ifdef __EMX__
-	    ServerFD = -1;
-#else
 	    ServerFD = connect_unix( num ) ;
-#endif
 	}
 	else {
 #else /* STREAMCONN */
@@ -461,11 +465,11 @@ int rkc_Connect_Iroha_Server( char* hostname )
 
 #define HEADER_SIZE ((sizeof(char)) + (sizeof(char)) + SIZEOFSHORT)
 
-/*
+
+/**
  * サーバから返された第一候補列を、第一候補列バッファに格納する。
  */
-static
-int firstKouhoStore( int n, BYTE* data, int len, BYTE* dest)
+static int firstKouhoStore( int n, BYTE* data, int len, BYTE* dest)
 {
     RkcContext *cx = (RkcContext *)dest;
     register Ushort *return_kouho, *wp ;
@@ -567,9 +571,9 @@ firstKouhoStore_2( int n, BYTE* data, int len, BYTE* dest)
     }                                                                \
   } while (0)
 
+
 #ifdef DEBUGPROTO
-static void
-printproto( char* p, int n)
+static void printproto( const char* p, int n)
 {
   int i;
 
@@ -583,8 +587,8 @@ printproto( char* p, int n)
   printf("\n");
 }
 
-static void
-probe( char* format, int n, char* p)
+
+static void probe( const char* format, int n, const char* p)
 {
   printf(format, n);
   printproto(p, n);

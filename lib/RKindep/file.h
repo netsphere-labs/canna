@@ -35,6 +35,7 @@
   #include <sys/select.h>
   #include <sys/socket.h>
   typedef int SOCKET;
+  #define INVALID_SOCKET -1
 #else
   #include <winsock2.h>
   #define fd_set FD_SET
@@ -45,16 +46,8 @@
 # include <sys/param.h>
 #endif
 
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
+#include <sys/time.h> // `timeval` structure
+#include <time.h>
 
 #include <stdio.h>
 

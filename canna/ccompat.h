@@ -32,12 +32,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef HAVE_STRINGS_H
-# include <strings.h>
-#endif
-#if !defined(STDC_HEADERS) && defined(HAVE_MEMORY_H)
-# include <memory.h>
+#include <strings.h>
+#if defined(HAVE_MEMORY_H)
+  #include <memory.h>
 #endif
 #include <errno.h>
 
