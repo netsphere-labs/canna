@@ -147,6 +147,9 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
+/* Enable IPv4/IPv6 socket. */
+#undef USE_INET_SOCKET
+
 /* Enable UNIX domain socket. */
 #undef USE_UNIX_SOCKET
 

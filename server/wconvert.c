@@ -76,7 +76,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: wconvert.c,v 1.11.2.2 2003/12/27 23:30:5
 #include "server.h"
 #include "RKindep/ecfuncs.h"
 #include <pwd.h>
-
+#include <unistd.h>
 #include <canna/patchlevel.h>
 #include "canna/sglobal.h"
 
@@ -652,14 +652,14 @@ ClientPtr *clientp ;
     return( 0 ) ;
 }
 
+
 static int
-irw_killserver(clientp)
-ClientPtr *clientp;
+irw_killserver( ClientPtr *clientp )
 {
   register ClientPtr client = *clientp;
   int stat = 0;
   const char *susername = "root";
-  const Address *cli_hostaddrp;
+    const struct sockaddr_storage * cli_hostaddrp;
   AddrList *ser_hostaddrs = NULL, *local_hostaddrs = NULL;
   int client_ok;
   static char   buf[ BUFSIZE ]; /* protodefs.h BUFSIZE 4096 */
@@ -692,9 +692,9 @@ ClientPtr *clientp;
     goto not_owner;
   }
 
-  cli_hostaddrp = &client->hostaddr;
-  if (client->hostaddr.family == AF_UNIX)
-    goto addr_ok;	/*  unixドメインの場合(0)、通過ok  */
+    cli_hostaddrp = &client->hostaddr;
+    if (client->hostaddr.ss_family == AF_UNIX)
+        goto addr_ok;	/*  unixドメインの場合(0)、通過ok  */
   /* サーバ側のホストアドレスの取得  成功(0) */
   if (!gethostname(buf, sizeof(buf)))
     ser_hostaddrs = GetAddrListFromName(buf);
@@ -1958,7 +1958,7 @@ ClientPtr *clientp ;
       /* ここまで */
       ir_debug( Dmsg(5, "dicname = %s\n", Request.type15.dicname) );
       ir_debug( Dmsg(5, "username = %s\n", username) );
-      
+
       stat = (RkwQueryDic(cxnum, (char *)username,
 			  (char *)Request.type15.dicname,
 			  dicinfo) < 0) ? -1 : 0;

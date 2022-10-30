@@ -27,6 +27,7 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 
 /* LINTLIBRARY */
 
+#define _POSIX_C_SOURCE 200809L
 #include "server.h"
 
 # include <syslog.h>
@@ -38,6 +39,7 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #ifdef HAVE_SYS_IOCTL_H
   #include <sys/ioctl.h>
 #endif
+#include <unistd.h>
 
 #ifndef DICHOME
   #define DICHOME  LOCALSTATE_DIR "/lib/canna/dic"
@@ -77,15 +79,12 @@ static char *userID=NULL; /* canna server's user id */
 #ifdef USE_INET_SOCKET
 /* flag for using INET Domain Socket */
 #ifdef USE_UNIX_SOCKET
-/* Not to use INET domain socket, if can use Unix Domain Socket */
+/* By default, not use IPv4/IPv6 socket, if UNIX Domain Socket is available. */
 int UseInet = 0;
 #else
 /* if can use Unix Domain Socket, Use INET domain socket */
 int UseInet = 1;
 #endif
-#ifdef INET6
-int UseInet6 = 0;
-#endif /* INET6 */
 #endif
 
 #define MAX_PREMOUNTS 20
@@ -114,8 +113,8 @@ Usage()
 
 extern void getserver_version pro((void));
 
-void
-EarlyInit ( int argc, char* argv[] )
+// コマンドラインオプションの解析.
+void EarlyInit( int argc, char* argv[] )
 {
     char *ddname = NULL;
     char buf[ MAXDATA ];
@@ -160,11 +159,6 @@ EarlyInit ( int argc, char* argv[] )
 	else if( !strcmp( argv[i], "-inet")) {
 	  UseInet = 1;
 	}
-#ifdef INET6
-	else if( !strcmp( argv[i], "-inet6") ) {
-	  UseInet6 = 1;
-	}
-#endif /* INET6 */
 #endif
 #ifdef RK_MMOUNT
 	else if( !strcmp( argv[i], "-m") ) {

@@ -1,3 +1,4 @@
+﻿// -*- coding:utf-8-with-signature -*-
 /* Copyright (c) 2003 Canna Project. All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -20,12 +21,16 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#define _POSIX_C_SOURCE 200809L // これがないと struct addrinfo が有効にならない
 #include "server.h"
 #include "RKindep/file.h"
 #include "RKindep/strops.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <fcntl.h>
+#ifdef USE_UNIX_SOCKET  /* UNIX ドメインの作成 */
+  #include <sys/un.h>
+#endif
 
 RCSID("$Id: comm.c,v 1.4.2.3 2004/04/26 21:48:37 aida_s Exp $");
 
@@ -35,16 +40,18 @@ RCSID("$Id: comm.c,v 1.4.2.3 2004/04/26 21:48:37 aida_s Exp $");
 #define MAX_LISTENERS 3
 #define FIRST_WANT 4
 
+// Listen socket. 一つの listen socket に複数の client buf がぶら下がる.
 typedef struct {
-  sock_type l_fd;
-  GetConnectionInfoProc l_info_proc;
-  void *l_info_obj;
+    SOCKET l_fd;
+    GetConnectionInfoProc l_info_proc;
+    void *l_info_obj;
 } ListenerRec;
 
 
+// クライアントとやり取りするためのバッファ
 struct tagClientBuf {
-  sock_type fd;
-  const ListenerRec *parent;
+    SOCKET fd; // Accepted socket.
+    const ListenerRec *parent; // Listen socket.
   ClientPtr client;
   size_t nwant;
   char *sendptr;
@@ -53,6 +60,7 @@ struct tagClientBuf {
   RkiStrbuf sendbuf;
 };
 
+// client buf のリスト (の1要素)
 typedef struct tagClibufList {
   struct tagClibufList *cbl_next;
   int cbl_finalized;
@@ -61,10 +69,9 @@ typedef struct tagClibufList {
 #define MEMBER_TO_OBJ(t, x, m) ((t *)((char *)(x) - offsetof(t, m)))
 #define CBL_BODY_TO_ENTRY(clibuf) MEMBER_TO_OBJ(ClibufList, clibuf, cbl_body)
 
+// 唯一のイベントマネジャーインスタンス.
 EventMgr *global_event_mgr = NULL;
 
-static void ClientBuf_init pro((ClientBuf *obj,
-      const ListenerRec *parent, sock_type fd));
 static void ClientBuf_destroy pro((ClientBuf *obj));
 static int ClientBuf_recv pro((ClientBuf *obj));
 static int ClientBuf_send pro((ClientBuf *obj));
@@ -92,13 +99,13 @@ process_request(ClientPtr *clientp, ClientBuf *client_buf, BYTE *data,
     nwant = parse_euc_request(&request, data, len, username, hostname);
 
   if (nwant)
-    return nwant; /* ���ԡ��ޤ��Ϥ�äȥǡ�����ɬ�� */
+    return nwant; /* 失敗、またはもっとデータが必要 */
 
-  /* �ºݤΥץ��ȥ���˱����������ʴؿ���Ƥ֡� */
+  /* 実際のプロトコルに応じた処理（関数を呼ぶ） */
 
-  if (client) /* initialize���ξ��ϸƤФʤ� */
+  if (client) /* initialize等の場合は呼ばない */
       (void)ClientStat(client, SETTIME, request, 0);
-  /* �ץ��ȥ���μ���������פ��� */
+  /* プロトコルの種類毎に統計を取る */
   if (client && client->version_hi > 1) {
 #ifdef EXTENSION
     if( request < W_MAXREQUESTNO )
@@ -121,31 +128,21 @@ process_request(ClientPtr *clientp, ClientBuf *client_buf, BYTE *data,
     r = (*CallFunc) (clientp);
   ir_debug(Dmsg(8,"%s returned %d\n", CallFuncName, r));
 
-  /* ���饤����Ȥ����ѥ����л��ѻ��֤����ꤹ�� */
-  if (client && client == *clientp) /* initialize,finalize���ΤȤ��ϸƤФʤ� */
+  /* クライアントの累積サーバ使用時間を設定する */
+  if (client && client == *clientp) /* initialize,finalize等のときは呼ばない */
     ClientStat(client, GETTIME, request, 0);
 
   if (r)
-    r = -1; /* �ɤ��������ԤǤ�Ȥꤢ����-1���֤� */
+    r = -1; /* どういう失敗でもとりあえず-1を返す */
   return r;
 }
 
 
-static int
-set_nonblock(sock)
-sock_type sock;
-{
-  int oldflags;
-  oldflags = fcntl(sock, F_GETFL, 0 /* dummy */);
-  return fcntl(sock, F_SETFL, oldflags | O_NONBLOCK);
-}
-
 static void
-ClientBuf_init(obj, parent, fd)
-ClientBuf *obj;
-const ListenerRec *parent;
-sock_type fd;
+ClientBuf_init( ClientBuf *obj, const ListenerRec *parent, SOCKET fd )
 {
+    assert(obj);
+
   obj->fd = fd;
   obj->parent = parent;
   obj->client = NULL;
@@ -158,9 +155,9 @@ sock_type fd;
   RkiStrbuf_init(&obj->sendbuf);
 }
 
+
 static void
-ClientBuf_destroy(obj)
-ClientBuf *obj;
+ClientBuf_destroy( ClientBuf *obj )
 {
   close(obj->fd);
   close_session(&obj->client, 0);
@@ -222,9 +219,9 @@ recvfail:
   return -1;
 }
 
+
 static int
-ClientBuf_send(obj)
-ClientBuf *obj;
+ClientBuf_send( ClientBuf *obj )
 {
   ssize_t size;
   RkiStrbuf *buf = &obj->sendbuf;
@@ -250,7 +247,7 @@ ClientBuf *obj;
   obj->nfail = 0;
   obj->sendptr += size;
   if (obj->sendptr == buf->sb_curr) {
-    ir_debug(Dmsg(5, "���饤����Ȥؤ��ֿ�����λ, fd=%d\n", obj->fd));
+    ir_debug(Dmsg(5, "クライアントへの返信が完了, fd=%d\n", obj->fd));
 #ifdef COMM_DEBUG
     obj->sendptr = (char *)0xdeadbeef;
 #endif
@@ -272,11 +269,9 @@ fail:
   return -1;
 }
 
+
 int
-ClientBuf_store_reply(obj, data, len)
-ClientBuf *obj;
-const BYTE *data;
-size_t len;
+ClientBuf_store_reply( ClientBuf *obj, const BYTE *data, size_t len )
 {
   ir_debug(Dmsg(7, "ClientBuf_store_reply() start\n"));
   assert(!obj->nwant && !CLIENT_BUF_IS_SENDING(obj));
@@ -288,56 +283,58 @@ size_t len;
   return 0;
 }
 
+
+// server/session.c からのみ呼び出される.
 int
-ClientBuf_get_connection_info(obj, addr, hostname)
-ClientBuf *obj;
-Address *addr;
-char **hostname;
+ClientBuf_get_connection_info( ClientBuf *obj, struct sockaddr* addr,
+                               char **hostname )
 {
-  const ListenerRec *parent = obj->parent;
-  return (*parent->l_info_proc) (parent->l_info_obj, obj->fd, addr, hostname);
+    assert(addr);
+    const ListenerRec *parent = obj->parent;
+    return (*parent->l_info_proc)(parent->l_info_obj, obj->fd, addr, hostname);
 }
 
-sock_type
-ClientBuf_getfd(obj)
-ClientBuf *obj;
+
+SOCKET ClientBuf_getfd( ClientBuf *obj )
 {
   return obj->fd;
 }
 
 ClientPtr
-ClientBuf_getclient(obj)
-ClientBuf *obj;
+ClientBuf_getclient( ClientBuf *obj )
 {
   return obj->client;
 }
 
 struct tagEventMgr {
-  ListenerRec listeners[MAX_LISTENERS];
-  size_t nlisteners;
-  ClibufList *cbl;
+    // 一つのイベントマネジャーは複数のソケットを listen.
+    ListenerRec listeners[MAX_LISTENERS];
+    size_t nlisteners; // 登録ずみの数.
+    ClibufList *cbl;  // 所有する.
   size_t nclibufs;
   int quitflag;
   int exit_status;
 };
 
-EventMgr *
-EventMgr_new()
+
+// 新しいイベントマネジャーを生成して返す.
+// @return If failed, NULL.
+EventMgr* EventMgr_new()
 {
-  EventMgr *obj = malloc(sizeof(EventMgr));
-  if (!obj)
-    return NULL;
-  obj->nlisteners = 0;
-  obj->cbl = NULL;
-  obj->nclibufs = 0;
-  obj->quitflag = 0;
-  obj->exit_status = 220; /* ��������Ф��֤�ʤ� */
-  return obj;
+    EventMgr* obj = (EventMgr*) malloc(sizeof(EventMgr));
+    if (!obj)
+        return NULL;
+    obj->nlisteners = 0;
+    obj->cbl = NULL;
+    obj->nclibufs = 0;
+    obj->quitflag = 0;
+    obj->exit_status = 220; /* これは絶対に返らない */
+
+    return obj;
 }
 
-void
-EventMgr_delete(obj)
-EventMgr *obj;
+
+void EventMgr_delete( EventMgr *obj )
 {
   ClibufList *curr;
 #ifdef COMM_DEBUG
@@ -362,16 +359,13 @@ EventMgr *obj;
 }
 
 int
-EventMgr_add_listener_sock(obj, listenerfd, info_proc, info_obj)
-EventMgr *obj;
-sock_type listenerfd;
-GetConnectionInfoProc info_proc;
-void *info_obj;
+EventMgr_add_listener_sock( EventMgr *obj, SOCKET listenerfd,
+                            GetConnectionInfoProc info_proc, void *info_obj )
 {
-  ListenerRec *entry = obj->listeners + obj->nlisteners;
+    ListenerRec *entry = obj->listeners + obj->nlisteners;
 
-  assert(obj->nlisteners < MAX_LISTENERS);
-  assert(listenerfd != INVALID_SOCK);
+    assert(obj->nlisteners < MAX_LISTENERS);
+    assert(listenerfd != INVALID_SOCKET );
   if (listenerfd >= RKI_FD_SETSIZE) {
     PrintMsg("EventMgr_add_listener_sock(): out of rki_fd_set: fd=%d\n",
 	listenerfd);
@@ -384,19 +378,16 @@ void *info_obj;
   return 0;
 }
 
-void
-EventMgr_quit_later(obj, status)
-EventMgr *obj;
-int status;
+
+void EventMgr_quit_later( EventMgr *obj, int status )
 {
   obj->quitflag = 1;
   obj->exit_status = status;
 }
 
+
 void
-EventMgr_finalize_notify(obj, clibuf)
-EventMgr *obj;
-const ClientBuf *clibuf;
+EventMgr_finalize_notify( EventMgr *obj, const ClientBuf *clibuf )
 {
   ClibufList *entry = CBL_BODY_TO_ENTRY(clibuf);
   assert(clibuf);
@@ -404,37 +395,40 @@ const ClientBuf *clibuf;
   entry->cbl_finalized = 1;
 }
 
-static int
-EventMgr_accept(obj, listener_entry)
-EventMgr *obj;
-ListenerRec *listener_entry;
-{
-  ClibufList *cbl_ent = NULL;
-  sock_type connfd = INVALID_SOCK;
 
-  ir_debug(Dmsg(7, "EventMgr_accept() start\n"));
-  connfd = accept(listener_entry->l_fd, NULL, 0);
-  if (connfd == INVALID_SOCK) {
-    /* rarely happens; probably ECONNABORTED or EINTR */
-    PrintMsg("EventMgr_accept(): accept: errno=%d\n", errno);
-    goto fail;
-  } else if (connfd >= RKI_FD_SETSIZE) {
-    PrintMsg("EventMgr_accept(): out of rki_fd_set: fd=%d\n", connfd);
-    goto fail;
-  }
-  if (set_nonblock(connfd)) {
-    PrintMsg("EventMgr_accept(): set_nonblock(): errno=%d\n", errno);
-    goto fail;
-  }
-  if (!(cbl_ent = malloc(sizeof(ClibufList))))
-    goto nomem;
-  ClientBuf_init(&cbl_ent->cbl_body, listener_entry, connfd);
+// @return 成功 = 0
+static int
+EventMgr_accept( EventMgr *obj, ListenerRec *listener_entry )
+{
+    ClibufList *cbl_ent = NULL;
+    SOCKET connfd;
+
+    ir_debug(Dmsg(7, "EventMgr_accept() start\n"));
+    connfd = accept(listener_entry->l_fd, NULL, 0);
+    if (connfd == INVALID_SOCKET) {
+        /* rarely happens; probably ECONNABORTED or EINTR */
+        PrintMsg("EventMgr_accept(): accept: errno=%d\n", errno);
+        goto fail;
+    } else if (connfd >= RKI_FD_SETSIZE) {
+        PrintMsg("EventMgr_accept(): out of rki_fd_set: fd=%d\n", connfd);
+        goto fail;
+    }
+    // select() で待つので不要.
+    //if (non_blocking(connfd, 1)) {
+    //PrintMsg("EventMgr_accept(): set_nonblock(): errno=%d\n", errno);
+    //goto fail;
+    //}
+
+    if (!(cbl_ent = malloc(sizeof(ClibufList))))
+        goto nomem;
+    ClientBuf_init(&cbl_ent->cbl_body, listener_entry, connfd);
   cbl_ent->cbl_finalized = 0;
   cbl_ent->cbl_next = obj->cbl;
   obj->cbl = cbl_ent;
   ++obj->nclibufs;
-  ir_debug(Dmsg(5, "���饤����ȤȤ���³������, fd=%d\n", connfd));
-  return 0;
+  ir_debug(Dmsg(5, "クライアントとの接続に成功, fd=%d\n", connfd));
+
+    return 0;
 
 nomem:
   nomem_msg("EventMgr_accept()");
@@ -442,7 +436,7 @@ fail:
   if (cbl_ent)
     ClientBuf_destroy(&cbl_ent->cbl_body);
   free(cbl_ent);
-  if (connfd != INVALID_SOCK)
+  if (connfd != INVALID_SOCKET)
     close(connfd);
   return -1;
 }
@@ -472,7 +466,7 @@ EventMgr_check_fds(EventMgr *obj, rki_fd_set *rfds, rki_fd_set *wfds)
 
     if (error ||
 	(cbl_ent->cbl_finalized && !CLIENT_BUF_IS_SENDING(client_buf))) {
-      ir_debug(Dmsg(5, "���饤����ȤȤ���³���ڤ�, fd=%d\n",
+      ir_debug(Dmsg(5, "クライアントとの接続を切る, fd=%d\n",
 	    ClientBuf_getfd_fast(client_buf)));
       *cbl_link = cbl_ent->cbl_next;
       --obj->nclibufs;
@@ -484,9 +478,8 @@ EventMgr_check_fds(EventMgr *obj, rki_fd_set *rfds, rki_fd_set *wfds)
   }
 }
 
-int
-EventMgr_run(obj)
-EventMgr *obj;
+
+int EventMgr_run( EventMgr *obj )
 {
   struct timeval timeout;
   int sync_flag = 0;
@@ -525,7 +518,7 @@ EventMgr *obj;
 
     if (obj->quitflag && !needwrite)
       break;
-    ir_debug(Dmsg(5, "\nselect()���Ԥ��򳫻�\n"));
+    ir_debug(Dmsg(5, "\nselect()で待ちを開始\n"));
     timeout_tmp = timeout;
     r = select(nfds, &rfds, &wfds, NULL, &timeout_tmp);
     savederr = errno;
@@ -538,14 +531,14 @@ EventMgr *obj;
 	break;
       }
     } else if (r == 0) {
-      /* select �����»��֤�ۤ����Τ� sync ������Ԥ� */
-      if (sync_flag == 0) {/* sync_flag �� 0 �λ��� Allsync ��Ԥ� */
+      /* select の制限時間を越えたので sync 処理を行う */
+      if (sync_flag == 0) {/* sync_flag が 0 の時は Allsync を行う */
 	ir_debug(Dmsg(5, "EventMgr_run(): select: all sync start\n"));
 	AllSync();
-	sync_flag = 1; /* ���Ԥʤä��Τ� �ե饰��Ω�Ƥ� */
+	sync_flag = 1; /* 一回行なったので フラグを立てる */
       }
     } else {
-      sync_flag = 0; /* �ǡ������褿�Τǥե饰�򲼤��� */
+      sync_flag = 0; /* データが来たのでフラグを下げる */
       EventMgr_check_fds(obj, &rfds, &wfds);
     }
     if (CheckSignal()) {
@@ -556,10 +549,9 @@ EventMgr *obj;
   return obj->exit_status;
 }
 
+
 void
-EventMgr_clibuf_first(obj, it)
-EventMgr *obj;
-EventMgrIterator *it;
+EventMgr_clibuf_first( EventMgr *obj, EventMgrIterator *it )
 {
   ClibufList *entry = obj->cbl;
   it->entry = entry;
@@ -569,17 +561,16 @@ EventMgrIterator *it;
     it->it_val = NULL;
 }
 
+
 void
-EventMgr_clibuf_end(obj, it)
-EventMgr *obj;
-EventMgrIterator *it;
+EventMgr_clibuf_end( EventMgr *obj, EventMgrIterator *it )
 {
   it->it_val = NULL;
 }
 
+
 void
-EventMgrIterator_next(obj)
-EventMgrIterator *obj;
+EventMgrIterator_next( EventMgrIterator *obj )
 {
   ClibufList *entry = (ClibufList *)obj->entry;
   ClibufList *next = entry->cbl_next;
@@ -596,452 +587,291 @@ enum {
   SOCK_OK = 0
 };
 
-#ifdef USE_UNIX_SOCKET  /* �գΣɣإɥᥤ��κ��� */
-static int
-open_unix_socket (sock, unaddr)
-sock_type *sock;
-struct sockaddr_un *unaddr;
+#ifdef USE_UNIX_SOCKET  /* UNIX ドメインの作成 */
+// listen() までを行う.
+// @param sock [out] ソケットのファイルディスクリプタを得る.
+static int open_unix_socket( SOCKET* sock )
 {
-  int oldUmask;
-  int request = -1;
-  int status = SOCK_OTHER_ERROR;
-  const int sockpathmax = sizeof(unaddr->sun_path) - 3;
+    assert( sock );
 
-  assert(0 <= PortNumberPlus && PortNumberPlus < 100);
-  unaddr->sun_family = AF_UNIX;
-  oldUmask = umask (0);
+    //int oldUmask;
+    SOCKET request = INVALID_SOCKET;
+    int status = SOCK_OTHER_ERROR;
 
-  if ( mkdir( IR_UNIX_DIR, 0777 ) == -1 &&
-      errno != EEXIST ) {
-    ir_debug( Dmsg(5, "Can't open %s error No. %d\n",IR_UNIX_DIR, errno));
-  }
-  if (RkiStrlcpy(unaddr->sun_path, IR_UNIX_PATH, sockpathmax) >= sockpathmax) {
-    ir_debug( Dmsg(5, "Path to socket is too long\n"));
-    goto last;
-  }
-  if( PortNumberPlus )
-    sprintf( unaddr->sun_path, "%s:%d", unaddr->sun_path, PortNumberPlus ) ;
-  if ((request = socket (AF_UNIX, SOCK_STREAM, 0)) < 0)
-  {
-    ir_debug( Dmsg(5, "Warning: UNIX socket for server failed.\n"));
-  }
-  else
-  {
-    if (!bind(request, (struct sockaddr *)unaddr,
-	     sizeof(struct sockaddr_un))) {
-      ir_debug( Dmsg(5, "�ե�����̾:[%s]\n",unaddr->sun_path));
-      if (!listen (request, 5)) {
-	if (!set_nonblock(request)) {
-	  status = SOCK_OK;
-	  goto last;
-	} else {
-	  ir_debug( Dmsg(5,"Warning: Server could not set nonblocking mode.\n"));
-	}
-      } else {
-	ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
-      }
-      unlink(unaddr->sun_path);
+    struct sockaddr_un unaddr;
+    memset(&unaddr, 0, sizeof unaddr);
+    unaddr.sun_family = AF_UNIX;
+    //oldUmask = umask(0);   umask をわざわざクリアする必要なし.
+    const int sockpathmax = sizeof(unaddr.sun_path) - 3;
+
+    if ( mkdir(IR_UNIX_DIR, 0755) == -1 && errno != EEXIST ) {
+        ir_debug( Dmsg(5, "Could not mkdir %s errno = %d\n", IR_UNIX_DIR, errno));
+        *sock = request;
+        return status;
     }
-    else {
-      status = SOCK_BIND_ERROR;
-      ir_debug( Dmsg(5,"Warning: Server could not bind.\n"));
+    if (RkiStrlcpy(unaddr.sun_path, IR_UNIX_PATH, sockpathmax) >= sockpathmax) {
+        ir_debug( Dmsg(5, "Path to socket is too long\n"));
+        *sock = request;
+        return status;
     }
-    close(request);
-    request = -1; /* listen ���� */
-  }
+    if ( PortNumberPlus >= 1 ) {
+        sprintf( unaddr.sun_path + strlen(unaddr.sun_path), ":%d",
+                 PortNumberPlus ) ;
+    }
 
-last:
-  (void)umask( oldUmask );
-  *sock = request;
-  return status;
+    if ( (request = socket(AF_UNIX, SOCK_STREAM, 0)) == INVALID_SOCKET ) {
+        ir_debug( Dmsg(5, "Warning: UNIX socket for server failed.\n"));
+        //umask(oldUmask);
+        *sock = request;
+        return status;
+    }
+
+    if ( bind(request, (struct sockaddr*) &unaddr, sizeof(struct sockaddr_un))) {
+        fprintf(stderr, "ERROR: Server could not bind %s\n", unaddr.sun_path);
+        close(request);
+        *sock = INVALID_SOCKET;
+        return SOCK_BIND_ERROR;
+    }
+    ir_debug( Dmsg(5, "UNIX Socket path: %s\n", unaddr.sun_path));
+
+    if ( listen(request, 5) < 0 ) { // mark as passive socket.
+        ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
+        close(request);
+        unlink(unaddr.sun_path);
+        *sock = INVALID_SOCKET;
+        return SOCK_BIND_ERROR;
+    }
+
+    *sock = request;
+    return SOCK_OK;
 }
 #endif /* USE_UNIX_SOCKET */
 
-#ifdef USE_INET_SOCKET  /* �ɣΣţԥɥᥤ��κ��� */
-static int
-open_inet_socket (sock)
-sock_type *sock;
+
+#ifdef USE_INET_SOCKET  /* IPv4/IPv6 ソケットの作成 */
+// listen() までを行う.
+// @param sock [out] ソケットfdを書き戻す.
+static int open_inet_socket( SOCKET* sock )
 {
+    struct addrinfo hints, *info;
+    struct addrinfo* infolist = NULL;
+    char portbuf[11];
+    //const struct servent* sp;
+    int retry;
+    SOCKET request;
+    int status = SOCK_OTHER_ERROR;
 
-  struct sockaddr_in insock;
-  struct servent *sp;
-  int retry, request;
-  int status = SOCK_OTHER_ERROR;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET6;  // IPv4/IPv6両対応
+    hints.ai_socktype = SOCK_STREAM;
+    // AI_PASSIVE をセットして node = NULLのときは, INADDR_ANY, IN6ADDR_ANY_INIT.
+    hints.ai_flags = AI_PASSIVE;
 
-  /* /etc/services����ݡ����ֹ��������� */
-  if( (sp = getservbyname(IR_SERVICE_NAME ,"tcp")) == NULL )
-  {
-    ir_debug( Dmsg(5,"Warning: Port number not find on '/etc/services'.\n"));
-    ir_debug( Dmsg(5,"         Use %d as default.\n", IR_DEFAULT_PORT));
-  }
-
-  if ((request = socket( AF_INET, SOCK_STREAM, 0 )) < 0)
-  {
-    ir_debug( Dmsg(5,"Warning: INET socket for server failed.\n"));
-  }
-  else
-  {
-#ifdef SO_REUSEADDR
-    {
-      int one = 1;
-      setsockopt(request, SOL_SOCKET, SO_REUSEADDR,
-		 (char *)&one, sizeof(int));
+    // 起動時にポート番号指定された
+    if ( PortNumberPlus >= 1 ) {
+        sprintf(portbuf, "%d", PortNumberPlus);
+        hints.ai_flags |= AI_NUMERICSERV;
     }
-#endif
-    bzero ((char *)&insock, sizeof (insock));
-    insock.sin_family = AF_INET;
-    insock.sin_port =
-    (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + PortNumberPlus;
-
-    ir_debug( Dmsg(5, "�ݡ����ֹ�:[%d]\n",insock.sin_port));
-
-    insock.sin_port = htons(insock.sin_port);
-    insock.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    retry = 0;
-    while ( bind(request, (struct sockaddr *)&insock, sizeof(insock)) < 0 )
-    {
-      ir_debug( Dmsg(5, "bind �ȥ饤���[%d]\n",retry));
-      if (++retry == 5){
-	ir_debug( Dmsg(5,"Warning: Server could not bind.\n"));
-	close(request);
-	request = -1; /* bind ����  */
-	break;
-      }
-      sleep (1);
+    else {
+        // getservbyname() は廃れたが, デフォルトポート番号を使うかの判定
+        // /etc/services ファイルからポート番号取得.
+        if ( getservbyname(IR_SERVICE_NAME, "tcp") )
+            strcpy(portbuf, IR_SERVICE_NAME);
+        else {
+            ir_debug( Dmsg(5,"Warning: Port number not found on '/etc/services'.\n"));
+            sprintf(portbuf, "%d", IR_DEFAULT_PORT);
+            hints.ai_flags |= AI_NUMERICSERV;
+        }
     }
-    if( retry != 5 ) {
-      if (listen (request, 5)){
-	ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
-	close(request);
-	request = -1; /* listen ����  */
-      } else {
-	if (set_nonblock(request)) {
-	  ir_debug( Dmsg(5,"Warning: Server could not set nonblocking mode.\n"));
-	  close(request);
-	  request = -1;
-	} else {
-	  status = SOCK_OK;
-	}
-      }
-    } else {
-      status = SOCK_BIND_ERROR;
+    ir_debug( Dmsg(5,"Service: [%s]\n", portbuf));
+
+    *sock = INVALID_SOCKET;
+    int err = getaddrinfo( NULL, portbuf, &hints, &infolist);
+    if (err != 0) {
+        ir_debug( Dmsg(5,"Warning: (internal error) getaddrinfo() failed: %s\n",
+                       gai_strerror(err)) );
+        return SOCK_OTHER_ERROR;
     }
-  }
-  *sock = request;
-  return status;
+
+    request = socket( infolist->ai_family, infolist->ai_socktype,
+                      infolist->ai_protocol );
+    if (request == INVALID_SOCKET ) {
+        ir_debug( Dmsg(5,"Warning: INET socket for server failed.\n"));
+        freeaddrinfo(infolist);
+        return SOCK_OTHER_ERROR;
+    }
+
+    int one = 1;
+    setsockopt(request, SOL_SOCKET, SO_REUSEADDR, (char*) &one, sizeof(one));
+
+    if ( bind(request, infolist->ai_addr, infolist->ai_addrlen) < 0 ) {
+        ir_debug( Dmsg(5,"Warning: Server could not bind: %s.\n", portbuf) );
+        close(request);
+        freeaddrinfo(infolist);
+        return SOCK_BIND_ERROR;
+    }
+    // もういらん
+    freeaddrinfo(infolist); infolist = NULL;
+
+    if ( listen(request, 5) < 0 ) {
+        ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
+        close(request);
+        return SOCK_BIND_ERROR;
+    }
+    // if (set_nonblock(request)) { これはおかしい。select() はブロッキングモード
+
+    *sock = request;
+    return SOCK_OK;
 }
-
-#ifdef INET6
-static int
-open_inet6_socket (sock)
-sock_type *sock;
-{
-
-  struct addrinfo hints, *info, *infolist;
-  char portbuf[10];
-  struct servent *sp;
-  int retry, request = -1;
-  int status = SOCK_OTHER_ERROR;
-
-  /* /etc/services����ݡ����ֹ��������� */
-  if( (sp = getservbyname(IR_SERVICE_NAME ,"tcp")) == NULL )
-  {
-    ir_debug( Dmsg(5,"Warning: Port number not find on '/etc/services'.\n"));
-    ir_debug( Dmsg(5,"         Use %d as default.\n", IR_DEFAULT_PORT));
-  }
-
-  sprintf(portbuf, "%d",
-    (sp ? ntohs(sp->s_port) : IR_DEFAULT_PORT) + PortNumberPlus);
-  ir_debug( Dmsg(5, "�ݡ����ֹ�:[%s]\n", portbuf));
-  bzero( &hints, sizeof(hints) );
-  hints.ai_flags = AI_PASSIVE;
-  hints.ai_family = PF_INET6;
-  hints.ai_socktype = SOCK_STREAM;
-  if( getaddrinfo( NULL, portbuf, &hints, &infolist ) ) {
-    ir_debug( Dmsg(5,"Warning: (internal error) getaddrinfo() failed.\n"));
-    *sock = -1;
-    return SOCK_OTHER_ERROR;
-  }
-  for( info = infolist; info; info = info->ai_next ) {
-    if ((request =
-	  socket( info->ai_family, info->ai_socktype, info->ai_protocol )
-	    ) < 0)
-    {
-      ir_debug( Dmsg(5,"Warning: INET socket for server failed.\n"));
-    }
-    else
-    {
-#ifdef SO_REUSEADDR
-      {
-	int one = 1;
-	setsockopt(request, SOL_SOCKET, SO_REUSEADDR,
-		   (char *)&one, sizeof(int));
-      }
-#endif
-#if defined(IR_V6ONLY_BIND)
-      {
-	int one = 1;
-	setsockopt(request, IPPROTO_IPV6, IPV6_V6ONLY,
-		   (char *)&one, sizeof(int));
-      }
-#endif /* IR_V6ONLY_BIND */
-
-      retry = 0;
-      while ( bind(request, info->ai_addr, info->ai_addrlen) < 0 )
-      {
-	ir_debug( Dmsg(5, "bind �ȥ饤���[%d]\n",retry));
-	if (++retry == 5){
-	  ir_debug( Dmsg(5,"Warning: Server could not bind.\n"));
-	  close(request);
-	  request = -1; /* bind ����  */
-	  break;
-	}
-	sleep (1);
-      }
-      if( retry != 5 ) {
-	if (listen (request, 5)){
-	  ir_debug( Dmsg(5,"Warning: Server could not listen.\n"));
-	  close(request);
-	  request = -1; /* listen ����  */
-	} else {
-	  if (set_nonblock(request)) {
-	    ir_debug( Dmsg(5,"Warning: Server could not set nonblocking mode.\n"));
-	    close(request);
-	    request = -1;
-	  } else {
-	    status = SOCK_OK;
-	  }
-	}
-      } else {
-	status = SOCK_BIND_ERROR;
-      }
-    }
-  }
-  freeaddrinfo(infolist);
-  *sock = request;
-  return status;
-}
-#endif /* INET6 */
 #endif /* USE_INET_SOCKET */
 
+
 #ifdef USE_UNIX_SOCKET
+// @param addr [out] 通信相手の情報を addr に書き込む
+// @param hostname [out] ホスト名の文字列を生成する. 呼び出し側が解放すること
 static int
-get_addr_unix(dummy, connfd, addr, hostname)
-/* ARGSUSED */
-void *dummy;
-sock_type connfd;
-Address *addr;
-char **hostname;
+get_addr_unix(void *dummy, SOCKET connfd, struct sockaddr* addr, char **hostname)
 {
-  char buf[MAXDATA];
+    assert(addr);
+    char buf[MAXDATA];
 
-  if(gethostname(buf, MAXDATA - 7) < 0) {
-    PrintMsg("gethostname failed\n");
-    return -1;
-  }
-  buf[MAXDATA - 7] = '\0';
-  strcat(buf, "(UNIX)") ;
-  if ((*hostname = strdup(buf)) == NULL)
-    return -1;
-  addr->family = AF_UNIX;
-  addr->len = 0;
-  return 0;
-}
-
-static int
-get_addr_inet(dummy, connfd, addr, hostname)
-/* ARGSUSED */
-void *dummy;
-sock_type connfd;
-Address *addr;
-char **hostname;
-{
-#ifdef INET6
-  struct sockaddr_storage from;
-#else /* !INET6 */
-  struct sockaddr_in	from;
-  struct hostent	*hp;
-#endif /* !INET6 */
-  char		buf[MAXDATA];
-  canna_socklen_t 	fromlen = sizeof( from ) ;
-  struct sockaddr	*fromp = (struct sockaddr *)&from;
-
-  bzero( &from, fromlen ) ;
-  if (getpeername(connfd, (struct sockaddr *)&from, &fromlen) < 0) {
-    PrintMsg( "getpeername error No.%d\n", errno );
-    return -1;
-  }
-
-#ifdef INET6
-  if (fromp->sa_family == AF_INET || fromp->sa_family == AF_INET6) {
-    int res = getnameinfo(fromp, fromlen, buf, MAXDATA, NULL, 0, 0);
-    if (res) {
-      /* cannot store even a numeric hostname */
-      PrintMsg( "getaddrinfo error No.%d\n", res );
-      return -1;
+    //if (gethostname(buf, MAXDATA - 7) < 0) {
+    //PrintMsg("gethostname failed\n");
+    //return -1;
+    //}
+    //buf[MAXDATA - 7] = '\0';
+    //strcat(buf, "(UNIX)") ;
+    socklen_t addrlen = sizeof(struct sockaddr_un);
+    int retval = getpeername(connfd, addr, &addrlen);
+    if (!retval) { // 成功
+        if ( (*hostname = strdup("(UNIX)")) == NULL )
+            return -1;
     }
-  }
-#else /* !INET6 */
-  if( from.sin_family == AF_INET ) {
-    hp = gethostbyaddr((char *)&from.sin_addr, sizeof( struct in_addr ),
-	from.sin_family);
-    if ( hp )
-      strncpy( buf, hp->h_name, MAXDATA-1 ) ;
-    else
-      strncpy( buf, inet_ntoa( from.sin_addr ), MAXDATA-1 ) ;
-  }
-#endif /* !INET6 */
-  else {
-    PrintMsg( "unknown protocol family: %d\n", fromp->sa_family );
-    return -1;
-  }
-
-  if ((*hostname = strdup(buf)) == NULL)
-    return -1;
-  addr->saddr = from;
-  addr->family = fromp->sa_family;
-  addr->len = fromlen;
-  return 0;
+    return retval;
 }
-#endif
+#endif // USE_UNIX_SOCKET
 
-struct tagSockHolder {
-#ifdef USE_UNIX_SOCKET
-  sock_type unsock;
-  struct sockaddr_un unaddr;
-#endif
-#ifdef USE_INET_SOCKET
-  sock_type insock;
-# ifdef INET6
-  sock_type in6sock;
-# endif
-#endif
-};
 
-SockHolder *
-SockHolder_new()
+#ifdef USE_INET_SOCKET  /* IPv4/IPv6 ソケットの作成 */
+static int
+get_addr_inet(void *dummy, SOCKET connfd, struct sockaddr* addr, char **hostname)
 {
-  SockHolder *obj = malloc(sizeof(SockHolder));
-  int status = SOCK_OK;
+    assert(addr);
 
-  if (!obj)
-    return NULL;
+    char		buf[MAXDATA];
+    socklen_t fromlen = sizeof( struct sockaddr_storage );
+
+    memset(addr, 0, fromlen );
+    if ( getpeername(connfd, addr, &fromlen) < 0 ) {
+        PrintMsg( "getpeername error No.%d\n", errno );
+        return -1;
+    }
+
+    if (addr->sa_family == AF_INET || addr->sa_family == AF_INET6) {
+        int res = getnameinfo(addr, fromlen, buf, MAXDATA, NULL, 0, 0);
+        if (res) {
+            /* cannot store even a numeric hostname */
+            PrintMsg( "getaddrinfo error No.%d\n", res );
+            return -1;
+        }
+    }
+    else {
+        PrintMsg( "unknown protocol family: %d\n", addr->sa_family );
+        return -1;
+    }
+
+    if ((*hostname = strdup(buf)) == NULL)
+        return -1;
+    return 0;
+}
+#endif // USE_INET_SOCKET
+
+
+// 関数名と異なり、ここでソケットを準備する.
+// @return If failed, -1.
+int SockHolder_new()
+{
+    int status = SOCK_OK;
 
 #ifdef USE_UNIX_SOCKET
-  obj->unsock = INVALID_SOCK;
-  bzero(&obj->unaddr, sizeof obj->unaddr);
+    SOCKET unsock = INVALID_SOCKET;
+    //bzero(&obj->unaddr, sizeof obj->unaddr);
 #endif
 #ifdef USE_INET_SOCKET
-  obj->insock = INVALID_SOCK;
-# ifdef INET6
-  obj->in6sock = INVALID_SOCK;
-# endif
+    SOCKET insock = INVALID_SOCKET;
 #endif
 
-  ir_debug( Dmsg(3,"�����饽���åȤ���\n") );
+    ir_debug( Dmsg(3,"今からソケットを作る\n") );
 
-#ifdef USE_UNIX_SOCKET /* �գΣɣإɥᥤ�� */
-  if ((status = open_unix_socket(&obj->unsock, &obj->unaddr)) != SOCK_OK) {
-    ir_debug( Dmsg(5,"Warning: UNIX domain not created.\n"));
-    goto fail;
-  }
-  ir_debug( Dmsg(3,"�գΣɣإɥᥤ��ϤǤ���\n") );
+#ifdef USE_UNIX_SOCKET /* UNIX ドメイン */
+    if ( (status = open_unix_socket(&unsock)) != SOCK_OK) {
+        ir_debug( Dmsg(5,"Warning: UNIX domain not created.\n"));
+        goto fail;
+    }
+    ir_debug( Dmsg(3,"UNIX ドメインはできた\n") );
 #endif /*  USE_UNIX_SOCKET */
 
-#ifdef USE_INET_SOCKET  /* �ɣΣţԥɥᥤ�� */
-  if(UseInet){
-    if ((status = open_inet_socket(&obj->insock)) != SOCK_OK) {
-      ir_debug( Dmsg(5,"Warning: INET domain not created.\n"));
-      goto fail;
+#ifdef USE_INET_SOCKET  /* INET ドメイン */
+    if (UseInet) {
+        if ( (status = open_inet_socket(&insock)) != SOCK_OK) {
+            ir_debug( Dmsg(5,"Warning: INET domain not created.\n"));
+            goto fail;
+        }
+        ir_debug( Dmsg(3, "INET ドメインはできた\n") );
     }
-    ir_debug( Dmsg(3,"�ɣΣţԥɥᥤ��ϤǤ���\n") );
-  }
-#ifdef INET6
-  if(UseInet6){
-    if ((status = open_inet6_socket(&obj->in6sock)) != SOCK_OK) {
-      ir_debug( Dmsg(5,"Warning: INET6 domain not created.\n"));
-      goto fail;
-    }
-    ir_debug( Dmsg(3,"�ɣΣţԣ��ɥᥤ��ϤǤ���\n") );
-  }
-#endif
 #endif /* USE_INET_SOCKET */
 
-  ir_debug( Dmsg(3,"�����åȤν����ϤǤ���\n") );
-  return obj;
+    ir_debug( Dmsg(3,"ソケットの準備はできた\n") );
+
+#ifdef USE_UNIX_SOCKET
+    assert(unsock != INVALID_SOCKET);
+    if ( EventMgr_add_listener_sock(global_event_mgr, unsock,
+                                    &get_addr_unix, NULL) ) {
+        return -1;
+    }
+#endif
+
+#ifdef USE_INET_SOCKET
+    if (UseInet) {
+        if (EventMgr_add_listener_sock(global_event_mgr,
+                                       insock, &get_addr_inet, NULL)) {
+            return -1;
+        }
+    }
+#endif
+
+    return 0;
 
 fail:
-  if (status == SOCK_BIND_ERROR) {
-    fprintf(stderr, "\n");
-    fprintf(stderr, "ERROR:\n ");
-    fprintf(stderr, "  Another 'cannaserver' is detected.\n");
-#ifdef USE_UNIX_SOCKET
-    fprintf(stderr, "   If 'cannaserver' is not running,\n");
-    fprintf(stderr, "   \"%s\" may remain accidentally.\n", obj->unaddr.sun_path);
-    fprintf(stderr, "   So, after making sure that 'cannaserver' is not running.\n");
-    fprintf(stderr, "   Please execute following command.\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "               rm %s\n", obj->unaddr.sun_path);
-#endif
-    fprintf(stderr, "\n");
-  } else {
-    assert(status == SOCK_OTHER_ERROR);
-    fprintf(stderr, "ERROR: Cannot open sockets in some errors\n ");
-  }
-  SockHolder_delete(obj);
-  return NULL;
-}
+    if (status == SOCK_BIND_ERROR) {
+        fprintf(stderr, "\n");
+        fprintf(stderr, "ERROR:\n ");
+        fprintf(stderr, "   Another `cannaserver` is running.\n");
+        fprintf(stderr, "\n");
+    } else {
+        assert(status == SOCK_OTHER_ERROR);
+        fprintf(stderr, "ERROR: Could not open sockets in some errors\n ");
+    }
 
-void
-SockHolder_delete(obj)
-SockHolder *obj;
-{
-  if (!obj)
-    return;
-#ifdef USE_UNIX_SOCKET
-  if (obj->unsock != INVALID_SOCK) {
-    close(obj->unsock);
-    unlink(obj->unaddr.sun_path);
-  }
-#endif
-#ifdef USE_INET_SOCKET
-  if (obj->insock != INVALID_SOCK)
-    close(obj->insock);
-# ifdef INET6
-  if (obj->in6sock != INVALID_SOCK)
-    close(obj->insock);
-# endif
-#endif
-  free(obj);
-}
-
-int
-SockHolder_tie(obj, event_mgr)
-SockHolder *obj;
-EventMgr *event_mgr;
-{
-#ifdef USE_UNIX_SOCKET
-  assert(obj->unsock != INVALID_SOCK);
-  if (EventMgr_add_listener_sock(event_mgr,
-	obj->unsock, &get_addr_unix, NULL))
     return -1;
-#endif
-#ifdef USE_INET_SOCKET
-  if (UseInet) {
-    if (EventMgr_add_listener_sock(event_mgr,
-	  obj->insock, &get_addr_inet, NULL))
-      return -1;
-  }
-# ifdef INET6
-  if (UseInet6) {
-    if (EventMgr_add_listener_sock(event_mgr,
-	  obj->in6sock, &get_addr_inet, NULL))
-      return -1;
-  }
-# endif
-#endif
-  return 0;
 }
 
-/* vim: set sw=2: */
+
+/*
+void SockHolder_delete( SockHolder *obj )
+{
+    if (!obj)
+        return;
+#ifdef USE_UNIX_SOCKET
+    if (obj->unsock != INVALID_SOCKET) {
+        close(obj->unsock);
+        unlink(obj->unaddr.sun_path);
+    }
+#endif
+#ifdef USE_INET_SOCKET
+    if (obj->insock != INVALID_SOCKET)
+        close(obj->insock);
+#endif
+    free(obj);
+}
+*/

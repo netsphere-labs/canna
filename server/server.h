@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright (c) 2003 Canna Project. All rights reserved.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -30,29 +31,26 @@
 #include <sys/types.h>
 
 #include <sys/time.h>
-#ifdef TIME_WITH_SYS_TIME
-# include <time.h>
-#endif
-#include <sys/times.h>
-#ifdef HAVE_SYS_SELECT_H
+#include <time.h>
+#include <sys/times.h> // file access and modification times structure
 #include <sys/select.h>
-#endif
+#include <sys/socket.h>
 
 #include "canna/net.h"
-#include <unistd.h>
-#ifdef HAVE_SYS_STAT_H
-# include <sys/stat.h>
+#ifndef _WIN32
+  #include <unistd.h>
 #endif
+#include <sys/stat.h>
 #include <assert.h>
 #include "RKindep/ecfuncs.h"
 
-/* ¼«Æ°È½ÊÌ»Ù±ç¥³¥á¥ó¥È: ¤³¤ì¤ÏEUC-JP¤À¤¾¡£Éı¤È¤¤¤¦»ú¤¬¤¢¤ì¤ĞÂç¾æÉ×¡£ */
+/* è‡ªå‹•åˆ¤åˆ¥æ”¯æ´ã‚³ãƒ¡ãƒ³ãƒˆ: ã“ã‚Œã¯EUC-JPã ãã€‚å¹…ã¨ã„ã†å­—ãŒã‚ã‚Œã°å¤§ä¸ˆå¤«ã€‚ */
 
 typedef struct tagEventMgr EventMgr;
 typedef struct tagClientBuf ClientBuf;
 typedef struct tagSockHolder SockHolder;
 typedef struct tagUserTable UserTable;
-typedef struct _Address Address;
+//typedef struct _Address Address;
 typedef struct _Client *ClientPtr;
 typedef struct _ClientStat *ClientStatPtr;
 
@@ -87,15 +85,17 @@ typedef struct _ClientStat *ClientStatPtr;
 #endif
 
 /* subset of struct addrinfo */
+/*
 struct _Address {
     int family;
     size_t len;
-#ifdef INET6
-    struct sockaddr_storage saddr; /* XXX huge padding */
+//#ifdef INET6
+    struct sockaddr_storage saddr; // XXX huge padding
 #else
     struct sockaddr_in saddr;
 #endif
 };
+*/
 
 #define IR_ADDR_INSA(x) ((struct sockaddr_in *)&(x)->saddr)
 #define IR_ADDR_IN(x) (&IR_ADDR_INSA(x)->sin_addr)
@@ -103,51 +103,51 @@ struct _Address {
 # define IR_ADDR_IN6SA(x) ((struct sockaddr_in6 *)&(x)->saddr)
 # define IR_ADDR_IN6(x) (&IR_ADDR_IN6SA(x)->sin6_addr)
 # define IR_ADDR_IN6SCOPE(x) (IR_ADDR_IN6SA(x)->sin6_scope_id)
-# ifdef IPV6_V6ONLY
-#  define IR_V6ONLY_BIND
-# endif /* IPV6_V6ONLY */
-# if defined(IR_V6ONLY_BIND) || defined(sun)
-#  define IR_V4MAPPED_AVOIDABLE
-# endif
-# ifndef IR_V4MAPPED_AVOIDABLE
-#  error "You need newer IPv6 stack."
-# endif
+//# ifdef IPV6_V6ONLY
+//#  define IR_V6ONLY_BIND
+//# endif /* IPV6_V6ONLY */
+//# if defined(IR_V6ONLY_BIND) || defined(sun)
+//#  define IR_V4MAPPED_AVOIDABLE
+//# endif
+//# ifndef IR_V4MAPPED_AVOIDABLE
+//#  error "You need newer IPv6 stack."
+//# endif
 #endif /* INET6 */
 
 
-/* ¥¯¥é¥¤¥¢¥ó¥ÈËè¤Ëºî¤é¤ì¤ë¡¢¥ì¥¤¥ä5¤Î¾ğÊó¤ò»ı¤Ä¹½Â¤ÂÎ */
+/* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ¯ã«ä½œã‚‰ã‚Œã‚‹ã€ãƒ¬ã‚¤ãƒ¤5ã®æƒ…å ±ã‚’æŒã¤æ§‹é€ ä½“ */
 typedef struct _Client {
-    struct tagClientBuf *client_buf ;        /* ¥Ğ¥Ã¥Õ¥¡ */
-    int 	usr_no ;		     /* ¥æ¡¼¥¶´ÉÍıÈÖ¹æ */
+    struct tagClientBuf *client_buf ;        /* ãƒãƒƒãƒ•ã‚¡ */
+    int 	usr_no ;		     /* ãƒ¦ãƒ¼ã‚¶ç®¡ç†ç•ªå· */
     short 	version_hi ;		     /* protocol major version */
     short 	version_lo ;		     /* protocol miner version */
-    ir_time_t	used_time ;		     /* ¥æ¡¼¥¶¾ÃÈñ»ş´Ö */
-    ir_time_t	idle_date ;		     /* ¥¢¥¤¥É¥ë»ş´Ö */
-    ir_time_t	connect_date ;		     /* ¥³¥Í¥¯¥È¤·¤¿»ş´Ö */
-    char	*username ;		     /* ¥æ¡¼¥¶Ì¾  */
-    char	*groupname;		     /* ¥°¥ë¡¼¥×Ì¾  */
-    char	*hostname ;		     /* ¥Û¥¹¥ÈÌ¾  */
-    Address	hostaddr;		     /* ¥Û¥¹¥È¥¢¥É¥ì¥¹ */
-    int 	pcount[ W_MAXREQUESTNO ] ;   /* ¥×¥í¥È¥³¥ë¥«¥¦¥ó¥È */
-    int		*context_flag;               /* ¥³¥ó¥Æ¥¯¥¹¥È´ÉÍı¥Õ¥é¥° */
-    int		cfsize, ncon;		     /* ¾å¤Î¥Æ¡¼¥Ö¥ë¤ÎÂç¤­¤µ´ÉÍı */
-    char	*clientname ;		     /* ¥¯¥é¥¤¥¢¥ó¥ÈÌ¾  */
+    ir_time_t	used_time ;		     /* ãƒ¦ãƒ¼ã‚¶æ¶ˆè²»æ™‚é–“ */
+    ir_time_t	idle_date ;		     /* ã‚¢ã‚¤ãƒ‰ãƒ«æ™‚é–“ */
+    ir_time_t	connect_date ;		     /* ã‚³ãƒã‚¯ãƒˆã—ãŸæ™‚é–“ */
+    char	*username ;		     /* ãƒ¦ãƒ¼ã‚¶å  */
+    char	*groupname;		     /* ã‚°ãƒ«ãƒ¼ãƒ—å  */
+    char	*hostname ;		     /* ãƒ›ã‚¹ãƒˆå  */
+    struct sockaddr_storage hostaddr;		     /* ãƒ›ã‚¹ãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ */
+    int 	pcount[ W_MAXREQUESTNO ] ;   /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚«ã‚¦ãƒ³ãƒˆ */
+    int		*context_flag;               /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç®¡ç†ãƒ•ãƒ©ã‚° */
+    int		cfsize, ncon;		     /* ä¸Šã®ãƒ†ãƒ¼ãƒ–ãƒ«ã®å¤§ãã•ç®¡ç† */
+    char	*clientname ;		     /* ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå  */
 } ClientRec ;
 
 typedef struct _ClientStat {
-    int 	id ;			     /* ¥½¥±¥Ã¥ÈÈÖ¹æ */
-    int 	usr_no ;		     /* ¥æ¡¼¥¶´ÉÍıÈÖ¹æ */
-    ir_time_t	used_time ;		     /* ¥æ¡¼¥¶¾ÃÈñ»ş´Ö */
-    ir_time_t	idle_date ;		     /* ¥¢¥¤¥É¥ë»ş´Ö */
-    ir_time_t	connect_date ;		     /* ¥³¥Í¥¯¥È¤·¤¿»ş´Ö */
-    int 	pcount[ OLD_MAXREQUESTNO ] ; /* ¥×¥í¥È¥³¥ë¥«¥¦¥ó¥È */
-    char	username[ NAME_LENGTH+1] ;   /* ¥æ¡¼¥¶Ì¾  */
-    char	hostname[ HOST_NAME ] ;      /* ¥Û¥¹¥ÈÌ¾  */
-    char	context_flag[ OLD_MAX_CX ] ;	 /* ¥³¥ó¥Æ¥¯¥¹¥È´ÉÍı¥Õ¥é¥° */
+    int 	id ;			     /* ã‚½ã‚±ãƒƒãƒˆç•ªå· */
+    int 	usr_no ;		     /* ãƒ¦ãƒ¼ã‚¶ç®¡ç†ç•ªå· */
+    ir_time_t	used_time ;		     /* ãƒ¦ãƒ¼ã‚¶æ¶ˆè²»æ™‚é–“ */
+    ir_time_t	idle_date ;		     /* ã‚¢ã‚¤ãƒ‰ãƒ«æ™‚é–“ */
+    ir_time_t	connect_date ;		     /* ã‚³ãƒã‚¯ãƒˆã—ãŸæ™‚é–“ */
+    int 	pcount[ OLD_MAXREQUESTNO ] ; /* ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚«ã‚¦ãƒ³ãƒˆ */
+    char	username[ NAME_LENGTH+1] ;   /* ãƒ¦ãƒ¼ã‚¶å  */
+    char	hostname[ HOST_NAME ] ;      /* ãƒ›ã‚¹ãƒˆå  */
+    char	context_flag[ OLD_MAX_CX ] ;	 /* ã‚³ãƒ³ãƒ†ã‚¯ã‚¹ãƒˆç®¡ç†ãƒ•ãƒ©ã‚° */
 } ClientStatRec ;
 
 typedef struct _AddrList {
-    Address addr;
+    struct sockaddr_storage addr;
     struct _AddrList *next;
 } AddrList;
 
@@ -163,11 +163,11 @@ typedef struct _AccessControlList {
 typedef struct _AccessControlList *ACLPtr ;
 
 #ifdef USE_INET_SOCKET
-/* flag for using INET Domain Socket */
+/* Flag for using IPv4/IPv6 socket */
 extern int UseInet;
-#ifdef INET6
-extern int UseInet6;
-#endif /* INET6 */
+//#ifdef INET6
+//extern int UseInet6;
+//#endif /* INET6 */
 #endif
 
 extern int PortNumberPlus;
@@ -183,9 +183,9 @@ extern int canna_server_hi;
 extern int canna_server_lo;
 
 /* misc.c */
-#ifdef __STDC__
-# define USE_VARARGS
-#endif
+//#ifdef __STDC__
+//# define USE_VARARGS
+//#endif
 #define vapro(x) x
 
 #ifdef DEBUG
@@ -199,10 +199,12 @@ int BecomeDaemon pro((void));
 void CloseServer pro((void));
 int CheckSignal pro((void));
 AddrList *GetAddrListFromName pro((const char *hostname));
-AddrList *SearchAddrList pro((const AddrList *list, const Address *addrp));
+AddrList *SearchAddrList pro((const AddrList *list,
+                              const struct sockaddr_storage* addrp));
 void FreeAddrList pro((AddrList *list));
 int NumberAccessControlList pro((void));
-int CheckAccessControlList pro((Address *hostaddrp, const char *username));
+int CheckAccessControlList pro((struct sockaddr_storage* hostaddrp,
+                                const char *username));
 int SetDicHome pro((ClientPtr client, int cxnum));
 ClientPtr *get_all_other_clients pro((ClientPtr self, size_t *count));
 void AllSync pro((void));

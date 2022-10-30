@@ -1,3 +1,4 @@
+я╗┐// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -12,12 +13,12 @@
  * is" without express or implied warranty.
  *
  * NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN
  * NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
- * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
- * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
- * PERFORMANCE OF THIS SOFTWARE. 
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
@@ -47,9 +48,9 @@ static int DISPLAY_to_hostname();
 
 /* cfuncdef
 
-   YYparse -- еле╣е┐е▐еде║е╒ебедеыдЄ╞╔дрбг
+   YYparse -- уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТшкнуВАуАВ
 
-   е╒ебедеые╟еге╣епеъе╫е┐д╟╗╪─ъд╡дьд┐е╒ебедеыдЄ╞╔д▀╣■дрбг
+   уГХуВбуВдуГлуГЗуВгуВ╣уВпуГкуГЧуВ┐уБзцМЗхоЪуБХуВМуБЯуГХуВбуВдуГлуВТшкнуБ┐ш╛╝уВАуАВ
 
 */
 
@@ -59,12 +60,12 @@ extern YYparse_by_rcfilename();
 
 /* cfuncdef
 
-  parse -- .canna е╒ебедеыдЄ├╡д╖д╞днд╞╞╔д▀╣■дрбг
+  parse -- .canna уГХуВбуВдуГлуВТцОвуБЧуБжуБНуБжшкнуБ┐ш╛╝уВАуАВ
 
-  parse д╧еле╣е┐е▐еде║е╒ебедеыдЄ├╡д╖бвд╜д╬е╒ебедеыдЄекб╝е╫еєд╖е╤б╝е╣д╣
-  дыбг
+  parse уБпуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТцОвуБЧуАБуБЭуБоуГХуВбуВдуГлуВТуВкуГ╝уГЧуГ│уБЧуГСуГ╝уВ╣уБЩ
+  уВЛуАВ
 
-  е╤б╝е╣├цд╬е╒ебедеыд╬╠╛┴░дЄ CANNA_rcfilename д╦╞■дьд╞дкдпбг
+  уГСуГ╝уВ╣ф╕нуБоуГХуВбуВдуГлуБохРНхЙНуВТ CANNA_rcfilename уБлхЕеуВМуБжуБКуБПуАВ
 
   */
 
@@ -110,8 +111,8 @@ fit_initfilename()
 void
 parse()
 {
-  char *p, *getenv();
-  int n;
+    char *p;
+    int n;
   extern iroha_debug;
   int home_canna_exist = 0;
   extern char *initFileSpecified;
@@ -128,14 +129,14 @@ parse()
   if (clisp_init() == 0) {
 
     if (ckverbose) {
-      printf("еле╣е┐е▐еде║е╒ебедеыд╧╞╔д▀╣■д▀д▐д╗дєбг\n");
+      printf("уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуБпшкнуБ┐ш╛╝уБ┐уБ╛уБЫуВУуАВ\n");
     }
 
     addWarningMesg("\245\341\245\342\245\352\244\254\302\255\244\352\244\336"
 	"\244\273\244\363\241\243\245\253\245\271\245\277\245\336\245\244"
 	"\245\272\245\325\245\241\245\244\245\353\244\362\306\311\244\337"
 	"\271\376\244\341\244\336\244\273\244\363\241\243\\n");
-          /* есетеъдм┬ндъд▐д╗дєбгеле╣е┐е▐еде║е╒ебедеыдЄ╞╔д▀╣■дсд▐д╗дєбг */
+          /* уГбуГвуГкуБМш╢│уВКуБ╛уБЫуВУуАВуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТшкнуБ┐ш╛╝уВБуБ╛уБЫуВУуАВ */
     goto quitparse;
   }
 
@@ -147,7 +148,7 @@ parse()
     }
     else {
       if (ckverbose) {
-	printf("еле╣е┐е▐еде║е╒ебедеыд╧╞╔д▀╣■д▀д▐д╗дєбг\n");
+	printf("уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуБпшкнуБ┐ш╛╝уБ┐уБ╛уБЫуВУуАВ\n");
       }
 
       sprintf(buf, "\273\330\304\352\244\265\244\354\244\277\245\253\245\271"
@@ -155,7 +156,7 @@ parse()
 	"\40\45\163\40\244\254\302\270\272\337\244\267\244\336\244\273"
 	"\244\363\241\243",
 	      CANNA_rcfilename);
-              /* ╗╪─ъд╡дьд┐еле╣е┐е▐еде║е╒ебедеы %s дм┬╕║▀д╖д▐д╗дєбг */
+              /* цМЗхоЪуБХуВМуБЯуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уБМхнШхЬиуБЧуБ╛уБЫуВУуАВ */
       addWarningMesg(buf);
       goto quitparse;
     }
@@ -176,14 +177,14 @@ parse()
 	"\312\321\277\364\40\45\163\40\244\254\273\330\304\352\244\265"
 	"\244\354\244\306\244\244"
 	    , OBSOLETE_FILEENVNAME);
-    /* ├э░╒: еле╣е┐е▐еде║е╒ебедеыдЄ╗╪─ъд╣дыд┐дсд╬┤─╢н╩╤┐Ї %s дм╗╪─ъд╡дьд╞дд */
+    /* ц│ицДП: уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТцМЗхоЪуБЩуВЛуБЯуВБуБочТ░хвГхдЙцХ░ %s уБМцМЗхоЪуБХуВМуБжуБД */
     addWarningMesg(buf);
     sprintf(buf, "\40\40\40\40\40\40\244\336\244\271\244\254\241\242\277\267"
 	"\267\301\274\260\244\316\245\253\245\271\245\277\245\336\245\244"
 	"\245\272\245\325\245\241\245\244\245\353\244\362\273\330\304\352"
 	"\244\271\244\353\40\45\163\40\244\254\273\330\304\352"
 	    , FILEENVNAME);
-    /*       д▐д╣дмбв┐╖╖┴╝░д╬еле╣е┐е▐еде║е╒ебедеыдЄ╗╪─ъд╣ды %s дм╗╪─ъ */
+    /*       уБ╛уБЩуБМуАБцЦ░х╜вх╝ПуБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТцМЗхоЪуБЩуВЛ %s уБМцМЗхоЪ */
     addWarningMesg(buf);
     addWarningMesg("\40\40\40\40\40\40\244\265\244\354\244\306\244\244"
 	"\244\336\244\273\244\363\241\243\277\267\267\301\274\260\244\316"
@@ -191,11 +192,11 @@ parse()
 	"\245\244\245\353\244\362\272\356\300\256\244\267\241\242\264\304"
 	"\266\255\312\321\277\364"
 		   );
-    /*       д╡дьд╞ддд▐д╗дєбг┐╖╖┴╝░д╬еле╣е┐е▐еде║е╒ебедеыдЄ║ю└од╖бв┤─╢н╩╤┐Ї */
+    /*       уБХуВМуБжуБДуБ╛уБЫуВУуАВцЦ░х╜вх╝ПуБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуВТф╜ЬцИРуБЧуАБчТ░хвГхдЙцХ░ */
     sprintf(buf, "\40\40\40\40\40\40\45\163\40\244\362\300\337\304\352"
 	"\244\267\244\306\262\274\244\265\244\244\241\243"
 	    , FILEENVNAME);
-    /*      %s дЄ└▀─ъд╖д╞▓╝д╡ддбг */
+    /*      %s уВТшинхоЪуБЧуБжф╕ЛуБХуБДуАВ */
     addWarningMesg(buf);
   }
 #endif
@@ -217,42 +218,42 @@ parse()
       p = getenv("DISPLAY");
       if (p) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
-	
+
 	CANNA_rcfilename[n] = '-';
 	strcpy(CANNA_rcfilename + n + 1, display);
-	
+
 	if(YYparse_by_rcfilename(CANNA_rcfilename)) {
 	  make_initfilename();
 	}
       }
-      
+
       /* $HOME/.canna-TERM */
-      
+
       p = getenv("TERM");
       if (p) {
 	CANNA_rcfilename[n] = '-';
 	strcpy(CANNA_rcfilename + n + 1, p);
 	if(YYparse_by_rcfilename(CANNA_rcfilename)) {
 	  make_initfilename();
-	}	  
+	}
       }
     }
 #ifdef OBSOLETE_RCFILENAME
-    else { /* .canna дм┬╕║▀д╖д╞ддд╩дд */
+    else { /* .canna уБМхнШхЬиуБЧуБжуБДуБкуБД */
       strcpy(CANNA_rcfilename, p);
       strcat(CANNA_rcfilename, "/");
       strcat(CANNA_rcfilename, OBSOLETE_RCFILENAME);
       n = strlen(CANNA_rcfilename);
-      if (close(open(CANNA_rcfilename, O_RDONLY)) == 0) { /* двды */
+      if (close(open(CANNA_rcfilename, O_RDONLY)) == 0) { /* уБВуВЛ */
 	sprintf(buf, "\303\355\260\325\72\40\265\354\267\301\274\260\244\316"
 	"\245\253\245\271\245\277\245\336\245\244\245\272\245\325\245\241"
 	"\245\244\245\353\40\45\163\40\244\254\302\270\272\337\244\267"
 	"\244\306\244\244\244\336\244\271\244\254\277\267\267\301\274\260"
 	"\244\316"
 		, OBSOLETE_RCFILENAME);
-        /* ├э░╒: ╡ь╖┴╝░д╬еле╣е┐е▐еде║е╒ебедеы %s дм┬╕║▀д╖д╞ддд▐д╣дм┐╖╖┴╝░д╬ */
+        /* ц│ицДП: цЧзх╜вх╝ПуБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уБМхнШхЬиуБЧуБжуБДуБ╛уБЩуБМцЦ░х╜вх╝ПуБо */
 	addWarningMesg(buf);
 	sprintf(buf, "\40\40\40\40\40\40\245\253\245\271\245\277\245\336"
 	"\245\244\245\272\245\325\245\241\245\244\245\353\40\45\163\40"
@@ -260,39 +261,38 @@ parse()
 	"\244\363\241\243\143\141\156\166\145\162\164\40\245\263\245\336"
 	"\245\363\245\311\244\362"
 		, RCFILENAME);
-        /*    еле╣е┐е▐еде║е╒ебедеы %s дм┬╕║▀д╖д╞ддд▐д╗дєбгcanvert е│е▐еєе╔дЄ */
+        /*    уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уБМхнШхЬиуБЧуБжуБДуБ╛уБЫуВУуАВcanvert уВ│уГЮуГ│уГЙуВТ */
 	addWarningMesg(buf);
 	sprintf(buf, "\40\40\40\40\40\40\315\370\315\321\244\267\244\306"
 	"\277\267\267\301\274\260\244\316\245\253\245\271\245\277\245\336"
 	"\245\244\245\272\245\325\245\241\245\244\245\353\40\45\163\40\244\362"
 	"\272\356\300\256\244\267\244\306\262\274\244\265\244\244\241\243"
 		, RCFILENAME);
-        /*     ═°═╤д╖д╞┐╖╖┴╝░д╬еле╣е┐е▐еде║е╒ебедеы %s дЄ║ю└од╖д╞▓╝д╡ддбг */
+        /*     хИйчФиуБЧуБжцЦ░х╜вх╝ПуБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уВТф╜ЬцИРуБЧуБжф╕ЛуБХуБДуАВ */
 	addWarningMesg(buf);
 	sprintf(buf, "\40\40\40\40\40\40\50\316\343\51\40\143\141\156\166"
 	"\145\162\164\40\55\143\40\55\157\40\176\57\45\163\40\55\156\40"
 	"\176\57\45\163"
 		, OBSOLETE_RCFILENAME, RCFILENAME);
-        /*       (╬у) canvert -c -o ~/%s -n ~/%s" */
+        /*       (ф╛Л) canvert -c -o ~/%s -n ~/%s" */
 	addWarningMesg(buf);
       }
     }
 #endif
   }
 
-  if ( !home_canna_exist ) {
-    /* ║╟╕хд╧е╖е╣е╞ере╟е╒ейеые╚д╬е╒ебедеыдЄ╞╔др */
-    strcpy(CANNA_rcfilename, CANNALIBDIR);
-    n = strlen(CANNA_rcfilename);
- 
-    strcpy(CANNA_rcfilename + n, "/default");
-    strcat(CANNA_rcfilename + n, RCFILENAME);
+    if ( !home_canna_exist ) {
+        /* цЬАх╛МуБпуВ╖уВ╣уГЖуГауГЗуГХуВйуГлуГИуБоуГХуВбуВдуГлуВТшкнуВА */
+        sprintf( CANNA_rcfilename, "%s/default%s",
+                 PACKAGE_SYSCONF_DIR, // /etc/canna
+                 RCFILENAME );        // .canna
+
     if (YYparse_by_rcfilename(CANNA_rcfilename)) {
       make_initfilename();
       p = getenv("DISPLAY");
       if (p) {
 	char display[NAMEBUFSIZE];
-	
+
 	DISPLAY_to_hostname(p, display, NAMEBUFSIZE);
 
 	CANNA_rcfilename[n] = '/';
@@ -315,11 +315,11 @@ parse()
     }
     else {
       if (ckverbose) {
-	printf("еле╣е┐е▐еде║е╒ебедеыд╧╞╔д▀╣■д▀д▐д╗дєбг\n");
+	printf("уВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГлуБпшкнуБ┐ш╛╝уБ┐уБ╛уБЫуВУуАВ\n");
       }
-      sprintf(buf, 
+      sprintf(buf,
 #ifndef CODED_MESSAGE
-      "е╖е╣е╞ерд╬еле╣е┐е▐еде║е╒ебедеы %s дм┬╕║▀д╖д▐д╗дєбг",
+      "уВ╖уВ╣уГЖуГауБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уБМхнШхЬиуБЧуБ╛уБЫуВУуАВ",
 #else
       "\245\267\245\271\245\306\245\340\244\316\245\253\245\271"
       "\245\277\245\336\245\244\245\272\245\325\245\241\245\244\245\353"
@@ -327,13 +327,13 @@ parse()
       "\244\363\241\243",
 #endif
 	      CANNA_rcfilename);
-      /* е╖е╣е╞ерд╬еле╣е┐е▐еде║е╒ебедеы %s дм┬╕║▀д╖д▐д╗дєбг */
+      /* уВ╖уВ╣уГЖуГауБоуВлуВ╣уВ┐уГЮуВдуВ║уГХуВбуВдуГл %s уБМхнШхЬиуБЧуБ╛уБЫуВУуАВ */
       addWarningMesg(buf);
     }
   }
 
  quitparse:
-  /* CANNA_initfilename дЄе╕еуе╣е╚е╡еде║д╦┤вдъ╣■др */
+  /* CANNA_initfilename уВТуВ╕уГгуВ╣уГИуВ╡уВдуВ║уБлхИИуВКш╛╝уВА */
   fit_initfilename();
   clisp_fin();
 

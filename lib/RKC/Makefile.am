@@ -3,7 +3,7 @@
 
 lib_LTLIBRARIES = libRKC16.la
 
-libRKC16_la_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -DCPP='"/usr/bin/cpp -E -fdirectives-only -nostdinc"'
+libRKC16_la_CFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -DCPP='"$(CANNA_PP)"'
 
 # current:revision:age
 # => *.so.(current-age).age.revision

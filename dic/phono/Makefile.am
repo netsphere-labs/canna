@@ -15,12 +15,8 @@ FORCPP = ../../cmd/forcpp/forcpp
 KPDIC = ../../cmd/kpdic/kpdic
 ROMAJI_DIC_DEF = -DSHIFT
 
-# gcc -E プリプロセスのみ実行 -> アカン
-# cpp -fdirectives-only -E .. directives such as "#define", "#ifdef", and
-#                             "#error" のみ処理
-#     -nostdinc
 .kpdef.cbp:
-	LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc $(ROMAJI_DIC_DEF) $< > t
+	$(CANNA_PP) $(ROMAJI_DIC_DEF) $< > t
 	$(KPDIC) < t > $@
 
 dist_pkgdata_DATA = $(CBP)

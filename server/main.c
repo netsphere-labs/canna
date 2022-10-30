@@ -42,15 +42,16 @@ int main(int argc, char* argv[])
     SockHolder *sock_holder = NULL;
     int status;
 
-  EarlyInit(argc, argv);
+    // コマンドラインオプションの解析.
+    EarlyInit(argc, argv);
   if (!(global_user_table = UserTable_new())
       || !(global_event_mgr = EventMgr_new()))
     goto genfail;
 
-  if (!(sock_holder = SockHolder_new()))
-    goto fail;
-  if (SockHolder_tie(sock_holder, global_event_mgr))
-    goto genfail;
+    // 一つのイベントマネジャーが複数のソケットを listen できる.
+    // 両方のソケットをイベントマネジャーに追加する.
+    if ( SockHolder_new() )
+        goto fail;
 
   /* サーバを子プロセス(デーモン)として起動する */
   parentid = BecomeDaemon();
@@ -67,9 +68,10 @@ genfail:
 fail:
   status = 2;
 last:
-  SockHolder_delete(sock_holder);
-  EventMgr_delete(global_event_mgr);
+    //SockHolder_delete(sock_holder);
+    EventMgr_delete(global_event_mgr);
   UserTable_delete(global_user_table);
   CloseServer();
-  return status;
+
+    return status;
 }

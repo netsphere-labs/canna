@@ -78,6 +78,9 @@ extern char *RkiGetLine pro((FILE *src));
 extern void *RkiReadWholeFile pro((FILE *src, size_t *retsize));
 
 extern const char* RkiBasename pro((const char *src));
+
+extern int non_blocking( SOCKET sock, int mode );
+
 #ifdef __cplusplus
 }
 #endif

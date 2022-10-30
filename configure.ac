@@ -80,6 +80,13 @@ esac
 AC_MSG_RESULT([$native_win32])
 AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 
+# CPP は C言語用の処理が多い。最小限の処理だけをさせる.
+# gcc -E プリプロセスのみ実行ではない. アカン
+# cpp -fdirectives-only -E .. directives such as "#define", "#ifdef", and
+#                             "#error" のみ処理
+#     -nostdinc
+AC_SUBST(CANNA_PP, "LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc")
+
 AC_ENABLE_STATIC(no)
 
 # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
@@ -119,6 +126,8 @@ AS_IF([test "x$enable_unix_socket" != "xno"], [
     AC_DEFINE_UNQUOTED(IR_UNIX_DIR, ["$enable_unix_socket"])
   ])
 ])
+
+AC_DEFINE(USE_INET_SOCKET, 1, [Enable IPv4/IPv6 socket.])
 
 
 dnl Set PACKAGE_SYSCONF_DIR in config.h.

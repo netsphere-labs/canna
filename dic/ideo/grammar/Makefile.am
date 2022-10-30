@@ -14,9 +14,7 @@ FORSORT = $(CANNACMDDIR)/forsort/forsort
 FORCPP = $(CANNACMDDIR)/forcpp/forcpp
 
 cpp.gram: gram.code gram.goto main.code
-	$(FORCPP) -7 < $<  | \
-		$(CPP) $(DEFINES) -I$(top_srcdir)/dic/ideo/grammar - | \
-		$(FORCPP) -8 > $@
+	$(CANNA_PP) $(DEFINES) -I$(top_srcdir)/dic/ideo/grammar $< > $@
 
 cnj.swd cnj.bits cnj.h cnj.mac: cpp.gram 
 		$(CRXGRAM) -f $< 

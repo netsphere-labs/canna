@@ -35,8 +35,8 @@
   #define INVALID_SOCKET -1
 #endif
 
-typedef int (*GetConnectionInfoProc) pro((void *obj,
-                      SOCKET connfd, Address *addr, char **hostname));
+typedef int (*GetConnectionInfoProc)(void *obj,
+                    SOCKET connfd, struct sockaddr* addr, char **hostname);
 
 typedef struct {
   /* public */
@@ -49,8 +49,8 @@ extern EventMgr *global_event_mgr;
 
 int ClientBuf_store_reply pro((ClientBuf *obj,
       const BYTE *data, size_t len));
-int ClientBuf_get_connection_info pro((ClientBuf *obj,
-      Address *addr, char **hostname));
+int ClientBuf_get_connection_info(ClientBuf *obj,
+                                  struct sockaddr* addr, char **hostname);
 SOCKET ClientBuf_getfd pro((ClientBuf *obj));
 ClientPtr ClientBuf_getclient pro((ClientBuf *obj));
 
@@ -65,9 +65,9 @@ void EventMgr_clibuf_first pro((EventMgr *obj, EventMgrIterator *it));
 void EventMgr_clibuf_end pro((EventMgr *obj, EventMgrIterator *it));
 void EventMgrIterator_next pro((EventMgrIterator *obj));
 
-SockHolder *SockHolder_new pro((void));
-void SockHolder_delete pro((SockHolder *obj));
-int SockHolder_tie pro((SockHolder *obj, EventMgr *event_mgr));
+int  SockHolder_new();
+//void SockHolder_delete pro((SockHolder *obj));
+//int SockHolder_tie pro((SockHolder *obj, EventMgr *event_mgr));
 
 #endif	/* COMM_H */
 /* vim: set sw=2: */
