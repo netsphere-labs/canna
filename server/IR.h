@@ -1,3 +1,4 @@
+ï»¿// -*- coding:utf-8-with-signature -*-
 /* Copyright 1992 NEC Corporation, Tokyo, Japan.
  *
  * Permission to use, copy, modify, distribute and sell this software
@@ -23,22 +24,14 @@
 /* sccs_id[]="%Z% NEC UNIX( PC-UX/EWS-UX ) %M% %R%.%L% %E% %U%"; */
 /* $Id: IR.h,v 1.11 2003/09/23 07:11:31 aida_s Exp $ */
 
-/* ¼«Æ°È½ÊÌ»Ù±ç¥³¥á¥ó¥È: ¤³¤ì¤ÏEUC-JP¤À¤¾¡£Éı¤È¤¤¤¦»ú¤¬¤¢¤ì¤ĞÂç¾æÉ×¡£ */
+/* è‡ªå‹•åˆ¤åˆ¥æ”¯æ´ã‚³ãƒ¡ãƒ³ãƒˆ: ã“ã‚Œã¯EUC-JPã ãã€‚å¹…ã¨ã„ã†å­—ãŒã‚ã‚Œã°å¤§ä¸ˆå¤«ã€‚ */
 
 #include "config.h"
 #include "canna/ccompat.h"
 #include <sys/types.h>
+#include <time.h>
 
-
-#ifdef HAVE_TIME_H
-# include <time.h>
-#endif
-#ifdef HAVE_TIME_T
-typedef time_t ir_time_t;
-#else
-typedef long ir_time_t;
-#endif
-
+// å®šç¾©å¿…é ˆ
 #define EXTENSION
 
 #include "canna/protodefs.h"

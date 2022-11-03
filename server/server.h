@@ -48,7 +48,7 @@
 
 typedef struct tagEventMgr EventMgr;
 typedef struct tagClientBuf ClientBuf;
-typedef struct tagSockHolder SockHolder;
+//typedef struct tagSockHolder SockHolder;
 typedef struct tagUserTable UserTable;
 //typedef struct _Address Address;
 typedef struct _Client *ClientPtr;
@@ -59,9 +59,10 @@ typedef struct _ClientStat *ClientStatPtr;
 #include "IR.h"
 #include "comm.h"
 
-#if !CANNA_LIGHT
+//#if !CANNA_LIGHT
+// 定義必須.
 #define USE_EUC_PROTOCOL
-#endif /* !CANNA_LIGHT */
+//#endif /* !CANNA_LIGHT */
 
 #define DDPATH              "canna"
 #define DDUSER              "user"
@@ -97,10 +98,8 @@ struct _Address {
 };
 */
 
-#define IR_ADDR_INSA(x) ((struct sockaddr_in *)&(x)->saddr)
-#define IR_ADDR_IN(x) (&IR_ADDR_INSA(x)->sin_addr)
-#ifdef INET6
-# define IR_ADDR_IN6SA(x) ((struct sockaddr_in6 *)&(x)->saddr)
+// server/misc.c で使用.
+//# define IR_ADDR_IN6SA(x) ((struct sockaddr_in6 *)&(x)->saddr)
 # define IR_ADDR_IN6(x) (&IR_ADDR_IN6SA(x)->sin6_addr)
 # define IR_ADDR_IN6SCOPE(x) (IR_ADDR_IN6SA(x)->sin6_scope_id)
 //# ifdef IPV6_V6ONLY
@@ -112,7 +111,6 @@ struct _Address {
 //# ifndef IR_V4MAPPED_AVOIDABLE
 //#  error "You need newer IPv6 stack."
 //# endif
-#endif /* INET6 */
 
 
 /* クライアント毎に作られる、レイヤ5の情報を持つ構造体 */
@@ -121,9 +119,9 @@ typedef struct _Client {
     int 	usr_no ;		     /* ユーザ管理番号 */
     short 	version_hi ;		     /* protocol major version */
     short 	version_lo ;		     /* protocol miner version */
-    ir_time_t	used_time ;		     /* ユーザ消費時間 */
-    ir_time_t	idle_date ;		     /* アイドル時間 */
-    ir_time_t	connect_date ;		     /* コネクトした時間 */
+    time_t	used_time ;		     /* ユーザ消費時間 */
+    time_t	idle_date ;		     /* アイドル時間 */
+    time_t	connect_date ;		     /* コネクトした時間 */
     char	*username ;		     /* ユーザ名  */
     char	*groupname;		     /* グループ名  */
     char	*hostname ;		     /* ホスト名  */
@@ -137,9 +135,9 @@ typedef struct _Client {
 typedef struct _ClientStat {
     int 	id ;			     /* ソケット番号 */
     int 	usr_no ;		     /* ユーザ管理番号 */
-    ir_time_t	used_time ;		     /* ユーザ消費時間 */
-    ir_time_t	idle_date ;		     /* アイドル時間 */
-    ir_time_t	connect_date ;		     /* コネクトした時間 */
+    time_t	used_time ;		     /* ユーザ消費時間 */
+    time_t	idle_date ;		     /* アイドル時間 */
+    time_t	connect_date ;		     /* コネクトした時間 */
     int 	pcount[ OLD_MAXREQUESTNO ] ; /* プロトコルカウント */
     char	username[ NAME_LENGTH+1] ;   /* ユーザ名  */
     char	hostname[ HOST_NAME ] ;      /* ホスト名  */
@@ -155,6 +153,7 @@ typedef struct _AccessControlList {
     struct _AccessControlList  *prev ;
     struct _AccessControlList  *next ;
     char *hostname ;
+    // '\0' 区切りのユーザ名リスト.
     char *usernames ;
     int  usercnt ;
     AddrList *hostaddrs;
@@ -199,12 +198,12 @@ int BecomeDaemon pro((void));
 void CloseServer pro((void));
 int CheckSignal pro((void));
 AddrList *GetAddrListFromName pro((const char *hostname));
-AddrList *SearchAddrList pro((const AddrList *list,
+const AddrList *SearchAddrList pro((const AddrList *list,
                               const struct sockaddr_storage* addrp));
 void FreeAddrList pro((AddrList *list));
 int NumberAccessControlList pro((void));
-int CheckAccessControlList pro((struct sockaddr_storage* hostaddrp,
-                                const char *username));
+int CheckAccessControlList( const struct sockaddr_storage* hostaddrp,
+                            const char *username );
 int SetDicHome pro((ClientPtr client, int cxnum));
 ClientPtr *get_all_other_clients pro((ClientPtr self, size_t *count));
 void AllSync pro((void));

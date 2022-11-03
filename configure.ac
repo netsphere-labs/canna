@@ -16,8 +16,8 @@ AC_CONFIG_MACRO_DIRS([m4])
 ############################
 # Checks for programs.
 
-AC_PROG_CXX
-AC_PROG_CC
+AC_PROG_CXX([clang++ g++ c++])
+AC_PROG_CC([clang gcc cc])
 AC_PROG_CPP
 AM_PROG_AR
 LT_INIT
@@ -61,7 +61,7 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 
 # BSD only
-AC_CHECK_FUNCS([strlcpy strlcat])
+AC_CHECK_FUNCS([strlcpy strlcat vsyslog initgroups bzero])
 
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF(wchar_t)
@@ -85,12 +85,19 @@ AM_CONDITIONAL(OS_WIN32, test "$native_win32" = "yes")
 # cpp -fdirectives-only -E .. directives such as "#define", "#ifdef", and
 #                             "#error" のみ処理
 #     -nostdinc
-AC_SUBST(CANNA_PP, "LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc")
+AS_CASE(["$CC"],
+  [clang*], [
+    AC_SUBST(CANNA_PP, "LANG=C /usr/bin/cpp -E -nostdinc") ],
+  [gcc*], [
+    AC_SUBST(CANNA_PP, "LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc")
+    # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
+    # -Wformat=2 includes -Wformat-security
+    CFLAGS="$CFLAGS -std=c11 -Wall -Wextra -Wshadow -Wformat=2 -Wformat-truncation -Wundef -fno-common -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -Wno-unused-parameter -fstack-protector-strong "  
+    ],
+  [AC_MSG_ERROR([Unknown C compiler.])]
+  )
 
 AC_ENABLE_STATIC(no)
-
-# ICE with -fstack-clash-protection. gcc 10.2 on mingw.
-test -z "$GCC" || CFLAGS="$CFLAGS -std=c11 -Wall -Wextra -Wformat-security -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -fstack-protector-strong -fstack-clash-protection"  
 
 
 dnl ----------------------------------------------------------------------------
@@ -114,6 +121,7 @@ fi
 AC_DEFINE_UNQUOTED(LOCALSTATE_DIR, "${LOCALSTATE_DIR}")
 
 
+# AS_IF(), AS_CASE() などは, autoconf が提供する, シェル制御構造のﾎﾟｰﾀﾌﾞﾙな代替.
 # ソケットファイル: Linux = /run 以下, FreeBSD = /var/run
 AC_ARG_ENABLE([unix-socket],
   AS_HELP_STRING([--disable-unix-socket],

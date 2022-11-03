@@ -23,6 +23,7 @@
  */
 
 /* LINTLIBRARY */
+#define _POSIX_C_SOURCE 200809L
 #include "server.h"
 
 RCSID("$Id: session.c,v 1.1 2003/09/21 12:56:29 aida_s Exp $");
@@ -273,14 +274,12 @@ int notify;
   *clientp = NULL;
 }
 
+
 void
-ClientStat(client, type, request_Type, return_date)
-ClientPtr client ;
-int request_Type, type;
-char *return_date ;
+ClientStat( ClientPtr client, int type, int request_Type, char *return_date)
 {
-  static ir_time_t set_time ; /* サーバを使用した時間を測る基点 */
-  ir_time_t  cur_time ;
+    static time_t set_time ; /* サーバを使用した時間を測る基点 */
+    time_t  cur_time ;
 
   cur_time = time( NULL ) ;
 
@@ -290,7 +289,7 @@ char *return_date ;
       {
 	struct tm	 *tt ;
 	char *date ;
-	ir_time_t cdate ;
+        time_t cdate ;
 
 	cdate = client->connect_date ;
 	tt = localtime( &cdate ) ;

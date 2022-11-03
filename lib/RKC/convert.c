@@ -39,11 +39,11 @@ static char rcs_id[] = "$Id: convert.c,v 1.9.2.1 2004/04/26 21:48:37 aida_s Exp 
 #include <signal.h>
 
 /* 単語登録で辞書が作れなくなるので、とりあえずコメントアウト
-#ifdef CANNA_LIGHT
+//#ifdef CANNA_LIGHT
 #ifdef EXTENSION
 #undef EXTENSION
 #endif
-#endif
+//#endif
  */
 
 extern int _RkwGetYomi( RkcContext* cx, cannawc* yomi, int maxyomi);
@@ -80,7 +80,8 @@ uint32_t L4TOL(BYTE* p)
 {
   return (((((p[0] << 8) | p[1]) << 8) | p[2]) << 8) | p[3];
 }
-#endif
+#endif // USE_EUC_PROTOCOL
+
 
 #ifdef DEBUGPROTO
 static void
@@ -1249,6 +1250,7 @@ int rkc_get_lex( RkcContext* cx, int max, RkLex* info_return )
 }
 
 #endif /* USE_EUC_PROTOCOL */
+
 
 static int
 rkc_error()

@@ -28,8 +28,10 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <fcntl.h>
-#ifdef USE_UNIX_SOCKET  /* UNIX ドメインの作成 */
-  #include <sys/un.h>
+#ifndef _WIN32
+  #ifdef USE_UNIX_SOCKET  /* UNIX ドメインの作成 */
+    #include <sys/un.h>
+  #endif
 #endif
 
 RCSID("$Id: comm.c,v 1.4.2.3 2004/04/26 21:48:37 aida_s Exp $");
@@ -744,7 +746,7 @@ get_addr_unix(void *dummy, SOCKET connfd, struct sockaddr* addr, char **hostname
     socklen_t addrlen = sizeof(struct sockaddr_un);
     int retval = getpeername(connfd, addr, &addrlen);
     if (!retval) { // 成功
-        if ( (*hostname = strdup("(UNIX)")) == NULL )
+        if ( (*hostname = strdup("unix")) == NULL )  // hosts.canna と合わせる
             return -1;
     }
     return retval;

@@ -39,7 +39,7 @@ int (*CallFunc) pro((ClientPtr *clientp));
 int main(int argc, char* argv[])
 {
     int parentid;
-    SockHolder *sock_holder = NULL;
+    //SockHolder *sock_holder = NULL;
     int status;
 
     // コマンドラインオプションの解析.

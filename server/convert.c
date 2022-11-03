@@ -30,11 +30,11 @@ static char rcs_id[] = "@(#) 102.1 $Id: convert.c,v 1.10.2.1 2003/12/27 17:15:24
 #include <canna/patchlevel.h>
 #include "canna/sglobal.h"
 
-#if CANNA_LIGHT
-#ifdef EXTENSION
-#undef EXTENSION
-#endif
-#endif
+//#if CANNA_LIGHT
+//#ifdef EXTENSION
+//#undef EXTENSION
+//#endif
+//#endif
 
 #define SIZEOFSHORT 2 /* for protocol */
 #define SIZEOFLONG  4 /* for protocol */

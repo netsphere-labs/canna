@@ -73,9 +73,9 @@ RCSID("$Id: cannastat.c,v 1.5.2.2 2003/12/27 17:15:21 aida_s Exp $");
 typedef struct _Client {
     int 	id ;			     /* ソケット番号 */
     int 	usr_no ;		     /* ユーザ管理番号 */
-    ir_time_t	used_time ;		     /* ユーザ消費時間 */
-    ir_time_t	idle_date ;		     /* アイドル時間 */
-    ir_time_t	connect_date ;		     /* コネクトした時間 */
+    time_t	used_time ;		     /* ユーザ消費時間 */
+    time_t	idle_date ;		     /* アイドル時間 */
+    time_t	connect_date ;		     /* コネクトした時間 */
     char	*username ;		     /* ユーザ名  */
     char	*groupname;		     /* グループ名  */
     char	*hostname ;		     /* ホスト名  */
@@ -85,7 +85,7 @@ typedef struct _Client {
 typedef unsigned int Uint;
 
 static int ServerVersion ;
-static ir_time_t cur_time ;
+static time_t cur_time ;
 
 static int *TotalReqCount = NULL;
 size_t ProtoCount, ListSize, ContextNum ;
@@ -286,7 +286,7 @@ int flag;
     printf("Canna Server (Ver. %d.%d)\n", major_version, minor_version ) ;
 
     /* サーバのカレント時間 */
-    cur_time = (ir_time_t)L4TOL(p), p+= SIZEOFLONG;
+    cur_time = (time_t) L4TOL(p), p+= SIZEOFLONG;
 
     /* プロトコル数 */
     ProtoCount = S2TOS(p), p+= SIZEOFSHORT;
@@ -424,7 +424,7 @@ DispInfo( ClientPtr client, int flag )
     char	name[ 10 ], host[ 15 ], appname[15];
     char	*ascdate = (char *)0xdeadbeef /* for gcc */ ;
     int 	i, id, user_no, u_cx ;
-    ir_time_t	cdate, udate, idate ;
+    time_t	cdate, udate, idate ;
     struct tm	*tt ;
 
     id = client->id ;
@@ -548,9 +548,9 @@ CreateData( const BYTE* readbuf, ClientPtr who, size_t cinfolen )
 
     who->id = (int)L4TOL(receivep); receivep += SIZEOFLONG;
     who->usr_no = (int)L4TOL(receivep); receivep += SIZEOFLONG;
-    who->used_time = (ir_time_t)L4TOL(receivep); receivep += SIZEOFLONG;
-    who->idle_date = (ir_time_t)L4TOL(receivep); receivep += SIZEOFLONG;
-    who->connect_date = (ir_time_t)L4TOL(receivep); receivep += SIZEOFLONG;
+    who->used_time = (time_t) L4TOL(receivep); receivep += SIZEOFLONG;
+    who->idle_date = (time_t) L4TOL(receivep); receivep += SIZEOFLONG;
+    who->connect_date = (time_t) L4TOL(receivep); receivep += SIZEOFLONG;
 
     for( j = 0; j < ProtoCount; j++ )
 	TotalReqCount[j] = (int)L4TOL(receivep), receivep += SIZEOFLONG;

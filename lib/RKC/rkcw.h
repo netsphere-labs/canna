@@ -27,11 +27,14 @@
 
 #define exp(x) x
 
-#if !defined(CANNA_LIGHT)
+//#if !defined(CANNA_LIGHT)
+// 定義必須
 #define USE_EUC_PROTOCOL
-#endif
+//#endif
 
+// 定義必須
 #define EXTENSION
+
 #define DEBUG
 
 #ifdef USE_UNIX_SOCKET

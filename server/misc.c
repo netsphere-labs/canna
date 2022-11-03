@@ -27,19 +27,26 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 
 /* LINTLIBRARY */
 
+#define _DEFAULT_SOURCE // vsyslog(), since glibc 2.19
 #define _POSIX_C_SOURCE 200809L
 #include "server.h"
 
-# include <syslog.h>
-#include <grp.h> // initgroups()
+#include <syslog.h>
+#include <grp.h>
 #include <stdarg.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <pwd.h>
+#include <ctype.h>
 #ifdef HAVE_SYS_IOCTL_H
   #include <sys/ioctl.h>
 #endif
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+  #ifdef USE_UNIX_SOCKET
+    #include <sys/un.h>
+  #endif
+#endif
 
 #ifndef DICHOME
   #define DICHOME  LOCALSTATE_DIR "/lib/canna/dic"
@@ -52,7 +59,16 @@ static char rcs_id[]="@(#) $Id: misc.c,v 1.16.2.4 2004/04/26 21:48:37 aida_s Exp
 #define ERRFILE     "CANNA"
 #define ERRFILE2    "msgs"
 #define ERRSIZE     64
+
 #ifndef ACCESS_FILE
+// The list of hostname allowed to connect to the Canna server.
+//   ホスト名:ユーザ名1, ユーザ名2, ...
+//   ホスト名
+//   unix
+// ホスト名として "unix" がないと, UNIX ドメインソケットで接続できない.
+// 例:
+//   localhost
+//   unix
 #define ACCESS_FILE "/etc/hosts.canna"
 #endif
 
@@ -63,7 +79,7 @@ static void FreeAccessControlList pro((void));
 
 #ifdef DEBUG
 #define LOGFILE "/tmp/canna.log"
-static FILE *ServerLogFp = (FILE *)0;
+static FILE *ServerLogFp = NULL;
 static FILE *Fp;
 static int DebugMode = 0;
 static int LogLevel = 0;
@@ -93,20 +109,25 @@ char *PreMountTabl[MAX_PREMOUNTS];
 int npremounts = 0;
 static char *MyName ;
 
-ACLPtr ACLHead = (ACLPtr)NULL;
+// アクセス許可するクライアントIPアドレス一覧.
+ACLPtr ACLHead = NULL;
+
 static int caught_signal = 0;
 static int openlog_done = 0;
 static int rkw_initialize_done = 0;
 
 static void Reset(int );
 
-#ifdef INET6
-#define USAGE "Usage: cannaserver [-p num] [-l num] [-u userid] [-syslog] [-inet] [-inet6] [-d] [dichome]"
+#ifdef USE_INET_SOCKET
+#define USAGE "Usage: cannaserver [-p port_num] [-l num] [-u userid] [-syslog] [-inet] [-d] [dichome]\n" \
+    "    -p port_num  If UNIX domain socket, use another filename"
 #else
-#define USAGE "Usage: cannaserver [-p num] [-l num] [-u userid] [-syslog] [-inet] [-d] [dichome]"
-#endif
-static void
-Usage()
+#define USAGE "Usage: cannaserver [-p port_num] [-l num] [-u userid] [-syslog] [-d] [dichome]" \
+    "    -p port_num  If UNIX domain socket, use another filename"
+#endif // USE_INET_SOCKET
+
+
+static void Usage()
 {
   FatalError(USAGE);
 }
@@ -116,7 +137,7 @@ extern void getserver_version pro((void));
 // コマンドラインオプションの解析.
 void EarlyInit( int argc, char* argv[] )
 {
-    char *ddname = NULL;
+    char *ddname = NULL;  // 辞書の場所
     char buf[ MAXDATA ];
     int     i;
     int     context;
@@ -165,25 +186,15 @@ void EarlyInit( int argc, char* argv[] )
 	  MMountFlag = RK_MMOUNT;
 	}
 #endif
-#ifdef HAVE_SYSLOG
- 	else if (!strcmp( argv[i], "-syslog")) {
-	  Syslog = 1;
-	}
+        else if (!strcmp( argv[i], "-syslog")) {
+            Syslog = 1;
+        }
     }
 
     if (Syslog) {
       openlog("cannaserver", LOG_PID, LOG_DAEMON);
       openlog_done = 1;
     } /* -syslog だったら、ログファイルを初期化する */
-#else
-    }
-
-/* TCP/IP スタックが利用可能でない時は終了する */
-    if (gethostname( buf, MAXDATA ) != 0) {
-	fprintf(stderr,"TCP/IP stack is not working\n") ;
-	exit( 1 );
-    }
-#endif
 
     if( !ddname ) {
         ddname = (char*) malloc(strlen(DICHOME) + 1);
@@ -198,9 +209,11 @@ void EarlyInit( int argc, char* argv[] )
 	    if(setgid(pwent->pw_gid)) {
 	        FatalError("cannaserver:couldn't set groupid to canna user's group\n");
 	    }
+#ifdef HAVE_INITGROUPS
 	    if (initgroups(userID, pwent->pw_gid)) {
 	        FatalError("cannserver: couldn't init supplementary groups\n");
 	    }
+#endif
 	    if (setuid(pwent->pw_uid)) {
 	        FatalError("cannaserver: couldn't set userid\n");
 	    }
@@ -312,18 +325,17 @@ BecomeDaemon ()
 void
 CloseServer()
 {
-#ifdef HAVE_SYSLOG
     if (Syslog && openlog_done) {
-      closelog();
+        closelog();
     }
-#endif
+
     if (rkw_initialize_done)
 	RkwFinalize() ;
 }
+
+
 /* 初期化に失敗した場合に呼ぶ。EventMgr_run()まで来たら呼ばないこと。 */
-static void
-FatalError(f)
-    const char *f;
+static void FatalError(const char* f)
 {
     fprintf(stderr,"%s\n", f);
     CloseServer();
@@ -335,28 +347,7 @@ FatalError(f)
 
 #ifdef DEBUG
 
-#ifndef USE_VARARGS
-
-/* VARARGS */
-void
-Dmsg( Pri, f, s0, s1, s2, s3, s4, s5, s6, s7, s8 )
-int Pri ;
-const char *f;
-const char *s0, *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8 ;
-{
-    if (!ServerLogFp)
-	ServerLogFp = stderr;
-    if ( LogLevel >= Pri ) {
-	fprintf(ServerLogFp , f, s0, s1, s2, s3, s4, s5, s6, s7, s8 );
-	fflush( ServerLogFp ) ;
-    }
-}
-
-#else /* USE_VARARGS */
-
-#ifdef __STDC__
-void
-Dmsg(int Pri, const char *f, ...)
+void Dmsg(int Pri, const char *f, ...)
 {
   va_list ap;
 
@@ -371,131 +362,54 @@ Dmsg(int Pri, const char *f, ...)
   }
   va_end(ap);
 }
-#else
-void
-Dmsg(Pri, f, va_alist)
-int Pri;
-const char *f;
-va_dcl
+#endif
+
+
+void PrintMsg(const char *f, ...)
 {
-  va_list ap;
-  const char *args[MAXARGS];
-  int argno = 0;
-
-  va_start(ap);
-
-  while (++argno < MAXARGS && (args[argno] = va_arg(ap, const char *)))
-    ;
-  args[MAXARGS - 1] = (const char *)0;
-  va_end(ap);
-
-  if (!ServerLogFp) {
-    ServerLogFp = stderr;
-  }
-  if (LogLevel >= Pri) {
-    fprintf(ServerLogFp, f, args[0], args[1], args[2], args[3], args[4],
-	    args[5], args[6], args[7], args[8]);
-    fflush(ServerLogFp);
-  }
-}
-#endif /* !__STDC__ */
-#endif /* USE_VARARGS */
+    va_list ap;
+#if !defined(HAVE_VSYSLOG)
+    const char *args[MAXARGS];
+    int argno = 0;
 #endif
-
-#ifndef USE_VARARGS
-void
-PrintMsg( f, s0, s1, s2, s3, s4, s5, s6, s7, s8 )
-const char *f;
-const char *s0, *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8 ;
-{
-    ir_time_t Time ;
-    char    *date ;
-
-#ifdef HAVE_SYSLOG
-    if (Syslog) {
-      syslog(LOG_WARNING, f, s0, s1, s2, s3, s4, s5, s6, s7, s8);
-    } else
-#endif
-    {
-      Time = time( NULL ) ;
-      date = (char *)ctime( &Time ) ;
-      date[24] = '\0' ;
-      fprintf( stderr, "%s :", date ) ;
-      fprintf( stderr, f, s0, s1, s2, s3, s4, s5, s6, s7, s8 );
-      fflush( stderr ) ;
-    }
-}
-#else /* USE_VARARGS */
-
-#if !defined(__STDC__) || (defined(HAVE_SYSLOG) && !defined(HAVE_VSYSLOG))
-# define READ_ALL_ARGS
-#endif
-
-void
-#ifdef __STDC__
-PrintMsg(const char *f, ...)
-#else
-PrintMsg(f, va_alist)
-const char *f;
-va_dcl
-#endif
-{
-  va_list ap;
-#ifdef READ_ALL_ARGS
-  const char *args[MAXARGS];
-  int argno = 0;
-#endif
-  ir_time_t Time;
+    time_t Time;
   char    *date;
 
-#ifdef __STDC__
-  va_start(ap, f);
-#else
-  va_start(ap);
+    va_start(ap, f);
+
+#if !defined(HAVE_VSYSLOG)
+    while (++argno < MAXARGS && (args[argno] = va_arg(ap, const char *)))
+        ;
+    args[MAXARGS - 1] = (const char *)0;
 #endif
 
-#ifdef READ_ALL_ARGS
-  while (++argno < MAXARGS && (args[argno] = va_arg(ap, const char *)))
-    ;
-  args[MAXARGS - 1] = (const char *)0;
-#endif
-
-#ifdef HAVE_SYSLOG
-  if (Syslog) {
+    if (Syslog) {
 #ifdef HAVE_VSYSLOG
-    vsyslog(LOG_WARNING, f, ap);
+        vsyslog(LOG_WARNING, f, ap);
 #else
-    syslog(LOG_WARNING, f, args[0], args[1], args[2], args[3], args[4],
-	   args[5], args[6], args[7], args[8]);
+        syslog(LOG_WARNING, f, args[0], args[1], args[2], args[3], args[4],
+               args[5], args[6], args[7], args[8]);
 #endif
-  } else
-#endif /* HAVE_SYSLOG */
-  {
+    } else {
     Time = time(NULL);
     date = (char *)ctime(&Time);
     date[24] = '\0';
     fprintf(stderr, "%s :", date);
-#ifdef __STDC__
     vfprintf(stderr, f, ap);
-#else
-    fprintf(stderr, f, args[0], args[1], args[2], args[3], args[4],
-	    args[5], args[6], args[7], args[8]);
-#endif
     fflush( stderr ) ;
   }
-  va_end(ap);
+    va_end(ap);
 }
-#endif /* USE_VARARGS */
 
-void
-nomem_msg(where)
-const char *where;
+
+void nomem_msg( const char *where )
 {
   if (where)
     PrintMsg("%s: out of memory\n", where);
   else
     PrintMsg("out of memory\n");
 }
+
 
 // callback
 static void Reset(int sig)
@@ -519,267 +433,271 @@ CheckSignal()
     return 0;
 }
 
+
+#define IR_ADDR_IN(x) ( ((struct sockaddr_in*)(x))->sin_addr )
+
 static int
-AddrAreEqual(x, y)
-const Address *x, *y;
+AddrAreEqual( const struct sockaddr_storage* x,
+              const struct sockaddr_storage* y )
 {
+    // int IN6_ARE_ADDR_EQUAL(const struct in6_addr *, const struct in6_addr *)
+    // は RFC 2292, RFC 3542 で定義される. POSIX ではない.
+
     int res = 0;
-    if (x->family != y->family)
-      return 0;
-    switch (x->family) {
-      case AF_UNIX:
-	res = 1;
+    if (x->ss_family != y->ss_family)
+        return 0;
+
+    switch (x->ss_family) {
+    case AF_UNIX:
+        //res = !strcmp( ((struct sockaddr_un*) x)->sun_path,
+        //((struct sockaddr_un*) y)->sun_path );
+        return 1;  // ACL リストにはパス名は入っていない.
+
+    case AF_INET:
+        // sin_port は調べない.
+        res = IR_ADDR_IN(x).s_addr == IR_ADDR_IN(y).s_addr;
 	break;
-      case AF_INET:
-	res = IR_ADDR_IN(x)->s_addr == IR_ADDR_IN(y)->s_addr;
-	break;
-#ifdef INET6
-      case AF_INET6:
-	res = (IR_ADDR_IN6SCOPE(x) == 0 || IR_ADDR_IN6SCOPE(y) == 0
-	    || IR_ADDR_IN6SCOPE(x) == IR_ADDR_IN6SCOPE(y))
-	  && IN6_ARE_ADDR_EQUAL(IR_ADDR_IN6(x), IR_ADDR_IN6(y));
-	break;
-#endif
-      default:
-	abort();
-      /* NOTREACHED */
+
+    case AF_INET6:
+        {
+            const struct sockaddr_in6* x6 = (struct sockaddr_in6*) x;
+            const struct sockaddr_in6* y6 = (struct sockaddr_in6*) y;
+
+            // リンクローカルアドレス fe80::/10 ではスコープid必須.
+            // -> IPv6アドレスとスコープidの比較が必要.
+            // 余談: サイトローカルアドレスは RFC 3879 (Sep 2004) で廃止.
+            // sin6_port は調べない.
+            res = x6->sin6_scope_id == y6->sin6_scope_id &&
+                  IN6_ARE_ADDR_EQUAL(&x6->sin6_addr, &y6->sin6_addr);
+        }
+        break;
+
+    default:
+        abort(); /* NOTREACHED */
     }
     return res;
 }
 
-AddrList *
-GetAddrListFromName(hostname)
-const char   *hostname;
+
+/**
+ * CreateAccessControlList() から呼び出される. ホスト名からアドレスを正引きし
+ * て, AddrList エントリを生成する.
+ * @param hostname ホスト名. "unix" の場合, UNIX ドメインソケットとみなす.
+ * @return 新しい AddrList エントリ. 呼出し側が FreeAddrList() すること.
+ *         失敗したら NULL.
+ */
+AddrList* GetAddrListFromName( const char* hostname )
 {
     AddrList *res = NULL;
-#ifdef INET6
     struct addrinfo hints, *info;
-    struct addrinfo *infolists[2];
+    struct addrinfo* infolists = NULL;
     int i;
-#else
-    const struct hostent *hent;
-    const char *const *haddrp;
-    struct in_addr numaddr;
-#endif
 
+#ifdef USE_UNIX_SOCKET
     if (!strcmp(hostname, "unix")) {
-      res = calloc(1, sizeof(AddrList));
-      if (!res)
-	return NULL;
-      res->addr.family = AF_UNIX;
-      res->addr.len = 0;
-      res->next = NULL;
-      return res;
+        res = calloc(1, sizeof(AddrList));
+        if (!res)
+            return NULL;
+        struct sockaddr_un* u = &res->addr;
+        u->sun_family = AF_UNIX;
+        u->sun_path[0] = '\0';
+        res->next = NULL;
+        return res;
     }
+#endif // USE_UNIX_SOCKET
 
-#ifdef INET6
     bzero(&hints, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
-    infolists[0] = infolists[1] = NULL;
-    if (UseInet6) {
-	hints.ai_family = PF_INET6;
-	getaddrinfo(hostname, NULL, &hints, &infolists[0]);
-    }
-    if (UseInet) {
-	hints.ai_family = PF_INET;
-	getaddrinfo(hostname, NULL, &hints, &infolists[1]);
-    }
+    hints.ai_family = AF_UNSPEC; // IPv4/IPv6両対応
+    hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG; // 実行ホストが IPv6 only の場合, IPv4-Mapped IPv6 Address を返す.
+    getaddrinfo(hostname, NULL, &hints, &infolists);
 
-    for (i = 0; i < 2; i++) {
-      for (info = infolists[i]; info; info = info->ai_next) {
-	AddrList *newnode;
-	if (info->ai_family == AF_INET6
-	    &&IN6_IS_ADDR_V4MAPPED(
-	      &((struct sockaddr_in6 *)info->ai_addr)->sin6_addr))
-	  continue;
-	newnode = calloc(1, sizeof(AddrList));
-	if (!newnode) {
-	  freeaddrinfo(infolists[i]);
-	  goto fail;
-	}
-	newnode->addr.family = info->ai_family;
-	newnode->addr.len = info->ai_addrlen;
-	memcpy(&newnode->addr.saddr, info->ai_addr, info->ai_addrlen);
-	newnode->next = res;
-	res = newnode;
-      }
-      if (infolists[i])
-	  freeaddrinfo(infolists[i]);
+    for (info = infolists; info; info = info->ai_next) {
+        AddrList *newnode;
+        newnode = calloc(1, sizeof(AddrList));
+        if (!newnode) {
+            freeaddrinfo( infolists );
+            goto failed;
+        }
+        memcpy(&newnode->addr, info->ai_addr, info->ai_addrlen);
+        newnode->next = res;
+        res = newnode;
     }
-#else /* !INET6 */
-    if (
-#ifdef HAVE_INET_ATON
-	inet_aton(hostname, &numaddr)
-#else
-	((numaddr.s_addr = inet_addr(hostname)) != (in_addr_t)-1)
-#endif
-       ) {
-      res = calloc(1, sizeof(AddrList));
-      if (!res)
-	goto fail;
-      res->addr.family = AF_INET;
-      res->addr.len = sizeof(struct sockaddr_in);
-      res->addr.saddr.sin_addr = numaddr;
-      res->next = 0;
-      return res;
-    }
-    hent = gethostbyname(hostname);
-    if (hent == NULL || hent->h_addrtype != AF_INET)
-      return NULL;
-#ifndef HAVE_STRUCT_HOSTENT_H_ADDR_LIST
-    haddrp = &hent->h_addr;
-#else
-    for (haddrp = hent->h_addr_list; *haddrp; haddrp++)
-#endif
-    {
-      AddrList *newnode = calloc(1, sizeof(AddrList));
-      if (!newnode)
-	goto fail;
-      newnode->addr.family = AF_INET;
-      newnode->addr.len = sizeof(struct sockaddr_in);
-      newnode->addr.saddr.sin_addr = *(const struct in_addr *)*haddrp;
-      newnode->next = res;
-      res = newnode;
-    }
-#endif /* !INET6 */
+    freeaddrinfo( infolists );
+
     return res;
-fail:
-    while(res) {
-      AddrList *next = res->next;
-      free(res);
-      res = next;
-    }
+
+failed:
+    FreeAddrList(res);
     return NULL;
 }
 
-AddrList *
-SearchAddrList(list, addrp)
-const AddrList *list;
-const Address *addrp;
+
+const AddrList *
+SearchAddrList( const AddrList *list, const struct sockaddr_storage* addrp )
 {
-    for (; list; list = list->next)
-      if (AddrAreEqual(&list->addr, addrp))
-	break;
-    return (AddrList *)list;
+    for (; list; list = list->next) {
+        if (AddrAreEqual(&list->addr, addrp))
+            break;
+    }
+    return list;
 }
 
 void
-FreeAddrList(list)
-AddrList *list;
+FreeAddrList( AddrList *list )
 {
-    while(list) {
-      AddrList *next = list->next;
-      free(list);
-      list = next;
-    };
+    while (list) {
+        AddrList *next = list->next;
+        free(list);
+        list = next;
+    }
 }
 
+
+static char* skip_space(char* p) {
+    while (*p && isspace(*p) ) p++;
+    return p;
+}
+
+// /etc/hosts.canna ファイル (許可ホストリスト) を読み込む.
+// IPv6アドレスの場合は [] で囲むこと.
+//     [fe80::xxxx:xxxx%hoge]:user1, user2, ...
+// @return ファイルが見つからない場合 -1.
+//         そのほかの失敗も -1.
 static int
 CreateAccessControlList()
 {
     char   buf[BUFSIZE];
-    char   *wp, *p ;
+    char* wp;  // 語の先頭
+    char* p ;
     ACLPtr  current;
     ACLPtr  prev = (ACLPtr)NULL ;
     FILE    *fp ;
-    int namelen;
+    //int namelen;
 
-    if( (fp = fopen( ACCESS_FILE, "r" )) == (FILE *)NULL )
-	return( -1 ) ;
+    /* /etc/hosts.canna からホスト名を求める */
+    if( (fp = fopen(ACCESS_FILE, "r")) == NULL )
+        return -1 ;
 
-    if (ACLHead) {
+    if (ACLHead)
       FreeAccessControlList();
-    }
 
-    while( fgets( (char *)buf, BUFSIZE, fp ) != (char *)NULL ) {
-	buf[ strlen( (char *)buf )-1 ] = '\0' ;
-	wp = buf ;
-#ifdef INET6
-	if( *wp == '\0' )
-	    continue;
-	else if( *wp == '[' ) {
+    while( fgets(buf, BUFSIZE, fp) != NULL ) {
+        wp = buf ;
+        if ( (p = strchr(wp, '#')) != NULL ) // '#' 1行コメント
+            *p = '\0';
+        wp = skip_space(wp);
+        if ( !*wp )
+            continue;
+
+        if( !(current = (ACLPtr)malloc( sizeof( ACLRec ) )) ) {
+	    PrintMsg("Cound not create access control entry!" ) ;
+	    fclose( fp ) ;
+	    FreeAccessControlList() ;
+            return -1 ;
+        }
+	bzero( current, sizeof( ACLRec ) ) ;
+
+        if( *wp == '[' ) {  // IPv6アドレス
 	    size_t bodylen;
 	    wp++;
 	    p = strchr( wp, ']' );
-	    if( !p )
-		continue;
-	    *( p++ ) = '\0';
-	    if( *p == ':' )
-		p++;
-	    else if( *p != '\0' )
-		continue;
-	    /* ここでの形式チェックは厳密でなくてよい */
+            if( !p ) {
+                fprintf(stderr, "Invalid IPv6 address.\n");
+                free(current);
+                continue;
+            }
+            *p = '\0';
+            /* ここでの形式チェックは厳密でなくてよい */
 	    bodylen = strspn( wp, "0123456789ABCDEFabcdef:." );
-	    if( !bodylen || !( wp[bodylen] == '\0' || wp[bodylen] == '%' )
-		    || strchr( wp, ':' ) == NULL )
-		continue;
-	} else {
-	    p = strchr( wp, ':' );
-	    if( p )
-		*( p++ ) = '\0';
-	    else
-		p = wp + strlen( wp );
-	}
-#else /* !INET6 */
-	if( !strtok( (char *)wp, ":" ) )
-	    continue ;
-	p = wp + strlen( (char *)wp ) + 1;
-#endif /* !INET6 */
+            if ( !bodylen || !(wp[bodylen] == '\0' || wp[bodylen] == '%') ||
+                    strchr(wp, ':') == NULL ) {
+                fprintf(stderr, "Invalid IPv6 address.\n");
+                free(current);
+                continue;
+            }
 
-	if( !(current = (ACLPtr)malloc( sizeof( ACLRec ) )) ) {
-	    PrintMsg("Can't create access control list!!" ) ;
-	    fclose( fp ) ;
-	    FreeAccessControlList() ;
-	    return( -1 ) ;
-	}
+            current->hostname = strndup(wp, p - wp);
+            p++;  // ']' をskip
+        }
+        else { // Hostname or IPv4 address
+            p = wp;
+            while (isalnum(*p) || *p == '.' || *p == '-')
+                p++;
+            // この後ろに来るのは ':' かコメントのみ.
+            if ( p - wp == 0 || (*p && !(isspace(*p) || *p == ':')) ) {
+                fprintf(stderr, "Invalid host name.\n");
+                free(current);
+                continue;
+            }
+            current->hostname = strndup(wp, p - wp);
+        }
 
-	bzero( current, sizeof( ACLRec ) ) ;
-
-	namelen = strlen(wp);
-	current->hostname = malloc(namelen + 1);
-	if (current->hostname) {
-	  strcpy(current->hostname, wp);
-	}
-
-	/* AccessControlListをインターネットアドレスで管理する */
-	/* hosts.cannaからホスト名を求める */
-	/* ホスト名からインターネットアドレスを求めて ACLRecに登録する  */
-	current->hostaddrs = GetAddrListFromName(wp);
-	if (!current->hostaddrs) {
+	/* AccessControlListをインターネットアドレスで管理する.
+           ホスト名からインターネットアドレスを求めて ACLRecに登録する.
+           hostname = "unix" の場合, UNIX ドメインソケットとみなす. */
+        current->hostaddrs = GetAddrListFromName(current->hostname);
+        if (!current->hostaddrs) {
 	  /* アドレスが見つからない場合 */
 	  /* インターネットアドレス表記が間違っているので無視する */
-	  /* hostsにエントリが無いことをメッセージにだした方が良いか */
-	  /* も知れない */
-	  if (current->hostname)
-	    free((char *)current->hostname);
-	  free((char *)current);
-	  continue;
-	}
+            fprintf(stderr, "Warning: Not found IP address: %s\n", current->hostname);
+            free( current->hostname );
+            free( current );
+            continue;
+        }
 	/* 今のところアドレスが重複していてもそのまま覚えておく */
 
-	wp = p;
+        // ユーザ名リストがある場合
+        wp = skip_space(p);
+        if( *wp ) {
+            current->usernames = malloc(strlen(wp) + 1);
+            if ( !current->usernames ) {
+                free( current->hostname ); FreeAddrList(current->hostaddrs);
+                free( current );
+                fclose(fp);
+                return -1;
+            }
 
-	if( strlen( (char *)wp ) ) {
-	    current->usernames = malloc(strlen(wp) + 1);
-	    if (current->usernames) {
-	        strcpy((char *)current->usernames, wp);
-		for( p = current->usernames; *p != '\0'; p++ ) {
-		    if( *p == ',' ) {
-			*p = '\0' ;
-			current->usercnt ++ ;
-		    }
-		}
-		current->usercnt ++ ;
-	    }
-	}
+            char* q = current->usernames;
+            while (1) {
+                p = wp = skip_space(wp);
+
+                // ユーザ名は Portable Filename Character Set
+                while ( *p && (isalnum(*p) || strchr("._-", *p)) )
+                    p++;
+                if ( p - wp == 0 || (*p && !(isspace(*p) || *p == ',')) ) {
+                    fprintf(stderr, "Invalid user name.\n");
+                    if ( (p = strchr(p, ',')) != NULL ) {
+                        p++; // ',' の次
+                        continue;
+                    }
+                    break;
+                }
+
+                memcpy(q, wp, p - wp); q[p - wp] = '\0'; q += (p - wp) + 1;
+                current->usercnt ++ ;
+
+                p = skip_space(p);
+                if ( !*p ) break;
+                else if ( *p == ',' ) {
+                    wp = p + 1; continue;
+                }
+                else {
+                    // カンマなしに次の語.
+                    fprintf(stderr, "Invalid access control entry.\n");
+                    break;
+                }
+            }
+        }
+
 	if( ACLHead ) {
 	    current->prev = prev ;
 	    prev->next = current ;
 	} else {
 	    ACLHead = current ;
-	    current->prev = (ACLPtr)NULL ;
+	    current->prev = NULL ;
 	}
-	current->next = (ACLPtr)NULL ;
+	current->next = NULL ;
 	prev = current ;
     }
 
@@ -790,12 +708,12 @@ CreateAccessControlList()
 static void
 FreeAccessControlList()
 {
-    ACLPtr  wp, tailp = (ACLPtr)NULL;
+    ACLPtr  wp, tailp = NULL;
 
     if( !(wp = ACLHead) )
-	return ;
+        return ;
 
-    for( ; wp != (ACLPtr)NULL; wp = wp->next ) {
+    for( ; wp != NULL; wp = wp->next ) {
 	    if( wp->hostname )
 		free( wp->hostname ) ;
 	    if( wp->usernames )
@@ -804,45 +722,44 @@ FreeAccessControlList()
 	    tailp = wp ;
     }
 
-    for( wp = tailp; wp != (ACLPtr)NULL; wp = wp->prev ) {
+    for ( wp = tailp; wp != NULL; wp = wp->prev ) {
 	if( wp->next )
 	    free( wp->next ) ;
     }
-    ACLHead = (ACLPtr)NULL ;
+    ACLHead = NULL ;
 }
 
+
+// server/session.c から呼び出される.
+// @return 許可する = 0, 許可しない = -1
 int
-CheckAccessControlList(hostaddrp, username)
-Address *hostaddrp;
-const char *username;
+CheckAccessControlList( const struct sockaddr_storage* hostaddrp,
+                        const char *username )
 {
-  int i;
-  char *userp;
-  ACLPtr wp;
+    int i;
+    const char *userp;
+    ACLPtr wp;
 
-  if (!ACLHead) return 0;
+    if (!ACLHead) return 0;
 
-  ir_debug(Dmsg(5, "My name is %s\n", MyName));
+    ir_debug(Dmsg(5, "My name is %s\n", MyName));
 
-  for (wp = ACLHead ; wp ; wp = wp->next) {
+    for (wp = ACLHead ; wp ; wp = wp->next) {
     /* AccessControlListで持っているインタネットアドレスと一致する
        ものをサーチする */
-    if (SearchAddrList(wp->hostaddrs, hostaddrp)) {
-      if (wp->usernames) {
-	for (i = 0, userp = wp->usernames ; i < wp->usercnt ; i++) {
-	  if (!strcmp(userp, username)) {
-	    return 0;
-	  }
-	  userp += strlen(userp) + 1;
-	}
-	return -1;
-      }
-      else {
-	return 0;
-      }
+        if (SearchAddrList(wp->hostaddrs, hostaddrp)) {
+            if ( !wp->usernames )
+                return 0;
+
+            for (i = 0, userp = wp->usernames ; i < wp->usercnt ; i++) {
+                if (!strcmp(userp, username))
+                    return 0;
+                userp += strlen(userp) + 1;
+            }
+            return -1;
+        }
     }
-  }
-  return -1;
+    return -1;
 }
 
 int
@@ -857,10 +774,8 @@ NumberAccessControlList()
   return n;
 }
 
-int
-SetDicHome( client, cxnum )
-ClientPtr client ;
-int cxnum ;
+
+int SetDicHome( ClientPtr client, int cxnum )
 {
     char dichome[ 256 ] ;
 
@@ -898,10 +813,9 @@ int cxnum ;
     return( 1 ) ;
 }
 
+
 ClientPtr *
-get_all_other_clients(self, count)
-ClientPtr self;
-size_t *count;
+get_all_other_clients( ClientPtr self, size_t *count )
 {
     EventMgrIterator curr, end;
     ClientPtr *res, *p;

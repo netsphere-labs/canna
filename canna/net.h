@@ -37,9 +37,9 @@
   #include <sys/socket.h>
   #include <netinet/in.h>
   #include <netdb.h>
-#endif
-#ifdef UNIXCONN
-  #include <sys/un.h>
+  #ifdef UNIXCONN
+    #include <sys/un.h>
+  #endif
 #endif
 #include <arpa/inet.h>
 
