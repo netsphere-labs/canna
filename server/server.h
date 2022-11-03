@@ -79,7 +79,7 @@ typedef struct _ClientStat *ClientStatPtr;
 
 #define LOCAL_BUFSIZE		2048
 
-#ifdef DEBUG
+#ifndef NDEBUG
 #define ir_debug( cannadebug )	 cannadebug
 #else
 #define ir_debug( cannadebug )
@@ -187,8 +187,8 @@ extern int canna_server_lo;
 //#endif
 #define vapro(x) x
 
-#ifdef DEBUG
-void Dmsg vapro((int Pri, const char *f, ...));
+#ifndef NDEBUG
+void Dmsg(int Pri, const char *f, ...);
 #endif /* DEBUG */
 void PrintMsg vapro((const char *f, ...));
 void nomem_msg pro((const char *));

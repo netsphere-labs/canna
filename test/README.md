@@ -44,41 +44,59 @@ Round-trip を確認. Checked.
 
 ## cmd/cannacheck
 
+2022.11.3
 ```
 $ /opt/canna/bin/cannacheck -v
-カスタマイズファイルとして "/opt/canna/var/lib/canna/default.canna" を用います。
-romaji path = /home/hori/.config/canna/default.cbp
+カスタマイズファイルとして "/opt/canna/etc/canna/default.canna" を用います。romaji path = /home/hori/.config/canna/default.cbp
 romaji path = /opt/canna/share/canna/default.cbp
 ローマ字かな変換テーブル: `/opt/canna/share/canna/default.cbp'
-RKC config path=/home/hori/.config/canna/rkc.conf, preproc=/usr/bin/cpp -E -fdirectives-only -nostdinc
-サーバ "unix" に接続します。
+RKC config path=/home/hori/.config/canna/rkc.conf, preproc=LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc
+サーバ "localhost" に接続します。
 RKC�������ե����뤬�����ޤ���
-���ʴ����Ѵ������Ф��̿��Ǥ��ޤ���
+bushu���ޥ����ȤǤ��ޤ����Ǥ���
+keishiki���ޥ����ȤǤ��ޤ����Ǥ���
+hojoswd���ޥ����ȤǤ��ޤ����Ǥ���
+hojomwd���ޥ����ȤǤ��ޤ����Ǥ���
+fuzokugo���ޥ����ȤǤ��ޤ����Ǥ���
+iroha���ޥ����ȤǤ��ޤ����Ǥ���
 ```
 
-下2行は次の文字列:
+下 7行は次の文字列:
 ```
-RKCの設定ファイルがありません      -> これはエラーではない.
-かな漢字変換サーバと通信できません
+RKCの設定ファイルがありません
+bushuをマウントできませんでした
+keishikiをマウントできませんでした
+hojoswdをマウントできませんでした
+hojomwdをマウントできませんでした
+fuzokugoをマウントできませんでした
+irohaをマウントできませんでした
 ```
 
 環境変数 `CANNA_RKC_PREPROCESSOR`
 
 TODO:
- - <s>カスタマイズファイルの場所が /var/lib/ 以下ではおかしい。`/etc/` 以下でないと.</s> 修正済み. ●テスト未了
+ - <s>カスタマイズファイルの場所が /var/lib/ 以下ではおかしい。`/etc/` 以下でないと.</s> 修正済み. default.canna のインストール先も変更.
 
 
 
 ## server/
 
+2022.11.3
 ```
-$ /opt/canna/sbin/cannaserver 
-mkdir() failed: /opt/canna/var/lib/canna/dic/user
-cannaserver:Initialize failed: RkwInitialize()
+$ sudo /opt/canna/sbin/cannaserver -d 100 -inet
+辞書ホームディレクトリィ = /opt/canna/var/lib/canna/dic
+My name is kiwi2.fruits
+今からソケットを作る
+UNIX Socket path: /opt/canna/var/run/canna/IROHA.sock
+UNIX ドメインはできた
+Service: [canna]
+INET ドメインはできた
+ソケットの準備はできた
+select()で待ちを開始
 ```
 
 root で動かせば, 起動はできる.
--> cannacheck から接続できない。アカン.
+ - <s>cannacheck から接続できない.</s> IPソケットでの接続はできた。●●UNIX ドメインソケット未了.
 
 UNIX ドメインソケット
   -p オプションで, ソケットファイルに ":1" などを追加.

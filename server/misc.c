@@ -345,7 +345,7 @@ static void FatalError(const char* f)
 
 #define MAXARGS 10
 
-#ifdef DEBUG
+#ifndef NDEBUG
 
 void Dmsg(int Pri, const char *f, ...)
 {
