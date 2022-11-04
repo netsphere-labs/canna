@@ -30,6 +30,8 @@
   #define STRICT
   #define NOMINMAX
   #include <winsock2.h>
+#else
+  typedef int SOCKET;
 #endif
 
 typedef void (*RkcConfigErrorProc) pro((const char *const *errors));

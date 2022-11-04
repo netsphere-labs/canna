@@ -213,4 +213,4 @@ struct rkcproto {
 
 /* function prototypes .. */
 
-extern int rkc_Connect_Iroha_Server pro((char *));
+extern SOCKET rkc_Connect_Iroha_Server(const char *);

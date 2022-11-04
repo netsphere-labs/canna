@@ -78,6 +78,12 @@ TODO:
  - <s>カスタマイズファイルの場所が /var/lib/ 以下ではおかしい。`/etc/` 以下でないと.</s> 修正済み. default.canna のインストール先も変更.
 
 
+## cmd/cannastat
+
+●●未了
+
+
+
 
 ## server/
 
