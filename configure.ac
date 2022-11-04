@@ -1,7 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.71])
+# mingw: autoconf 2.69
+AC_PREREQ([2.69])
 
 # [FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS]
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
@@ -126,7 +127,7 @@ AC_DEFINE_UNQUOTED(LOCALSTATE_DIR, "${LOCALSTATE_DIR}")
 AC_ARG_ENABLE([unix-socket],
   AS_HELP_STRING([--disable-unix-socket],
       [Disable UNIX domain socket. If use, the argument is the directory they are in. (default:${LOCALSTATE_DIR}/run/canna)]))
-AS_IF([test "x$enable_unix_socket" != "xno"], [
+AS_IF([test "x$enable_unix_socket" != "xno" -a "x$native_win32" = "xno"], [
   AC_DEFINE(USE_UNIX_SOCKET, 1, [Enable UNIX domain socket.])
   AS_IF([test "x$enable_unix_socket" = "x"], [
     AC_DEFINE_UNQUOTED(IR_UNIX_DIR, ["${LOCALSTATE_DIR}/run/canna"], [UNIX domain socket directory.])

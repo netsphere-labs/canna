@@ -67,8 +67,10 @@ static char rcs_id[] = "$Id: wconvert.c,v 1.16.2.1 2004/04/26 21:48:37 aida_s Ex
 
 #include <sys/types.h>
 #include <signal.h>
-#include <sys/socket.h>
-#include <netdb.h> // AI_NUMERICSERV
+#ifndef _WIN32
+  #include <sys/socket.h>
+  #include <netdb.h> // AI_NUMERICSERV
+#endif
 
 #include "canna/net.h"
 
@@ -334,13 +336,9 @@ rkc_build_cannaserver_list( char** list )
     }
 
     /* CANNAHOSTFILE ファイルからリストを作成する */
-#ifdef __EMX__
-    if( (hostfp = fopen( CANNAHOSTFILE, "rt" )) != (FILE *)NULL ) {
-#else
-    if( (hostfp = fopen( CANNAHOSTFILE, "r" )) != (FILE *)NULL ) {
-#endif
-      while( (hostp = fgets( work, MAX_HOSTNAME, hostfp) ) != NULL ) {
-	/* 改行文字をとる */
+    if( (hostfp = fopen(CANNAHOSTFILE, "rt")) != NULL ) {
+        while( (hostp = fgets( work, MAX_HOSTNAME, hostfp) ) != NULL ) {
+            /* 改行文字をとる */
 	work[ strlen( hostp )-1 ] = '\0' ;
 	/* リストに格納する */
 	*listp = (char *)malloc(strlen(work) + 1);
@@ -359,7 +357,7 @@ rkc_build_cannaserver_list( char** list )
 
 /* 引数に NULL ポインタを渡してはいけません。*/
 /* それどころか、十分おおきな配列を渡さなければならないのだ */
-SOCKET rkc_Connect_Iroha_Server( char* hostname )
+SOCKET rkc_Connect_Iroha_Server( const char* hostname )
 {
     char *serverlist[ MAX_LIST ], **listp ;
     int num ;

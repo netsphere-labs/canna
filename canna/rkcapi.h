@@ -17,7 +17,7 @@
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* $Id: rkcapi.h,v 1.2 2003/09/23 07:11:30 aida_s Exp $ */
@@ -25,9 +25,19 @@
 #ifndef RKCAPI_H
 #define RKCAPI_H
 
+#ifdef _WIN32
+  #define WIN32_LEAN_AND_MEAN
+  #define STRICT
+  #define NOMINMAX
+  #include <winsock2.h>
+#endif
+
 typedef void (*RkcConfigErrorProc) pro((const char *const *errors));
-int RkcGetServerFD pro((void));
-int RkcConnectIrohaServer pro((char *servername));
+
+SOCKET RkcGetServerFD(void);
+
+SOCKET RkcConnectIrohaServer(const char* servername);
+
 void RkcListenConfigErrors pro((RkcConfigErrorProc handler));
 int RkcRecvEReply pro((unsigned char *buf, int bufsize,
       int requiredsize, int *len_return));
@@ -38,4 +48,3 @@ int RkcSendWRequest pro((const unsigned char *Buffer, int size));
 int RkwGetProtocolVersion pro((int *majorp, int *minorp));
 
 #endif /* RKCAPI_H */
-/* vim: set sw=2: */

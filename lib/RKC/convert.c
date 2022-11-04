@@ -34,9 +34,12 @@ static char rcs_id[] = "$Id: convert.c,v 1.9.2.1 2004/04/26 21:48:37 aida_s Exp 
 #include "rkc.h"
 #include "server/IRproto.h"
 #include "RKindep/file.h"
-
 #include <sys/types.h>
 #include <signal.h>
+
+#ifndef _WIN32
+  #define closesocket close
+#endif
 
 /* 単語登録で辞書が作れなくなるので、とりあえずコメントアウト
 //#ifdef CANNA_LIGHT
@@ -54,7 +57,7 @@ extern int ushort2eucsize(const cannawc* yomi, int len);
 
 #ifdef USE_EUC_PROTOCOL
 
-extern int ServerFD ;
+extern SOCKET ServerFD ;
 extern unsigned int ServerTimeout ;
 
 #define SENDBUFSIZE 1024
@@ -100,10 +103,10 @@ printproto(char* p, int n)
 }
 
 static void
-probe(char* format, int n, char* p)
+probe(const char* format, int n, char* p)
 {
-  printf(format, n);
-  printproto(p, n);
+    printf(format, n);
+    printproto(p, n);
 }
 #else /* !DEBUGPROTO */
 #define probe(a, b, c)
@@ -127,8 +130,8 @@ probe(char* format, int n, char* p)
 int
 RkcRecvEReply(BYTE* buf, int bufsize, int requiredsize, int* len_return)
 {
-  int empty_count = 0, bufcnt = 0, readlen;
-  unsigned rest = (unsigned)bufsize;
+    int empty_count = 0, bufcnt = 0, readlen;
+    int rest = bufsize;
   BYTE *bufptr = buf;
   struct timeval timeout, timeout2;
   rki_fd_set rfds, rfds2;
@@ -140,9 +143,9 @@ RkcRecvEReply(BYTE* buf, int bufsize, int requiredsize, int* len_return)
 
   errno = 0;
 
-  empty_count = 0;
-  do {
-    timeout2 = timeout;
+    empty_count = 0;
+    do {
+        timeout2 = timeout;
     rfds2 = rfds;
     if (ServerTimeout) {
       int r = select(ServerFD + 1, &rfds2, NULL, NULL, &timeout2);
@@ -155,7 +158,7 @@ RkcRecvEReply(BYTE* buf, int bufsize, int requiredsize, int* len_return)
 	  break;
       }
     }
-    readlen = read(ServerFD, (char *)bufptr, rest);
+    readlen = recv(ServerFD, (char*) bufptr, rest, 0);
     if (readlen < 0) {
       if (errno == EINTR) {
 	continue;
@@ -179,7 +182,7 @@ RkcRecvEReply(BYTE* buf, int bufsize, int requiredsize, int* len_return)
 
   if (bufcnt == 0 || (requiredsize && bufcnt < requiredsize)) {
     errno = EPIPE;
-    close(ServerFD);
+    closesocket(ServerFD);
     return NO;
   }
   else {
@@ -200,10 +203,12 @@ static void DoSomething(int sig)
 int
 RkcSendERequest( const BYTE* Buffer, int size )
 {
-    register int todo, retval = YES;
-    register int write_stat;
-    register const BYTE *bufindex;
+    int todo, retval = YES;
+    int write_stat;
+    const BYTE *bufindex;
+#ifndef _WIN32
     void (*Sig)(int);
+#endif
     struct timeval timeout, timeout2;
     rki_fd_set wfds, wfds2;
 
@@ -215,9 +220,11 @@ RkcSendERequest( const BYTE* Buffer, int size )
     errno = 0 ;
     bufindex = Buffer ;
     todo = size ;
+#ifndef _WIN32
     Sig = signal(SIGPIPE, SIG_IGN);
     if ( Sig == SIG_ERR )
         return NO;
+#endif
 
     while (size) {
 	timeout2 = timeout;
@@ -236,7 +243,7 @@ RkcSendERequest( const BYTE* Buffer, int size )
 	  }
 	}
 
-        write_stat = write(ServerFD, (char *)bufindex, (unsigned)todo);
+        write_stat = send(ServerFD, (char*) bufindex, todo, 0);
 	if (write_stat >= 0) {
 	    size -= write_stat;
 	    todo = size;
@@ -262,11 +269,13 @@ RkcSendERequest( const BYTE* Buffer, int size )
     }
     goto last;
 fail:
-    close( ServerFD ) ;
+    closesocket( ServerFD ) ;
     retval = NO;
     errno = EPIPE ;
 last:
+#ifndef _WIN32
     signal(SIGPIPE, Sig);
+#endif
     return retval;
 }
 
@@ -627,16 +636,17 @@ firstKouhoStore( int n, RkcContext* cx, BYTE* data, int datalen)
     return res;
 }
 
+
 static long
-rkc_initialize( char* username )
+rkc_initialize( const char* username )
 {
-  long reply;
-  long len = strlen( (char *)username ) + 1 ;
+    long reply;
+    long len = strlen(username ) + 1 ;
 
   if (SendType0Request((long) IR_INIT, len, (BYTE *)username) &&
       RecvType0Reply(&reply)) {
     if (reply < 0) {
-      close(ServerFD);
+        closesocket(ServerFD);
     }
     return reply;
   }
@@ -655,12 +665,13 @@ int Fin_Create( int request )
   return -1;
 }
 
+
 static
 int rkc_finalize()
 {
-  int retval = Fin_Create(IR_FIN);
-  (void)close(ServerFD);
-  return retval;
+    int retval = Fin_Create(IR_FIN);
+    closesocket(ServerFD);
+    return retval;
 }
 
 static

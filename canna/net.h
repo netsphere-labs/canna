@@ -40,7 +40,7 @@
   #ifdef UNIXCONN
     #include <sys/un.h>
   #endif
+  #include <arpa/inet.h>
 #endif
-#include <arpa/inet.h>
 
 #endif /* NET_H */

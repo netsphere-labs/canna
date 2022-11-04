@@ -60,10 +60,18 @@ static char rcs_id[] = "$Id: rkc.c,v 1.12 2003/09/24 15:01:07 aida_s Exp $";
 #include "RKindep/ecfuncs.h"
 
 #include    <sys/types.h>
+#include <stdio.h>
 #ifndef _WIN32
   #include    <pwd.h>
   #include    <grp.h>
   #include    <unistd.h>
+  #define closesocket close
+#else
+  #define WIN32_LEAN_AND_MEAN
+  #define STRICT
+  #define NOMINMAX
+  #include <windows.h>
+  #include <lmcons.h> // UNLEN
 #endif
 #include    <signal.h>
 #include <assert.h>
@@ -94,7 +102,8 @@ rkc_call_flag = 0x00   ; /* RkInitializeが呼ばれてRkFinalizeが呼ばれる
 
 static short ProtocolMinor = 0 ;
 static short ProtocolMajor = 0;
-static int ServerFD = 0;					/* S004 */
+
+static SOCKET ServerFD = INVALID_SOCKET;					/* S004 */
 
 extern struct rkcproto wideproto;
 #ifdef USE_EUC_PROTOCOL
@@ -245,7 +254,7 @@ static RkUserInfo* uinfo = NULL;
 
 // lib/canna/henkan.c, lib/canna/kctrl.c から呼び出される. -> クライアント側
 // @return 成功 1, 失敗 0
-int RkwSetUserInfo( const char* user, const char* group, const char* /*topdir*/)
+int RkwSetUserInfo( const char* user, const char* group, const char* topdir )
 {
     if ( !user || !group )
         return 0;
@@ -263,18 +272,27 @@ int RkwSetUserInfo( const char* user, const char* group, const char* /*topdir*/)
 }
 
 
+// @return ユーザ名. 静的領域を指す. 解放してはならない.
 static const char* FindUserName()
 {
     if (uinfo)
         return uinfo->uname;
 
+#ifndef _WIN32
     struct passwd *pass = getpwuid(getuid()); // 実ユーザ getuid() でよい.
     if( pass )
         return pass->pw_name;
 
     // logname コマンドは LOGNAME 環境変数を無視する. 使うべきではない.
-    char* username = NULL;
+    //char* username = NULL;
     return getlogin();
+#else
+    static char buf[UNLEN + 1];
+    DWORD siz = sizeof(buf);
+    GetUserName(buf, &siz);
+
+    return buf;
+#endif
 }
 
 
@@ -283,11 +301,28 @@ static const char* FindGroupName()
     if (uinfo)
         return uinfo->gname;
 
+#ifndef _WIN32
     struct group *gr = getgrgid(getgid()) ;
     if (gr && gr->gr_name)
         return gr->gr_name;
 
     return NULL;
+#else
+    // 環境変数 USERDOMAIN が簡単だが...
+    static char buf[300];
+    DWORD siz = sizeof(buf);
+    DWORD sidLen = 0;
+    SID_NAME_USE snu;
+    LookupAccountName(NULL,           // lpSystemName
+                      FindUserName(), // lpAccountName
+                      NULL,
+                      &sidLen,
+                      buf,
+                      &siz,
+                      &snu);
+    fprintf(stderr, "DEBUG: domain name = %s\n", buf);
+    return buf;
+#endif
 }
 
 
@@ -326,7 +361,8 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
         strcpy(ServerNameSpecified, hostname);
     }
 
-    if( (ServerFD = rkc_Connect_Iroha_Server( ConnectIrohaServerName )) < 0 ) { /* S004 */
+    if( (ServerFD = rkc_Connect_Iroha_Server(ConnectIrohaServerName)) ==
+                INVALID_SOCKET ) { /* S004 */
 	errno = EPIPE ;
         goto init_err;
     }
@@ -376,10 +412,10 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     RkcFree(data);
 
     if (!*ProtoVerTbl[i]) {
-      freeCC(cx->client);
-      errno = EPIPE;
-      (void)close(ServerFD);
-      goto init_err;
+        freeCC(cx->client);
+        errno = EPIPE;
+        closesocket(ServerFD);
+        goto init_err;
     }
 
     /* サーバのマイナーバージョンを得る */
@@ -403,15 +439,11 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     return -1;
 }
 
-/*
- *  RkwFinalize ()
- *
- *  Description:
- *  -----------
+
+/**
  *  かな漢字変換の終了
  */
-void
-RkwFinalize()
+void RkwFinalize()
 {
     int i ;
 
@@ -1451,20 +1483,19 @@ RkwGetServerVersion( int* majorp, int* minorp)
 }
 
 							/* begin:S004 */
-int
-RkcGetServerFD()
+SOCKET RkcGetServerFD()
 {
-    return( ServerFD );
+    return ServerFD ;
 }
 
-int
-G070_RkcGetServerFD()
+SOCKET G070_RkcGetServerFD()
 {
-    return( ServerFD );
+    return ServerFD ;
 }
 
-int
-RkcConnectIrohaServer( char* servername )
+
+SOCKET
+RkcConnectIrohaServer( const char* servername )
 {
     /* XXX:
      * RkcDisconnectIrohaServerに相当するインターフェースが無いので、
@@ -1473,11 +1504,12 @@ RkcConnectIrohaServer( char* servername )
      * ことにする。
      */
     rkc_configure();
-    return( rkc_Connect_Iroha_Server( servername ) );
+    return rkc_Connect_Iroha_Server(servername) ;
 }
 							/* end:S004 */
-int
-G069_RkcConnectIrohaServer( char* servername )
+
+SOCKET
+G069_RkcConnectIrohaServer( const char* servername )
 {
     return RkcConnectIrohaServer(servername);
 }
