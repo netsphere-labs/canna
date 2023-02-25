@@ -66,7 +66,11 @@ int main(int argc, char* argv[], char* envp[])
   jrKanjiControl(0, KC_SETVERBOSE,
                  (char *)(intptr_t)(IROHA_verbose ?
 				CANNA_FULL_VERBOSE : CANNA_HALF_VERBOSE));
-  if (jrKanjiControl(0, KC_INITIALIZE, (char *)&warn) != -1) {
+
+    if (jrKanjiControl(0, KC_INITIALIZE, (char *)&warn) < 0) {
+        printf("KC_INITIALIZE failed.\n");
+        return 1;
+    }
     if (IROHA_verbose) {
       char *p;
 
@@ -84,5 +88,4 @@ int main(int argc, char* argv[], char* envp[])
       }
     }
     jrKanjiControl(0, KC_FINALIZE, (char *)0);
-  }
 }

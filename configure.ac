@@ -8,7 +8,7 @@ AC_PREREQ([2.69])
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([WHATIS.jp])
-# manual によれば -Wcategory が書けるはずだが, 反映されない.
+# Manual によれば <code>-W<var>category</var></code> が書けるはずだが, 反映されない.
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS([config.h])
@@ -93,7 +93,7 @@ AS_CASE(["$CC"],
     AC_SUBST(CANNA_PP, "LANG=C /usr/bin/cpp -E -fdirectives-only -nostdinc")
     # ICE with -fstack-clash-protection. gcc 10.2 on mingw.
     # -Wformat=2 includes -Wformat-security
-    CFLAGS="$CFLAGS -std=c11 -Wall -Wextra -Wshadow -Wformat=2 -Wformat-truncation -Wundef -fno-common -Wcast-align -Wwrite-strings -Wstrict-prototypes -pedantic -Wno-long-long -Wno-unused-parameter -fstack-protector-strong "  
+    CFLAGS="$CFLAGS -std=c11 -Wall -Wextra -Wshadow -Wformat=2 -Wformat-truncation -Wundef -fno-common -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wno-unused-parameter -fstack-protector-strong "  
     ],
   [AC_MSG_ERROR([Unknown C compiler.])]
   )

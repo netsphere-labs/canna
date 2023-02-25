@@ -38,8 +38,10 @@
 
 RCSID("$Id: file.c,v 1.3 2003/09/24 14:50:40 aida_s Exp $");
 
-// @param mode  非0 = into non-blocking mode.
-// @return If failed, -1.
+/**
+ * @param mode  非0 = into non-blocking mode.
+ * @return If failed, -1.
+ */
 int non_blocking( SOCKET sock, int mode )
 {
     assert( sock != INVALID_SOCKET );
@@ -49,7 +51,7 @@ int non_blocking( SOCKET sock, int mode )
     return fcntl(sock, F_SETFL,
                  mode ? (oldflags | O_NONBLOCK) : (oldflags & ~O_NONBLOCK) );
 #else
-    // Windows では「現在のモード」を得る方法はない!
+    // Windows では「現在のモード」を得る方法はない
     u_long iMode = mode ? 1 : 0;
     int iResult = ioctlsocket( sock, FIONBIO, &iMode);
     if ( iResult != NO_ERROR )

@@ -38,8 +38,6 @@
 #endif
 #include <errno.h>
 
-//#include "sysdep.h"
-
 #if defined(HAVE_STRCHR) && !defined(HAVE_INDEX) && !defined(index)
 # define index(s, c) strchr(s, c)
 # define rindex(s, c) strrchr(s, c)

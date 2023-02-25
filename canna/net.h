@@ -29,10 +29,6 @@
 #include "ccompat.h"
 
 #include <sys/types.h>
-//#include <net/socket.h>
-//#include <net/in.h>
-//#include <net/netdb.h>
-//#include <net/un.h>
 #ifndef _WIN32
   #include <sys/socket.h>
   #include <netinet/in.h>

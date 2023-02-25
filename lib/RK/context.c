@@ -186,6 +186,8 @@ _RkInitialize(const char* ddhome, int numCache)
   return con;
 }
 
+
+// サーバ側: かな漢字変換の初期化.
 int
 RkwInitialize( const char* ddhome )
 {
@@ -194,7 +196,7 @@ RkwInitialize( const char* ddhome )
    * Cache:	36B*512 	= 20KB
    * Heap:	30*1024B	= 30KB
    */
-  return(ddhome ? _RkInitialize(ddhome, 512*10) : -1);
+  return ddhome ? _RkInitialize(ddhome, 512*10) : -1;
 }
 
 /* RkFinalize: Renbunsetu henkan shuuryou shori
@@ -938,57 +940,3 @@ RkwDeleteDic(int cx_num, char* name, cannawc* word)
   }
   return(-1);
 }
-
-
-#if 0 // def STANDALONE /* The following code is as simulating the code in
- lib/RKC API.  In case STANDALONE, it becomes possible for libRK to be
- linked with libcanna directly. */
-
-int RkwSetAppName pro((int, char *));
-
-int
-RkwSetAppName(Context, name)
-int Context;
-char *name;
-{
-  return 0;
-}
-
-char *RkwGetServerName pro((void));
-
-char *
-RkwGetServerName()
-{
-  return (char *)NULL;
-}
-
-int RkwGetProtocolVersion pro((int *, int *));
-
-int
-RkwGetProtocolVersion(majorp, minorp)
-int *majorp, *minorp;
-{
-    *majorp = CANNA_MAJOR_MINOR / 1000;
-    *minorp = CANNA_MAJOR_MINOR % 1000;
-    return 0;
-}
-
-int RkwGetServerVersion(int *, int *);
-
-int
-RkwGetServerVersion(majorp, minorp)
-int *majorp, *minorp;
-{
-  *majorp = CANNA_MAJOR_MINOR / 1000;
-  *minorp = CANNA_MAJOR_MINOR % 1000;
-  return 0;
-}
-
-
-int
-RkwSetUserInfo(const char* user, const char* group, const char* topdir)
-{
-  return 1;
-}
-
-#endif /* STANDALONE */

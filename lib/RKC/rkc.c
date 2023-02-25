@@ -118,7 +118,7 @@ static struct rkcproto *RKCP = &wideproto;
 static short PROTOCOL = 0 ;
 
 static char ConnectIrohaServerName[ MAX_HOSTNAME + 1 ];
-static char *ServerNameSpecified;
+static char *ServerNameSpecified = NULL;
 static RkcConfigErrorProc config_error_handler;
 
 /*
@@ -329,12 +329,12 @@ static const char* FindGroupName()
 
 
 /**
- * かな漢字変換の初期化: サーバに接続する.
+ * クライアント側: かな漢字変換の初期化: サーバに接続する.
  *
  * @return   0 or -1
  */
 int
-RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き数を無視する */
+RkwInitialize( const char* hostname )
 {
     int    i;
     long  server ;
@@ -342,7 +342,7 @@ RkwInitialize( const char* hostname ) /* とりあえずrkcの場合は、引き
     const char* username;
     char *data ;
 
-    if( rkc_call_flag == BUSY )
+    if( rkc_call_flag == BUSY )  // 意味は BUSY ではなく接続済み.
         return 0;
 
     rkc_configure();
@@ -533,19 +533,13 @@ RkwKillServer()
 
 }
 
-/*
- *  RkwCreateContext ()
- *
- *  Description:
- *  -----------
+
+/**
  *  新しいコンテクストの作成
  *
- *  Returns:
- *  -------
- *  コンテクスト番号 or -1
+ * @return コンテクスト番号 or -1
  */
-int
-RkwCreateContext()
+int RkwCreateContext()
 {
     int    server ;
     RkcContext *cx ;
@@ -1456,8 +1450,8 @@ RkwGetStat(int cxnum, RkStat* stat)
     return( ret ) ;
 }
 
-char *
-RkwGetServerName()
+
+char* RkwGetServerName()
 {
   if (ConnectIrohaServerName[0]) {
     return( ConnectIrohaServerName ) ;
@@ -1467,16 +1461,18 @@ RkwGetServerName()
   }
 }
 
-int
-RkwGetProtocolVersion( int* majorp, int* minorp)
+
+int RkwGetProtocolVersion( int* majorp, int* minorp)
 {
+    assert(majorp); assert(minorp);
+
     *majorp = ProtocolMajor;
     *minorp = ProtocolMinor;
     return 0;
 }
 
-exp(int)
-RkwGetServerVersion( int* majorp, int* minorp)
+
+int RkwGetServerVersion( int* majorp, int* minorp)
 {
     if( !PROTOCOL )
 	return( RkwGetProtocolVersion(majorp, minorp) );

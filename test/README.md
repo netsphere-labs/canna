@@ -41,8 +41,9 @@ Round-trip を確認. Checked.
 
 
 
+## クライアントユーティリティ
 
-## cmd/cannacheck
+### cmd/cannacheck
 
 2022.11.3
 ```
@@ -75,12 +76,18 @@ irohaをマウントできませんでした
 環境変数 `CANNA_RKC_PREPROCESSOR`
 
 TODO:
- - <s>カスタマイズファイルの場所が /var/lib/ 以下ではおかしい。`/etc/` 以下でないと.</s> 修正済み. default.canna のインストール先も変更.
+ - <s>カスタマイズファイルの場所が `/var/lib/` 以下ではおかしい。`/etc/` 以下でないと.</s> 修正済み. `default.canna` のインストール先も変更.
 
 
-## cmd/cannastat
+### cmd/cannastat
 
 ●●未了
+
+
+### cmd/cshost
+
+●●未了
+
 
 
 
@@ -89,7 +96,7 @@ TODO:
 
 2022.11.3
 ```
-$ sudo /opt/canna/sbin/cannaserver -d 100 -inet
+$ <kbd>sudo /opt/canna/sbin/cannaserver -d 100 -inet</kbd>
 辞書ホームディレクトリィ = /opt/canna/var/lib/canna/dic
 My name is kiwi2.fruits
 今からソケットを作る
@@ -107,9 +114,10 @@ root で動かせば, 起動はできる.
 UNIX ドメインソケット
   -p オプションで, ソケットファイルに ":1" などを追加.
 IPソケット
-  -- ポート番号は   -p port  .. Original はポート番号に加算する数字. 謎過ぎる.
-  指定がない場合, `/etc/services` からポート番号を取得.
-  それもない場合, default port number 5680
+  Original はポート番号に加算する数字. 謎過ぎる. 次のようにした:
+    - ポート番号を指定  <kbd>-p port</kbd>
+    - 指定がない場合, `/etc/services` からポート番号を取得.
+    - それもない場合, default port number 5680
 
 
 
@@ -123,3 +131,16 @@ TODO: RKindep のソースコードファイルを取り込んでいるが、単
  - cmd/canlisp が不味い. ほかは問題なさそう.
 
 
+接続先サーバの決定方法
+
+cmd/cannastat.c -> RkwInitialize(hostname)
+
+<s>lib/RK/context.c:RkwInitialize( const char* ddhome )</s>  // ×これはサーバ側
+
+lib/RKC/rkc.c:RkwInitialize( const char* hostname )
+  -> 大域変数 ServerNameSpecified にホスト名保存
+     -> rkc_Connect_Iroha_Server(ConnectIrohaServerName)
+
+lib/RKC/wconvert.c:SOCKET rkc_Connect_Iroha_Server( const char* hostname_port )
+  -> rkc_build_cannaserver_list( listp ) ;
+     ●●接続先を複数、収集して、リストを作る。複数の接続先というのはどういう意味か?
