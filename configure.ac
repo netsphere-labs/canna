@@ -1,8 +1,9 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# mingw: autoconf 2.69
-AC_PREREQ([2.69])
+# mingw: autoconf 2.71
+# Fedora 37: autoconf 2.71
+AC_PREREQ([2.71])
 
 # [FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS]
 AC_INIT([canna],[3.7p3-q1],[hisashi dot horikawa at gmail dot com])
